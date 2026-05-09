@@ -3,13 +3,28 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:page-health": "node scripts/run-page-health-smoke-test.js",
+    "test:copy-integrity": "node scripts/run-copy-integrity-smoke-test.js",
+    "test:deposit-lifecycle": "node scripts/run-deposit-lifecycle-smoke-test.js",
+    "test:withdrawal-lifecycle": "node scripts/run-withdrawal-lifecycle-smoke-test.js",
+    "test:escrow-lifecycle": "node scripts/run-escrow-lifecycle-smoke-test.js",
+    "test:notification-lifecycle": "node scripts/run-notification-lifecycle-smoke-test.js",
+    "test:service-simulation": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-overnight-service-simulation.ps1",
+    "prisma:generate": "prisma generate",
+    "prisma:validate": "prisma validate",
+    "prisma:migrate": "prisma migrate dev"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "next": "16.2.4",
+    "pg": "^8.20.0",
+    "prisma": "^7.8.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

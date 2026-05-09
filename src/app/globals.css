@@ -1,26 +1,151 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary: #00c2ff;
+  --color-primary-hover: #22e1ff;
+  --color-bg: #f8fafc;
+  --color-card: #ffffff;
+  --color-card-soft: #f1f5f9;
+  --color-control: #ffffff;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-success: #22c55e;
+  --color-warning: #facc15;
+  --color-danger: #ef4444;
+  --color-border: rgba(15, 23, 42, 0.12);
+  --color-border-soft: rgba(15, 23, 42, 0.08);
+  --color-shadow: rgba(15, 23, 42, 0.08);
+
+  --gg-accent: var(--color-primary);
+  --gg-accent-hover: var(--color-primary-hover);
+  --background: var(--color-bg);
+  --foreground: var(--color-text-primary);
+  --gg-page-bg: var(--color-bg);
+  --gg-header-bg: rgba(255, 255, 255, 0.96);
+  --gg-card-bg: var(--color-card);
+  --gg-card-soft-bg: var(--color-card-soft);
+  --gg-control-bg: var(--color-control);
+  --gg-border: var(--color-border);
+  --gg-border-soft: var(--color-border-soft);
+  --gg-text: var(--color-text-primary);
+  --gg-muted: var(--color-text-secondary);
+  --gg-subtle: #94a3b8;
+  --gg-inverse-text: #ffffff;
+  --gg-shadow: var(--color-shadow);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: Consolas, "Courier New", monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+a,
+button,
+select,
+input,
+textarea {
+  -webkit-tap-highlight-color: color-mix(in srgb, var(--gg-accent) 18%, transparent);
+}
+
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--gg-accent);
+  outline-offset: 3px;
+}
+
+a:active,
+button:active {
+  filter: brightness(0.98);
+}
+
+@layer utilities {
+  .bg-white,
+  .bg-slate-50,
+  .bg-\[\#ffffff\] {
+    background-color: var(--gg-card-bg) !important;
+  }
+
+  .bg-white\/70,
+  .bg-white\/80,
+  .bg-white\/95 {
+    background-color: color-mix(in srgb, var(--gg-card-bg) 88%, transparent) !important;
+  }
+
+  .bg-\[\#f3f4f6\],
+  .bg-\[\#f4f6f8\],
+  .bg-\[\#f5f6f8\],
+  .bg-\[\#f8fafc\] {
+    background-color: var(--gg-page-bg) !important;
+  }
+
+  .text-\[\#111827\],
+  .text-slate-950,
+  .text-slate-900 {
+    color: var(--gg-text) !important;
+  }
+
+  .text-\[\#6b7280\],
+  .text-\[\#9ca3af\],
+  .text-slate-700,
+  .text-slate-600,
+  .text-slate-500,
+  .text-slate-400 {
+    color: var(--gg-muted) !important;
+  }
+
+  .border-\[\#e5e7eb\],
+  .border-\[\#d8dde5\],
+  .border-slate-200,
+  .border-slate-300 {
+    border-color: var(--gg-border) !important;
+  }
+
+  .shadow-slate-200\/80,
+  .shadow-slate-200,
+  .shadow-sm,
+  .shadow-lg,
+  .shadow-xl {
+    --tw-shadow-color: var(--gg-shadow) !important;
+  }
+
+  .bg-\[var\(--gg-accent\)\],
+  .file\:bg-\[var\(--gg-accent\)\]::file-selector-button {
+    color: var(--gg-inverse-text) !important;
+  }
+
+  .rounded-2xl {
+    border-radius: 12px !important;
+  }
+}
+
+
+@layer utilities {
+  .bg-slate-950,
+  .bg-black {
+    background-color: var(--gg-accent) !important;
+    color: var(--gg-inverse-text) !important;
+  }
+
+  .hover\:bg-slate-800:hover,
+  .hover\:bg-black:hover {
+    background-color: var(--gg-accent-hover) !important;
+    color: var(--gg-inverse-text) !important;
+  }
 }

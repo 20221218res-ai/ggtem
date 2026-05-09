@@ -1,0 +1,783 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  CUSTOMER
+  SELLER
+  CS
+  MODERATOR
+  FINANCE
+  ADMIN
+  SUPER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  SELLING_RESTRICTED
+  WITHDRAWAL_HOLD
+  BANNED
+}
+
+enum ListingCategory {
+  GAME_MONEY
+  GAME_ITEM
+  GAME_ACCOUNT
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  SOLD_OUT
+  HIDDEN
+  REMOVED
+}
+
+enum OrderStatus {
+  REQUESTED
+  ESCROW_LOCKED
+  SELLER_RESPONSE_PENDING
+  DELIVERY_IN_PROGRESS
+  DELIVERY_COMPLETED
+  BUYER_CONFIRM_PENDING
+  COMPLETED
+  CANCELED
+  DISPUTED
+  REFUNDED
+}
+
+enum BuyRequestStatus {
+  ACTIVE
+  ACCEPTED
+  EXPIRED
+  CANCELED
+  COMPLETED
+}
+
+enum WalletLedgerType {
+  ADMIN_DEPOSIT_APPROVED
+  BUYER_ESCROW_LOCKED
+  ORDER_CANCELED_REFUND
+  ORDER_COMPLETED_RELEASE_TO_SELLER
+  PLATFORM_FEE_COLLECTED
+  PREMIUM_PROMOTION_PURCHASED
+  SETTLEMENT_AVAILABLE
+  BUY_REQUEST_LOCKED
+  BUY_REQUEST_RELEASED
+  WITHDRAWAL_REQUESTED
+  WITHDRAWAL_COMPLETED
+  WITHDRAWAL_REJECTED
+  DISPUTE_REFUND
+  DISPUTE_RELEASE
+  ADMIN_ADJUSTMENT
+}
+
+enum LedgerDirection {
+  CREDIT
+  DEBIT
+}
+
+enum WalletBucket {
+  AVAILABLE
+  ESCROW_LOCKED
+  BUY_REQUEST_LOCKED
+  PENDING_SETTLEMENT
+  WITHDRAWABLE
+  WITHDRAWAL_LOCKED
+  PLATFORM_REVENUE
+}
+
+enum DepositStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  EXPIRED
+  CANCELED
+}
+
+enum WithdrawalStatus {
+  REQUESTED
+  UNDER_REVIEW
+  APPROVED
+  SENT
+  COMPLETED
+  REJECTED
+  CANCELED
+}
+
+enum WithdrawalChain {
+  TRC20
+  BEP20
+}
+
+enum NotificationType {
+  CHAT_MESSAGE
+  ORDER_STATUS
+  DISPUTE_UPDATE
+  WALLET_UPDATE
+  SYSTEM
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  displayName        String
+  passwordHash       String?
+  emailVerifiedAt    DateTime?
+  role               UserRole            @default(CUSTOMER)
+  status             UserStatus          @default(ACTIVE)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  wallet             Wallet?
+  listings           Listing[]           @relation("SellerListings")
+  buyRequests        BuyRequest[]        @relation("BuyerBuyRequests")
+  buyRequestOffers   BuyRequestOffer[]   @relation("SellerBuyRequestOffers")
+  buyerOrders        Order[]             @relation("BuyerOrders")
+  sellerOrders       Order[]             @relation("SellerOrders")
+  reviewsGiven       OrderReview[]       @relation("OrderReviewBuyer")
+  reviewsReceived    OrderReview[]       @relation("OrderReviewSeller")
+  depositRequests    DepositRequest[]    @relation("DepositRequester")
+  withdrawalRequests WithdrawalRequest[] @relation("WithdrawalRequester")
+  adminAuditLogs     AdminAuditLog[]     @relation("AdminActor")
+  adminNotesReceived AdminUserNote[]     @relation("AdminUserNoteTarget")
+  adminNotesAuthored AdminUserNote[]     @relation("AdminUserNoteAuthor")
+  adminGameNotes     AdminGameNote[]     @relation("AdminGameNoteAuthor")
+  slaIncidentNotes   AdminSlaIncidentNote[] @relation("AdminSlaIncidentNoteAuthor")
+  reportsMade        TrustReport[]       @relation("TrustReportReporter")
+  reportsReceived    TrustReport[]       @relation("TrustReportTarget")
+  sessions           Session[]
+  passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  adminInviteTokens  AdminInviteToken[] @relation("AdminInviteUser")
+  adminInvitesCreated AdminInviteToken[] @relation("AdminInviteCreator")
+  buyerChatRooms     ChatRoom[]          @relation("BuyerChatRooms")
+  sellerChatRooms    ChatRoom[]          @relation("SellerChatRooms")
+  sentChatMessages   ChatMessage[]       @relation("SenderChatMessages")
+  notifications      Notification[]
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  userId      String
+  token       String   @unique
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model LoginAttempt {
+  id            String    @id @default(cuid())
+  email         String
+  ipKey         String
+  failedCount   Int       @default(0)
+  lockedUntil   DateTime?
+  lastFailedAt  DateTime?
+  lastSuccessAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([email, ipKey])
+  @@index([email, lockedUntil])
+  @@index([ipKey, lockedUntil])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model AdminInviteToken {
+  id          String    @id @default(cuid())
+  userId      String
+  createdById String?
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  usedAt      DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  user        User      @relation("AdminInviteUser", fields: [userId], references: [id], onDelete: Cascade)
+  createdBy   User?     @relation("AdminInviteCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([userId, expiresAt])
+  @@index([createdById, createdAt])
+}
+
+model Wallet {
+  id                  String              @id @default(cuid())
+  userId              String              @unique
+  currency            String              @default("USDT")
+  availableBalance    Decimal             @default(0) @db.Decimal(18, 6)
+  escrowLockedBalance Decimal             @default(0) @db.Decimal(18, 6)
+  buyRequestLocked    Decimal             @default(0) @db.Decimal(18, 6)
+  pendingSettlement   Decimal             @default(0) @db.Decimal(18, 6)
+  withdrawableBalance Decimal             @default(0) @db.Decimal(18, 6)
+  withdrawalLocked    Decimal             @default(0) @db.Decimal(18, 6)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  user                User                @relation(fields: [userId], references: [id])
+  ledgerEntries       WalletLedgerEntry[]
+  depositRequests     DepositRequest[]
+  withdrawalRequests  WithdrawalRequest[]
+}
+
+model WalletLedgerEntry {
+  id            String           @id @default(cuid())
+  walletId      String
+  userId        String
+  type          WalletLedgerType
+  direction     LedgerDirection
+  bucket        WalletBucket
+  amount        Decimal          @db.Decimal(18, 6)
+  currency      String           @default("USDT")
+  referenceType String?
+  referenceId   String?
+  memo          String?
+  createdAt     DateTime         @default(now())
+  wallet        Wallet           @relation(fields: [walletId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([referenceType, referenceId])
+}
+
+model Game {
+  id            String          @id @default(cuid())
+  name          String          @unique
+  code          String          @unique
+  moneyUnitName String          @default("게임머니")
+  imageUrl         String?
+  imageStoragePath String?
+  imageAlt         String?
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  servers       GameServer[]
+  listings      Listing[]
+  adminNotes AdminGameNote[]
+}
+
+model GameServer {
+  id       String    @id @default(cuid())
+  gameId   String
+  name     String
+  code     String
+  isActive Boolean   @default(true)
+  game     Game      @relation(fields: [gameId], references: [id])
+  listings Listing[]
+
+  @@unique([gameId, code])
+}
+
+model Listing {
+  id          String            @id @default(cuid())
+  sellerId    String
+  gameId      String
+  serverId    String?
+  category    ListingCategory
+  accountTransferType String?
+  title       String
+  description String?
+  unitPrice   Decimal           @db.Decimal(18, 6)
+  currency    String            @default("USDT")
+  status      ListingStatus      @default(ACTIVE)
+  premiumStartedAt DateTime?
+  premiumEndsAt    DateTime?
+  premiumDurationHours Int?
+  premiumFeeAmount Decimal?      @db.Decimal(18, 6)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  seller      User              @relation("SellerListings", fields: [sellerId], references: [id])
+  game        Game              @relation(fields: [gameId], references: [id])
+  server      GameServer?       @relation(fields: [serverId], references: [id])
+  inventory   ListingInventory?
+  orders      Order[]
+  images      ListingImage[]
+  buyRequestOffers BuyRequestOffer[]
+
+  @@index([sellerId, status])
+  @@index([gameId, serverId, category, status])
+  @@index([category, accountTransferType])
+  @@index([premiumEndsAt])
+}
+
+model ListingImage {
+  id          String   @id @default(cuid())
+  listingId    String
+  imageUrl     String
+  storagePath  String
+  altText      String?
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  listing      Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, sortOrder])
+}
+
+model ListingInventory {
+  id                String   @id @default(cuid())
+  listingId         String   @unique
+  totalQuantity     Decimal  @db.Decimal(24, 6)
+  minimumQuantity   Decimal  @default(1) @db.Decimal(24, 6)
+  availableQuantity Decimal  @db.Decimal(24, 6)
+  lockedQuantity    Decimal  @default(0) @db.Decimal(24, 6)
+  soldQuantity      Decimal  @default(0) @db.Decimal(24, 6)
+  version           Int      @default(0)
+  updatedAt         DateTime @updatedAt
+  listing           Listing  @relation(fields: [listingId], references: [id])
+}
+
+model BuyRequest {
+  id                  String           @id @default(cuid())
+  buyerId             String
+  gameId              String
+  serverId            String?
+  category            ListingCategory
+  title               String?
+  description         String?
+  accountTransferType String?
+  accountRank         String?
+  quantity            Decimal          @db.Decimal(24, 6)
+  unitPrice           Decimal          @db.Decimal(18, 6)
+  totalAmount         Decimal          @db.Decimal(18, 6)
+  lockAmount          Decimal          @db.Decimal(18, 6)
+  currency            String           @default("USDT")
+  status              BuyRequestStatus @default(ACTIVE)
+  expiresAt           DateTime?
+  premiumStartedAt    DateTime?
+  premiumEndsAt       DateTime?
+  premiumDurationHours Int?
+  premiumFeeAmount    Decimal?         @db.Decimal(18, 6)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  buyer               User             @relation("BuyerBuyRequests", fields: [buyerId], references: [id])
+  offers              BuyRequestOffer[]
+
+  @@index([buyerId, status])
+  @@index([gameId, serverId, category, status])
+  @@index([category, accountTransferType])
+  @@index([premiumEndsAt])
+}
+
+model BuyRequestOffer {
+  id           String      @id @default(cuid())
+  buyRequestId String
+  sellerId     String
+  listingId    String?
+  quantity     Decimal     @db.Decimal(24, 6)
+  unitPrice    Decimal     @db.Decimal(18, 6)
+  totalAmount  Decimal     @db.Decimal(18, 6)
+  currency     String      @default("USDT")
+  message      String?
+  status       String      @default("PENDING")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  buyRequest   BuyRequest  @relation(fields: [buyRequestId], references: [id], onDelete: Cascade)
+  seller       User        @relation("SellerBuyRequestOffers", fields: [sellerId], references: [id])
+  listing      Listing?    @relation(fields: [listingId], references: [id])
+
+  @@index([buyRequestId, status, createdAt])
+  @@index([sellerId, status, createdAt])
+  @@index([listingId])
+  @@unique([buyRequestId, sellerId, listingId])
+}
+
+model Order {
+  id                     String       @id @default(cuid())
+  orderNumber            String       @unique
+  buyerId                String
+  sellerId               String
+  listingId              String
+  status                 OrderStatus  @default(REQUESTED)
+  quantity               Decimal      @db.Decimal(24, 6)
+  unitPrice              Decimal      @db.Decimal(18, 6)
+  grossAmount            Decimal      @db.Decimal(18, 6)
+  platformFeeAmount      Decimal      @default(0) @db.Decimal(18, 6)
+  sellerReceivableAmount Decimal      @db.Decimal(18, 6)
+  currency               String       @default("USDT")
+  autoConfirmAt          DateTime?
+  completedAt            DateTime?
+  canceledAt             DateTime?
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  buyer                  User         @relation("BuyerOrders", fields: [buyerId], references: [id])
+  seller                 User         @relation("SellerOrders", fields: [sellerId], references: [id])
+  listing                Listing      @relation(fields: [listingId], references: [id])
+  events                 OrderEvent[]
+  chatRoom               ChatRoom?
+  trustReports           TrustReport[]
+  review                 OrderReview?
+
+  @@index([buyerId, status])
+  @@index([sellerId, status])
+  @@index([listingId, status])
+}
+
+model ChatRoom {
+  id            String        @id @default(cuid())
+  orderId        String        @unique
+  buyerId        String
+  sellerId       String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  lastMessageAt  DateTime?
+  order          Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  buyer          User          @relation("BuyerChatRooms", fields: [buyerId], references: [id])
+  seller         User          @relation("SellerChatRooms", fields: [sellerId], references: [id])
+  messages       ChatMessage[]
+
+  @@index([buyerId, updatedAt])
+  @@index([sellerId, updatedAt])
+}
+
+model ChatMessage {
+  id         String    @id @default(cuid())
+  roomId      String
+  senderId    String
+  body        String
+  createdAt   DateTime  @default(now())
+  readAt      DateTime?
+  room        ChatRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender      User      @relation("SenderChatMessages", fields: [senderId], references: [id])
+
+  @@index([roomId, createdAt])
+  @@index([senderId, createdAt])
+}
+
+model OrderEvent {
+  id        String      @id @default(cuid())
+  orderId   String
+  status    OrderStatus
+  message   String
+  metadata  Json?
+  createdAt DateTime    @default(now())
+  order     Order       @relation(fields: [orderId], references: [id])
+
+  @@index([orderId, createdAt])
+}
+
+model OrderReview {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  buyerId   String
+  sellerId  String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  buyer     User     @relation("OrderReviewBuyer", fields: [buyerId], references: [id])
+  seller    User     @relation("OrderReviewSeller", fields: [sellerId], references: [id])
+  moderation OrderReviewModeration?
+
+  @@index([sellerId, createdAt])
+  @@index([buyerId, createdAt])
+}
+
+model OrderReviewModeration {
+  id            String   @id @default(cuid())
+  reviewId      String   @unique
+  status        String   @default("VISIBLE")
+  reason        String?
+  moderatedById String?
+  moderatedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  review        OrderReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([status, updatedAt])
+  @@index([moderatedById, moderatedAt])
+}
+
+model DepositRequest {
+  id                 String        @id @default(cuid())
+  userId             String
+  walletId           String
+  provider           String        @default("MANUAL_BANK")
+  currency           String        @default("USDT")
+  amount             Decimal       @db.Decimal(18, 6)
+  status             DepositStatus @default(PENDING)
+  depositCode        String?
+  providerTxId       String?
+  rawProviderPayload Json?
+  memo               String?
+  confirmedByAdminId String?
+  requestedAt        DateTime      @default(now())
+  confirmedAt        DateTime?
+  user               User          @relation("DepositRequester", fields: [userId], references: [id])
+  wallet             Wallet        @relation(fields: [walletId], references: [id])
+
+  @@index([userId, status])
+}
+
+model DepositWalletAddress {
+  id               String          @id @default(cuid())
+  chain            WithdrawalChain @unique
+  label            String
+  asset            String          @default("USDT")
+  networkName      String
+  address          String
+  minimumAmount    Decimal         @default(10) @db.Decimal(18, 6)
+  isActive         Boolean         @default(true)
+  sortOrder        Int             @default(0)
+  updatedByAdminId String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@index([updatedByAdminId, updatedAt])
+}
+
+model WithdrawalRequest {
+  id                 String           @id @default(cuid())
+  userId             String
+  walletId           String
+  provider           String           @default("MANUAL_BANK")
+  currency           String           @default("USDT")
+  amount             Decimal          @db.Decimal(18, 6)
+  fee                Decimal          @default(0) @db.Decimal(18, 6)
+  netAmount          Decimal          @default(0) @db.Decimal(18, 6)
+  chain              WithdrawalChain?
+  status             WithdrawalStatus @default(REQUESTED)
+  destination        String
+  memo               String?
+  riskFlags          Json?
+  requestIpKey       String?
+  deviceKey          String?
+  failureReason      String?
+  processedByAdminId String?
+  requestedAt        DateTime         @default(now())
+  processedAt        DateTime?
+  completedAt        DateTime?
+  user               User             @relation("WithdrawalRequester", fields: [userId], references: [id])
+  wallet             Wallet           @relation(fields: [walletId], references: [id])
+  logs               WithdrawalLog[]
+
+  @@index([userId, status])
+  @@index([status, requestedAt])
+  @@index([requestIpKey, requestedAt])
+  @@index([deviceKey, requestedAt])
+}
+
+model WithdrawalLog {
+  id                  String   @id @default(cuid())
+  withdrawalRequestId String
+  userId              String
+  action              String
+  statusFrom          String?
+  statusTo            String?
+  message             String?
+  metadata            Json?
+  createdAt           DateTime @default(now())
+  withdrawalRequest   WithdrawalRequest @relation(fields: [withdrawalRequestId], references: [id], onDelete: Cascade)
+
+  @@index([withdrawalRequestId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  adminId    String?
+  action     String
+  targetType String
+  targetId   String?
+  reason     String?
+  before     Json?
+  after      Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+  admin      User?    @relation("AdminActor", fields: [adminId], references: [id])
+
+  @@index([adminId, createdAt])
+  @@index([targetType, targetId])
+}
+
+model CmsDocument {
+  id               String               @id @default(cuid())
+  slug             String               @unique
+  type             String
+  title            String
+  status           String               @default("DRAFT")
+  currentVersionId String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  versions         CmsDocumentVersion[]
+
+  @@index([type, status])
+  @@index([status, updatedAt])
+}
+
+model CmsDocumentVersion {
+  id            String      @id @default(cuid())
+  documentId    String
+  version       String
+  locale        String      @default("ko-KR")
+  title         String
+  body          String
+  status        String      @default("DRAFT")
+  changeNote    String?
+  authorId      String?
+  requestedById String?
+  approvedById  String?
+  publishedAt   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  document      CmsDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, locale, version])
+  @@index([documentId, status, createdAt])
+  @@index([locale, status])
+}
+
+model AdminSlaIncident {
+  id              String    @id @default(cuid())
+  queueKey        String
+  activeKey       String?   @unique
+  label           String
+  status          String    @default("OPEN")
+  priority        String
+  priorityScore   Int
+  slaLabel        String
+  previewLabel    String
+  href            String
+  acknowledgedAt  DateTime?
+  acknowledgedBy  String?
+  firstDetectedAt DateTime  @default(now())
+  lastDetectedAt  DateTime  @updatedAt
+  resolvedAt      DateTime?
+  notes           AdminSlaIncidentNote[]
+
+  @@index([status, lastDetectedAt])
+  @@index([queueKey, status])
+}
+
+model AdminSlaIncidentNote {
+  id         String           @id @default(cuid())
+  incidentId String
+  adminId    String
+  body       String
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  incident   AdminSlaIncident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  admin      User             @relation("AdminSlaIncidentNoteAuthor", fields: [adminId], references: [id])
+
+  @@index([incidentId, createdAt])
+  @@index([adminId, createdAt])
+}
+
+model AdminFinanceCloseReport {
+  id           String   @id @default(cuid())
+  range        String
+  fromAt       DateTime
+  toAt         DateTime
+  entryCount   Int
+  uniqueUsers  Int
+  creditAmount Decimal  @db.Decimal(18, 6)
+  debitAmount  Decimal  @db.Decimal(18, 6)
+  netAmount    Decimal  @db.Decimal(18, 6)
+  snapshot     Json
+  note         String?
+  closedById   String
+  closedAt     DateTime @default(now())
+
+  @@index([range, closedAt])
+  @@index([closedById, closedAt])
+}
+
+model TrustReport {
+  id             String    @id @default(cuid())
+  reporterId     String
+  targetUserId   String
+  orderId        String?
+  category       String
+  status         String    @default("OPEN")
+  severity       String    @default("MEDIUM")
+  sourceType     String?
+  sourceId       String?
+  description    String
+  resolutionNote String?
+  resolvedById   String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  resolvedAt     DateTime?
+  reporter       User      @relation("TrustReportReporter", fields: [reporterId], references: [id])
+  targetUser     User      @relation("TrustReportTarget", fields: [targetUserId], references: [id])
+  order          Order?    @relation(fields: [orderId], references: [id])
+
+  @@index([status, severity, createdAt])
+  @@index([targetUserId, status])
+  @@index([reporterId, createdAt])
+  @@index([orderId])
+  @@unique([sourceType, sourceId])
+}
+
+model AdminUserNote {
+  id        String   @id @default(cuid())
+  userId    String
+  adminId   String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation("AdminUserNoteTarget", fields: [userId], references: [id], onDelete: Cascade)
+  admin     User     @relation("AdminUserNoteAuthor", fields: [adminId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([adminId, createdAt])
+}
+
+model AdminGameNote {
+  id        String   @id @default(cuid())
+  gameId    String
+  adminId   String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  admin     User     @relation("AdminGameNoteAuthor", fields: [adminId], references: [id])
+
+  @@index([gameId, updatedAt])
+  @@index([adminId, createdAt])
+}
+
+model Notification {
+  id         String           @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  body        String
+  href        String?
+  isRead      Boolean          @default(false)
+  metadata    Json?
+  createdAt   DateTime         @default(now())
+  readAt      DateTime?
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+}

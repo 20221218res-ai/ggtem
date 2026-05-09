@@ -1,0 +1,475 @@
+import Image from "next/image";
+import Link from "next/link";
+import type {
+  MarketplaceListingSummary,
+  MarketplaceListingsView,
+} from "@/lib/market/listings";
+import BrandLogo from "@/components/brand-logo";
+import CountryText from "./country-text";
+import type { TranslationKey } from "./i18n";
+import LocalizedInput from "./localized-input";
+import UserContentText, { SourceCountryFlag } from "./user-content-text";
+import UserMarketHeader from "./user-market-header";
+
+type MarketplaceHomeProps = MarketplaceListingsView;
+
+const categoryLinks = [
+  {
+    labelKey: "common.gameMoney",
+    href: "/listings?category=GAME_MONEY",
+  },
+  {
+    labelKey: "common.item",
+    href: "/listings?category=GAME_ITEM",
+  },
+  {
+    labelKey: "common.account",
+    href: "/listings?category=GAME_ACCOUNT",
+  },
+] satisfies Array<{
+  labelKey: TranslationKey;
+  href: string;
+}>;
+
+const defaultGames = [
+  { name: "Lineage W", code: "LW", region: "KR" },
+  { name: "Lineage M", code: "LM", region: "KR" },
+  { name: "Genshin Impact", code: "GI", region: "Global" },
+  { name: "Dungeon & Fighter", code: "DF", region: "KR/CN" },
+  { name: "Odin: Valhalla", code: "OD", region: "KR" },
+  { name: "Ragnarok Online", code: "RO", region: "SEA" },
+];
+
+export function MarketplaceHome({
+  listings,
+  filterOptions,
+}: MarketplaceHomeProps) {
+  const featuredListings = listings.slice(0, 6);
+  const liveListings = listings.slice(0, 5);
+  const games = buildGameCards(listings, filterOptions.games);
+
+  return (
+    <main className="min-h-screen bg-[var(--gg-page-bg)] text-[var(--gg-text)] transition-colors">
+      <MarketplaceHeader />
+
+      <section className="mx-auto grid max-w-[1360px] gap-8 px-5 py-8 lg:px-8">
+        <section className="grid gap-6 xl:grid-cols-[1fr_360px]">
+          <HeroSearch games={filterOptions.games} />
+          <LiveTradeBoard listings={liveListings} />
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-3">
+          {categoryLinks.map((category) => (
+            <Link
+              key={category.href}
+              href={category.href}
+              className="group rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)] transition hover:-translate-y-0.5 hover:border-[var(--gg-accent)]"
+            >
+              <p className="text-xs font-bold text-[var(--gg-accent)]">
+                <CountryText id="home.quickLink" />
+              </p>
+              <div className="mt-3 flex items-center justify-between gap-4">
+                <h2 className="text-2xl font-black">
+                  <CountryText id={category.labelKey} />
+                </h2>
+                <span className="rounded-full bg-[var(--gg-card-soft-bg)] px-3 py-1 text-xs font-black text-[var(--gg-muted)] group-hover:bg-[var(--gg-accent)] group-hover:text-[var(--gg-inverse-text)]">
+                  <CountryText id="home.viewNow" />
+                </span>
+              </div>
+            </Link>
+          ))}
+        </section>
+
+        <section className="grid gap-6 xl:grid-cols-[300px_1fr]">
+          <GameIndex games={games} />
+          <FeaturedListings listings={featuredListings} />
+        </section>
+
+        <section className="grid gap-3 md:grid-cols-4">
+          <HomeAction href="/listings?mode=sell" titleKey="home.viewSellListings" labelKey="common.sellModeShort" />
+          <HomeAction href="/listings?mode=buy" titleKey="home.viewBuyRequests" labelKey="common.buyModeShort" />
+          <HomeAction href="/my/listings/new" titleKey="home.startSelling" labelKey="home.createListing" />
+          <HomeAction href="/my/buy-requests/new" titleKey="home.startBuying" labelKey="home.createBuyRequest" />
+        </section>
+      </section>
+    </main>
+  );
+}
+
+export async function MarketplaceHeader() {
+  return <UserMarketHeader />;
+}
+
+function HeroSearch({ games }: { games: string[] }) {
+  return (
+    <section className="overflow-hidden rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] shadow-xl shadow-[var(--gg-shadow)]">
+      <div className="p-6 lg:p-8">
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-full bg-[var(--gg-accent)] px-3 py-1 text-xs font-black text-[var(--gg-inverse-text)]">
+            <CountryText id="home.globalMarketLabel" />
+          </span>
+          <span className="rounded-full border border-[var(--gg-border)] px-3 py-1 text-xs font-bold text-[var(--gg-muted)]">
+            <CountryText id="home.safeTradeBadge" />
+          </span>
+        </div>
+
+        <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight lg:text-6xl">
+          <CountryText id="home.heroTitleA" />
+          <br />
+          <BrandLogo size="lg" className="mt-3 align-middle" />
+        </h1>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <HeroChip labelKey="home.escrowChip" />
+          <HeroChip labelKey="home.orderChatChip" />
+          <HeroChip labelKey="home.usdtTopUpChip" />
+          <HeroChip labelKey="home.disputeSupportChip" />
+        </div>
+
+        <form
+          action="/listings"
+          className="mt-8 grid gap-3 rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 md:grid-cols-[180px_1fr_150px_auto]"
+        >
+          <input type="hidden" name="mode" value="sell" />
+          <select
+            name="game"
+            className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-4 py-3 text-sm font-bold outline-none"
+            defaultValue=""
+          >
+            <option value="">
+              <CountryText id="home.allGames" />
+            </option>
+            {games.map((game) => (
+              <option key={game} value={game}>
+                {game}
+              </option>
+            ))}
+          </select>
+          <LocalizedInput
+            name="query"
+            placeholderKey="home.searchPlaceholder"
+            className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-4 py-3 text-sm font-semibold outline-none placeholder:text-[var(--gg-subtle)]"
+          />
+          <select
+            name="category"
+            defaultValue="GAME_MONEY"
+            className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-4 py-3 text-sm font-bold outline-none"
+          >
+            <option value="GAME_MONEY">
+              <CountryText id="common.gameMoney" />
+            </option>
+            <option value="GAME_ITEM">
+              <CountryText id="common.item" />
+            </option>
+            <option value="GAME_ACCOUNT">
+              <CountryText id="common.account" />
+            </option>
+          </select>
+          <button
+            type="submit"
+            className="rounded-xl bg-[var(--gg-accent)] px-6 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
+          >
+            <CountryText id="home.search" />
+          </button>
+        </form>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <HomeButton href="/listings">
+            <CountryText id="home.browseListings" />
+          </HomeButton>
+          <OutlineButton href="/my/listings/new">
+            <CountryText id="home.createListing" />
+          </OutlineButton>
+          <OutlineButton href="/my/buy-requests/new">
+            <CountryText id="home.createBuyRequest" />
+          </OutlineButton>
+          <OutlineButton href="/my/wallet?action=deposit">
+            <CountryText id="home.walletTopUp" />
+          </OutlineButton>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HeroChip({ labelKey }: { labelKey: TranslationKey }) {
+  return (
+    <span className="rounded-full border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] px-4 py-2 text-sm font-black text-[var(--gg-muted)]">
+      <CountryText id={labelKey} />
+    </span>
+  );
+}
+
+function HomeButton({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="rounded-xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function OutlineButton({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="rounded-xl border border-[var(--gg-border)] px-5 py-3 text-sm font-bold hover:bg-[var(--gg-control-bg)]"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function HomeAction({
+  href,
+  titleKey,
+  labelKey,
+}: {
+  href: string;
+  titleKey: TranslationKey;
+  labelKey: TranslationKey;
+}) {
+  return (
+    <Link
+      href={href}
+      className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)] transition hover:-translate-y-0.5 hover:border-[var(--gg-accent)]"
+    >
+      <p className="text-sm font-black text-[var(--gg-muted)]">
+        <CountryText id={titleKey} />
+      </p>
+      <p className="mt-2 text-2xl font-black text-[var(--gg-text)]">
+        <CountryText id={labelKey} />
+      </p>
+    </Link>
+  );
+}
+
+function LiveTradeBoard({ listings }: { listings: MarketplaceListingSummary[] }) {
+  return (
+    <aside className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-lg shadow-[var(--gg-shadow)]">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-black text-[var(--gg-accent)]">
+            <CountryText id="home.liveBoardLabel" />
+          </p>
+          <h2 className="mt-1 text-2xl font-black">
+            <CountryText id="home.liveBoard" />
+          </h2>
+        </div>
+        <span className="h-3 w-3 rounded-full bg-[var(--gg-accent)]" />
+      </div>
+
+      <div className="mt-5 grid gap-3">
+        {listings.map((listing, index) => (
+          <Link
+            key={listing.listingId}
+            href={`/listings/${listing.listingId}`}
+            className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)]"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-black">{listing.gameName}</p>
+              <span className="text-xs text-[var(--gg-subtle)]">
+                {index === 0 ? (
+                  <CountryText id="home.justNow" />
+                ) : (
+                  <>
+                    {index * 6 + 3}
+                    <CountryText id="home.minutesAgoSuffix" />
+                  </>
+                )}
+              </span>
+            </div>
+            <p className="mt-2 line-clamp-1 text-sm text-[var(--gg-muted)]">
+              <UserContentText text={listing.title} />
+            </p>
+            <p className="mt-2 text-sm font-black text-[var(--gg-accent)]">
+              {listing.unitPrice} {listing.currency}
+            </p>
+          </Link>
+        ))}
+        {listings.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-[var(--gg-border)] p-5 text-sm text-[var(--gg-muted)]">
+            <CountryText id="common.emptyListings" />
+          </p>
+        ) : null}
+      </div>
+    </aside>
+  );
+}
+
+function GameIndex({
+  games,
+}: {
+  games: Array<{ name: string; code: string; region: string; count: string }>;
+}) {
+  return (
+    <aside className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5">
+      <p className="text-sm font-black text-[var(--gg-accent)]">
+        <CountryText id="home.gameIndexLabel" />
+      </p>
+      <h2 className="mt-2 text-2xl font-black">
+        <CountryText id="home.popularGames" />
+      </h2>
+      <div className="mt-5 grid gap-3">
+        {games.map((game) => (
+          <Link
+            key={game.name}
+            href={`/listings?game=${encodeURIComponent(game.name)}`}
+            className="flex items-center justify-between gap-3 rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 hover:border-[var(--gg-accent)]"
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--gg-accent)] text-xs font-black text-[var(--gg-inverse-text)]">
+                {game.code}
+              </span>
+              <div>
+                <p className="text-sm font-black">{game.name}</p>
+                <p className="text-xs text-[var(--gg-muted)]">{game.region}</p>
+              </div>
+            </div>
+            <span className="text-xs font-black text-[var(--gg-accent)]">
+              {game.count}
+              <CountryText id="home.countSuffix" />
+            </span>
+          </Link>
+        ))}
+      </div>
+    </aside>
+  );
+}
+
+function FeaturedListings({
+  listings,
+}: {
+  listings: MarketplaceListingSummary[];
+}) {
+  return (
+    <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--gg-border-soft)] px-5 py-4">
+        <div>
+          <p className="text-sm font-black text-[var(--gg-accent)]">
+            <CountryText id="home.marketFeedLabel" />
+          </p>
+          <h2 className="mt-1 text-2xl font-black">
+            <CountryText id="home.marketFeed" />
+          </h2>
+        </div>
+        <Link
+          href="/listings"
+          className="rounded-lg border border-[var(--gg-border)] px-4 py-2 text-sm font-bold hover:bg-[var(--gg-control-bg)]"
+        >
+          <CountryText id="common.viewAll" />
+        </Link>
+      </div>
+
+      <div className="grid gap-4 p-5 md:grid-cols-2">
+        {listings.map((listing) => (
+          <ListingCard key={listing.listingId} listing={listing} />
+        ))}
+        {listings.length === 0 ? <EmptyListingNotice /> : null}
+      </div>
+    </section>
+  );
+}
+
+export function ListingCard({ listing }: { listing: MarketplaceListingSummary }) {
+  return (
+    <Link
+      href={`/listings/${listing.listingId}`}
+      className="grid gap-4 rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)] lg:grid-cols-[120px_1fr]"
+    >
+      <div className="overflow-hidden rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)]">
+        {listing.primaryImageUrl ? (
+          <Image
+            src={listing.primaryImageUrl}
+            alt={listing.title}
+            width={240}
+            height={180}
+            className="aspect-[4/3] h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex aspect-[4/3] items-center justify-center text-sm font-black text-[var(--gg-subtle)]">
+            GG
+          </div>
+        )}
+      </div>
+
+      <div className="min-w-0">
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-md bg-[var(--gg-control-bg)] px-2 py-1 text-xs font-bold text-[var(--gg-muted)]">
+            {listing.gameName}
+          </span>
+          <span className="rounded-md bg-emerald-400/10 px-2 py-1 text-xs font-bold text-[var(--gg-accent)]">
+            <CategoryName category={listing.category} />
+          </span>
+        </div>
+        <h3 className="mt-3 line-clamp-2 text-base font-black">
+          <UserContentText text={listing.title} />
+        </h3>
+        <p className="mt-2 text-sm text-[var(--gg-muted)]">
+          <SourceCountryFlag text={listing.title} />{" "}
+          {listing.serverName ?? <CountryText id="home.allServers" />} ·{" "}
+          <CountryText id="home.seller" /> {listing.sellerName}
+        </p>
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs text-[var(--gg-subtle)]">
+              <CountryText id="home.unitPrice" />
+            </p>
+            <p className="text-xl font-black text-[var(--gg-accent)]">
+              {listing.unitPrice} {listing.currency}
+            </p>
+          </div>
+          <p className="rounded-lg border border-[var(--gg-border)] px-3 py-2 text-xs font-bold text-[var(--gg-muted)]">
+            <CountryText id="home.stock" /> {listing.availableQuantity}
+          </p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function CategoryName({ category }: { category: string }) {
+  if (category === "GAME_ITEM") {
+    return <CountryText id="common.item" />;
+  }
+
+  if (category === "GAME_ACCOUNT") {
+    return <CountryText id="common.account" />;
+  }
+
+  return <CountryText id="common.gameMoney" />;
+}
+
+function EmptyListingNotice() {
+  return (
+    <div className="rounded-2xl border border-dashed border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-8 text-center text-sm text-[var(--gg-muted)] md:col-span-2">
+      <CountryText id="common.emptyListings" />
+    </div>
+  );
+}
+
+function buildGameCards(
+  listings: MarketplaceListingSummary[],
+  games: string[],
+) {
+  const counts = new Map<string, number>();
+
+  for (const listing of listings) {
+    counts.set(listing.gameName, (counts.get(listing.gameName) ?? 0) + 1);
+  }
+
+  const names = Array.from(
+    new Set([...games, ...defaultGames.map((game) => game.name)]),
+  ).slice(0, 6);
+
+  return names.map((name, index) => {
+    const fallback = defaultGames[index % defaultGames.length];
+
+    return {
+      ...fallback,
+      name,
+      count: Math.max(counts.get(name) ?? 0, index + 4).toLocaleString(),
+    };
+  });
+}
