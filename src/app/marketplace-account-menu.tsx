@@ -82,7 +82,7 @@ export default function MarketplaceAccountMenu({
       {isOpen ? (
         <div
           role="menu"
-          className="absolute right-0 top-[calc(100%+8px)] z-50 w-[340px] overflow-hidden rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] shadow-xl shadow-[var(--gg-shadow)]"
+          className="absolute right-0 top-[calc(100%+8px)] z-50 w-[min(calc(100vw-2rem),340px)] overflow-hidden rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] shadow-xl shadow-[var(--gg-shadow)]"
         >
           <div className="border-b border-[var(--gg-border-soft)] px-4 py-3">
             <p className="font-black text-[var(--gg-text)]">{displayName}</p>

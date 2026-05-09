@@ -5,6 +5,7 @@ import Link from "next/link";
 import BrandLogo from "@/components/brand-logo";
 import CountrySelector from "./country-selector";
 import MarketplaceAccountMenu from "./marketplace-account-menu";
+import SignOutButton from "./sign-out-button";
 import useCountryTranslation from "./use-country-translation";
 import type { TranslationKey } from "./i18n";
 
@@ -77,12 +78,18 @@ export default function UserMarketHeaderClient({
           )}
           <CountrySelector />
           {currentUser ? (
-            <MarketplaceAccountMenu
-              displayName={currentUser.displayName}
-              email={currentUser.email}
-              unreadChatCount={unreadChatCount}
-              unreadNotificationCount={unreadNotificationCount}
-            />
+            <>
+              <SignOutButton
+                redirectTo="/"
+                className="inline-flex h-9 items-center justify-center rounded-full border border-red-200 bg-white px-3 text-xs font-black text-red-500 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 sm:hidden"
+              />
+              <MarketplaceAccountMenu
+                displayName={currentUser.displayName}
+                email={currentUser.email}
+                unreadChatCount={unreadChatCount}
+                unreadNotificationCount={unreadNotificationCount}
+              />
+            </>
           ) : null}
         </div>
       </div>
@@ -144,7 +151,7 @@ function QuickTextLink({ href, children }: { href: string; children: ReactNode }
     <Link
       href={href}
       prefetch={false}
-      className="hidden text-sm font-black text-[var(--gg-text)] hover:text-[var(--gg-accent)] sm:inline"
+      className="inline-flex h-9 items-center justify-center rounded-full border border-[var(--gg-border)] bg-white px-3 text-xs font-black text-[var(--gg-text)] hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)] sm:h-auto sm:rounded-none sm:border-0 sm:bg-transparent sm:px-0 sm:text-sm"
     >
       {children}
     </Link>
