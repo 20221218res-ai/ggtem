@@ -41,7 +41,7 @@ export default function AdminSignInGate() {
 
       <button
         type="button"
-        aria-label="관리자 접근 열기"
+        aria-label="hidden access control"
         onClick={() => setClickCount((count) => count + 1)}
         className="fixed bottom-0 right-0 h-20 w-20 cursor-default opacity-0"
       />

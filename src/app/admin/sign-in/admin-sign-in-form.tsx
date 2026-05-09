@@ -35,7 +35,7 @@ export default function AdminSignInForm() {
       };
 
       if (!response.ok) {
-        throw new Error(result.message ?? "관리자 로그인에 실패했습니다.");
+        throw new Error(result.message ?? "로그인에 실패했습니다.");
       }
 
       router.push(result.redirectPath ?? "/admin");
@@ -44,7 +44,7 @@ export default function AdminSignInForm() {
       setError(
         submitError instanceof Error
           ? submitError.message
-          : "관리자 로그인에 실패했습니다.",
+          : "로그인에 실패했습니다.",
       );
     } finally {
       setIsSubmitting(false);
