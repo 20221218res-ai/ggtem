@@ -25,6 +25,7 @@ const groupOrder = [
 const primaryHrefs = new Set([
   "/admin",
   "/admin/orders",
+  "/admin/order-chats",
   "/admin/disputes",
   "/admin/deposits",
   "/admin/withdrawals",

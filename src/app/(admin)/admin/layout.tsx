@@ -26,6 +26,13 @@ const adminLinks = [
     roles: ROLE_GROUPS.ORDER_OPERATORS,
   },
   {
+    href: "/admin/order-chats",
+    label: "채팅",
+    description: "주문 채팅 열람과 외부거래 위험 신호 확인",
+    group: "오늘 업무",
+    roles: ROLE_GROUPS.ORDER_OPERATORS,
+  },
+  {
     href: "/admin/disputes",
     label: "분쟁",
     description: "분쟁 증거 확인과 중재 처리",
