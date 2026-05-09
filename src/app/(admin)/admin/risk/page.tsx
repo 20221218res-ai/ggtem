@@ -260,6 +260,9 @@ function RiskReportList({ reports }: { reports: RiskReport[] }) {
                       <p className="mt-3 whitespace-pre-wrap rounded-lg bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-700">
                         {description}
                       </p>
+                      {isOffPlatformReport(report) ? (
+                        <OffPlatformReportPanel report={report} />
+                      ) : null}
                     </div>
                     <RiskSignalBox title={signal.title} body={signal.body} tone={signal.tone} />
                   </div>
@@ -359,6 +362,38 @@ function RiskTraceLinks({ report }: { report: RiskReport }) {
       <AdminLink href={`/admin/audit?targetType=TRUST_REPORT&query=${report.reportId}`}>
         감사 로그
       </AdminLink>
+    </div>
+  );
+}
+
+function OffPlatformReportPanel({ report }: { report: RiskReport }) {
+  const detectionLabels = extractDetectionLabels(report.description);
+
+  return (
+    <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-950">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full bg-red-600 px-2.5 py-1 text-xs font-black text-white">
+          외부거래 자동 탐지
+        </span>
+        {detectionLabels.length > 0 ? (
+          detectionLabels.map((label) => (
+            <Badge key={label} tone="red">
+              {label}
+            </Badge>
+          ))
+        ) : (
+          <Badge tone="red">연락처/외부거래 의심</Badge>
+        )}
+      </div>
+      <p className="mt-3 font-semibold leading-6">
+        GGtem 채팅과 에스크로 밖으로 이동시키는 시도입니다. 주문 채팅 원문과 감사 로그를 먼저 확인하고,
+        반복 시 판매 제한 또는 출금 보류를 검토하세요.
+      </p>
+      <div className="mt-3 grid gap-2 md:grid-cols-3">
+        <SignalPill label="연결 주문" value={report.orderNumber ?? report.orderId ?? "주문 없음"} />
+        <SignalPill label="대상 계정" value={`${report.targetName} / ${userStatusLabel(report.targetStatus)}`} />
+        <SignalPill label="권장 처리" value="검토 중 전환 후 증거 확인" />
+      </div>
     </div>
   );
 }
@@ -484,7 +519,37 @@ function getSellerCandidateReviewSignal(candidate: SellerRiskCandidate) {
   };
 }
 
+function isOffPlatformReport(report: RiskReport) {
+  return (
+    report.category === "OFF_PLATFORM_PAYMENT" ||
+    report.sourceType === "OFF_PLATFORM_CONTACT"
+  );
+}
+
+function extractDetectionLabels(description: string) {
+  const marker = "탐지 항목:";
+  const markerIndex = description.indexOf(marker);
+
+  if (markerIndex === -1) return [];
+
+  return description
+    .slice(markerIndex + marker.length)
+    .split(",")
+    .map((label) => label.trim())
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
 function getReportReviewSignal(report: RiskReport) {
+  if (isOffPlatformReport(report)) {
+    return {
+      label: "외부거래",
+      title: "외부거래/연락처 교환 차단",
+      body: "채팅에서 SNS, 전화번호, 이메일, 개인 지갑주소 또는 외부거래 유도 문구가 자동 차단되었습니다. 주문 채팅 원문과 감사 로그를 확인하세요.",
+      tone: "red" as const,
+    };
+  }
+
   if (report.category === "OFF_PLATFORM_PAYMENT") {
     return {
       label: "외부 결제",
@@ -561,6 +626,8 @@ function severityLabel(severity: string) {
 }
 
 function reportCategoryLabel(category: string) {
+  if (category === "OFF_PLATFORM_PAYMENT") return "외부거래/연락처";
+
   const labels: Record<string, string> = {
     LOW_RATING_REVIEW: "낮은 평점 리뷰",
     FAKE_REVIEW: "허위 리뷰",
@@ -581,6 +648,8 @@ function reportCategoryLabel(category: string) {
 }
 
 function sourceTypeLabel(sourceType?: string | null) {
+  if (sourceType === "OFF_PLATFORM_CONTACT") return "자동 탐지";
+
   if (!sourceType) return "유저 직접 신고";
 
   const labels: Record<string, string> = {
