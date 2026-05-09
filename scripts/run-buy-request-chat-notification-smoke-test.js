@@ -106,6 +106,27 @@ async function main() {
     assertEqual(initialRoom.sellerId, seller.id, "chat room seller");
     assertEqual(initialRoom.messageCount, "0", "initial message count");
 
+    logStep("block off-platform contact in order chat");
+    const blockedChat = await postJson(
+      "/api/market/order-chat",
+      sellerToken,
+      {
+        orderId,
+        body: `카톡으로 연락 주세요 010-1234-5678 ${Date.now()}`,
+      },
+      { allowFailure: true },
+    );
+    assertEqual(blockedChat.response.status, 400, "off-platform chat blocked status");
+    if (!String(blockedChat.json.message ?? "").includes("외부 연락처")) {
+      throw new Error(`unexpected off-platform block message: ${JSON.stringify(blockedChat.json)}`);
+    }
+    const roomAfterBlockedMessage = await readChatRoomSnapshot(client, orderId);
+    assertEqual(roomAfterBlockedMessage.messageCount, "0", "blocked chat is not persisted");
+    await assertOffPlatformAuditLog(client, {
+      orderId,
+      actorUserId: seller.id,
+    });
+
     logStep("verify instant-sale notifications", { orderId, buyRequestId });
     await assertNotification(client, {
       userId: buyer.id,
@@ -368,6 +389,27 @@ async function assertNotification(client, input) {
   }
   if (input.titleIncludes && !notification.title.includes(input.titleIncludes)) {
     throw new Error(`Notification title mismatch: ${JSON.stringify(notification)}`);
+  }
+}
+
+async function assertOffPlatformAuditLog(client, input) {
+  const result = await client.query(
+    `select id, action, reason, after
+       from "AdminAuditLog"
+      where action = 'OFF_PLATFORM_CONTACT_BLOCKED'
+        and "targetType" = 'ORDER_CHAT_MESSAGE'
+        and (after->>'orderId') = $1
+        and (after->>'actorUserId') = $2
+      order by "createdAt" desc
+      limit 1`,
+    [input.orderId, input.actorUserId],
+  );
+  const auditLog = result.rows[0];
+  if (!auditLog) {
+    throw new Error(`Missing off-platform contact audit log for ${input.actorUserId}`);
+  }
+  if (!String(auditLog.reason ?? "").includes("외부거래/연락처")) {
+    throw new Error(`Unexpected off-platform audit reason: ${JSON.stringify(auditLog)}`);
   }
 }
 
