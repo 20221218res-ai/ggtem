@@ -71,10 +71,7 @@ export default function UserMarketHeaderClient({
               <QuickTextLink href="/my/wallet?action=withdraw">{t("common.withdraw")}</QuickTextLink>
             </>
           ) : (
-            <>
-              <QuickTextLink href="/sign-in">{t("common.signIn")}</QuickTextLink>
-              <QuickTextLink href="/sign-up">{t("common.signUp")}</QuickTextLink>
-            </>
+            null
           )}
           <CountrySelector />
           {currentUser ? (
@@ -137,9 +134,18 @@ export default function UserMarketHeaderClient({
           </Link>
         ))}
         <div className="flex shrink-0 items-center gap-2 sm:ml-auto">
-          <TextIconLink href="/my/wallet" label={t("common.wallet")} />
-          <TextIconLink href="/my/chat" label={t("common.chat")} badge={unreadChatCount} />
-          <TextIconLink href="/my" label={t("common.my")} badge={unreadNotificationCount} />
+          {currentUser ? (
+            <>
+              <TextIconLink href="/my/wallet" label={t("common.wallet")} />
+              <TextIconLink href="/my/chat" label={t("common.chat")} badge={unreadChatCount} />
+              <TextIconLink href="/my" label={t("common.my")} badge={unreadNotificationCount} />
+            </>
+          ) : (
+            <>
+              <TextIconLink href="/sign-in" label={t("common.signIn")} />
+              <TextIconLink href="/sign-up" label={t("common.signUp")} tone="primary" />
+            </>
+          )}
         </div>
       </div>
     </header>
@@ -187,16 +193,22 @@ function TextIconLink({
   href,
   label,
   badge,
+  tone = "default",
 }: {
   href: string;
   label: string;
   badge?: number;
+  tone?: "default" | "primary";
 }) {
   return (
     <Link
       href={href}
       prefetch={false}
-      className="relative flex h-10 min-w-10 items-center justify-center rounded-full border border-[var(--gg-border)] px-3 text-xs font-black text-[var(--gg-text)] hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)]"
+      className={`relative flex h-10 min-w-10 items-center justify-center rounded-full border px-3 text-xs font-black ${
+        tone === "primary"
+          ? "border-[var(--gg-accent)] bg-[var(--gg-accent)] text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
+          : "border-[var(--gg-border)] text-[var(--gg-text)] hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)]"
+      }`}
     >
       {label}
       {badge ? (
