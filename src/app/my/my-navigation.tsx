@@ -84,7 +84,7 @@ export default function MyNavigation({
           <span className="hidden max-w-28 truncate text-sm font-black text-[var(--gg-text)] lg:block">
             {displayName}
           </span>
-          <SignOutButton className="rounded-lg border border-[var(--gg-border)] bg-white px-3 py-2 text-sm font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)] disabled:cursor-not-allowed disabled:opacity-60" />
+          <SignOutButton className="inline-flex h-9 items-center justify-center rounded-full border border-[var(--gg-border)] bg-white px-3 text-xs font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)] disabled:cursor-not-allowed disabled:opacity-60 sm:h-auto sm:rounded-lg sm:py-2 sm:text-sm" />
         </div>
       </div>
 
@@ -167,7 +167,7 @@ function HeaderTextLink({ href, children }: { href: string; children: ReactNode 
   return (
     <Link
       href={href}
-      className="hidden text-sm font-black text-[var(--gg-text)] hover:text-[var(--gg-accent)] sm:inline"
+      className="inline-flex h-9 items-center justify-center rounded-full border border-[var(--gg-border)] bg-white px-3 text-xs font-black text-[var(--gg-text)] hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)] sm:h-auto sm:rounded-none sm:border-0 sm:bg-transparent sm:px-0 sm:text-sm"
     >
       {children}
     </Link>
