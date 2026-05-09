@@ -195,6 +195,18 @@ function SellerRiskCandidatesSection({ candidates }: { candidates: SellerRiskCan
                 <SignalPill label="고위험 신고" value={`${candidate.highSeverityReportCount}건`} />
               </div>
 
+              {candidate.offPlatformReportCount > 0 ? (
+                <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3">
+                  <p className="text-xs font-black text-red-700">외부거래 반복 탐지</p>
+                  <p className="mt-1 text-lg font-black text-red-950">
+                    {candidate.offPlatformReportCount.toLocaleString("ko-KR")}건
+                  </p>
+                  <p className="mt-1 text-xs font-semibold leading-5 text-red-800">
+                    채팅 원문과 감사 로그를 확인한 뒤 판매 제한 또는 출금 보류를 검토하세요.
+                  </p>
+                </div>
+              ) : null}
+
               <p className="mt-3 text-sm font-semibold text-slate-700">
                 추천 조치: {recommendedActionLabel(candidate.recommendedAction)}
               </p>
@@ -496,6 +508,14 @@ function getNextAction(summary: ReturnType<typeof getRiskReviewSummary>) {
 }
 
 function getSellerCandidateReviewSignal(candidate: SellerRiskCandidate) {
+  if (candidate.offPlatformReportCount >= 2) {
+    return {
+      title: "반복 외부거래 시도",
+      body: "최근 30일 안에 외부 연락처, SNS, 이메일, 개인 지갑주소 또는 외부거래 유도 문구가 반복 탐지된 계정입니다. 주문 채팅과 감사 로그를 확인한 뒤 판매 제한과 출금 보류를 함께 검토하세요.",
+      tone: "red" as const,
+    };
+  }
+
   if (candidate.riskLabel === "HIGH") {
     return {
       title: "판매 제한 우선 검토",
@@ -681,6 +701,7 @@ function riskLabel(risk: string) {
 }
 
 function recommendedActionLabel(action: string) {
+  if (action.includes("WITHDRAWAL_HOLD")) return "판매 제한 + 출금 보류 검토";
   if (action.includes("SELLING_RESTRICTED")) return "판매 제한 검토";
   return "신고 내용 모니터링";
 }

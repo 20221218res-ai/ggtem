@@ -47,6 +47,7 @@ export type AdminRiskState = {
     status: string;
     openReportCount: number;
     highSeverityReportCount: number;
+    offPlatformReportCount: number;
     lowReviewCount: number;
     averageLowRating: string;
     lastSignalAt: string;
@@ -600,7 +601,12 @@ async function getSellerRiskCandidates(prisma: ReturnType<typeof getPrismaClient
     Date.now() - SELLER_RISK_WINDOW_DAYS * 24 * 60 * 60 * 1000,
   );
 
-  const [lowReviewGroups, openReportGroups, highSeverityReportGroups] =
+  const [
+    lowReviewGroups,
+    openReportGroups,
+    highSeverityReportGroups,
+    offPlatformReportGroups,
+  ] =
     await Promise.all([
       prisma.orderReview.groupBy({
         by: ["sellerId"],
@@ -656,6 +662,28 @@ async function getSellerRiskCandidates(prisma: ReturnType<typeof getPrismaClient
           id: true,
         },
       }),
+      prisma.trustReport.groupBy({
+        by: ["targetUserId"],
+        where: {
+          OR: [
+            {
+              category: "OFF_PLATFORM_PAYMENT",
+            },
+            {
+              sourceType: "OFF_PLATFORM_CONTACT",
+            },
+          ],
+          createdAt: {
+            gte: since,
+          },
+        },
+        _count: {
+          id: true,
+        },
+        _max: {
+          createdAt: true,
+        },
+      }),
     ]);
 
   const candidateIds = Array.from(
@@ -667,6 +695,9 @@ async function getSellerRiskCandidates(prisma: ReturnType<typeof getPrismaClient
         .filter((group) => group._count.id >= 2)
         .map((group) => group.targetUserId),
       ...highSeverityReportGroups.map((group) => group.targetUserId),
+      ...offPlatformReportGroups
+        .filter((group) => group._count.id >= 2)
+        .map((group) => group.targetUserId),
     ]),
   );
 
@@ -695,24 +726,37 @@ async function getSellerRiskCandidates(prisma: ReturnType<typeof getPrismaClient
   const highSeverityReportMap = new Map(
     highSeverityReportGroups.map((group) => [group.targetUserId, group]),
   );
+  const offPlatformReportMap = new Map(
+    offPlatformReportGroups.map((group) => [group.targetUserId, group]),
+  );
 
   return users
     .map((user) => {
       const lowReviewGroup = lowReviewMap.get(user.id);
       const openReportGroup = openReportMap.get(user.id);
       const highSeverityReportGroup = highSeverityReportMap.get(user.id);
+      const offPlatformReportGroup = offPlatformReportMap.get(user.id);
       const lowReviewCount = lowReviewGroup?._count.rating ?? 0;
       const openReportCount = openReportGroup?._count.id ?? 0;
       const highSeverityReportCount = highSeverityReportGroup?._count.id ?? 0;
+      const offPlatformReportCount = offPlatformReportGroup?._count.id ?? 0;
       const lastSignals = [
         lowReviewGroup?._max.createdAt,
         openReportGroup?._max.createdAt,
+        offPlatformReportGroup?._max.createdAt,
       ].filter((date): date is Date => Boolean(date));
       const lastSignalAt = lastSignals.length
         ? new Date(Math.max(...lastSignals.map((date) => date.getTime())))
         : new Date();
       const riskScore =
-        lowReviewCount * 2 + openReportCount + highSeverityReportCount * 3;
+        lowReviewCount * 2 +
+        openReportCount +
+        highSeverityReportCount * 3 +
+        offPlatformReportCount * 3;
+      const shouldRestrict =
+        riskScore >= 6 ||
+        highSeverityReportCount >= 2 ||
+        offPlatformReportCount >= 2;
 
       return {
         userId: user.id,
@@ -721,17 +765,20 @@ async function getSellerRiskCandidates(prisma: ReturnType<typeof getPrismaClient
         status: user.status,
         openReportCount,
         highSeverityReportCount,
+        offPlatformReportCount,
         lowReviewCount,
         averageLowRating: (lowReviewGroup?._avg.rating ?? 0).toFixed(1),
         lastSignalAt: formatKoreanDate(lastSignalAt),
         riskLabel:
-          riskScore >= 6 || highSeverityReportCount >= 2
+          shouldRestrict
             ? "HIGH"
             : riskScore >= 3
               ? "MEDIUM"
               : "LOW",
         recommendedAction:
-          riskScore >= 6 || highSeverityReportCount >= 2
+          offPlatformReportCount >= 2
+            ? "Review for WITHDRAWAL_HOLD and SELLING_RESTRICTED"
+            : shouldRestrict
             ? "Review for SELLING_RESTRICTED"
             : "Monitor and review open reports",
         riskScore,
@@ -746,6 +793,7 @@ async function getSellerRiskCandidates(prisma: ReturnType<typeof getPrismaClient
       status: candidate.status,
       openReportCount: candidate.openReportCount,
       highSeverityReportCount: candidate.highSeverityReportCount,
+      offPlatformReportCount: candidate.offPlatformReportCount,
       lowReviewCount: candidate.lowReviewCount,
       averageLowRating: candidate.averageLowRating,
       lastSignalAt: candidate.lastSignalAt,
