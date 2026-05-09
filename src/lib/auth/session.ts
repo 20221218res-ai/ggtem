@@ -682,7 +682,7 @@ export async function verifyEmailWithToken(input: { token: string }) {
     throw new Error("\uC774\uBA54\uC77C \uC778\uC99D \uB9C1\uD06C\uAC00 \uC720\uD6A8\uD558\uC9C0 \uC54A\uAC70\uB098 \uB9CC\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.");
   }
 
-  await prisma.$transaction(async (tx) => {
+  const verifiedUser = await prisma.$transaction(async (tx) => {
     const consumedToken = await tx.emailVerificationToken.updateMany({
       where: {
         id: verificationToken.id,
@@ -702,18 +702,33 @@ export async function verifyEmailWithToken(input: { token: string }) {
       );
     }
 
-    await tx.user.update({
+    return tx.user.update({
       where: {
         id: verificationToken.userId,
       },
       data: {
         emailVerifiedAt: new Date(),
       },
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+        role: true,
+        status: true,
+        emailVerifiedAt: true,
+      },
     });
   });
 
+  if (["SUSPENDED", "BANNED"].includes(verifiedUser.status)) {
+    throw new Error("현재 사용할 수 없는 계정입니다.");
+  }
+
+  await createSessionForUser(verifiedUser);
+
   return {
     message: "\uC774\uBA54\uC77C \uC778\uC99D\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.",
+    redirectPath: "/my",
   };
 }
 async function assertLoginIsNotLocked(email: string, ipKey: string) {
