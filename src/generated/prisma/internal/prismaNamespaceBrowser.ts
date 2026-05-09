@@ -67,6 +67,7 @@ export const ModelName = {
   BuyRequest: 'BuyRequest',
   BuyRequestOffer: 'BuyRequestOffer',
   Order: 'Order',
+  OrderAccountCredential: 'OrderAccountCredential',
   ChatRoom: 'ChatRoom',
   ChatMessage: 'ChatMessage',
   OrderEvent: 'OrderEvent',
@@ -364,6 +365,24 @@ export const OrderScalarFieldEnum = {
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderAccountCredentialScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  sellerId: 'sellerId',
+  buyerId: 'buyerId',
+  encryptedPayload: 'encryptedPayload',
+  encryptionVersion: 'encryptionVersion',
+  submittedAt: 'submittedAt',
+  updatedAt: 'updatedAt',
+  buyerFirstViewedAt: 'buyerFirstViewedAt',
+  buyerLastViewedAt: 'buyerLastViewedAt',
+  buyerViewCount: 'buyerViewCount',
+  sellerLastUpdatedAt: 'sellerLastUpdatedAt'
+} as const
+
+export type OrderAccountCredentialScalarFieldEnum = (typeof OrderAccountCredentialScalarFieldEnum)[keyof typeof OrderAccountCredentialScalarFieldEnum]
 
 
 export const ChatRoomScalarFieldEnum = {

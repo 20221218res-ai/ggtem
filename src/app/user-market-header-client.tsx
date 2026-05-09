@@ -34,7 +34,7 @@ export default function UserMarketHeaderClient({
   return (
     <header className="sticky top-0 z-30 overflow-x-clip border-b border-[var(--gg-border-soft)] bg-white/95 shadow-sm shadow-[var(--gg-shadow)] backdrop-blur">
       <div className="mx-auto flex max-w-[1360px] flex-wrap items-center gap-4 px-4 py-2 lg:px-8">
-        <Link href="/" className="flex shrink-0 items-center" aria-label="GGtem home">
+        <Link href="/" prefetch={false} className="flex shrink-0 items-center" aria-label="GGtem home">
           <BrandLogo />
         </Link>
 
@@ -123,6 +123,7 @@ export default function UserMarketHeaderClient({
           <Link
             key={category.href}
             href={category.href}
+            prefetch={false}
             className="shrink-0 rounded-full px-3 py-2 text-sm font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)] hover:text-[var(--gg-accent)]"
           >
             {t(category.labelKey)}
@@ -142,6 +143,7 @@ function QuickTextLink({ href, children }: { href: string; children: ReactNode }
   return (
     <Link
       href={href}
+      prefetch={false}
       className="hidden text-sm font-black text-[var(--gg-text)] hover:text-[var(--gg-accent)] sm:inline"
     >
       {children}
@@ -166,6 +168,7 @@ function HeaderAction({
   return (
     <Link
       href={href}
+      prefetch={false}
       className={`shrink-0 rounded-full px-4 py-2 text-sm font-black ${className}`}
     >
       {children}
@@ -185,6 +188,7 @@ function TextIconLink({
   return (
     <Link
       href={href}
+      prefetch={false}
       className="relative flex h-10 min-w-10 items-center justify-center rounded-full border border-[var(--gg-border)] px-3 text-xs font-black text-[var(--gg-text)] hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)]"
     >
       {label}

@@ -8,6 +8,13 @@ import {
 } from "node:crypto";
 import { promisify } from "node:util";
 import { isDemoModeEnabled } from "@/lib/demo-mode";
+import {
+  assertTransactionalEmailReady,
+  buildPublicUrl,
+  sendEmailVerificationEmail,
+  sendPasswordResetEmail,
+  shouldExposeAuthDebugLinks,
+} from "@/lib/email/transactional-email";
 import { getPrismaClient } from "@/lib/prisma";
 import { ensureUserWallet } from "@/lib/market/wallets";
 
@@ -61,6 +68,7 @@ export type AppSessionUser = {
   displayName: string;
   role: string;
   status: string;
+  emailVerifiedAt: Date | null;
 };
 
 async function hashPassword(password: string) {
@@ -114,6 +122,7 @@ async function createSessionForUser(user: {
   displayName: string;
   role: string;
   status: string;
+  emailVerifiedAt?: Date | null;
 }) {
   const prisma = getPrismaClient();
   const token = randomUUID();
@@ -153,6 +162,7 @@ async function createSessionForUser(user: {
     displayName: user.displayName,
     role: user.role,
     status: user.status,
+    emailVerifiedAt: user.emailVerifiedAt ?? null,
   };
 }
 
@@ -287,6 +297,8 @@ export async function registerUserAccount(input: {
     throw new Error("\uC774\uBBF8 \uAC00\uC785\uB41C \uC774\uBA54\uC77C\uC785\uB2C8\uB2E4.");
   }
 
+  assertTransactionalEmailReady();
+
   const passwordHash = await hashPassword(password);
   const user = await prisma.user.create({
     data: {
@@ -298,11 +310,24 @@ export async function registerUserAccount(input: {
   });
   await ensureUserWallet(user.id);
   const verificationToken = await createEmailVerificationToken(user.id);
-  const sessionUser = await createSessionForUser(user);
+  const verificationUrl = `/verify-email/${verificationToken}`;
+  const emailResult = await sendEmailVerificationEmail({
+    to: user.email,
+    displayName: user.displayName,
+    verificationUrl: buildPublicUrl(verificationUrl),
+  });
 
   return {
-    ...sessionUser,
-    verificationUrl: `/verify-email/${verificationToken}`,
+    userId: user.id,
+    email: user.email,
+    displayName: user.displayName,
+    role: user.role,
+    status: user.status,
+    emailVerifiedAt: user.emailVerifiedAt,
+    message: emailResult.delivered
+      ? "가입이 완료되었습니다. 이메일 인증 링크를 발송했습니다."
+      : "가입이 완료되었습니다. 개발 환경에서는 인증 링크를 직접 열 수 있습니다.",
+    verificationUrl: shouldExposeAuthDebugLinks() ? verificationUrl : null,
   };
 }
 
@@ -351,6 +376,10 @@ export async function signInWithCredentials(input: {
 
   if (input.allowedRoles && !input.allowedRoles.includes(user.role)) {
     throw new Error(input.forbiddenMessage ?? "\uC774 \uD654\uBA74\uC5D0\uC11C \uB85C\uADF8\uC778\uD560 \uC218 \uC5C6\uB294 \uACC4\uC815\uC785\uB2C8\uB2E4.");
+  }
+
+  if (!user.emailVerifiedAt && !isInternalRole(user.role)) {
+    throw new Error("이메일 인증을 완료한 뒤 로그인해 주세요.");
   }
 
   await recordSuccessfulLoginAttempt(email, ipKey);
@@ -453,6 +482,7 @@ export async function getCurrentSessionUser(): Promise<AppSessionUser | null> {
     displayName: session.user.displayName,
     role: session.user.role,
     status: session.user.status,
+    emailVerifiedAt: session.user.emailVerifiedAt,
   };
 }
 
@@ -462,10 +492,18 @@ export async function getCurrentUserEmailForRole(input: {
 }) {
   const sessionUser = await getCurrentSessionUser();
   if (sessionUser && input.allowedRoles.includes(sessionUser.role)) {
+    if (!sessionUser.emailVerifiedAt && !isInternalRole(sessionUser.role)) {
+      throw new Error("이메일 인증이 필요합니다.");
+    }
+
     return sessionUser.email;
   }
 
-  return input.fallbackEmail;
+  if (isDemoModeEnabled()) {
+    return input.fallbackEmail;
+  }
+
+  throw new Error("로그인이 필요합니다.");
 }
 
 export function getDemoAccountOptions() {
@@ -490,6 +528,8 @@ export async function requestPasswordReset(input: { email: string }) {
     },
     select: {
       id: true,
+      email: true,
+      displayName: true,
     },
   });
 
@@ -500,11 +540,21 @@ export async function requestPasswordReset(input: { email: string }) {
     };
   }
 
+  assertTransactionalEmailReady();
+
   const token = await createPasswordResetToken(user.id);
+  const resetUrl = `/password-reset/${token}`;
+  const emailResult = await sendPasswordResetEmail({
+    to: user.email,
+    displayName: user.displayName,
+    resetUrl: buildPublicUrl(resetUrl),
+  });
 
   return {
-    message: "\uBE44\uBC00\uBC88\uD638 \uC7AC\uC124\uC815 \uB9C1\uD06C\uAC00 \uC0DD\uC131\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uC774\uBA54\uC77C \uBC1C\uC1A1 \uC5F0\uB3D9\uC740 \uCD94\uD6C4 \uC5F0\uACB0\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.",
-    resetUrl: `/password-reset/${token}`,
+    message: emailResult.delivered
+      ? "비밀번호 재설정 메일을 발송했습니다."
+      : "비밀번호 재설정 링크가 생성되었습니다. 개발 환경에서는 링크를 직접 열 수 있습니다.",
+    resetUrl: shouldExposeAuthDebugLinks() ? resetUrl : null,
   };
 }
 
@@ -584,6 +634,8 @@ export async function requestEmailVerification(input: { email: string }) {
     },
     select: {
       id: true,
+      email: true,
+      displayName: true,
       emailVerifiedAt: true,
     },
   });
@@ -595,11 +647,21 @@ export async function requestEmailVerification(input: { email: string }) {
     };
   }
 
+  assertTransactionalEmailReady();
+
   const token = await createEmailVerificationToken(user.id);
+  const verificationUrl = `/verify-email/${token}`;
+  const emailResult = await sendEmailVerificationEmail({
+    to: user.email,
+    displayName: user.displayName,
+    verificationUrl: buildPublicUrl(verificationUrl),
+  });
 
   return {
-    message: "\uC774\uBA54\uC77C \uC778\uC99D \uB9C1\uD06C\uAC00 \uC0DD\uC131\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uC774\uBA54\uC77C \uBC1C\uC1A1 \uC5F0\uB3D9\uC740 \uCD94\uD6C4 \uC5F0\uACB0\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.",
-    verificationUrl: `/verify-email/${token}`,
+    message: emailResult.delivered
+      ? "이메일 인증 메일을 발송했습니다."
+      : "이메일 인증 링크가 생성되었습니다. 개발 환경에서는 링크를 직접 열 수 있습니다.",
+    verificationUrl: shouldExposeAuthDebugLinks() ? verificationUrl : null,
   };
 }
 
@@ -805,6 +867,10 @@ function shouldUseSecureSessionCookie() {
   }
 
   return false;
+}
+
+function isInternalRole(role: string) {
+  return ["CS", "MODERATOR", "FINANCE", "ADMIN", "SUPER"].includes(role);
 }
 
 function formatLoginLockTime(date: Date) {

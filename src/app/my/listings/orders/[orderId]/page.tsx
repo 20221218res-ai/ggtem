@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import AccountCredentialPanel from "@/app/account-credential-panel";
 import CountryText from "@/app/country-text";
 import type { TranslationKey } from "@/app/i18n";
 import TrustReportForm from "@/app/trust-report-form";
@@ -102,6 +103,10 @@ export default async function SellerOrderDetailPage({ params }: SellerOrderDetai
 
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
           <SellerOrderActions orderId={order.orderId} status={order.status} />
+
+          {order.category === "GAME_ACCOUNT" ? (
+            <AccountCredentialPanel orderId={order.orderId} mode="seller" />
+          ) : null}
 
           <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)]">
             <h2 className="text-lg font-black">

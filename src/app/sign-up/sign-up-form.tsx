@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Alert,
   Button,
+  ButtonLink,
   Card,
   CardHeading,
   Field,
@@ -15,17 +15,20 @@ import CountryText from "../country-text";
 import useCountryTranslation from "../use-country-translation";
 
 export default function SignUpForm() {
-  const router = useRouter();
   const { t } = useCountryTranslation();
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setMessage("");
+    setVerificationUrl(null);
     setIsSubmitting(true);
 
     try {
@@ -49,8 +52,9 @@ export default function SignUpForm() {
         throw new Error(result.message ?? t("auth.signUpFailed"));
       }
 
-      router.push("/");
-      router.refresh();
+      setMessage(result.message ?? "가입이 완료되었습니다. 이메일 인증을 진행해 주세요.");
+      setVerificationUrl(result.verificationUrl ?? null);
+      setPassword("");
     } catch (submitError) {
       setError(
         submitError instanceof Error ? submitError.message : t("auth.signUpFailed"),
@@ -107,6 +111,16 @@ export default function SignUpForm() {
         {error ? (
           <div className="mt-4">
             <Alert tone="danger">{error}</Alert>
+          </div>
+        ) : null}
+        {message ? (
+          <div className="mt-4 space-y-3">
+            <Alert tone="success">{message}</Alert>
+            {verificationUrl ? (
+              <ButtonLink href={verificationUrl} tone="secondary">
+                이메일 인증 링크 열기
+              </ButtonLink>
+            ) : null}
           </div>
         ) : null}
       </form>

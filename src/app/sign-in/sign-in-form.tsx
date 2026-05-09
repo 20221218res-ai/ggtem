@@ -148,72 +148,74 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
         ) : null}
       </form>
 
-      <Card>
-        <CardHeading
-          eyebrow={<CountryText id="auth.testAccount" />}
-          title={<CountryText id="auth.quickLogin" />}
-          description={<CountryText id="auth.quickLoginDescription" />}
-        />
+      {accounts.length > 0 ? (
+        <Card>
+          <CardHeading
+            eyebrow={<CountryText id="auth.testAccount" />}
+            title={<CountryText id="auth.quickLogin" />}
+            description={<CountryText id="auth.quickLoginDescription" />}
+          />
 
-        <div className="mt-5 grid gap-3">
-          <button
-            type="button"
-            onClick={() => void handleQuickSignIn("/my/orders")}
-            disabled={isSubmitting}
-            className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 text-left transition hover:border-[var(--gg-accent)] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <span className="font-semibold text-[var(--gg-text)]">
-              <CountryText id="auth.buyerOrderTest" />
-            </span>
-            <span className="mt-1 block text-sm text-[var(--gg-muted)]">
-              <CountryText id="auth.buyerOrderTestDescription" />
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => void handleQuickSignIn("/my/listings")}
-            disabled={isSubmitting}
-            className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 text-left transition hover:border-[var(--gg-accent)] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <span className="font-semibold text-[var(--gg-text)]">
-              <CountryText id="auth.sellerManageTest" />
-            </span>
-            <span className="mt-1 block text-sm text-[var(--gg-muted)]">
-              <CountryText id="auth.sellerManageTestDescription" />
-            </span>
-          </button>
-        </div>
-
-        <div className="mt-5 space-y-3">
-          {accounts.map((account) => (
+          <div className="mt-5 grid gap-3">
             <button
-              key={account.email}
               type="button"
-              onClick={() => {
-                setEmail(account.email);
-                setPassword(account.password);
-              }}
-              className="w-full rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] p-4 text-left transition hover:border-[var(--gg-accent)]"
+              onClick={() => void handleQuickSignIn("/my/orders")}
+              disabled={isSubmitting}
+              className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 text-left transition hover:border-[var(--gg-accent)] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <div className="flex items-center justify-between gap-3">
-                <span className="font-semibold text-[var(--gg-text)]">
-                  {account.displayName}
-                </span>
-                <span className="rounded-md bg-[var(--gg-card-soft-bg)] px-2 py-1 text-xs font-semibold text-[var(--gg-muted)]">
-                  <CountryText id="auth.select" />
-                </span>
-              </div>
-              <p className="mt-2 text-sm text-[var(--gg-muted)]">
-                {account.email}
-              </p>
-              <p className="mt-1 text-xs text-[var(--gg-subtle)]">
-                <CountryText id="auth.password" />: {account.password}
-              </p>
+              <span className="font-semibold text-[var(--gg-text)]">
+                <CountryText id="auth.buyerOrderTest" />
+              </span>
+              <span className="mt-1 block text-sm text-[var(--gg-muted)]">
+                <CountryText id="auth.buyerOrderTestDescription" />
+              </span>
             </button>
-          ))}
-        </div>
-      </Card>
+
+            <button
+              type="button"
+              onClick={() => void handleQuickSignIn("/my/listings")}
+              disabled={isSubmitting}
+              className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 text-left transition hover:border-[var(--gg-accent)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <span className="font-semibold text-[var(--gg-text)]">
+                <CountryText id="auth.sellerManageTest" />
+              </span>
+              <span className="mt-1 block text-sm text-[var(--gg-muted)]">
+                <CountryText id="auth.sellerManageTestDescription" />
+              </span>
+            </button>
+          </div>
+
+          <div className="mt-5 space-y-3">
+            {accounts.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                onClick={() => {
+                  setEmail(account.email);
+                  setPassword(account.password);
+                }}
+                className="w-full rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] p-4 text-left transition hover:border-[var(--gg-accent)]"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-semibold text-[var(--gg-text)]">
+                    {account.displayName}
+                  </span>
+                  <span className="rounded-md bg-[var(--gg-card-soft-bg)] px-2 py-1 text-xs font-semibold text-[var(--gg-muted)]">
+                    <CountryText id="auth.select" />
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-[var(--gg-muted)]">
+                  {account.email}
+                </p>
+                <p className="mt-1 text-xs text-[var(--gg-subtle)]">
+                  <CountryText id="auth.password" />: {account.password}
+                </p>
+              </button>
+            ))}
+          </div>
+        </Card>
+      ) : null}
     </div>
   );
 }

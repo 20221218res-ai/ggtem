@@ -335,6 +335,7 @@ export type OrderWhereInput = {
   chatRoom?: Prisma.XOR<Prisma.ChatRoomNullableScalarRelationFilter, Prisma.ChatRoomWhereInput> | null
   trustReports?: Prisma.TrustReportListRelationFilter
   review?: Prisma.XOR<Prisma.OrderReviewNullableScalarRelationFilter, Prisma.OrderReviewWhereInput> | null
+  accountCredential?: Prisma.XOR<Prisma.OrderAccountCredentialNullableScalarRelationFilter, Prisma.OrderAccountCredentialWhereInput> | null
 }
 
 export type OrderOrderByWithRelationInput = {
@@ -362,6 +363,7 @@ export type OrderOrderByWithRelationInput = {
   chatRoom?: Prisma.ChatRoomOrderByWithRelationInput
   trustReports?: Prisma.TrustReportOrderByRelationAggregateInput
   review?: Prisma.OrderReviewOrderByWithRelationInput
+  accountCredential?: Prisma.OrderAccountCredentialOrderByWithRelationInput
 }
 
 export type OrderWhereUniqueInput = Prisma.AtLeast<{
@@ -392,6 +394,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   chatRoom?: Prisma.XOR<Prisma.ChatRoomNullableScalarRelationFilter, Prisma.ChatRoomWhereInput> | null
   trustReports?: Prisma.TrustReportListRelationFilter
   review?: Prisma.XOR<Prisma.OrderReviewNullableScalarRelationFilter, Prisma.OrderReviewWhereInput> | null
+  accountCredential?: Prisma.XOR<Prisma.OrderAccountCredentialNullableScalarRelationFilter, Prisma.OrderAccountCredentialWhereInput> | null
 }, "id" | "orderNumber">
 
 export type OrderOrderByWithAggregationInput = {
@@ -464,6 +467,7 @@ export type OrderCreateInput = {
   chatRoom?: Prisma.ChatRoomCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateInput = {
@@ -488,6 +492,7 @@ export type OrderUncheckedCreateInput = {
   chatRoom?: Prisma.ChatRoomUncheckedCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportUncheckedCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewUncheckedCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUpdateInput = {
@@ -512,6 +517,7 @@ export type OrderUpdateInput = {
   chatRoom?: Prisma.ChatRoomUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateInput = {
@@ -536,6 +542,7 @@ export type OrderUncheckedUpdateInput = {
   chatRoom?: Prisma.ChatRoomUncheckedUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUncheckedUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUncheckedUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderCreateManyInput = {
@@ -821,6 +828,20 @@ export type EnumOrderStatusFieldUpdateOperationsInput = {
   set?: $Enums.OrderStatus
 }
 
+export type OrderCreateNestedOneWithoutAccountCredentialInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutAccountCredentialInput, Prisma.OrderUncheckedCreateWithoutAccountCredentialInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutAccountCredentialInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneRequiredWithoutAccountCredentialNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutAccountCredentialInput, Prisma.OrderUncheckedCreateWithoutAccountCredentialInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutAccountCredentialInput
+  upsert?: Prisma.OrderUpsertWithoutAccountCredentialInput
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutAccountCredentialInput, Prisma.OrderUpdateWithoutAccountCredentialInput>, Prisma.OrderUncheckedUpdateWithoutAccountCredentialInput>
+}
+
 export type OrderCreateNestedOneWithoutChatRoomInput = {
   create?: Prisma.XOR<Prisma.OrderCreateWithoutChatRoomInput, Prisma.OrderUncheckedCreateWithoutChatRoomInput>
   connectOrCreate?: Prisma.OrderCreateOrConnectWithoutChatRoomInput
@@ -900,6 +921,7 @@ export type OrderCreateWithoutBuyerInput = {
   chatRoom?: Prisma.ChatRoomCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutBuyerInput = {
@@ -923,6 +945,7 @@ export type OrderUncheckedCreateWithoutBuyerInput = {
   chatRoom?: Prisma.ChatRoomUncheckedCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportUncheckedCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewUncheckedCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutBuyerInput = {
@@ -956,6 +979,7 @@ export type OrderCreateWithoutSellerInput = {
   chatRoom?: Prisma.ChatRoomCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutSellerInput = {
@@ -979,6 +1003,7 @@ export type OrderUncheckedCreateWithoutSellerInput = {
   chatRoom?: Prisma.ChatRoomUncheckedCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportUncheckedCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewUncheckedCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutSellerInput = {
@@ -1067,6 +1092,7 @@ export type OrderCreateWithoutListingInput = {
   chatRoom?: Prisma.ChatRoomCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutListingInput = {
@@ -1090,6 +1116,7 @@ export type OrderUncheckedCreateWithoutListingInput = {
   chatRoom?: Prisma.ChatRoomUncheckedCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportUncheckedCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewUncheckedCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutListingInput = {
@@ -1118,6 +1145,118 @@ export type OrderUpdateManyWithWhereWithoutListingInput = {
   data: Prisma.XOR<Prisma.OrderUpdateManyMutationInput, Prisma.OrderUncheckedUpdateManyWithoutListingInput>
 }
 
+export type OrderCreateWithoutAccountCredentialInput = {
+  id?: string
+  orderNumber: string
+  status?: $Enums.OrderStatus
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grossAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  autoConfirmAt?: Date | string | null
+  completedAt?: Date | string | null
+  canceledAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  buyer: Prisma.UserCreateNestedOneWithoutBuyerOrdersInput
+  seller: Prisma.UserCreateNestedOneWithoutSellerOrdersInput
+  listing: Prisma.ListingCreateNestedOneWithoutOrdersInput
+  events?: Prisma.OrderEventCreateNestedManyWithoutOrderInput
+  chatRoom?: Prisma.ChatRoomCreateNestedOneWithoutOrderInput
+  trustReports?: Prisma.TrustReportCreateNestedManyWithoutOrderInput
+  review?: Prisma.OrderReviewCreateNestedOneWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutAccountCredentialInput = {
+  id?: string
+  orderNumber: string
+  buyerId: string
+  sellerId: string
+  listingId: string
+  status?: $Enums.OrderStatus
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grossAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  autoConfirmAt?: Date | string | null
+  completedAt?: Date | string | null
+  canceledAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  events?: Prisma.OrderEventUncheckedCreateNestedManyWithoutOrderInput
+  chatRoom?: Prisma.ChatRoomUncheckedCreateNestedOneWithoutOrderInput
+  trustReports?: Prisma.TrustReportUncheckedCreateNestedManyWithoutOrderInput
+  review?: Prisma.OrderReviewUncheckedCreateNestedOneWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutAccountCredentialInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutAccountCredentialInput, Prisma.OrderUncheckedCreateWithoutAccountCredentialInput>
+}
+
+export type OrderUpsertWithoutAccountCredentialInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutAccountCredentialInput, Prisma.OrderUncheckedUpdateWithoutAccountCredentialInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutAccountCredentialInput, Prisma.OrderUncheckedCreateWithoutAccountCredentialInput>
+  where?: Prisma.OrderWhereInput
+}
+
+export type OrderUpdateToOneWithWhereWithoutAccountCredentialInput = {
+  where?: Prisma.OrderWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutAccountCredentialInput, Prisma.OrderUncheckedUpdateWithoutAccountCredentialInput>
+}
+
+export type OrderUpdateWithoutAccountCredentialInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grossAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerOrdersNestedInput
+  seller?: Prisma.UserUpdateOneRequiredWithoutSellerOrdersNestedInput
+  listing?: Prisma.ListingUpdateOneRequiredWithoutOrdersNestedInput
+  events?: Prisma.OrderEventUpdateManyWithoutOrderNestedInput
+  chatRoom?: Prisma.ChatRoomUpdateOneWithoutOrderNestedInput
+  trustReports?: Prisma.TrustReportUpdateManyWithoutOrderNestedInput
+  review?: Prisma.OrderReviewUpdateOneWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutAccountCredentialInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  listingId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grossAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  events?: Prisma.OrderEventUncheckedUpdateManyWithoutOrderNestedInput
+  chatRoom?: Prisma.ChatRoomUncheckedUpdateOneWithoutOrderNestedInput
+  trustReports?: Prisma.TrustReportUncheckedUpdateManyWithoutOrderNestedInput
+  review?: Prisma.OrderReviewUncheckedUpdateOneWithoutOrderNestedInput
+}
+
 export type OrderCreateWithoutChatRoomInput = {
   id?: string
   orderNumber: string
@@ -1139,6 +1278,7 @@ export type OrderCreateWithoutChatRoomInput = {
   events?: Prisma.OrderEventCreateNestedManyWithoutOrderInput
   trustReports?: Prisma.TrustReportCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutChatRoomInput = {
@@ -1162,6 +1302,7 @@ export type OrderUncheckedCreateWithoutChatRoomInput = {
   events?: Prisma.OrderEventUncheckedCreateNestedManyWithoutOrderInput
   trustReports?: Prisma.TrustReportUncheckedCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewUncheckedCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutChatRoomInput = {
@@ -1201,6 +1342,7 @@ export type OrderUpdateWithoutChatRoomInput = {
   events?: Prisma.OrderEventUpdateManyWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutChatRoomInput = {
@@ -1224,6 +1366,7 @@ export type OrderUncheckedUpdateWithoutChatRoomInput = {
   events?: Prisma.OrderEventUncheckedUpdateManyWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUncheckedUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUncheckedUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderCreateWithoutEventsInput = {
@@ -1247,6 +1390,7 @@ export type OrderCreateWithoutEventsInput = {
   chatRoom?: Prisma.ChatRoomCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutEventsInput = {
@@ -1270,6 +1414,7 @@ export type OrderUncheckedCreateWithoutEventsInput = {
   chatRoom?: Prisma.ChatRoomUncheckedCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportUncheckedCreateNestedManyWithoutOrderInput
   review?: Prisma.OrderReviewUncheckedCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutEventsInput = {
@@ -1309,6 +1454,7 @@ export type OrderUpdateWithoutEventsInput = {
   chatRoom?: Prisma.ChatRoomUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutEventsInput = {
@@ -1332,6 +1478,7 @@ export type OrderUncheckedUpdateWithoutEventsInput = {
   chatRoom?: Prisma.ChatRoomUncheckedUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUncheckedUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUncheckedUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderCreateWithoutReviewInput = {
@@ -1355,6 +1502,7 @@ export type OrderCreateWithoutReviewInput = {
   events?: Prisma.OrderEventCreateNestedManyWithoutOrderInput
   chatRoom?: Prisma.ChatRoomCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportCreateNestedManyWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutReviewInput = {
@@ -1378,6 +1526,7 @@ export type OrderUncheckedCreateWithoutReviewInput = {
   events?: Prisma.OrderEventUncheckedCreateNestedManyWithoutOrderInput
   chatRoom?: Prisma.ChatRoomUncheckedCreateNestedOneWithoutOrderInput
   trustReports?: Prisma.TrustReportUncheckedCreateNestedManyWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutReviewInput = {
@@ -1417,6 +1566,7 @@ export type OrderUpdateWithoutReviewInput = {
   events?: Prisma.OrderEventUpdateManyWithoutOrderNestedInput
   chatRoom?: Prisma.ChatRoomUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUpdateManyWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutReviewInput = {
@@ -1440,6 +1590,7 @@ export type OrderUncheckedUpdateWithoutReviewInput = {
   events?: Prisma.OrderEventUncheckedUpdateManyWithoutOrderNestedInput
   chatRoom?: Prisma.ChatRoomUncheckedUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUncheckedUpdateManyWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderCreateWithoutTrustReportsInput = {
@@ -1463,6 +1614,7 @@ export type OrderCreateWithoutTrustReportsInput = {
   events?: Prisma.OrderEventCreateNestedManyWithoutOrderInput
   chatRoom?: Prisma.ChatRoomCreateNestedOneWithoutOrderInput
   review?: Prisma.OrderReviewCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutTrustReportsInput = {
@@ -1486,6 +1638,7 @@ export type OrderUncheckedCreateWithoutTrustReportsInput = {
   events?: Prisma.OrderEventUncheckedCreateNestedManyWithoutOrderInput
   chatRoom?: Prisma.ChatRoomUncheckedCreateNestedOneWithoutOrderInput
   review?: Prisma.OrderReviewUncheckedCreateNestedOneWithoutOrderInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutTrustReportsInput = {
@@ -1525,6 +1678,7 @@ export type OrderUpdateWithoutTrustReportsInput = {
   events?: Prisma.OrderEventUpdateManyWithoutOrderNestedInput
   chatRoom?: Prisma.ChatRoomUpdateOneWithoutOrderNestedInput
   review?: Prisma.OrderReviewUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutTrustReportsInput = {
@@ -1548,6 +1702,7 @@ export type OrderUncheckedUpdateWithoutTrustReportsInput = {
   events?: Prisma.OrderEventUncheckedUpdateManyWithoutOrderNestedInput
   chatRoom?: Prisma.ChatRoomUncheckedUpdateOneWithoutOrderNestedInput
   review?: Prisma.OrderReviewUncheckedUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderCreateManyBuyerInput = {
@@ -1609,6 +1764,7 @@ export type OrderUpdateWithoutBuyerInput = {
   chatRoom?: Prisma.ChatRoomUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutBuyerInput = {
@@ -1632,6 +1788,7 @@ export type OrderUncheckedUpdateWithoutBuyerInput = {
   chatRoom?: Prisma.ChatRoomUncheckedUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUncheckedUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUncheckedUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutBuyerInput = {
@@ -1674,6 +1831,7 @@ export type OrderUpdateWithoutSellerInput = {
   chatRoom?: Prisma.ChatRoomUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutSellerInput = {
@@ -1697,6 +1855,7 @@ export type OrderUncheckedUpdateWithoutSellerInput = {
   chatRoom?: Prisma.ChatRoomUncheckedUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUncheckedUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUncheckedUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutSellerInput = {
@@ -1758,6 +1917,7 @@ export type OrderUpdateWithoutListingInput = {
   chatRoom?: Prisma.ChatRoomUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutListingInput = {
@@ -1781,6 +1941,7 @@ export type OrderUncheckedUpdateWithoutListingInput = {
   chatRoom?: Prisma.ChatRoomUncheckedUpdateOneWithoutOrderNestedInput
   trustReports?: Prisma.TrustReportUncheckedUpdateManyWithoutOrderNestedInput
   review?: Prisma.OrderReviewUncheckedUpdateOneWithoutOrderNestedInput
+  accountCredential?: Prisma.OrderAccountCredentialUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutListingInput = {
@@ -1867,6 +2028,7 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   chatRoom?: boolean | Prisma.Order$chatRoomArgs<ExtArgs>
   trustReports?: boolean | Prisma.Order$trustReportsArgs<ExtArgs>
   review?: boolean | Prisma.Order$reviewArgs<ExtArgs>
+  accountCredential?: boolean | Prisma.Order$accountCredentialArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
 
@@ -1945,6 +2107,7 @@ export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   chatRoom?: boolean | Prisma.Order$chatRoomArgs<ExtArgs>
   trustReports?: boolean | Prisma.Order$trustReportsArgs<ExtArgs>
   review?: boolean | Prisma.Order$reviewArgs<ExtArgs>
+  accountCredential?: boolean | Prisma.Order$accountCredentialArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1968,6 +2131,7 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     chatRoom: Prisma.$ChatRoomPayload<ExtArgs> | null
     trustReports: Prisma.$TrustReportPayload<ExtArgs>[]
     review: Prisma.$OrderReviewPayload<ExtArgs> | null
+    accountCredential: Prisma.$OrderAccountCredentialPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2388,6 +2552,7 @@ export interface Prisma__OrderClient<T, Null = never, ExtArgs extends runtime.Ty
   chatRoom<T extends Prisma.Order$chatRoomArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$chatRoomArgs<ExtArgs>>): Prisma.Prisma__ChatRoomClient<runtime.Types.Result.GetResult<Prisma.$ChatRoomPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   trustReports<T extends Prisma.Order$trustReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$trustReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrustReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   review<T extends Prisma.Order$reviewArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$reviewArgs<ExtArgs>>): Prisma.Prisma__OrderReviewClient<runtime.Types.Result.GetResult<Prisma.$OrderReviewPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  accountCredential<T extends Prisma.Order$accountCredentialArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$accountCredentialArgs<ExtArgs>>): Prisma.Prisma__OrderAccountCredentialClient<runtime.Types.Result.GetResult<Prisma.$OrderAccountCredentialPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2918,6 +3083,25 @@ export type Order$reviewArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    */
   include?: Prisma.OrderReviewInclude<ExtArgs> | null
   where?: Prisma.OrderReviewWhereInput
+}
+
+/**
+ * Order.accountCredential
+ */
+export type Order$accountCredentialArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OrderAccountCredential
+   */
+  select?: Prisma.OrderAccountCredentialSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OrderAccountCredential
+   */
+  omit?: Prisma.OrderAccountCredentialOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderAccountCredentialInclude<ExtArgs> | null
+  where?: Prisma.OrderAccountCredentialWhereInput
 }
 
 /**

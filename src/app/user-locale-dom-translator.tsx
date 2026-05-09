@@ -145,29 +145,51 @@ export default function UserLocaleDomTranslator() {
     }
 
     let rafId = 0;
+    let observer: MutationObserver | null = null;
+
+    const stopObserver = () => {
+      observer?.disconnect();
+      observer = null;
+    };
+
+    const startObserver = () => {
+      if (observer) {
+        return;
+      }
+
+      observer = new MutationObserver(translateNow);
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: attributeNames,
+      });
+    };
+
     const translateNow = () => {
       window.cancelAnimationFrame(rafId);
-      rafId = window.requestAnimationFrame(() => translateDocument(getCurrentCountryCode()));
+      rafId = window.requestAnimationFrame(() => {
+        const countryCode = getCurrentCountryCode();
+        translateDocument(countryCode);
+
+        if (countryCode === "KR") {
+          stopObserver();
+        } else {
+          startObserver();
+        }
+      });
     };
 
     translateNow();
     window.addEventListener(COUNTRY_CHANGE_EVENT, translateNow);
     window.addEventListener("storage", translateNow);
 
-    const observer = new MutationObserver(translateNow);
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-      attributes: true,
-      attributeFilter: attributeNames,
-    });
-
     return () => {
       window.cancelAnimationFrame(rafId);
       window.removeEventListener(COUNTRY_CHANGE_EVENT, translateNow);
       window.removeEventListener("storage", translateNow);
-      observer.disconnect();
+      stopObserver();
     };
   }, [pathname]);
 

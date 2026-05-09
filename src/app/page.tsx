@@ -17,6 +17,7 @@ export default async function Home({ searchParams }: HomePageProps) {
     game: resolvedSearchParams?.game,
     category: resolvedSearchParams?.category,
     sort: resolvedSearchParams?.sort,
+    limit: 12,
   });
 
   return <MarketplaceHome {...view} />;

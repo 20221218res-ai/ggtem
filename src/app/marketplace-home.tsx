@@ -63,6 +63,7 @@ export function MarketplaceHome({
             <Link
               key={category.href}
               href={category.href}
+              prefetch={false}
               className="group rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)] transition hover:-translate-y-0.5 hover:border-[var(--gg-accent)]"
             >
               <p className="text-xs font-bold text-[var(--gg-accent)]">
@@ -203,6 +204,7 @@ function HomeButton({ href, children }: { href: string; children: React.ReactNod
   return (
     <Link
       href={href}
+      prefetch={false}
       className="rounded-xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
     >
       {children}
@@ -214,6 +216,7 @@ function OutlineButton({ href, children }: { href: string; children: React.React
   return (
     <Link
       href={href}
+      prefetch={false}
       className="rounded-xl border border-[var(--gg-border)] px-5 py-3 text-sm font-bold hover:bg-[var(--gg-control-bg)]"
     >
       {children}
@@ -233,6 +236,7 @@ function HomeAction({
   return (
     <Link
       href={href}
+      prefetch={false}
       className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)] transition hover:-translate-y-0.5 hover:border-[var(--gg-accent)]"
     >
       <p className="text-sm font-black text-[var(--gg-muted)]">
@@ -265,6 +269,7 @@ function LiveTradeBoard({ listings }: { listings: MarketplaceListingSummary[] })
           <Link
             key={listing.listingId}
             href={`/listings/${listing.listingId}`}
+            prefetch={false}
             className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)]"
           >
             <div className="flex items-center justify-between gap-3">
@@ -316,6 +321,7 @@ function GameIndex({
           <Link
             key={game.name}
             href={`/listings?game=${encodeURIComponent(game.name)}`}
+            prefetch={false}
             className="flex items-center justify-between gap-3 rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 hover:border-[var(--gg-accent)]"
           >
             <div className="flex items-center gap-3">
@@ -356,6 +362,7 @@ function FeaturedListings({
         </div>
         <Link
           href="/listings"
+          prefetch={false}
           className="rounded-lg border border-[var(--gg-border)] px-4 py-2 text-sm font-bold hover:bg-[var(--gg-control-bg)]"
         >
           <CountryText id="common.viewAll" />
@@ -376,6 +383,7 @@ export function ListingCard({ listing }: { listing: MarketplaceListingSummary })
   return (
     <Link
       href={`/listings/${listing.listingId}`}
+      prefetch={false}
       className="grid gap-4 rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)] lg:grid-cols-[120px_1fr]"
     >
       <div className="overflow-hidden rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)]">
@@ -385,6 +393,7 @@ export function ListingCard({ listing }: { listing: MarketplaceListingSummary })
             alt={listing.title}
             width={240}
             height={180}
+            sizes="(min-width: 1024px) 120px, (min-width: 768px) 50vw, 100vw"
             className="aspect-[4/3] h-full w-full object-cover"
           />
         ) : (

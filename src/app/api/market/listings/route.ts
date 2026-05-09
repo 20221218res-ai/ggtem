@@ -59,9 +59,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         message:
-          error instanceof Error
-            ? error.message
-            : "판매글을 등록하지 못했습니다.",
+          error instanceof Error ? error.message : "판매글을 등록하지 못했습니다.",
       },
       { status: 400 },
     );

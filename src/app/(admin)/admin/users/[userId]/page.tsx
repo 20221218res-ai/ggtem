@@ -168,6 +168,8 @@ export default async function AdminUserDetailPage({
           </section>
         ) : null}
 
+        <LinkedAccountSignalsSection detail={detail} />
+
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div>
@@ -473,6 +475,82 @@ function WalletLedgerSection({ detail }: { detail: UserDetail }) {
   );
 }
 
+function LinkedAccountSignalsSection({ detail }: { detail: UserDetail }) {
+  const highSignalCount = detail.linkedAccountSignals.filter(
+    (signal) => signal.riskLevel === "HIGH",
+  ).length;
+
+  return (
+    <section className="rounded-lg border border-amber-200 bg-amber-50 p-5 shadow-sm">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p className="text-sm font-black text-amber-700">중복 계정 신호</p>
+          <h2 className="mt-1 text-xl font-black text-slate-950">
+            1인 1계정 원칙 점검
+          </h2>
+          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+            같은 출금 주소, 출금 IP, 기기키, 로그인 IP를 공유하는 계정이 있는지 확인합니다.
+            이 신호만으로 제재하지 말고 주문/출금/상담 기록과 함께 판단하세요.
+          </p>
+        </div>
+        <Badge tone={highSignalCount > 0 ? "red" : detail.linkedAccountSignals.length > 0 ? "amber" : "emerald"}>
+          {detail.linkedAccountSignals.length > 0
+            ? `${detail.linkedAccountSignals.length}개 신호`
+            : "신호 없음"}
+        </Badge>
+      </div>
+
+      <div className="mt-5 grid gap-3 xl:grid-cols-2">
+        {detail.linkedAccountSignals.map((signal) => (
+          <article key={`${signal.signalType}:${signal.value}`} className="rounded-lg border border-amber-200 bg-white p-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div>
+                <div className="flex flex-wrap gap-2">
+                  <Badge tone={linkedRiskTone(signal.riskLevel)}>
+                    {linkedRiskLabel(signal.riskLevel)}
+                  </Badge>
+                  <Badge tone="amber">{signal.label}</Badge>
+                </div>
+                <p className="mt-3 break-all text-sm font-black text-slate-950">
+                  {signal.value}
+                </p>
+                <p className="mt-2 text-xs font-semibold text-slate-500">
+                  관련 계정 {signal.relatedUserCount}개 / 마지막 신호 {signal.lastSeenAt}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              {signal.relatedUsers.map((user) => (
+                <Link
+                  key={`${signal.signalType}:${user.userId}`}
+                  href={`/admin/users/${user.userId}`}
+                  className="flex flex-col rounded-lg border border-slate-200 bg-slate-50 p-3 hover:border-amber-300 hover:bg-white sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <span>
+                    <span className="block text-sm font-black text-slate-950">
+                      {user.displayName}
+                    </span>
+                    <span className="block text-xs font-semibold text-slate-500">
+                      {user.email}
+                    </span>
+                  </span>
+                  <span className="mt-2 text-xs font-bold text-slate-500 sm:mt-0">
+                    {statusLabel(user.status)} / {user.lastSeenAt}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </article>
+        ))}
+        {detail.linkedAccountSignals.length === 0 ? (
+          <EmptyState label="현재 동일 출금주소, IP, 기기키로 연결된 다른 계정이 없습니다." />
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 function SummaryCard({
   label,
   value,
@@ -738,6 +816,18 @@ function statusTone(status: string): Tone {
   }
   if (status === "SUSPENDED" || status === "BANNED") return "red";
   return "slate";
+}
+
+function linkedRiskTone(riskLevel: string): Tone {
+  if (riskLevel === "HIGH") return "red";
+  if (riskLevel === "MEDIUM") return "amber";
+  return "blue";
+}
+
+function linkedRiskLabel(riskLevel: string) {
+  if (riskLevel === "HIGH") return "높은 위험";
+  if (riskLevel === "MEDIUM") return "주의";
+  return "참고";
 }
 
 function accountStatusHint(status: string) {

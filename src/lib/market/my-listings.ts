@@ -4,6 +4,7 @@ import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
 import { getCurrentUserEmailForRole } from "@/lib/auth/session";
 import { ensureUserWallet } from "@/lib/market/wallets";
+import { assertNoOffPlatformContact } from "@/lib/risk/off-platform-contact";
 import {
   calculatePremiumPromotionFee,
   formatPremiumPromotionFee,
@@ -67,6 +68,8 @@ export type MarketplaceSellerOrderDetail = {
   status: string;
   listingId: string;
   listingTitle: string;
+  category: string;
+  accountTransferType: string | null;
   buyerName: string;
   quantity: string;
   grossAmount: string;
@@ -484,6 +487,16 @@ export async function createMarketplaceSellerListing(input: {
     throw new Error("계정 유형을 선택해 주세요.");
   }
 
+  await assertNoOffPlatformContact(
+    [trimmedTitle, trimmedDescription].filter(Boolean).join("\n"),
+    {
+      actorUserId: seller.id,
+      sourceType: "LISTING_DRAFT",
+      sourceId: `seller:${seller.id}:${Date.now()}`,
+      contentKind: "LISTING",
+    },
+  );
+
   if (premiumFeeAmount > 0n) {
     const availableBalance = parseFixedAmount(
       sellerWallet.availableBalance.toString(),
@@ -674,6 +687,16 @@ export async function updateMarketplaceSellerListing(input: {
   if (nextTotalQuantity <= 0n) {
     throw new Error("총 수량은 0보다 커야 합니다.");
   }
+
+  await assertNoOffPlatformContact(
+    [trimmedTitle, trimmedDescription].filter(Boolean).join("\n"),
+    {
+      actorUserId: seller.id,
+      sourceType: "LISTING_EDIT",
+      sourceId: input.listingId,
+      contentKind: "LISTING",
+    },
+  );
 
   return prisma.$transaction(async (tx) => {
     const listing = await tx.listing.findFirst({
@@ -1179,6 +1202,8 @@ export async function getMarketplaceSellerOrderDetail(
     status: order.status,
     listingId: order.listingId,
     listingTitle: order.listing.title,
+    category: order.listing.category,
+    accountTransferType: order.listing.accountTransferType,
     buyerName: order.buyer.displayName,
     quantity: order.quantity.toString(),
     grossAmount: order.grossAmount.toString(),

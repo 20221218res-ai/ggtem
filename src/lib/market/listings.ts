@@ -89,6 +89,7 @@ export type MarketplaceListingFilters = {
   category?: string;
   accountTransferType?: string;
   sort?: string;
+  limit?: number;
 };
 
 export type MarketplaceListingsView = {
@@ -117,6 +118,7 @@ export async function getMarketplaceListings(
     filters?.accountTransferType,
   );
   const normalizedSort = filters?.sort?.trim() || "latest";
+  const take = clampListingLimit(filters?.limit ?? 100);
   const where: Prisma.ListingWhereInput = {
     status: "ACTIVE",
     game: {
@@ -170,25 +172,57 @@ export async function getMarketplaceListings(
     ];
   }
 
-  const listings = await prisma.listing.findMany({
-    where,
-    include: {
-      seller: true,
-      inventory: true,
-      game: true,
-      server: true,
-      images: {
-        orderBy: {
-          sortOrder: "asc",
+  const [listings, allActiveListings] = await Promise.all([
+    prisma.listing.findMany({
+      where,
+      include: {
+        seller: true,
+        inventory: true,
+        game: true,
+        server: true,
+        images: {
+          orderBy: {
+            sortOrder: "asc",
+          },
+          take: 1,
         },
-        take: 1,
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: 100,
-  });
+      orderBy: getListingOrderBy(normalizedSort),
+      take,
+    }),
+    prisma.listing.findMany({
+      where: {
+        status: "ACTIVE",
+        game: {
+          isActive: true,
+        },
+        server: {
+          is: {
+            isActive: true,
+          },
+        },
+        inventory: {
+          is: {
+            availableQuantity: {
+              gt: 0,
+            },
+          },
+        },
+      },
+      select: {
+        category: true,
+        game: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 100,
+    }),
+  ]);
 
   const sortedListings = [...listings].sort((left, right) => {
     if (normalizedSort === "price_low") {
@@ -211,34 +245,6 @@ export async function getMarketplaceListings(
     prisma,
     sortedListings.map((listing) => listing.sellerId),
   );
-
-  const allActiveListings = await prisma.listing.findMany({
-    where: {
-      status: "ACTIVE",
-      game: {
-        isActive: true,
-      },
-      server: {
-        is: {
-          isActive: true,
-        },
-      },
-      inventory: {
-        is: {
-          availableQuantity: {
-            gt: 0,
-          },
-        },
-      },
-    },
-    include: {
-      game: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: 100,
-  });
 
   return {
     listings: sortedListings.map((listing) => ({
@@ -284,6 +290,26 @@ export async function getMarketplaceListings(
       sort: normalizedSort,
     },
   };
+}
+
+function clampListingLimit(limit: number) {
+  if (!Number.isFinite(limit)) {
+    return 100;
+  }
+
+  return Math.min(Math.max(Math.trunc(limit), 1), 100);
+}
+
+function getListingOrderBy(sort: string): Prisma.ListingOrderByWithRelationInput {
+  if (sort === "price_low") {
+    return { unitPrice: "asc" };
+  }
+
+  if (sort === "price_high") {
+    return { unitPrice: "desc" };
+  }
+
+  return { createdAt: "desc" };
 }
 
 export async function getMarketplaceListingDetail(

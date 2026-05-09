@@ -1,5 +1,7 @@
 import { UserRole, UserStatus } from "@/generated/prisma/enums";
 import type { Prisma } from "@/generated/prisma/client";
+import type { LinkedAccountSignal } from "@/lib/admin/linked-account-risk";
+import { getLinkedAccountSignalsForUser } from "@/lib/admin/linked-account-risk";
 import { getPrismaClient } from "@/lib/prisma";
 
 export const ADMIN_USER_ROLE_OPTIONS = Object.values(UserRole);
@@ -163,6 +165,7 @@ export type AdminUserDetail = {
     adminEmail: string;
     createdAt: string;
   }>;
+  linkedAccountSignals: LinkedAccountSignal[];
   reviewsGiven: Array<{
     reviewId: string;
     rating: number;
@@ -452,37 +455,39 @@ export async function getAdminUserDetail(
     return null;
   }
 
-  const [restrictionTimeline, walletLedgerEntries] = await Promise.all([
-    prisma.adminAuditLog.findMany({
-      where: {
-        targetType: "USER",
-        targetId: user.id,
-        action: {
-          in: [
-            "SELLER_RISK_RESTRICTION_APPLIED",
-            "SELLER_RISK_RESTRICTION_RESTORED",
-            "USER_ACCESS_UPDATED",
-          ],
+  const [restrictionTimeline, walletLedgerEntries, linkedAccountSignals] =
+    await Promise.all([
+      prisma.adminAuditLog.findMany({
+        where: {
+          targetType: "USER",
+          targetId: user.id,
+          action: {
+            in: [
+              "SELLER_RISK_RESTRICTION_APPLIED",
+              "SELLER_RISK_RESTRICTION_RESTORED",
+              "USER_ACCESS_UPDATED",
+            ],
+          },
         },
-      },
-      include: {
-        admin: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 12,
-    }),
-    prisma.walletLedgerEntry.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 12,
-    }),
-  ]);
+        include: {
+          admin: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 12,
+      }),
+      prisma.walletLedgerEntry.findMany({
+        where: {
+          userId: user.id,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 12,
+      }),
+      getLinkedAccountSignalsForUser(user.id),
+    ]);
 
   return {
     user: {
@@ -601,6 +606,7 @@ export async function getAdminUserDetail(
       adminEmail: note.admin.email,
       createdAt: formatKoreanDate(note.createdAt),
     })),
+    linkedAccountSignals,
     reviewsGiven: user.reviewsGiven.map((review) => ({
       reviewId: review.id,
       rating: review.rating,

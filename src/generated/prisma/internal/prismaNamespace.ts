@@ -400,6 +400,7 @@ export const ModelName = {
   BuyRequest: 'BuyRequest',
   BuyRequestOffer: 'BuyRequestOffer',
   Order: 'Order',
+  OrderAccountCredential: 'OrderAccountCredential',
   ChatRoom: 'ChatRoom',
   ChatMessage: 'ChatMessage',
   OrderEvent: 'OrderEvent',
@@ -434,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "loginAttempt" | "passwordResetToken" | "emailVerificationToken" | "adminInviteToken" | "wallet" | "walletLedgerEntry" | "game" | "gameServer" | "listing" | "listingImage" | "listingInventory" | "buyRequest" | "buyRequestOffer" | "order" | "chatRoom" | "chatMessage" | "orderEvent" | "orderReview" | "orderReviewModeration" | "depositRequest" | "depositWalletAddress" | "withdrawalRequest" | "withdrawalLog" | "adminAuditLog" | "cmsDocument" | "cmsDocumentVersion" | "adminSlaIncident" | "adminSlaIncidentNote" | "adminFinanceCloseReport" | "trustReport" | "adminUserNote" | "adminGameNote" | "notification"
+    modelProps: "user" | "session" | "loginAttempt" | "passwordResetToken" | "emailVerificationToken" | "adminInviteToken" | "wallet" | "walletLedgerEntry" | "game" | "gameServer" | "listing" | "listingImage" | "listingInventory" | "buyRequest" | "buyRequestOffer" | "order" | "orderAccountCredential" | "chatRoom" | "chatMessage" | "orderEvent" | "orderReview" | "orderReviewModeration" | "depositRequest" | "depositWalletAddress" | "withdrawalRequest" | "withdrawalLog" | "adminAuditLog" | "cmsDocument" | "cmsDocumentVersion" | "adminSlaIncident" | "adminSlaIncidentNote" | "adminFinanceCloseReport" | "trustReport" | "adminUserNote" | "adminGameNote" | "notification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1619,6 +1620,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.OrderCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.OrderCountAggregateOutputType> | number
+        }
+      }
+    }
+    OrderAccountCredential: {
+      payload: Prisma.$OrderAccountCredentialPayload<ExtArgs>
+      fields: Prisma.OrderAccountCredentialFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OrderAccountCredentialFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAccountCredentialPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OrderAccountCredentialFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAccountCredentialPayload>
+        }
+        findFirst: {
+          args: Prisma.OrderAccountCredentialFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAccountCredentialPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OrderAccountCredentialFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAccountCredentialPayload>
+        }
+        findMany: {
+          args: Prisma.OrderAccountCredentialFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAccountCredentialPayload>[]
+        }
+        create: {
+          args: Prisma.OrderAccountCredentialCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAccountCredentialPayload>
+        }
+        createMany: {
+          args: Prisma.OrderAccountCredentialCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OrderAccountCredentialCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAccountCredentialPayload>[]
+        }
+        delete: {
+          args: Prisma.OrderAccountCredentialDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAccountCredentialPayload>
+        }
+        update: {
+          args: Prisma.OrderAccountCredentialUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAccountCredentialPayload>
+        }
+        deleteMany: {
+          args: Prisma.OrderAccountCredentialDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OrderAccountCredentialUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OrderAccountCredentialUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAccountCredentialPayload>[]
+        }
+        upsert: {
+          args: Prisma.OrderAccountCredentialUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAccountCredentialPayload>
+        }
+        aggregate: {
+          args: Prisma.OrderAccountCredentialAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOrderAccountCredential>
+        }
+        groupBy: {
+          args: Prisma.OrderAccountCredentialGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderAccountCredentialGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OrderAccountCredentialCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderAccountCredentialCountAggregateOutputType> | number
         }
       }
     }
@@ -3329,6 +3404,24 @@ export const OrderScalarFieldEnum = {
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
 
 
+export const OrderAccountCredentialScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  sellerId: 'sellerId',
+  buyerId: 'buyerId',
+  encryptedPayload: 'encryptedPayload',
+  encryptionVersion: 'encryptionVersion',
+  submittedAt: 'submittedAt',
+  updatedAt: 'updatedAt',
+  buyerFirstViewedAt: 'buyerFirstViewedAt',
+  buyerLastViewedAt: 'buyerLastViewedAt',
+  buyerViewCount: 'buyerViewCount',
+  sellerLastUpdatedAt: 'sellerLastUpdatedAt'
+} as const
+
+export type OrderAccountCredentialScalarFieldEnum = (typeof OrderAccountCredentialScalarFieldEnum)[keyof typeof OrderAccountCredentialScalarFieldEnum]
+
+
 export const ChatRoomScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
@@ -4088,6 +4181,7 @@ export type GlobalOmitConfig = {
   buyRequest?: Prisma.BuyRequestOmit
   buyRequestOffer?: Prisma.BuyRequestOfferOmit
   order?: Prisma.OrderOmit
+  orderAccountCredential?: Prisma.OrderAccountCredentialOmit
   chatRoom?: Prisma.ChatRoomOmit
   chatMessage?: Prisma.ChatMessageOmit
   orderEvent?: Prisma.OrderEventOmit

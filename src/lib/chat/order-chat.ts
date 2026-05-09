@@ -1,6 +1,7 @@
 import { getCurrentSessionUser } from "@/lib/auth/session";
 import { createUserNotification } from "@/lib/notifications/notifications";
 import { getPrismaClient } from "@/lib/prisma";
+import { assertNoOffPlatformContact } from "@/lib/risk/off-platform-contact";
 
 export type OrderChatView = {
   roomId: string;
@@ -421,6 +422,16 @@ export async function sendOrderChatMessage(input: {
   if (!order) {
     throw new Error("주문 채팅방을 찾을 수 없습니다.");
   }
+
+  await assertNoOffPlatformContact(trimmedBody, {
+    actorUserId: sessionUser.userId,
+    targetUserId:
+      sessionUser.userId === order.buyerId ? order.sellerId : order.buyerId,
+    orderId: order.id,
+    sourceType: "ORDER_CHAT_MESSAGE",
+    sourceId: `${order.id}:${Date.now()}`,
+    contentKind: "CHAT",
+  });
 
   const room = await ensureOrderChatRoom(order.id);
   const message = await prisma.chatMessage.create({

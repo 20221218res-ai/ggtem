@@ -75,9 +75,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         message:
-          error instanceof Error
-            ? error.message
-            : "구매요청을 처리하지 못했습니다.",
+          error instanceof Error ? error.message : "구매요청을 처리하지 못했습니다.",
       },
       { status: 400 },
     );

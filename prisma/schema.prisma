@@ -324,6 +324,8 @@ model Listing {
   @@index([sellerId, status])
   @@index([gameId, serverId, category, status])
   @@index([category, accountTransferType])
+  @@index([status, createdAt])
+  @@index([status, unitPrice])
   @@index([premiumEndsAt])
 }
 
@@ -383,6 +385,8 @@ model BuyRequest {
   @@index([buyerId, status])
   @@index([gameId, serverId, category, status])
   @@index([category, accountTransferType])
+  @@index([status, createdAt])
+  @@index([status, unitPrice])
   @@index([premiumEndsAt])
 }
 
@@ -434,10 +438,30 @@ model Order {
   chatRoom               ChatRoom?
   trustReports           TrustReport[]
   review                 OrderReview?
+  accountCredential      OrderAccountCredential?
 
   @@index([buyerId, status])
   @@index([sellerId, status])
   @@index([listingId, status])
+}
+
+model OrderAccountCredential {
+  id                       String   @id @default(cuid())
+  orderId                  String   @unique
+  sellerId                 String
+  buyerId                  String
+  encryptedPayload         String
+  encryptionVersion        Int      @default(1)
+  submittedAt              DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  buyerFirstViewedAt       DateTime?
+  buyerLastViewedAt        DateTime?
+  buyerViewCount           Int      @default(0)
+  sellerLastUpdatedAt      DateTime @default(now())
+  order                    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([sellerId, submittedAt])
+  @@index([buyerId, submittedAt])
 }
 
 model ChatRoom {

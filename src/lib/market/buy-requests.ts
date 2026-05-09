@@ -7,6 +7,7 @@ import { ensureUserWallet } from "@/lib/market/wallets";
 import { calculateMarketplaceOrderFees } from "@/lib/market/order-fees";
 import { getGameMoneyUnitName } from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
+import { assertNoOffPlatformContact } from "@/lib/risk/off-platform-contact";
 import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit";
 import {
   calculatePremiumPromotionFee,
@@ -570,6 +571,18 @@ export async function createMarketplaceBuyRequest(input: {
     throw new Error("계정 유형을 선택해 주세요.");
   }
 
+  await assertNoOffPlatformContact(
+    [trimmedTitle, trimmedDescription, trimmedAccountRank]
+      .filter(Boolean)
+      .join("\n"),
+    {
+      actorUserId: buyer.id,
+      sourceType: "BUY_REQUEST_DRAFT",
+      sourceId: `buyer:${buyer.id}:${Date.now()}`,
+      contentKind: "BUY_REQUEST",
+    },
+  );
+
   const game = await prisma.game.findUnique({
     where: {
       id: input.gameId,
@@ -937,6 +950,14 @@ export async function createMarketplaceBuyRequestOffer(input: {
   if (buyRequest.buyerId === sessionUser.userId) {
     throw new Error("본인이 등록한 구매요청에는 판매할 수 없습니다.");
   }
+
+  await assertNoOffPlatformContact(message ?? "", {
+    actorUserId: sessionUser.userId,
+    targetUserId: buyRequest.buyerId,
+    sourceType: "BUY_REQUEST_OFFER",
+    sourceId: `offer:${input.buyRequestId}:${sessionUser.userId}:${Date.now()}`,
+    contentKind: "BUY_REQUEST",
+  });
 
   let listing: {
     id: string;

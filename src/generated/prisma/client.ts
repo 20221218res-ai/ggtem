@@ -122,6 +122,11 @@ export type BuyRequestOffer = Prisma.BuyRequestOfferModel
  */
 export type Order = Prisma.OrderModel
 /**
+ * Model OrderAccountCredential
+ * 
+ */
+export type OrderAccountCredential = Prisma.OrderAccountCredentialModel
+/**
  * Model ChatRoom
  * 
  */

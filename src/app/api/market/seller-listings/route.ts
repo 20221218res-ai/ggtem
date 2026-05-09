@@ -67,8 +67,7 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json(
         {
-          message:
-            "판매글, 제목, 단가, 총 수량을 모두 입력해 주세요.",
+          message: "판매글, 제목, 단가, 총 수량을 모두 입력해 주세요.",
         },
         { status: 400 },
       );
@@ -87,9 +86,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         message:
-          error instanceof Error
-            ? error.message
-            : "판매글을 수정하지 못했습니다.",
+          error instanceof Error ? error.message : "판매글을 수정하지 못했습니다.",
       },
       { status: 400 },
     );
