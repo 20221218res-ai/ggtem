@@ -5,6 +5,7 @@ export type AdminOrderChatsState = {
   filters: {
     query: string;
     orderId: string | null;
+    riskOnly: boolean;
   };
   summary: {
     shownRooms: number;
@@ -58,10 +59,13 @@ export async function getAdminOrderChatsState(input: {
   query?: string | null;
   orderId?: string | null;
   viewerAdminId: string;
+  riskOnly?: boolean;
+  auditView?: boolean;
 }): Promise<AdminOrderChatsState> {
   const prisma = getPrismaClient();
   const query = input.query?.trim() ?? "";
   const orderId = input.orderId?.trim() || null;
+  const riskOnly = input.riskOnly === true;
   const where = query
     ? {
         OR: [
@@ -162,7 +166,7 @@ export async function getAdminOrderChatsState(input: {
     prisma.chatRoom.count(),
   ]);
 
-  const roomSummaries = rooms.map((room) => {
+  const allRoomSummaries = rooms.map((room) => {
     const orderedRecentMessages = [...room.messages].reverse();
     const riskSignalCount = orderedRecentMessages.filter((message) =>
       detectOffPlatformContact(message.body).blocked,
@@ -189,26 +193,35 @@ export async function getAdminOrderChatsState(input: {
     };
   });
 
+  const roomSummaries = riskOnly
+    ? allRoomSummaries.filter((room) => room.riskSignalCount > 0)
+    : allRoomSummaries;
+
   const selectedRoom = orderId
-    ? await getAdminOrderChatDetail(orderId, input.viewerAdminId)
+    ? await getAdminOrderChatDetail(orderId, input.viewerAdminId, input.auditView !== false)
     : null;
 
   return {
     filters: {
       query,
       orderId,
+      riskOnly,
     },
     summary: {
       shownRooms: roomSummaries.length,
       totalRooms,
-      riskyRooms: roomSummaries.filter((room) => room.riskSignalCount > 0).length,
+      riskyRooms: allRoomSummaries.filter((room) => room.riskSignalCount > 0).length,
     },
     rooms: roomSummaries,
     selectedRoom,
   };
 }
 
-async function getAdminOrderChatDetail(orderId: string, viewerAdminId: string) {
+async function getAdminOrderChatDetail(
+  orderId: string,
+  viewerAdminId: string,
+  auditView: boolean,
+) {
   const prisma = getPrismaClient();
   const room = await prisma.chatRoom.findFirst({
     where: {
@@ -240,22 +253,24 @@ async function getAdminOrderChatDetail(orderId: string, viewerAdminId: string) {
 
   if (!room) return null;
 
-  await prisma.adminAuditLog.create({
-    data: {
-      adminId: viewerAdminId,
-      action: "ADMIN_ORDER_CHAT_VIEWED",
-      targetType: "ORDER",
-      targetId: room.orderId,
-      reason: "관리자 주문 채팅 열람",
-      after: {
-        roomId: room.id,
-        orderNumber: room.order.orderNumber,
-        buyerId: room.buyerId,
-        sellerId: room.sellerId,
-        messageCount: room.messages.length,
+  if (auditView) {
+    await prisma.adminAuditLog.create({
+      data: {
+        adminId: viewerAdminId,
+        action: "ADMIN_ORDER_CHAT_VIEWED",
+        targetType: "ORDER",
+        targetId: room.orderId,
+        reason: "관리자 주문 채팅 열람",
+        after: {
+          roomId: room.id,
+          orderNumber: room.order.orderNumber,
+          buyerId: room.buyerId,
+          sellerId: room.sellerId,
+          messageCount: room.messages.length,
+        },
       },
-    },
-  });
+    });
+  }
 
   return {
     roomId: room.id,

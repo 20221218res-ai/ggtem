@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { AdminOrderChatsRefresh } from "./refresh-control";
 import { getAdminOrderChatsState } from "@/lib/admin/order-chats";
 import { requirePageRole, ROLE_GROUPS } from "@/lib/auth/guards";
 
@@ -7,6 +8,8 @@ type AdminOrderChatsPageProps = {
   searchParams?: Promise<{
     q?: string;
     orderId?: string;
+    refresh?: string;
+    risk?: string;
   }>;
 };
 
@@ -27,6 +30,8 @@ export default async function AdminOrderChatsPage({
     query: params?.q,
     orderId: params?.orderId,
     viewerAdminId: currentUser.userId,
+    riskOnly: params?.risk === "1",
+    auditView: params?.refresh !== "1",
   });
 
   return (
@@ -54,6 +59,8 @@ export default async function AdminOrderChatsPage({
           </div>
 
           <form className="mt-5 flex flex-col gap-2 md:flex-row">
+            {state.filters.riskOnly ? <input type="hidden" name="risk" value="1" /> : null}
+            {params?.refresh === "1" ? <input type="hidden" name="refresh" value="1" /> : null}
             <input
               name="q"
               defaultValue={state.filters.query}
@@ -73,6 +80,10 @@ export default async function AdminOrderChatsPage({
               초기화
             </Link>
           </form>
+          <AdminOrderChatsRefresh
+            autoRefresh={params?.refresh === "1"}
+            riskOnly={state.filters.riskOnly}
+          />
         </header>
 
         <section className="grid gap-3 md:grid-cols-3">
