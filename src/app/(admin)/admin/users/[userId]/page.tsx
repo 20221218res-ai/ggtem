@@ -168,6 +168,8 @@ export default async function AdminUserDetailPage({
           </section>
         ) : null}
 
+        <OffPlatformRiskSection detail={detail} />
+
         <LinkedAccountSignalsSection detail={detail} />
 
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
@@ -396,6 +398,100 @@ export default async function AdminUserDetailPage({
   );
 }
 
+function OffPlatformRiskSection({ detail }: { detail: UserDetail }) {
+  const risk = detail.offPlatformRisk;
+  const hasSignals = risk.reports.length > 0 || risk.count30d > 0;
+
+  return (
+    <section
+      id="off-platform-risk"
+      className={`scroll-mt-32 rounded-lg border p-5 shadow-sm ${
+        hasSignals
+          ? "border-red-200 bg-red-50"
+          : "border-slate-200 bg-white"
+      }`}
+    >
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p className={`text-sm font-black ${hasSignals ? "text-red-700" : "text-slate-500"}`}>
+            외부거래 탐지 근거
+          </p>
+          <h2 className="mt-1 text-xl font-black text-slate-950">
+            최근 30일 {risk.count30d.toLocaleString("ko-KR")}건 탐지
+          </h2>
+          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+            SNS, 전화번호, 이메일, 개인 지갑주소, 외부거래 유도 문구가 차단된 기록입니다.
+            계정 제한이나 출금 보류를 판단하기 전에 주문 채팅과 감사 로그를 함께 확인하세요.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <LinkButton
+            href={`/admin/risk?query=${encodeURIComponent(detail.user.email)}`}
+            label="리스크 큐"
+            tone={hasSignals ? "amber" : "dark"}
+          />
+          <LinkButton
+            href={`/admin/audit?query=${encodeURIComponent(detail.user.userId)}`}
+            label="감사 로그"
+          />
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-2 md:grid-cols-3">
+        <SignalBox label="미처리" value={`${risk.openCount}건`} />
+        <SignalBox label="고위험" value={`${risk.highSeverityCount}건`} />
+        <SignalBox label="최근 탐지" value={risk.latestSignalAt ?? "없음"} />
+      </div>
+
+      <div className="mt-4 space-y-3">
+        {risk.reports.map((report) => (
+          <div key={report.reportId} className="rounded-lg border border-red-200 bg-white p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone="red">{reportCategoryLabel(report.category)}</Badge>
+              <Badge tone={severityTone(report.severity)}>{severityLabel(report.severity)}</Badge>
+              <Badge tone={statusTone(report.status)}>{statusLabel(report.status)}</Badge>
+              {report.sourceType === "OFF_PLATFORM_CONTACT" ? (
+                <Badge tone="red">자동 탐지</Badge>
+              ) : null}
+            </div>
+            <p className="mt-3 whitespace-pre-wrap text-sm font-semibold leading-6 text-slate-700">
+              {report.description}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {extractDetectionLabels(report.description).map((label) => (
+                <Badge key={label} tone="red">
+                  {label}
+                </Badge>
+              ))}
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2 text-sm">
+              {report.orderId ? (
+                <LinkButton
+                  href={`/admin/orders?orderId=${report.orderId}`}
+                  label={`주문 ${report.orderNumber ?? ""}`.trim()}
+                  tone="dark"
+                />
+              ) : null}
+              <LinkButton
+                href={`/admin/risk?query=${encodeURIComponent(report.reportId)}`}
+                label="신고 상세"
+                tone="amber"
+              />
+              <span className="rounded-md bg-slate-100 px-3 py-2 text-xs font-bold text-slate-500">
+                {report.createdAt}
+              </span>
+            </div>
+          </div>
+        ))}
+
+        {!hasSignals ? (
+          <EmptyState label="외부거래 또는 연락처 교환 자동탐지 이력이 없습니다." />
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 function WalletLedgerSection({ detail }: { detail: UserDetail }) {
   return (
     <section
@@ -612,6 +708,15 @@ function Metric({ label, value }: { label: string; value: number }) {
   );
 }
 
+function SignalBox({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-4">
+      <p className="text-xs font-black text-slate-500">{label}</p>
+      <p className="mt-1 text-sm font-black text-slate-950">{value}</p>
+    </div>
+  );
+}
+
 function WalletLine({ label, value }: { label: string; value: string }) {
   return (
     <p className="rounded-lg border border-slate-200 bg-slate-50 p-3">
@@ -818,6 +923,12 @@ function statusTone(status: string): Tone {
   return "slate";
 }
 
+function severityTone(severity: string): Tone {
+  if (severity === "CRITICAL" || severity === "HIGH") return "red";
+  if (severity === "MEDIUM") return "amber";
+  return "slate";
+}
+
 function linkedRiskTone(riskLevel: string): Tone {
   if (riskLevel === "HIGH") return "red";
   if (riskLevel === "MEDIUM") return "amber";
@@ -951,6 +1062,7 @@ function referenceLabel(referenceType: string | null) {
 
 function reportCategoryLabel(category: string) {
   const labels: Record<string, string> = {
+    OFF_PLATFORM_PAYMENT: "외부거래/연락처",
     FRAUD: "사기",
     ABUSE: "욕설/비방",
     DELIVERY: "전달 문제",
@@ -958,6 +1070,20 @@ function reportCategoryLabel(category: string) {
     OTHER: "기타",
   };
   return labels[category] ?? category.replaceAll("_", " ");
+}
+
+function extractDetectionLabels(description: string) {
+  const marker = "탐지 항목:";
+  const markerIndex = description.indexOf(marker);
+
+  if (markerIndex === -1) return [];
+
+  return description
+    .slice(markerIndex + marker.length)
+    .split(",")
+    .map((label) => label.trim())
+    .filter(Boolean)
+    .slice(0, 6);
 }
 
 function severityLabel(severity: string) {

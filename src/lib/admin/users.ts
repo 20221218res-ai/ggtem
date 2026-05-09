@@ -158,6 +158,23 @@ export type AdminUserDetail = {
     nextStatus: string | null;
     createdAt: string;
   }>;
+  offPlatformRisk: {
+    count30d: number;
+    openCount: number;
+    highSeverityCount: number;
+    latestSignalAt: string | null;
+    reports: Array<{
+      reportId: string;
+      category: string;
+      status: string;
+      severity: string;
+      sourceType: string | null;
+      description: string;
+      orderId: string | null;
+      orderNumber: string | null;
+      createdAt: string;
+    }>;
+  };
   adminNotes: Array<{
     noteId: string;
     body: string;
@@ -455,7 +472,26 @@ export async function getAdminUserDetail(
     return null;
   }
 
-  const [restrictionTimeline, walletLedgerEntries, linkedAccountSignals] =
+  const offPlatformSince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const offPlatformReportWhere = {
+    targetUserId: user.id,
+    OR: [
+      {
+        category: "OFF_PLATFORM_PAYMENT",
+      },
+      {
+        sourceType: "OFF_PLATFORM_CONTACT",
+      },
+    ],
+  } satisfies Prisma.TrustReportWhereInput;
+
+  const [
+    restrictionTimeline,
+    walletLedgerEntries,
+    linkedAccountSignals,
+    offPlatformReports,
+    offPlatformReportCount30d,
+  ] =
     await Promise.all([
       prisma.adminAuditLog.findMany({
         where: {
@@ -487,6 +523,24 @@ export async function getAdminUserDetail(
         take: 12,
       }),
       getLinkedAccountSignalsForUser(user.id),
+      prisma.trustReport.findMany({
+        where: offPlatformReportWhere,
+        include: {
+          order: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 8,
+      }),
+      prisma.trustReport.count({
+        where: {
+          ...offPlatformReportWhere,
+          createdAt: {
+            gte: offPlatformSince,
+          },
+        },
+      }),
     ]);
 
   return {
@@ -599,6 +653,29 @@ export async function getAdminUserDetail(
       nextStatus: getAuditStatus(log.after, "status"),
       createdAt: formatKoreanDate(log.createdAt),
     })),
+    offPlatformRisk: {
+      count30d: offPlatformReportCount30d,
+      openCount: offPlatformReports.filter((report) =>
+        ["OPEN", "UNDER_REVIEW"].includes(report.status),
+      ).length,
+      highSeverityCount: offPlatformReports.filter((report) =>
+        ["HIGH", "CRITICAL"].includes(report.severity),
+      ).length,
+      latestSignalAt: offPlatformReports[0]
+        ? formatKoreanDate(offPlatformReports[0].createdAt)
+        : null,
+      reports: offPlatformReports.map((report) => ({
+        reportId: report.id,
+        category: report.category,
+        status: report.status,
+        severity: report.severity,
+        sourceType: report.sourceType,
+        description: report.description,
+        orderId: report.orderId,
+        orderNumber: report.order?.orderNumber ?? null,
+        createdAt: formatKoreanDate(report.createdAt),
+      })),
+    },
     adminNotes: user.adminNotesReceived.map((note) => ({
       noteId: note.id,
       body: note.body,
