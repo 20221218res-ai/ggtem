@@ -7,9 +7,6 @@ import { createUserNotification } from "@/lib/notifications/notifications";
 import { getPrismaClient } from "@/lib/prisma";
 import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit";
 
-const DEMO_FINANCE_EMAIL = "user-demo@ggitem.local";
-const DEMO_ADMIN_EMAIL = "admin-demo@ggitem.local";
-
 export type AdminFinanceState = {
   summary: {
     pendingDeposits: number;
@@ -212,77 +209,6 @@ export async function getAdminFinanceState(): Promise<AdminFinanceState> {
   const prisma = getPrismaClient();
 
   return prisma.$transaction(async (tx) => {
-    const { user, wallet } = await ensureFinanceDemoScenario(tx);
-
-    const [depositCount, withdrawalCount] = await Promise.all([
-      tx.depositRequest.count(),
-      tx.withdrawalRequest.count(),
-    ]);
-
-    if (depositCount === 0) {
-      await tx.depositRequest.createMany({
-        data: [
-          {
-            userId: user.id,
-            walletId: wallet.id,
-            provider: "MANUAL_BANK",
-            currency: "USDT",
-            amount: "500",
-            status: "PENDING",
-            memo: "관리자 확인 대기 중인 수동 입금",
-            requestedAt: hoursAgo(3),
-          },
-          {
-            userId: user.id,
-            walletId: wallet.id,
-            provider: "MANUAL_BANK",
-            currency: "USDT",
-            amount: "300",
-            status: "CONFIRMED",
-            memo: "이전에 확인된 입금",
-            requestedAt: hoursAgo(28),
-            confirmedAt: hoursAgo(26),
-          },
-        ],
-      });
-    }
-
-    if (withdrawalCount === 0) {
-      await tx.withdrawalRequest.createMany({
-        data: [
-          {
-            userId: user.id,
-            walletId: wallet.id,
-            provider: "MANUAL_BANK",
-            currency: "USDT",
-            amount: "120",
-            fee: "0.5",
-            netAmount: "120",
-            chain: "TRC20",
-            status: "REQUESTED",
-            destination: "TRC20 / TX-demo-destination",
-            memo: "User asked for manual payout review",
-            requestedAt: hoursAgo(2),
-          },
-          {
-            userId: user.id,
-            walletId: wallet.id,
-            provider: "MANUAL_BANK",
-            currency: "USDT",
-            amount: "80",
-            fee: "1",
-            netAmount: "80",
-            chain: "TRC20",
-            status: "COMPLETED",
-            destination: "KR Bank / 111-222-333444",
-            memo: "Completed sample withdrawal",
-            requestedAt: hoursAgo(52),
-            completedAt: hoursAgo(50),
-          },
-        ],
-      });
-    }
-
     const [pendingDeposits, pendingWithdrawals, recentDeposits, recentWithdrawals] =
       await Promise.all([
         tx.depositRequest.findMany({
@@ -899,8 +825,11 @@ export async function processAdminFinanceAction(input: {
   const prisma = getPrismaClient();
 
   return prisma.$transaction(async (tx) => {
-    const { adminUser } = await ensureFinanceDemoScenario(tx);
-    const actorAdminId = input.adminId ?? adminUser.id;
+    if (!input.adminId) {
+      throw new Error("관리자 인증 정보가 필요합니다.");
+    }
+
+    const actorAdminId = input.adminId;
     const depositActions = ["CONFIRM_DEPOSIT", "REJECT_DEPOSIT"];
     const withdrawalActions = ["COMPLETE_WITHDRAWAL", "REJECT_WITHDRAWAL"];
 
@@ -1572,66 +1501,12 @@ function parseCryptoDepositEvidence(memo: string | null): CryptoDepositEvidence 
   };
 }
 
-async function ensureFinanceDemoScenario(tx: Prisma.TransactionClient) {
-  const user = await tx.user.upsert({
-    where: {
-      email: DEMO_FINANCE_EMAIL,
-    },
-    update: {
-      displayName: "user-demo",
-    },
-    create: {
-      email: DEMO_FINANCE_EMAIL,
-      displayName: "user-demo",
-      role: "CUSTOMER",
-      status: "ACTIVE",
-    },
-  });
-
-  const wallet = await tx.wallet.upsert({
-    where: {
-      userId: user.id,
-    },
-    update: {},
-    create: {
-      userId: user.id,
-      currency: "USDT",
-      availableBalance: "500",
-      escrowLockedBalance: "0",
-      withdrawableBalance: "500",
-      withdrawalLocked: "0",
-    },
-  });
-
-  const adminUser = await tx.user.upsert({
-    where: {
-      email: DEMO_ADMIN_EMAIL,
-    },
-    update: {
-      displayName: "admin-demo",
-      role: "ADMIN",
-    },
-    create: {
-      email: DEMO_ADMIN_EMAIL,
-      displayName: "admin-demo",
-      role: "ADMIN",
-      status: "ACTIVE",
-    },
-  });
-
-  return { user, wallet, adminUser };
-}
-
 function formatKoreanDate(date: Date) {
   return new Intl.DateTimeFormat("ko-KR", {
     dateStyle: "medium",
     timeStyle: "short",
     timeZone: "Asia/Seoul",
   }).format(date);
-}
-
-function hoursAgo(hours: number) {
-  return new Date(Date.now() - hours * 60 * 60 * 1000);
 }
 
 function normalizeReconciliationRange(range: string | null | undefined) {

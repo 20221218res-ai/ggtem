@@ -7,6 +7,7 @@ import {
   roleHasAccess,
   type AllowedRole,
 } from "@/lib/auth/guards";
+import { isDemoToolEnabled } from "@/lib/demo-mode";
 import AdminNavigation, { type AdminNavigationLink } from "./admin-navigation";
 
 const adminLinks = [
@@ -214,6 +215,12 @@ const adminLinks = [
   roles: readonly AllowedRole[];
 }>;
 
+const demoToolLinks = new Set([
+  "/admin/trade-demo",
+  "/admin/order-lifecycle",
+  "/admin/inventory-lock",
+]);
+
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const requestHeaders = await headers();
   const pathname = requestHeaders.get("x-gg-pathname") ?? "";
@@ -232,8 +239,10 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     redirect("/admin");
   }
 
+  const showDemoTools = isDemoToolEnabled();
   const visibleLinks = adminLinks.filter((link) =>
-    roleHasAccess(currentUser.role, link.roles),
+    roleHasAccess(currentUser.role, link.roles) &&
+    (showDemoTools || !demoToolLinks.has(link.href)),
   ) satisfies AdminNavigationLink[];
 
   return (

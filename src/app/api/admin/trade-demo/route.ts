@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
+import { isDemoToolEnabled } from "@/lib/demo-mode";
 import {
   cancelTradeDemoOrder,
   completeTradeDemoOrder,
@@ -27,6 +28,10 @@ type TradeDemoRequestBody =
     };
 
 export async function GET() {
+  if (!isDemoToolEnabled()) {
+    return NextResponse.json({ message: "Demo tools are disabled." }, { status: 404 });
+  }
+
   const auth = await requireApiRole(ROLE_GROUPS.PLATFORM_ADMINS);
   if (!auth.ok) {
     return auth.response;
@@ -38,6 +43,10 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!isDemoToolEnabled()) {
+      return NextResponse.json({ message: "Demo tools are disabled." }, { status: 404 });
+    }
+
     const auth = await requireApiRole(ROLE_GROUPS.PLATFORM_ADMINS);
     if (!auth.ok) {
       return auth.response;

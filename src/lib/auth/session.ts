@@ -7,6 +7,7 @@ import {
   timingSafeEqual,
 } from "node:crypto";
 import { promisify } from "node:util";
+import { isDemoModeEnabled } from "@/lib/demo-mode";
 import { getPrismaClient } from "@/lib/prisma";
 import { ensureUserWallet } from "@/lib/market/wallets";
 
@@ -156,7 +157,7 @@ async function createSessionForUser(user: {
 }
 
 export async function ensureDemoAuthUsers() {
-  if (!isDemoAuthEnabled()) {
+  if (!isDemoModeEnabled()) {
     return;
   }
 
@@ -171,7 +172,7 @@ export async function ensureDemoAuthUsers() {
 }
 
 async function ensureDemoAuthUser(email: string, prisma = getPrismaClient()) {
-  if (!isDemoAuthEnabled()) {
+  if (!isDemoModeEnabled()) {
     return null;
   }
 
@@ -321,7 +322,7 @@ export async function signInWithCredentials(input: {
     throw new Error("\uC774\uBA54\uC77C \uB610\uB294 \uBE44\uBC00\uBC88\uD638\uAC00 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.");
   }
 
-  if (isDemoAuthEnabled()) {
+  if (isDemoModeEnabled()) {
     await ensureDemoAuthUser(email, prisma);
   }
   await assertLoginIsNotLocked(email, ipKey);
@@ -468,7 +469,7 @@ export async function getCurrentUserEmailForRole(input: {
 }
 
 export function getDemoAccountOptions() {
-  if (!isDemoAuthEnabled()) {
+  if (!isDemoModeEnabled()) {
     return [];
   }
 
@@ -478,17 +479,6 @@ export function getDemoAccountOptions() {
     displayName: account.displayName,
     role: account.role,
   }));
-}
-
-function isDemoAuthEnabled() {
-  const configuredValue = process.env.GGITEM_ENABLE_DEMO_ACCOUNTS?.trim()
-    .toLowerCase();
-
-  if (configuredValue) {
-    return ["1", "true", "yes"].includes(configuredValue);
-  }
-
-  return process.env.NODE_ENV !== "production";
 }
 
 export async function requestPasswordReset(input: { email: string }) {
