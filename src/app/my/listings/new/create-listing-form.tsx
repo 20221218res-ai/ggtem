@@ -72,7 +72,7 @@ export default function CreateListingForm({
   }, [selectedImage]);
   const saleQuantity = isAccountListing ? "1" : quantity;
   const saleMinimumQuantity = isAccountListing ? "1" : minimumQuantity;
-  const premiumUnits = Number(premiumDurationHours) > 0 ? Number(premiumDurationHours) / 36 : 0;
+  const premiumUnits = Number(premiumDurationHours) > 0 ? Number(premiumDurationHours) / 30 : 0;
   const premiumFee = premiumUnits;
   const availableBalanceAmount = Number(availableBalance || "0");
   const estimatedFullAmount = useMemo(() => {
@@ -374,7 +374,7 @@ export default function CreateListingForm({
         <Panel title="프리미엄 상위 노출">
           <div className="grid gap-4">
             <div className="rounded-2xl border border-pink-200 bg-pink-50 p-4">
-              <p className="text-sm font-black text-pink-700">36시간 1 USDT</p>
+              <p className="text-sm font-black text-pink-700">30시간 1 USDT</p>
               <p className="mt-1 text-sm font-bold text-slate-700">
                 프리미엄 판매글은 일반글보다 위에 노출되며, 판매 완료 또는 만료 시 자동 해제됩니다.
               </p>
@@ -386,9 +386,9 @@ export default function CreateListingForm({
                 className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
               >
                 <option value="0">선택 안 함</option>
-                {[36, 72, 108, 144, 180, 216].map((hours) => (
+                {[30, 60, 90, 120, 150, 180].map((hours) => (
                   <option key={hours} value={hours}>
-                    {hours}시간 / {hours / 36} USDT
+                    {hours}시간 / {hours / 30} USDT
                   </option>
                 ))}
               </select>

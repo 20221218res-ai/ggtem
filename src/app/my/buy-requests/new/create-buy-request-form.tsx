@@ -72,7 +72,7 @@ export default function CreateBuyRequestForm({
     maximumFractionDigits: 6,
   });
   const premiumHours = Number(premiumDurationHours);
-  const premiumUnits = premiumHours > 0 ? premiumHours / 36 : 0;
+  const premiumUnits = premiumHours > 0 ? premiumHours / 30 : 0;
   const premiumFee = premiumUnits;
   const requiredBalanceAmount = estimatedReserveAmount + premiumFee;
   const requiredBalance = requiredBalanceAmount.toLocaleString("en-US", {
@@ -374,7 +374,7 @@ export default function CreateBuyRequestForm({
             <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4">
               <p className="text-sm font-black text-[var(--gg-accent)]">상단 고정 노출</p>
               <p className="mt-1 text-sm font-bold text-[var(--gg-muted)]">
-                선택한 구매글은 프리미엄 영역에 먼저 노출됩니다. 36시간마다 1 USDT가 즉시 차감됩니다.
+                선택한 구매글은 프리미엄 영역에 먼저 노출됩니다. 30시간마다 1 USDT가 즉시 차감됩니다.
               </p>
             </div>
             <FieldLabel label="이용 시간">
@@ -384,9 +384,9 @@ export default function CreateBuyRequestForm({
                 className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
               >
                 <option value="0">사용 안 함</option>
-                {["36", "72", "108", "144", "180", "216"].map((hours) => (
+                {["30", "60", "90", "120", "150", "180"].map((hours) => (
                   <option key={hours} value={hours}>
-                    {hours}시간 / {Number(hours) / 36} USDT
+                    {hours}시간 / {Number(hours) / 30} USDT
                   </option>
                 ))}
               </select>
