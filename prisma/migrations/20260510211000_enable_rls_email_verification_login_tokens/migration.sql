@@ -1,0 +1,1 @@
+ALTER TABLE "EmailVerificationLoginToken" ENABLE ROW LEVEL SECURITY;

@@ -27,6 +27,8 @@ const LOGIN_LOCK_MINUTES = 15;
 const UNKNOWN_IP_KEY = "unknown";
 const PASSWORD_RESET_TOKEN_MINUTES = 30;
 const EMAIL_VERIFICATION_TOKEN_HOURS = 24;
+const PENDING_EMAIL_VERIFICATION_COOKIE_NAME = "ggitem_pending_email_verification";
+const PENDING_EMAIL_VERIFICATION_TOKEN_HOURS = 24;
 const scrypt = promisify(nodeScrypt);
 
 const DEMO_ACCOUNTS = [
@@ -70,6 +72,31 @@ export type AppSessionUser = {
   status: string;
   emailVerifiedAt: Date | null;
 };
+
+type PendingEmailVerificationLoginRow = {
+  id: string;
+  expiresAt: Date;
+  usedAt: Date | null;
+  userId: string;
+  email: string;
+  displayName: string;
+  role: string;
+  status: string;
+  emailVerifiedAt: Date | null;
+};
+
+export class EmailVerificationRequiredError extends Error {
+  code = "EMAIL_VERIFICATION_REQUIRED" as const;
+  email: string;
+  verificationUrl: string | null;
+
+  constructor(input: { email: string; verificationUrl: string | null }) {
+    super("이메일 인증이 필요합니다. 인증 메일을 발송했습니다.");
+    this.name = "EmailVerificationRequiredError";
+    this.email = input.email;
+    this.verificationUrl = input.verificationUrl;
+  }
+}
 
 async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
@@ -316,6 +343,7 @@ export async function registerUserAccount(input: {
     displayName: user.displayName,
     verificationUrl: buildPublicUrl(verificationUrl),
   });
+  await createPendingEmailVerificationLoginToken(user.id);
 
   return {
     userId: user.id,
@@ -328,6 +356,7 @@ export async function registerUserAccount(input: {
       ? "가입이 완료되었습니다. 이메일 인증 링크를 발송했습니다."
       : "가입이 완료되었습니다. 개발 환경에서는 인증 링크를 직접 열 수 있습니다.",
     verificationUrl: shouldExposeAuthDebugLinks() ? verificationUrl : null,
+    verificationPending: true,
   };
 }
 
@@ -379,7 +408,12 @@ export async function signInWithCredentials(input: {
   }
 
   if (!user.emailVerifiedAt && !isInternalRole(user.role)) {
-    throw new Error("이메일 인증을 완료한 뒤 로그인해 주세요.");
+    const verification = await requestEmailVerification({ email: user.email });
+    await createPendingEmailVerificationLoginToken(user.id);
+    throw new EmailVerificationRequiredError({
+      email: user.email,
+      verificationUrl: verification.verificationUrl,
+    });
   }
 
   await recordSuccessfulLoginAttempt(email, ipKey);
@@ -665,6 +699,93 @@ export async function requestEmailVerification(input: { email: string }) {
   };
 }
 
+export async function getPendingEmailVerificationStatus() {
+  const cookieStore = await cookies();
+  const pendingToken = cookieStore.get(PENDING_EMAIL_VERIFICATION_COOKIE_NAME)?.value;
+
+  if (!pendingToken) {
+    return {
+      status: "missing" as const,
+    };
+  }
+
+  const prisma = getPrismaClient();
+  const tokenHash = hashToken(pendingToken);
+  const rows = await prisma.$queryRaw<PendingEmailVerificationLoginRow[]>`
+    SELECT
+      t."id",
+      t."expiresAt",
+      t."usedAt",
+      u."id" AS "userId",
+      u."email",
+      u."displayName",
+      u."role"::text AS "role",
+      u."status"::text AS "status",
+      u."emailVerifiedAt"
+    FROM "EmailVerificationLoginToken" t
+    INNER JOIN "User" u ON u."id" = t."userId"
+    WHERE t."tokenHash" = ${tokenHash}
+    LIMIT 1
+  `;
+  const pendingLogin = rows[0];
+
+  if (
+    !pendingLogin ||
+    pendingLogin.usedAt ||
+    pendingLogin.expiresAt.getTime() <= Date.now()
+  ) {
+    await clearPendingEmailVerificationCookie();
+    return {
+      status: "expired" as const,
+    };
+  }
+
+  if (["SUSPENDED", "BANNED"].includes(pendingLogin.status)) {
+    await clearPendingEmailVerificationCookie();
+    return {
+      status: "blocked" as const,
+      message: "현재 사용할 수 없는 계정입니다.",
+    };
+  }
+
+  if (!pendingLogin.emailVerifiedAt) {
+    return {
+      status: "pending" as const,
+      email: pendingLogin.email,
+    };
+  }
+
+  const consumedToken = await prisma.$executeRaw`
+    UPDATE "EmailVerificationLoginToken"
+    SET "usedAt" = NOW()
+    WHERE "id" = ${pendingLogin.id}
+      AND "usedAt" IS NULL
+      AND "expiresAt" > NOW()
+  `;
+
+  if (consumedToken !== 1) {
+    await clearPendingEmailVerificationCookie();
+    return {
+      status: "expired" as const,
+    };
+  }
+
+  await createSessionForUser({
+    id: pendingLogin.userId,
+    email: pendingLogin.email,
+    displayName: pendingLogin.displayName,
+    role: pendingLogin.role,
+    status: pendingLogin.status,
+    emailVerifiedAt: pendingLogin.emailVerifiedAt,
+  });
+  await clearPendingEmailVerificationCookie();
+
+  return {
+    status: "verified" as const,
+    redirectPath: "/my",
+  };
+}
+
 export async function verifyEmailWithToken(input: { token: string }) {
   const prisma = getPrismaClient();
   const tokenHash = hashToken(input.token);
@@ -863,6 +984,47 @@ async function createEmailVerificationToken(userId: string) {
   });
 
   return token;
+}
+
+async function createPendingEmailVerificationLoginToken(userId: string) {
+  const prisma = getPrismaClient();
+  const token = randomBytes(32).toString("hex");
+  const tokenHash = hashToken(token);
+  const expiresAt = new Date(
+    Date.now() + PENDING_EMAIL_VERIFICATION_TOKEN_HOURS * 60 * 60 * 1000,
+  );
+
+  await prisma.$executeRaw`
+    DELETE FROM "EmailVerificationLoginToken"
+    WHERE "userId" = ${userId}
+      AND ("usedAt" IS NOT NULL OR "expiresAt" <= NOW())
+  `;
+  await prisma.$executeRaw`
+    INSERT INTO "EmailVerificationLoginToken" ("id", "userId", "tokenHash", "expiresAt")
+    VALUES (${randomUUID()}, ${userId}, ${tokenHash}, ${expiresAt})
+  `;
+
+  const cookieStore = await cookies();
+  cookieStore.set(PENDING_EMAIL_VERIFICATION_COOKIE_NAME, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: shouldUseSecureSessionCookie(),
+    path: "/",
+    expires: expiresAt,
+  });
+
+  return token;
+}
+
+async function clearPendingEmailVerificationCookie() {
+  const cookieStore = await cookies();
+  cookieStore.set(PENDING_EMAIL_VERIFICATION_COOKIE_NAME, "", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: shouldUseSecureSessionCookie(),
+    path: "/",
+    expires: new Date(0),
+  });
 }
 
 function hashToken(token: string) {

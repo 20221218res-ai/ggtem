@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { signInWithCredentials } from "@/lib/auth/session";
+import {
+  EmailVerificationRequiredError,
+  signInWithCredentials,
+} from "@/lib/auth/session";
 import { getSignedInRedirectPath, ROLE_GROUPS } from "@/lib/auth/guards";
 
 export async function POST(request: NextRequest) {
@@ -31,6 +34,18 @@ export async function POST(request: NextRequest) {
       redirectPath: getSignedInRedirectPath(user),
     });
   } catch (error) {
+    if (error instanceof EmailVerificationRequiredError) {
+      return NextResponse.json(
+        {
+          code: error.code,
+          message: error.message,
+          email: error.email,
+          verificationUrl: error.verificationUrl,
+        },
+        { status: 403 },
+      );
+    }
+
     return NextResponse.json(
       {
         message: error instanceof Error ? error.message : "Sign in failed.",

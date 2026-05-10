@@ -23,9 +23,10 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: user.message,
+      message: "회원가입이 완료되었습니다. 이메일 인증 링크를 발송했습니다.",
       role: user.role,
       verificationUrl: user.verificationUrl,
+      verificationPending: user.verificationPending,
     });
   } catch (error) {
     return NextResponse.json(
