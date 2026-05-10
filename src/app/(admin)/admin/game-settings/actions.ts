@@ -80,7 +80,7 @@ export async function createGameAction(formData: FormData) {
       nameVn: createdGame.nameVn,
       namePh: createdGame.namePh,
       nameTh: createdGame.nameTh,
-      imageUrl: createdGame.imageUrl,
+      imageUrl: summarizeImageUrlForAudit(createdGame.imageUrl),
       imageAlt: createdGame.imageAlt,
       isActive: createdGame.isActive,
     },
@@ -314,7 +314,7 @@ export async function updateGameAction(formData: FormData) {
       nameVn: updated.nameVn,
       namePh: updated.namePh,
       nameTh: updated.nameTh,
-      imageUrl: updated.imageUrl,
+      imageUrl: summarizeImageUrlForAudit(updated.imageUrl),
       imageAlt: updated.imageAlt,
       isActive: updated.isActive,
     },
@@ -659,6 +659,16 @@ function redirectWithError(message: string): never {
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
+}
+
+function summarizeImageUrlForAudit(imageUrl: string | null) {
+  if (!imageUrl) return null;
+
+  if (imageUrl.startsWith("data:")) {
+    return "[inline-game-image]";
+  }
+
+  return imageUrl;
 }
 
 async function createCatalogAuditLog(input: {
