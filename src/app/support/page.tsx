@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import UserMarketHeader from "@/app/user-market-header";
 import { getCurrentSessionUser } from "@/lib/auth/session";
-import { sendAdminTelegramAlert } from "@/lib/notifications/telegram";
 import { getPrismaClient } from "@/lib/prisma";
 import {
   getCustomerCenterDocuments,
@@ -221,7 +220,7 @@ function InquiryPanel({
         <h2 className="text-xl font-black">1:1 문의</h2>
         <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
           충전, 출금, 분쟁, 계정 거래처럼 운영자 확인이 필요한 내용을 접수하세요.
-          접수 즉시 운영자 텔레그램과 어드민 문의함에 표시됩니다.
+          접수 내용은 어드민 문의함에 표시되며 운영자가 확인 후 답변합니다.
         </p>
         {submitted ? (
           <div className="mt-5 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm font-black text-cyan-800">
@@ -338,7 +337,7 @@ function GameRequestPanel({
       <div className="rounded-lg border border-[var(--gg-border)] bg-white p-6">
         <h2 className="text-xl font-black">게임 / 서버 신청</h2>
         <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
-          원하는 게임이나 서버가 목록에 없으면 이곳에서 신청하세요. 접수 즉시 운영자 문의함과 텔레그램에 표시됩니다.
+          원하는 게임이나 서버가 목록에 없으면 이곳에서 신청하세요. 접수 내용은 어드민 문의함에서 검토합니다.
         </p>
         {submitted ? (
           <div className="mt-5 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm font-black text-cyan-800">
@@ -440,24 +439,13 @@ async function createSupportInquiryAction(formData: FormData) {
   }
 
   const prisma = getPrismaClient();
-  const inquiry = await prisma.supportInquiry.create({
+  await prisma.supportInquiry.create({
     data: {
       userId: currentUser.userId,
       category: safeCategory,
       title: title.slice(0, 100),
       body: body.slice(0, 2000),
     },
-  });
-
-  await sendAdminTelegramAlert({
-    title: "1:1 문의 접수",
-    lines: [
-      `문의 ID: ${inquiry.id}`,
-      `종류: ${inquiryCategoryLabel(safeCategory)}`,
-      `회원: ${currentUser.displayName} / ${currentUser.email}`,
-      `제목: ${title.slice(0, 100)}`,
-      `어드민: ${(process.env.ADMIN_BASE_URL ?? process.env.NEXT_PUBLIC_ADMIN_BASE_URL ?? "").replace(/\/$/, "")}/admin/support-inquiries`,
-    ],
   });
 
   redirect("/support?tab=inquiry&submitted=1");
@@ -492,25 +480,13 @@ async function createGameServerRequestAction(formData: FormData) {
   ].filter(Boolean);
 
   const prisma = getPrismaClient();
-  const inquiry = await prisma.supportInquiry.create({
+  await prisma.supportInquiry.create({
     data: {
       userId: currentUser.userId,
       category: "GAME_SERVER",
       title: title.slice(0, 100),
       body: detailLines.join("\n").slice(0, 2000),
     },
-  });
-
-  await sendAdminTelegramAlert({
-    title: "게임/서버 신청 접수",
-    lines: [
-      `문의 ID: ${inquiry.id}`,
-      `신청 종류: ${requestKind}`,
-      `게임명: ${gameName}`,
-      serverName ? `서버명: ${serverName}` : null,
-      `회원: ${currentUser.displayName} / ${currentUser.email}`,
-      `어드민: ${(process.env.ADMIN_BASE_URL ?? process.env.NEXT_PUBLIC_ADMIN_BASE_URL ?? "").replace(/\/$/, "")}/admin/support-inquiries`,
-    ],
   });
 
   redirect("/support?tab=game-request&submitted=1");
