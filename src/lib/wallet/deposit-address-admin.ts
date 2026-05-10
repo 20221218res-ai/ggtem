@@ -29,7 +29,7 @@ export async function updateDepositWalletAddress(input: UpdateDepositWalletAddre
   const isActive = input.isActive ?? false;
 
   if (!chain || !label || !networkName || !address) {
-    throw new Error("체인, 이름, 네트워크, 입금 주소를 모두 입력해 주세요.");
+    throw new Error("체인, 표시 이름, 네트워크, 입금 주소를 모두 입력해 주세요.");
   }
 
   if (!/^\d+(\.\d+)?$/.test(minimumAmount) || Number(minimumAmount) <= 0) {

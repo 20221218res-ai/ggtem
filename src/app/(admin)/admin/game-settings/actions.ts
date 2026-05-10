@@ -48,7 +48,12 @@ export async function createGameAction(formData: FormData) {
   const game = await prisma.game.create({
     data: { name, code, moneyUnitName, sortOrder, ...localizedNames },
   });
-  const uploadedImage = image ? await saveGameImage(game.id, image) : null;
+  let uploadedImage: Awaited<ReturnType<typeof saveGameImage>> | null = null;
+  try {
+    uploadedImage = image ? await saveGameImage(game.id, image) : null;
+  } catch (error) {
+    redirectWithError(getErrorMessage(error, "게임 이미지를 저장하지 못했습니다."));
+  }
   const createdGame = uploadedImage
     ? await prisma.game.update({
         where: { id: game.id },
@@ -265,7 +270,12 @@ export async function updateGameAction(formData: FormData) {
     redirectWithError("이미 같은 게임명 또는 게임 코드가 등록되어 있습니다.");
   }
 
-  const uploadedImage = image ? await saveGameImage(gameId, image) : null;
+  let uploadedImage: Awaited<ReturnType<typeof saveGameImage>> | null = null;
+  try {
+    uploadedImage = image ? await saveGameImage(gameId, image) : null;
+  } catch (error) {
+    redirectWithError(getErrorMessage(error, "게임 이미지를 저장하지 못했습니다."));
+  }
   const updated = await prisma.game.update({
     where: { id: gameId },
     data: {
@@ -538,14 +548,21 @@ async function saveGameImage(gameId: string, image: File) {
   }
 
   const uploadsDirectory = path.join(process.cwd(), "public", "uploads", "games");
-  await mkdir(uploadsDirectory, { recursive: true });
-
   const nextFileName = `${gameId}-${Date.now()}.${extension}`;
   const storagePath = path.join(uploadsDirectory, nextFileName);
   const imageUrl = `/uploads/games/${nextFileName}`;
-  await writeFile(storagePath, bytes);
 
-  return { imageUrl, storagePath };
+  try {
+    await mkdir(uploadsDirectory, { recursive: true });
+    await writeFile(storagePath, bytes);
+    return { imageUrl, storagePath };
+  } catch {
+    const mimeType = getGameImageMimeType(extension);
+    return {
+      imageUrl: `data:${mimeType};base64,${Buffer.from(bytes).toString("base64")}`,
+      storagePath: null,
+    };
+  }
 }
 
 function getGameImageExtension(fileName: string, contentType: string) {
@@ -561,6 +578,12 @@ function getGameImageExtension(fileName: string, contentType: string) {
   }
 
   return null;
+}
+
+function getGameImageMimeType(extension: string) {
+  if (extension === "png") return "image/png";
+  if (extension === "webp") return "image/webp";
+  return "image/jpeg";
 }
 
 function isGameImageSignatureValid(bytes: Uint8Array, extension: string) {
@@ -632,6 +655,10 @@ function redirectWithNotice(kind: NoticeKind, details?: Record<string, string>):
 
 function redirectWithError(message: string): never {
   redirect(`/admin/game-settings?error=${encodeURIComponent(message)}`);
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
 }
 
 async function createCatalogAuditLog(input: {

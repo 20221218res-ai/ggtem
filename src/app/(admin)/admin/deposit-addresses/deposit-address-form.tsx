@@ -26,7 +26,9 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
   const [label, setLabel] = useState(current?.label ?? defaults.label);
   const [networkName, setNetworkName] = useState(current?.networkName ?? defaults.networkName);
   const [address, setAddress] = useState(current?.address ?? "");
-  const [minimumAmount, setMinimumAmount] = useState(current?.minimumAmount ?? defaults.minimumAmount);
+  const [minimumAmount, setMinimumAmount] = useState(
+    current?.minimumAmount ?? defaults.minimumAmount,
+  );
   const [isActive, setIsActive] = useState(current?.isActive ?? true);
   const [reason, setReason] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
@@ -38,36 +40,42 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
     setStatus("saving");
     setMessage("저장 중입니다...");
 
-    const response = await fetch("/api/admin/deposit-addresses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        chain,
-        label,
-        asset: defaults.asset,
-        networkName,
-        address,
-        minimumAmount,
-        isActive,
-        reason,
-        adminPassword,
-      }),
-    });
-    const result = (await response.json().catch(() => null)) as { message?: string } | null;
+    try {
+      const response = await fetch("/api/admin/deposit-addresses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          chain,
+          label,
+          asset: defaults.asset,
+          networkName,
+          address,
+          minimumAmount,
+          isActive,
+          reason,
+          adminPassword,
+        }),
+      });
+      const result = (await response.json().catch(() => null)) as { message?: string } | null;
 
-    if (!response.ok) {
+      if (!response.ok) {
+        setStatus("error");
+        setMessage(result?.message ?? "입금 주소 저장에 실패했습니다.");
+        return;
+      }
+
+      setStatus("success");
+      setMessage(result?.message ?? "입금 주소 설정이 저장되었습니다.");
+      setAdminPassword("");
+      setReason("");
+      router.refresh();
+    } catch {
       setStatus("error");
-      setMessage(result?.message ?? "입금 주소 저장에 실패했습니다.");
-      return;
+      setMessage("요청을 보내지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.");
     }
-
-    setStatus("success");
-    setMessage(result?.message ?? "입금 주소 설정이 저장되었습니다.");
-    setAdminPassword("");
-    setReason("");
-    router.refresh();
   }
 
   return (
@@ -102,7 +110,7 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
         value={adminPassword}
         onChange={setAdminPassword}
         type="password"
-        placeholder="주소 변경을 위해 비밀번호 재확인"
+        placeholder="주소 변경을 위해 비밀번호를 다시 입력해 주세요"
       />
       {message ? (
         <p
