@@ -61,17 +61,6 @@ const tradeModeTabs = [
   { labelKey: "listings.buyMode", value: "buy" },
 ] satisfies Array<{ labelKey: TranslationKey; value: string }>;
 
-const fallbackGames = [
-  { name: "Lineage W", region: "KR", code: "lineage-w", imageUrl: "/api/game-card/lineage-w" },
-  { name: "Lineage Classic", region: "KR", code: "lineage-classic", imageUrl: "/api/game-card/lineage-classic" },
-  { name: "Aion 2", region: "KR", code: "aion-2", imageUrl: "/api/game-card/aion-2" },
-  { name: "Lineage M", region: "KR", code: "lineage-m", imageUrl: "/api/game-card/lineage-m" },
-  { name: "MapleStory Worlds", region: "KR", code: "maplestory-worlds", imageUrl: "/api/game-card/maplestory-worlds" },
-  { name: "Lord Nine", region: "KR", code: "lord-nine", imageUrl: "/api/game-card/lord-nine" },
-  { name: "Night Crows", region: "KR", code: "night-crows", imageUrl: "/api/game-card/night-crows" },
-  { name: "RF Online Next", region: "KR", code: "rf-online-next", imageUrl: "/api/game-card/rf-online-next" },
-];
-
 const serverPresets = [
   "Aphrodite",
   "Kera Hero",
@@ -1161,13 +1150,7 @@ function buildGameCards(
 
   const byName = new Map<string, GameCatalogOption>();
 
-  for (const game of [
-    ...games,
-    ...fallbackGames.map((game) => ({
-      ...game,
-      localizedNames: { KR: null, CN: null, VN: null, PH: null, TH: null },
-    })),
-  ]) {
+  for (const game of games) {
     if (!byName.has(game.name)) {
       byName.set(game.name, game);
     }
@@ -1178,12 +1161,10 @@ function buildGameCards(
   return Array.from(byName.values())
     .filter((game) => !normalizedSearch || game.name.toLowerCase().includes(normalizedSearch))
     .slice(0, 12)
-    .map((game, index) => {
-      const fallback = fallbackGames.find((item) => item.name === game.name) ?? fallbackGames[index % fallbackGames.length];
+    .map((game) => {
       const count = counts.get(game.name) ?? { sellCount: 0, buyCount: 0 };
 
       return {
-        ...fallback,
         ...game,
         sellCount: count.sellCount,
         buyCount: count.buyCount,

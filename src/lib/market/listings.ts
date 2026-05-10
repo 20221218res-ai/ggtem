@@ -181,7 +181,7 @@ export async function getMarketplaceListings(
     ];
   }
 
-  const [listings, allActiveListings] = await Promise.all([
+  const [listings, allActiveListings, activeGames] = await Promise.all([
     prisma.listing.findMany({
       where,
       include: {
@@ -237,6 +237,29 @@ export async function getMarketplaceListings(
         createdAt: "desc",
       },
       take: 100,
+    }),
+    prisma.game.findMany({
+      where: {
+        isActive: true,
+        servers: {
+          some: {
+            isActive: true,
+          },
+        },
+      },
+      select: {
+        name: true,
+        code: true,
+        imageUrl: true,
+        nameKo: true,
+        nameCn: true,
+        nameVn: true,
+        namePh: true,
+        nameTh: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
     }),
   ]);
 
@@ -296,8 +319,8 @@ export async function getMarketplaceListings(
       createdAt: formatKoreanDate(listing.createdAt),
     })),
     filterOptions: {
-      games: Array.from(new Set(allActiveListings.map((listing) => listing.game.name))),
-      gameOptions: mapGameOptions(allActiveListings.map((listing) => listing.game)),
+      games: activeGames.map((game) => game.name),
+      gameOptions: mapGameOptions(activeGames),
       categories: Array.from(
         new Set(allActiveListings.map((listing) => listing.category)),
       ),

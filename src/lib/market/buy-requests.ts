@@ -402,16 +402,8 @@ export async function getMarketplaceBuyRequests(
       }),
     ),
     filterOptions: {
-      games: Array.from(
-        new Set(
-          allActiveBuyRequests
-            .map((request) => gameById.get(request.gameId)?.name)
-            .filter((name): name is string => Boolean(name)),
-        ),
-      ),
-      gameOptions: mapGameOptions(games.filter((game) =>
-        allActiveBuyRequests.some((request) => request.gameId === game.id),
-      )),
+      games: games.map((game) => game.name),
+      gameOptions: mapGameOptions(games),
       categories: Array.from(
         new Set(allActiveBuyRequests.map((request) => request.category)),
       ),

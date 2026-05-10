@@ -33,17 +33,6 @@ const categoryLinks = [
   href: string;
 }>;
 
-const defaultGames = [
-  { name: "Lineage W", code: "lineage-w", region: "KR", imageUrl: "/api/game-card/lineage-w" },
-  { name: "Lineage Classic", code: "lineage-classic", region: "KR", imageUrl: "/api/game-card/lineage-classic" },
-  { name: "Aion 2", code: "aion-2", region: "KR", imageUrl: "/api/game-card/aion-2" },
-  { name: "Lineage M", code: "lineage-m", region: "KR", imageUrl: "/api/game-card/lineage-m" },
-  { name: "MapleStory Worlds", code: "maplestory-worlds", region: "KR", imageUrl: "/api/game-card/maplestory-worlds" },
-  { name: "Lord Nine", code: "lord-nine", region: "KR", imageUrl: "/api/game-card/lord-nine" },
-  { name: "Night Crows", code: "night-crows", region: "KR", imageUrl: "/api/game-card/night-crows" },
-  { name: "RF Online Next", code: "rf-online-next", region: "KR", imageUrl: "/api/game-card/rf-online-next" },
-];
-
 export function MarketplaceHome({
   listings,
   filterOptions,
@@ -480,22 +469,16 @@ function buildGameCards(
 
   const byName = new Map<string, GameCatalogOption>();
 
-  for (const game of [...games, ...defaultGames.map((game) => ({
-    ...game,
-    localizedNames: { KR: null, CN: null, VN: null, PH: null, TH: null },
-  }))]) {
+  for (const game of games) {
     if (!byName.has(game.name)) {
       byName.set(game.name, game);
     }
   }
 
-  return Array.from(byName.values()).slice(0, 8).map((game, index) => {
-    const fallback = defaultGames[index % defaultGames.length];
-
+  return Array.from(byName.values()).slice(0, 8).map((game) => {
     return {
-      ...fallback,
       ...game,
-      count: Math.max(counts.get(game.name) ?? 0, index + 4).toLocaleString(),
+      count: (counts.get(game.name) ?? 0).toLocaleString(),
     };
   });
 }
