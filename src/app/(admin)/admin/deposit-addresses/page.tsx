@@ -106,7 +106,7 @@ export default async function AdminDepositAddressesPage({
                 <Field
                   label="입금 주소"
                   name="address"
-                  defaultValue={current?.address ?? defaults.address}
+                  defaultValue={current?.address ?? ""}
                   placeholder={chain === "TRC20" ? "T로 시작하는 TRC20 주소" : "0x로 시작하는 BEP20 주소"}
                   monospace
                 />

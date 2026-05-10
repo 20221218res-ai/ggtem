@@ -18,7 +18,7 @@ export async function updateDepositWalletAddressAction(formData: FormData) {
   const label = getText(formData, "label") || defaults?.label || "";
   const asset = getText(formData, "asset") || defaults?.asset || "USDT";
   const networkName = getText(formData, "networkName") || defaults?.networkName || "";
-  const address = getText(formData, "address") || defaults?.address || "";
+  const address = getText(formData, "address");
   const minimumAmount = getText(formData, "minimumAmount") || defaults?.minimumAmount || "10";
   const reason = getText(formData, "reason");
   const adminPassword = getText(formData, "adminPassword");
