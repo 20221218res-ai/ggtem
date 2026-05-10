@@ -40,7 +40,9 @@ export default async function AdminMaintenancePage() {
       actions={
         <>
           <LinkLike href="/admin/audit?query=MAINTENANCE">점검 이력</LinkLike>
-          <ButtonLike tone="primary">새 점검 예약</ButtonLike>
+          <ButtonLike tone="primary" disabled title="점검 예약 저장 기능 연결 예정">
+            새 점검 예약 준비중
+          </ButtonLike>
         </>
       }
     >
@@ -64,11 +66,25 @@ export default async function AdminMaintenancePage() {
       </Panel>
 
       <section className="grid gap-5 xl:grid-cols-2">
-        <Panel title="예정된 점검" action={<ButtonLike>공지 작성</ButtonLike>}>
+        <Panel
+          title="예정된 점검"
+          action={
+            <ButtonLike disabled title="점검 공지 작성 기능 연결 예정">
+              공지 작성 준비중
+            </ButtonLike>
+          }
+        >
           <DataTable headers={["점검", "시작", "예상", "영향"]} rows={schedules} />
         </Panel>
 
-        <Panel title="사용자 미리보기" action={<ButtonLike tone="primary">저장</ButtonLike>}>
+        <Panel
+          title="사용자 미리보기"
+          action={
+            <ButtonLike tone="primary" disabled title="점검 안내 저장 기능 연결 예정">
+              저장 준비중
+            </ButtonLike>
+          }
+        >
           <div className="rounded-lg bg-slate-950 p-8 text-center text-white">
             <p className="text-4xl">점검</p>
             <h2 className="mt-4 text-2xl font-black">서비스 점검 중입니다</h2>

@@ -47,9 +47,13 @@ export function AdminMockPage({
 export function ButtonLike({
   children,
   tone = "white",
+  disabled = false,
+  title,
 }: {
   children: ReactNode;
   tone?: "white" | "primary" | "red" | "amber" | "green";
+  disabled?: boolean;
+  title?: string;
 }) {
   const classes = {
     white: "border-slate-200 bg-white text-slate-900 hover:bg-slate-50",
@@ -60,7 +64,14 @@ export function ButtonLike({
   };
 
   return (
-    <button className={`rounded-md border px-3 py-2 text-sm font-bold shadow-sm ${classes[tone]}`}>
+    <button
+      type="button"
+      disabled={disabled}
+      title={title}
+      className={`rounded-md border px-3 py-2 text-sm font-bold shadow-sm ${
+        disabled ? "cursor-not-allowed opacity-55 hover:bg-inherit" : ""
+      } ${classes[tone]}`}
+    >
       {children}
     </button>
   );

@@ -61,7 +61,9 @@ export default async function AdminCountrySettingsPage() {
       actions={
         <>
           <LinkLike href="/admin/reports?kind=country">국가별 리포트</LinkLike>
-          <ButtonLike tone="primary">새 국가 추가</ButtonLike>
+          <ButtonLike tone="primary" disabled title="국가 추가 기능 연결 예정">
+            새 국가 추가 준비중
+          </ButtonLike>
         </>
       }
     >
@@ -98,7 +100,14 @@ export default async function AdminCountrySettingsPage() {
       </Panel>
 
       <section className="grid gap-5 xl:grid-cols-2">
-        <Panel title="현재 운영 기준" action={<ButtonLike tone="primary">저장</ButtonLike>}>
+        <Panel
+          title="현재 운영 기준"
+          action={
+            <ButtonLike tone="primary" disabled title="국가별 운영 기준 저장 기능 연결 예정">
+              저장 준비중
+            </ButtonLike>
+          }
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             {countryRules.map(([label, value]) => (
               <div key={label} className="rounded-lg border border-slate-200 bg-slate-50 p-4">

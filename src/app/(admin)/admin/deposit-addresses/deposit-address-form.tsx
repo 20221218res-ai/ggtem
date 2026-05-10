@@ -80,16 +80,23 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
-      <Field label="표시 이름" value={label} onChange={setLabel} />
-      <Field label="네트워크" value={networkName} onChange={setNetworkName} />
+      <Field label="표시 이름" value={label} onChange={setLabel} required />
+      <Field label="네트워크" value={networkName} onChange={setNetworkName} required />
       <Field
         label="입금 주소"
         value={address}
         onChange={setAddress}
         placeholder={chain === "TRC20" ? "T로 시작하는 TRC20 주소" : "0x로 시작하는 BEP20 주소"}
         monospace
+        required
       />
-      <Field label="최소 입금액" value={minimumAmount} onChange={setMinimumAmount} inputMode="decimal" />
+      <Field
+        label="최소 입금액"
+        value={minimumAmount}
+        onChange={setMinimumAmount}
+        inputMode="decimal"
+        required
+      />
       <label className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-black">
         <input
           type="checkbox"
@@ -104,6 +111,8 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
         value={reason}
         onChange={setReason}
         placeholder="예: 운영 지갑 주소 교체 또는 보안 주소 변경"
+        minLength={10}
+        required
       />
       <Field
         label="최고관리자 비밀번호"
@@ -111,9 +120,11 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
         onChange={setAdminPassword}
         type="password"
         placeholder="주소 변경을 위해 비밀번호를 다시 입력해 주세요"
+        required
       />
       {message ? (
         <p
+          aria-live="polite"
           className={`rounded-md px-3 py-2 text-sm font-black ${
             status === "error"
               ? "bg-red-100 text-red-700"
@@ -144,6 +155,8 @@ function Field({
   inputMode,
   type = "text",
   monospace = false,
+  required = false,
+  minLength,
 }: {
   label: string;
   value: string;
@@ -152,6 +165,8 @@ function Field({
   inputMode?: "decimal";
   type?: "text" | "password";
   monospace?: boolean;
+  required?: boolean;
+  minLength?: number;
 }) {
   return (
     <label className="grid gap-2 text-sm font-black text-slate-700">
@@ -161,6 +176,8 @@ function Field({
         value={value}
         placeholder={placeholder}
         inputMode={inputMode}
+        required={required}
+        minLength={minLength}
         onChange={(event) => onChange(event.target.value)}
         className={`h-12 rounded-md border border-slate-200 bg-white px-4 text-sm font-bold text-slate-950 outline-none focus:border-[var(--color-primary)] ${
           monospace ? "font-mono" : ""

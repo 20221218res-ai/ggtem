@@ -50,7 +50,9 @@ export default async function AmlPage() {
           <LinkLike href="/admin/users">유저 콘솔</LinkLike>
           <LinkLike href="/admin/finance/ledger">지갑 원장</LinkLike>
           <LinkLike href="/admin/audit?query=AML">감사 로그</LinkLike>
-          <ButtonLike tone="primary">FIU 보고서</ButtonLike>
+          <ButtonLike tone="primary" disabled title="보고서 생성 기능 연결 예정">
+            FIU 보고서 준비중
+          </ButtonLike>
         </>
       }
     >
@@ -115,7 +117,14 @@ export default async function AmlPage() {
           </div>
         </Panel>
 
-        <Panel title="AML 감시 규칙" action={<ButtonLike tone="primary">새 규칙</ButtonLike>}>
+        <Panel
+          title="AML 감시 규칙"
+          action={
+            <ButtonLike tone="primary" disabled title="규칙 편집 기능 연결 예정">
+              새 규칙 준비중
+            </ButtonLike>
+          }
+        >
           <div className="divide-y divide-slate-100">
             {ruleRows.map(([title, desc]) => (
               <div key={title} className="flex items-center justify-between gap-4 py-4">
@@ -134,8 +143,12 @@ export default async function AmlPage() {
         title="블랙리스트 지갑"
         action={
           <>
-            <ButtonLike>OFAC 동기화</ButtonLike>
-            <ButtonLike tone="primary">수동 추가</ButtonLike>
+            <ButtonLike disabled title="외부 제재 목록 동기화 기능 연결 예정">
+              OFAC 동기화 준비중
+            </ButtonLike>
+            <ButtonLike tone="primary" disabled title="블랙리스트 지갑 수동 추가 기능 연결 예정">
+              수동 추가 준비중
+            </ButtonLike>
           </>
         }
       >

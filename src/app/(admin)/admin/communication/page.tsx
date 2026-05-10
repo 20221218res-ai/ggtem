@@ -39,8 +39,12 @@ export default async function AdminCommunicationPage() {
       actions={
         <>
           <LinkLike href="/admin/reports?kind=communication">발송 분석</LinkLike>
-          <ButtonLike>템플릿</ButtonLike>
-          <ButtonLike tone="primary">새 캠페인</ButtonLike>
+          <ButtonLike disabled title="템플릿 관리 기능 연결 예정">
+            템플릿 준비중
+          </ButtonLike>
+          <ButtonLike tone="primary" disabled title="캠페인 생성 기능 연결 예정">
+            새 캠페인 준비중
+          </ButtonLike>
         </>
       }
     >
@@ -81,7 +85,14 @@ export default async function AdminCommunicationPage() {
           <DataTable headers={["채널", "공급자", "사용량", "상태"]} rows={channels} />
         </Panel>
 
-        <Panel title="캠페인 작성" action={<ButtonLike tone="primary">테스트 발송</ButtonLike>}>
+        <Panel
+          title="캠페인 작성"
+          action={
+            <ButtonLike tone="primary" disabled title="테스트 발송 기능 연결 예정">
+              테스트 발송 준비중
+            </ButtonLike>
+          }
+        >
           <div className="grid gap-4 lg:grid-cols-2">
             <label className="text-sm font-black text-slate-700">
               캠페인 이름
@@ -98,9 +109,15 @@ export default async function AdminCommunicationPage() {
             <p className="mt-1 text-sm font-semibold text-slate-600">발송 전 비용과 예상 오픈율을 확인합니다.</p>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <ButtonLike>초안 저장</ButtonLike>
-            <ButtonLike>나에게 테스트</ButtonLike>
-            <ButtonLike tone="primary">187명에게 발송</ButtonLike>
+            <ButtonLike disabled title="초안 저장 기능 연결 예정">
+              초안 저장 준비중
+            </ButtonLike>
+            <ButtonLike disabled title="테스트 발송 기능 연결 예정">
+              나에게 테스트 준비중
+            </ButtonLike>
+            <ButtonLike tone="primary" disabled title="대량 발송 기능 연결 예정">
+              발송 준비중
+            </ButtonLike>
           </div>
         </Panel>
       </section>
