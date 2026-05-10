@@ -61,37 +61,6 @@ const tradeModeTabs = [
   { labelKey: "listings.buyMode", value: "buy" },
 ] satisfies Array<{ labelKey: TranslationKey; value: string }>;
 
-const serverPresets = [
-  "Aphrodite",
-  "Kera Hero",
-  "Jillian",
-  "Isilote",
-  "Joowu",
-  "Odin",
-  "Kerenis",
-  "Ashen",
-  "Trickster",
-  "Einhasad",
-  "Arden",
-  "Garion",
-  "Gunter",
-  "Master",
-  "Pandora",
-  "Balsen",
-  "Elen",
-  "Castor",
-  "Server Transfer",
-  "Yggdrasil",
-  "Laphagrim",
-  "Baba",
-  "Siren",
-  "Maple",
-  "Lindon",
-  "Hain",
-  "Roengrin",
-  "Barakas",
-  "Other",
-];
 const pricePresets = [
   { label: "~10 USDT", minPrice: "", maxPrice: "10" },
   { label: "~50 USDT", minPrice: "", maxPrice: "50" },
@@ -186,6 +155,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
                 selectedMode={selectedMode}
                 selectedGame={selectedGame}
                 selectedServer={selectedServer}
+                serverOptions={view.filterOptions.serverOptions}
                 minPrice={minPrice}
                 maxPrice={maxPrice}
                 selectedAccountType={selectedAccountType}
@@ -221,6 +191,7 @@ function ServerPriceSelector({
   selectedMode,
   selectedGame,
   selectedServer,
+  serverOptions,
   minPrice,
   maxPrice,
   selectedAccountType,
@@ -229,14 +200,15 @@ function ServerPriceSelector({
   selectedMode: string;
   selectedGame: string;
   selectedServer: string;
+  serverOptions: string[];
   minPrice: string;
   maxPrice: string;
   selectedAccountType: string;
 }) {
   const servers = Array.from(
     new Set([
-      ...serverPresets,
-      ...(selectedServer && !serverPresets.includes(selectedServer)
+      ...serverOptions,
+      ...(selectedServer && !serverOptions.includes(selectedServer)
         ? [selectedServer]
         : []),
     ]),
@@ -246,25 +218,27 @@ function ServerPriceSelector({
     <section className="overflow-hidden rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] shadow-sm shadow-[var(--gg-shadow)]">
       <FilterRow label={<CountryText id="listings.server" />}>
         <div className="flex flex-wrap gap-3">
-          {servers.map((server) => {
-            const value = server === "?꾩껜" ? "" : server;
-            const active = selectedServer === value || (!selectedServer && server === "?꾩껜");
+          {[
+            { key: "__all__", label: <CountryText id="listings.all" />, value: "" },
+            ...servers.map((server) => ({ key: server, label: server, value: server })),
+          ].map((server) => {
+            const active = selectedServer === server.value;
 
             return (
               <Link
-                key={server}
+                key={server.key}
                 href={buildListingFilterHref({
                   selectedCategory,
                   selectedMode,
                   selectedGame,
-                  server: value,
+                  server: server.value,
                   minPrice,
                   maxPrice,
                   accountType: selectedAccountType,
                 })}
                 className={active ? filterActiveClass : filterIdleClass}
               >
-                {server}
+                {server.label}
               </Link>
             );
           })}

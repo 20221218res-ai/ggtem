@@ -120,6 +120,7 @@ export type MarketplaceBuyRequestsView = {
   filterOptions: {
     games: string[];
     gameOptions: GameCatalogOption[];
+    serverOptions: string[];
     categories: string[];
   };
   appliedFilters: {
@@ -227,7 +228,7 @@ export async function getMarketplaceBuyRequestFormView(): Promise<MarketplaceBuy
             isActive: true,
           },
           orderBy: {
-            name: "asc",
+            code: "asc",
           },
         },
       },
@@ -284,6 +285,9 @@ export async function getMarketplaceBuyRequests(
       servers: {
         where: {
           isActive: true,
+        },
+        orderBy: {
+          code: "asc",
         },
       },
     },
@@ -400,6 +404,7 @@ export async function getMarketplaceBuyRequests(
     filterOptions: {
       games: games.map((game) => game.name),
       gameOptions: mapGameOptions(games),
+      serverOptions: getServerOptionsForGame(games, normalizedGame),
       categories: Array.from(
         new Set(allActiveBuyRequests.map((request) => request.category)),
       ),
@@ -1563,6 +1568,23 @@ function mapGameOptions(
     region: getGameRegion(game.name),
     localizedNames: mapGameLocalizedNames(game),
   }));
+}
+
+function getServerOptionsForGame(
+  games: Array<{
+    name: string;
+    servers?: Array<{
+      name: string;
+    }>;
+  }>,
+  gameName: string,
+) {
+  if (!gameName) {
+    return [];
+  }
+
+  const game = games.find((item) => item.name === gameName);
+  return game?.servers?.map((server) => server.name) ?? [];
 }
 
 function getGameRegion(gameName: string) {
