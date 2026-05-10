@@ -67,6 +67,11 @@ export type PasswordResetToken = Prisma.PasswordResetTokenModel
  */
 export type EmailVerificationToken = Prisma.EmailVerificationTokenModel
 /**
+ * Model EmailVerificationLoginToken
+ * 
+ */
+export type EmailVerificationLoginToken = Prisma.EmailVerificationLoginTokenModel
+/**
  * Model AdminInviteToken
  * 
  */

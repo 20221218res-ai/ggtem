@@ -15,6 +15,7 @@ import {
   type LocalizedGameNames,
   mapGameLocalizedNames,
 } from "@/lib/market/game-localization";
+import { validateServerDetail } from "@/lib/market/server-detail-options";
 import { copyFile, mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -110,6 +111,7 @@ export type MarketplaceSellerListingFormView = {
   }>;
   games: Array<{
     gameId: string;
+    code: string;
     name: string;
     localizedNames: LocalizedGameNames;
     servers: Array<{
@@ -407,8 +409,9 @@ export async function getMarketplaceSellerListingFormView(): Promise<Marketplace
       { value: "GAME_ACCOUNT", label: "계정" },
     ],
     games: games.map((game) => ({
-      gameId: game.id,
-      name: game.name,
+    gameId: game.id,
+    code: game.code,
+    name: game.name,
       localizedNames: mapGameLocalizedNames(game),
       servers: game.servers.map((server) => ({
         serverId: server.id,
@@ -421,6 +424,7 @@ export async function getMarketplaceSellerListingFormView(): Promise<Marketplace
 export async function createMarketplaceSellerListing(input: {
   gameId: string;
   serverId?: string;
+  serverDetail?: string;
   category: "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
   accountTransferType?: string;
   title: string;
@@ -535,6 +539,8 @@ export async function createMarketplaceSellerListing(input: {
     throw new Error("선택한 서버가 해당 게임에 속하지 않습니다.");
   }
 
+  const normalizedServerDetail = validateServerDetail(input.serverDetail, game.code);
+
   const listing = await prisma.$transaction(async (tx) => {
     const premiumWindow = getPremiumPromotionWindow(premiumDurationHours);
     const createdListing = await tx.listing.create({
@@ -542,6 +548,7 @@ export async function createMarketplaceSellerListing(input: {
         sellerId: seller.id,
         gameId: game.id,
         serverId: normalizedServerId,
+        serverDetail: normalizedServerDetail,
         category: input.category,
         accountTransferType:
           input.category === "GAME_ACCOUNT" ? normalizedAccountTransferType : null,
@@ -919,6 +926,7 @@ export async function duplicateMarketplaceSellerListing(input: {
         sellerId: seller.id,
         gameId: sourceListing.gameId,
         serverId: sourceListing.serverId,
+        serverDetail: sourceListing.serverDetail,
         category: sourceListing.category,
         accountTransferType: sourceListing.accountTransferType,
         title: `${sourceListing.title} (복사본)`,

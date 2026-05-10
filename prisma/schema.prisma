@@ -321,6 +321,7 @@ model Listing {
   sellerId    String
   gameId      String
   serverId    String?
+  serverDetail String?
   category    ListingCategory
   accountTransferType String?
   title       String
@@ -344,6 +345,7 @@ model Listing {
 
   @@index([sellerId, status])
   @@index([gameId, serverId, category, status])
+  @@index([gameId, serverId, serverDetail, category, status])
   @@index([category, accountTransferType])
   @@index([status, createdAt])
   @@index([status, unitPrice])
@@ -382,6 +384,7 @@ model BuyRequest {
   buyerId             String
   gameId              String
   serverId            String?
+  serverDetail        String?
   category            ListingCategory
   title               String?
   description         String?
@@ -405,6 +408,7 @@ model BuyRequest {
 
   @@index([buyerId, status])
   @@index([gameId, serverId, category, status])
+  @@index([gameId, serverId, serverDetail, category, status])
   @@index([category, accountTransferType])
   @@index([status, createdAt])
   @@index([status, unitPrice])

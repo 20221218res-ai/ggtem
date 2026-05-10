@@ -56,6 +56,7 @@ export const ModelName = {
   LoginAttempt: 'LoginAttempt',
   PasswordResetToken: 'PasswordResetToken',
   EmailVerificationToken: 'EmailVerificationToken',
+  EmailVerificationLoginToken: 'EmailVerificationLoginToken',
   AdminInviteToken: 'AdminInviteToken',
   Wallet: 'Wallet',
   WalletLedgerEntry: 'WalletLedgerEntry',
@@ -171,6 +172,18 @@ export const EmailVerificationTokenScalarFieldEnum = {
 export type EmailVerificationTokenScalarFieldEnum = (typeof EmailVerificationTokenScalarFieldEnum)[keyof typeof EmailVerificationTokenScalarFieldEnum]
 
 
+export const EmailVerificationLoginTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailVerificationLoginTokenScalarFieldEnum = (typeof EmailVerificationLoginTokenScalarFieldEnum)[keyof typeof EmailVerificationLoginTokenScalarFieldEnum]
+
+
 export const AdminInviteTokenScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -257,6 +270,7 @@ export const ListingScalarFieldEnum = {
   sellerId: 'sellerId',
   gameId: 'gameId',
   serverId: 'serverId',
+  serverDetail: 'serverDetail',
   category: 'category',
   accountTransferType: 'accountTransferType',
   title: 'title',
@@ -309,6 +323,7 @@ export const BuyRequestScalarFieldEnum = {
   buyerId: 'buyerId',
   gameId: 'gameId',
   serverId: 'serverId',
+  serverDetail: 'serverDetail',
   category: 'category',
   title: 'title',
   description: 'description',

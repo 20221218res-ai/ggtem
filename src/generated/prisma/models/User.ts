@@ -234,6 +234,7 @@ export type UserWhereInput = {
   sessions?: Prisma.SessionListRelationFilter
   passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
   emailVerificationTokens?: Prisma.EmailVerificationTokenListRelationFilter
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenListRelationFilter
   adminInviteTokens?: Prisma.AdminInviteTokenListRelationFilter
   adminInvitesCreated?: Prisma.AdminInviteTokenListRelationFilter
   buyerChatRooms?: Prisma.ChatRoomListRelationFilter
@@ -272,6 +273,7 @@ export type UserOrderByWithRelationInput = {
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   passwordResetTokens?: Prisma.PasswordResetTokenOrderByRelationAggregateInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenOrderByRelationAggregateInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenOrderByRelationAggregateInput
   adminInviteTokens?: Prisma.AdminInviteTokenOrderByRelationAggregateInput
   adminInvitesCreated?: Prisma.AdminInviteTokenOrderByRelationAggregateInput
   buyerChatRooms?: Prisma.ChatRoomOrderByRelationAggregateInput
@@ -313,6 +315,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   sessions?: Prisma.SessionListRelationFilter
   passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
   emailVerificationTokens?: Prisma.EmailVerificationTokenListRelationFilter
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenListRelationFilter
   adminInviteTokens?: Prisma.AdminInviteTokenListRelationFilter
   adminInvitesCreated?: Prisma.AdminInviteTokenListRelationFilter
   buyerChatRooms?: Prisma.ChatRoomListRelationFilter
@@ -381,6 +384,7 @@ export type UserCreateInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -419,6 +423,7 @@ export type UserUncheckedCreateInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -457,6 +462,7 @@ export type UserUpdateInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -495,6 +501,7 @@ export type UserUncheckedUpdateInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -649,6 +656,20 @@ export type UserUpdateOneRequiredWithoutEmailVerificationTokensNestedInput = {
   upsert?: Prisma.UserUpsertWithoutEmailVerificationTokensInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEmailVerificationTokensInput, Prisma.UserUpdateWithoutEmailVerificationTokensInput>, Prisma.UserUncheckedUpdateWithoutEmailVerificationTokensInput>
+}
+
+export type UserCreateNestedOneWithoutEmailVerificationLoginTokensInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmailVerificationLoginTokensInput, Prisma.UserUncheckedCreateWithoutEmailVerificationLoginTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmailVerificationLoginTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutEmailVerificationLoginTokensNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmailVerificationLoginTokensInput, Prisma.UserUncheckedCreateWithoutEmailVerificationLoginTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmailVerificationLoginTokensInput
+  upsert?: Prisma.UserUpsertWithoutEmailVerificationLoginTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEmailVerificationLoginTokensInput, Prisma.UserUpdateWithoutEmailVerificationLoginTokensInput>, Prisma.UserUncheckedUpdateWithoutEmailVerificationLoginTokensInput>
 }
 
 export type UserCreateNestedOneWithoutAdminInviteTokensInput = {
@@ -1006,6 +1027,7 @@ export type UserCreateWithoutSessionsInput = {
   reportsReceived?: Prisma.TrustReportCreateNestedManyWithoutTargetUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -1043,6 +1065,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   reportsReceived?: Prisma.TrustReportUncheckedCreateNestedManyWithoutTargetUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -1096,6 +1119,7 @@ export type UserUpdateWithoutSessionsInput = {
   reportsReceived?: Prisma.TrustReportUpdateManyWithoutTargetUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -1133,6 +1157,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   reportsReceived?: Prisma.TrustReportUncheckedUpdateManyWithoutTargetUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -1170,6 +1195,7 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   reportsReceived?: Prisma.TrustReportCreateNestedManyWithoutTargetUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -1207,6 +1233,7 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   reportsReceived?: Prisma.TrustReportUncheckedCreateNestedManyWithoutTargetUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -1260,6 +1287,7 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   reportsReceived?: Prisma.TrustReportUpdateManyWithoutTargetUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -1297,6 +1325,7 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   reportsReceived?: Prisma.TrustReportUncheckedUpdateManyWithoutTargetUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -1334,6 +1363,7 @@ export type UserCreateWithoutEmailVerificationTokensInput = {
   reportsReceived?: Prisma.TrustReportCreateNestedManyWithoutTargetUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -1371,6 +1401,7 @@ export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
   reportsReceived?: Prisma.TrustReportUncheckedCreateNestedManyWithoutTargetUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -1424,6 +1455,7 @@ export type UserUpdateWithoutEmailVerificationTokensInput = {
   reportsReceived?: Prisma.TrustReportUpdateManyWithoutTargetUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -1461,6 +1493,175 @@ export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
   reportsReceived?: Prisma.TrustReportUncheckedUpdateManyWithoutTargetUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
+  adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
+  adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
+  sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutEmailVerificationLoginTokensInput = {
+  id?: string
+  email: string
+  displayName: string
+  passwordHash?: string | null
+  emailVerifiedAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  listings?: Prisma.ListingCreateNestedManyWithoutSellerInput
+  buyRequests?: Prisma.BuyRequestCreateNestedManyWithoutBuyerInput
+  buyRequestOffers?: Prisma.BuyRequestOfferCreateNestedManyWithoutSellerInput
+  buyerOrders?: Prisma.OrderCreateNestedManyWithoutBuyerInput
+  sellerOrders?: Prisma.OrderCreateNestedManyWithoutSellerInput
+  reviewsGiven?: Prisma.OrderReviewCreateNestedManyWithoutBuyerInput
+  reviewsReceived?: Prisma.OrderReviewCreateNestedManyWithoutSellerInput
+  depositRequests?: Prisma.DepositRequestCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminInput
+  adminNotesReceived?: Prisma.AdminUserNoteCreateNestedManyWithoutUserInput
+  adminNotesAuthored?: Prisma.AdminUserNoteCreateNestedManyWithoutAdminInput
+  adminGameNotes?: Prisma.AdminGameNoteCreateNestedManyWithoutAdminInput
+  slaIncidentNotes?: Prisma.AdminSlaIncidentNoteCreateNestedManyWithoutAdminInput
+  reportsMade?: Prisma.TrustReportCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.TrustReportCreateNestedManyWithoutTargetUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
+  adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
+  buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
+  sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutEmailVerificationLoginTokensInput = {
+  id?: string
+  email: string
+  displayName: string
+  passwordHash?: string | null
+  emailVerifiedAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  listings?: Prisma.ListingUncheckedCreateNestedManyWithoutSellerInput
+  buyRequests?: Prisma.BuyRequestUncheckedCreateNestedManyWithoutBuyerInput
+  buyRequestOffers?: Prisma.BuyRequestOfferUncheckedCreateNestedManyWithoutSellerInput
+  buyerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutBuyerInput
+  sellerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSellerInput
+  reviewsGiven?: Prisma.OrderReviewUncheckedCreateNestedManyWithoutBuyerInput
+  reviewsReceived?: Prisma.OrderReviewUncheckedCreateNestedManyWithoutSellerInput
+  depositRequests?: Prisma.DepositRequestUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminInput
+  adminNotesReceived?: Prisma.AdminUserNoteUncheckedCreateNestedManyWithoutUserInput
+  adminNotesAuthored?: Prisma.AdminUserNoteUncheckedCreateNestedManyWithoutAdminInput
+  adminGameNotes?: Prisma.AdminGameNoteUncheckedCreateNestedManyWithoutAdminInput
+  slaIncidentNotes?: Prisma.AdminSlaIncidentNoteUncheckedCreateNestedManyWithoutAdminInput
+  reportsMade?: Prisma.TrustReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.TrustReportUncheckedCreateNestedManyWithoutTargetUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
+  adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
+  sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutEmailVerificationLoginTokensInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmailVerificationLoginTokensInput, Prisma.UserUncheckedCreateWithoutEmailVerificationLoginTokensInput>
+}
+
+export type UserUpsertWithoutEmailVerificationLoginTokensInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutEmailVerificationLoginTokensInput, Prisma.UserUncheckedUpdateWithoutEmailVerificationLoginTokensInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmailVerificationLoginTokensInput, Prisma.UserUncheckedCreateWithoutEmailVerificationLoginTokensInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutEmailVerificationLoginTokensInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutEmailVerificationLoginTokensInput, Prisma.UserUncheckedUpdateWithoutEmailVerificationLoginTokensInput>
+}
+
+export type UserUpdateWithoutEmailVerificationLoginTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  listings?: Prisma.ListingUpdateManyWithoutSellerNestedInput
+  buyRequests?: Prisma.BuyRequestUpdateManyWithoutBuyerNestedInput
+  buyRequestOffers?: Prisma.BuyRequestOfferUpdateManyWithoutSellerNestedInput
+  buyerOrders?: Prisma.OrderUpdateManyWithoutBuyerNestedInput
+  sellerOrders?: Prisma.OrderUpdateManyWithoutSellerNestedInput
+  reviewsGiven?: Prisma.OrderReviewUpdateManyWithoutBuyerNestedInput
+  reviewsReceived?: Prisma.OrderReviewUpdateManyWithoutSellerNestedInput
+  depositRequests?: Prisma.DepositRequestUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminNestedInput
+  adminNotesReceived?: Prisma.AdminUserNoteUpdateManyWithoutUserNestedInput
+  adminNotesAuthored?: Prisma.AdminUserNoteUpdateManyWithoutAdminNestedInput
+  adminGameNotes?: Prisma.AdminGameNoteUpdateManyWithoutAdminNestedInput
+  slaIncidentNotes?: Prisma.AdminSlaIncidentNoteUpdateManyWithoutAdminNestedInput
+  reportsMade?: Prisma.TrustReportUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.TrustReportUpdateManyWithoutTargetUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
+  adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
+  buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
+  sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutEmailVerificationLoginTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  listings?: Prisma.ListingUncheckedUpdateManyWithoutSellerNestedInput
+  buyRequests?: Prisma.BuyRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  buyRequestOffers?: Prisma.BuyRequestOfferUncheckedUpdateManyWithoutSellerNestedInput
+  buyerOrders?: Prisma.OrderUncheckedUpdateManyWithoutBuyerNestedInput
+  sellerOrders?: Prisma.OrderUncheckedUpdateManyWithoutSellerNestedInput
+  reviewsGiven?: Prisma.OrderReviewUncheckedUpdateManyWithoutBuyerNestedInput
+  reviewsReceived?: Prisma.OrderReviewUncheckedUpdateManyWithoutSellerNestedInput
+  depositRequests?: Prisma.DepositRequestUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminNestedInput
+  adminNotesReceived?: Prisma.AdminUserNoteUncheckedUpdateManyWithoutUserNestedInput
+  adminNotesAuthored?: Prisma.AdminUserNoteUncheckedUpdateManyWithoutAdminNestedInput
+  adminGameNotes?: Prisma.AdminGameNoteUncheckedUpdateManyWithoutAdminNestedInput
+  slaIncidentNotes?: Prisma.AdminSlaIncidentNoteUncheckedUpdateManyWithoutAdminNestedInput
+  reportsMade?: Prisma.TrustReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.TrustReportUncheckedUpdateManyWithoutTargetUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -1499,6 +1700,7 @@ export type UserCreateWithoutAdminInviteTokensInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
@@ -1536,6 +1738,7 @@ export type UserUncheckedCreateWithoutAdminInviteTokensInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
@@ -1578,6 +1781,7 @@ export type UserCreateWithoutAdminInvitesCreatedInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
@@ -1615,6 +1819,7 @@ export type UserUncheckedCreateWithoutAdminInvitesCreatedInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
@@ -1668,6 +1873,7 @@ export type UserUpdateWithoutAdminInviteTokensInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
@@ -1705,6 +1911,7 @@ export type UserUncheckedUpdateWithoutAdminInviteTokensInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
@@ -1753,6 +1960,7 @@ export type UserUpdateWithoutAdminInvitesCreatedInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
@@ -1790,6 +1998,7 @@ export type UserUncheckedUpdateWithoutAdminInvitesCreatedInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
@@ -1826,6 +2035,7 @@ export type UserCreateWithoutWalletInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -1863,6 +2073,7 @@ export type UserUncheckedCreateWithoutWalletInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -1916,6 +2127,7 @@ export type UserUpdateWithoutWalletInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -1953,6 +2165,7 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -1990,6 +2203,7 @@ export type UserCreateWithoutListingsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -2027,6 +2241,7 @@ export type UserUncheckedCreateWithoutListingsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -2080,6 +2295,7 @@ export type UserUpdateWithoutListingsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -2117,6 +2333,7 @@ export type UserUncheckedUpdateWithoutListingsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -2154,6 +2371,7 @@ export type UserCreateWithoutBuyRequestsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -2191,6 +2409,7 @@ export type UserUncheckedCreateWithoutBuyRequestsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -2244,6 +2463,7 @@ export type UserUpdateWithoutBuyRequestsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -2281,6 +2501,7 @@ export type UserUncheckedUpdateWithoutBuyRequestsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -2318,6 +2539,7 @@ export type UserCreateWithoutBuyRequestOffersInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -2355,6 +2577,7 @@ export type UserUncheckedCreateWithoutBuyRequestOffersInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -2408,6 +2631,7 @@ export type UserUpdateWithoutBuyRequestOffersInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -2445,6 +2669,7 @@ export type UserUncheckedUpdateWithoutBuyRequestOffersInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -2482,6 +2707,7 @@ export type UserCreateWithoutBuyerOrdersInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -2519,6 +2745,7 @@ export type UserUncheckedCreateWithoutBuyerOrdersInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -2561,6 +2788,7 @@ export type UserCreateWithoutSellerOrdersInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -2598,6 +2826,7 @@ export type UserUncheckedCreateWithoutSellerOrdersInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -2651,6 +2880,7 @@ export type UserUpdateWithoutBuyerOrdersInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -2688,6 +2918,7 @@ export type UserUncheckedUpdateWithoutBuyerOrdersInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -2736,6 +2967,7 @@ export type UserUpdateWithoutSellerOrdersInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -2773,6 +3005,7 @@ export type UserUncheckedUpdateWithoutSellerOrdersInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -2811,6 +3044,7 @@ export type UserCreateWithoutBuyerChatRoomsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
@@ -2848,6 +3082,7 @@ export type UserUncheckedCreateWithoutBuyerChatRoomsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
@@ -2890,6 +3125,7 @@ export type UserCreateWithoutSellerChatRoomsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -2927,6 +3163,7 @@ export type UserUncheckedCreateWithoutSellerChatRoomsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -2980,6 +3217,7 @@ export type UserUpdateWithoutBuyerChatRoomsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
@@ -3017,6 +3255,7 @@ export type UserUncheckedUpdateWithoutBuyerChatRoomsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
@@ -3065,6 +3304,7 @@ export type UserUpdateWithoutSellerChatRoomsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -3102,6 +3342,7 @@ export type UserUncheckedUpdateWithoutSellerChatRoomsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -3139,6 +3380,7 @@ export type UserCreateWithoutSentChatMessagesInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -3176,6 +3418,7 @@ export type UserUncheckedCreateWithoutSentChatMessagesInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -3229,6 +3472,7 @@ export type UserUpdateWithoutSentChatMessagesInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -3266,6 +3510,7 @@ export type UserUncheckedUpdateWithoutSentChatMessagesInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -3302,6 +3547,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -3339,6 +3585,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -3381,6 +3628,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -3418,6 +3666,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -3471,6 +3720,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -3508,6 +3758,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -3556,6 +3807,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -3593,6 +3845,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -3630,6 +3883,7 @@ export type UserCreateWithoutDepositRequestsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -3667,6 +3921,7 @@ export type UserUncheckedCreateWithoutDepositRequestsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -3720,6 +3975,7 @@ export type UserUpdateWithoutDepositRequestsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -3757,6 +4013,7 @@ export type UserUncheckedUpdateWithoutDepositRequestsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -3794,6 +4051,7 @@ export type UserCreateWithoutWithdrawalRequestsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -3831,6 +4089,7 @@ export type UserUncheckedCreateWithoutWithdrawalRequestsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -3884,6 +4143,7 @@ export type UserUpdateWithoutWithdrawalRequestsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -3921,6 +4181,7 @@ export type UserUncheckedUpdateWithoutWithdrawalRequestsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -3958,6 +4219,7 @@ export type UserCreateWithoutAdminAuditLogsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -3995,6 +4257,7 @@ export type UserUncheckedCreateWithoutAdminAuditLogsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -4048,6 +4311,7 @@ export type UserUpdateWithoutAdminAuditLogsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -4085,6 +4349,7 @@ export type UserUncheckedUpdateWithoutAdminAuditLogsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -4122,6 +4387,7 @@ export type UserCreateWithoutSlaIncidentNotesInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -4159,6 +4425,7 @@ export type UserUncheckedCreateWithoutSlaIncidentNotesInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -4212,6 +4479,7 @@ export type UserUpdateWithoutSlaIncidentNotesInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -4249,6 +4517,7 @@ export type UserUncheckedUpdateWithoutSlaIncidentNotesInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -4286,6 +4555,7 @@ export type UserCreateWithoutReportsMadeInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -4323,6 +4593,7 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -4365,6 +4636,7 @@ export type UserCreateWithoutReportsReceivedInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -4402,6 +4674,7 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -4455,6 +4728,7 @@ export type UserUpdateWithoutReportsMadeInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -4492,6 +4766,7 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -4540,6 +4815,7 @@ export type UserUpdateWithoutReportsReceivedInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -4577,6 +4853,7 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -4614,6 +4891,7 @@ export type UserCreateWithoutAdminNotesReceivedInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -4651,6 +4929,7 @@ export type UserUncheckedCreateWithoutAdminNotesReceivedInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -4693,6 +4972,7 @@ export type UserCreateWithoutAdminNotesAuthoredInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -4730,6 +5010,7 @@ export type UserUncheckedCreateWithoutAdminNotesAuthoredInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -4783,6 +5064,7 @@ export type UserUpdateWithoutAdminNotesReceivedInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -4820,6 +5102,7 @@ export type UserUncheckedUpdateWithoutAdminNotesReceivedInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -4868,6 +5151,7 @@ export type UserUpdateWithoutAdminNotesAuthoredInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -4905,6 +5189,7 @@ export type UserUncheckedUpdateWithoutAdminNotesAuthoredInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -4942,6 +5227,7 @@ export type UserCreateWithoutAdminGameNotesInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -4979,6 +5265,7 @@ export type UserUncheckedCreateWithoutAdminGameNotesInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -5032,6 +5319,7 @@ export type UserUpdateWithoutAdminGameNotesInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -5069,6 +5357,7 @@ export type UserUncheckedUpdateWithoutAdminGameNotesInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -5107,6 +5396,7 @@ export type UserCreateWithoutNotificationsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
@@ -5144,6 +5434,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
@@ -5197,6 +5488,7 @@ export type UserUpdateWithoutNotificationsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
@@ -5234,6 +5526,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
   adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
@@ -5266,6 +5559,7 @@ export type UserCountOutputType = {
   sessions: number
   passwordResetTokens: number
   emailVerificationTokens: number
+  emailVerificationLoginTokens: number
   adminInviteTokens: number
   adminInvitesCreated: number
   buyerChatRooms: number
@@ -5294,6 +5588,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   passwordResetTokens?: boolean | UserCountOutputTypeCountPasswordResetTokensArgs
   emailVerificationTokens?: boolean | UserCountOutputTypeCountEmailVerificationTokensArgs
+  emailVerificationLoginTokens?: boolean | UserCountOutputTypeCountEmailVerificationLoginTokensArgs
   adminInviteTokens?: boolean | UserCountOutputTypeCountAdminInviteTokensArgs
   adminInvitesCreated?: boolean | UserCountOutputTypeCountAdminInvitesCreatedArgs
   buyerChatRooms?: boolean | UserCountOutputTypeCountBuyerChatRoomsArgs
@@ -5448,6 +5743,13 @@ export type UserCountOutputTypeCountEmailVerificationTokensArgs<ExtArgs extends 
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountEmailVerificationLoginTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmailVerificationLoginTokenWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountAdminInviteTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AdminInviteTokenWhereInput
 }
@@ -5518,6 +5820,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
   emailVerificationTokens?: boolean | Prisma.User$emailVerificationTokensArgs<ExtArgs>
+  emailVerificationLoginTokens?: boolean | Prisma.User$emailVerificationLoginTokensArgs<ExtArgs>
   adminInviteTokens?: boolean | Prisma.User$adminInviteTokensArgs<ExtArgs>
   adminInvitesCreated?: boolean | Prisma.User$adminInvitesCreatedArgs<ExtArgs>
   buyerChatRooms?: boolean | Prisma.User$buyerChatRoomsArgs<ExtArgs>
@@ -5585,6 +5888,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
   emailVerificationTokens?: boolean | Prisma.User$emailVerificationTokensArgs<ExtArgs>
+  emailVerificationLoginTokens?: boolean | Prisma.User$emailVerificationLoginTokensArgs<ExtArgs>
   adminInviteTokens?: boolean | Prisma.User$adminInviteTokensArgs<ExtArgs>
   adminInvitesCreated?: boolean | Prisma.User$adminInvitesCreatedArgs<ExtArgs>
   buyerChatRooms?: boolean | Prisma.User$buyerChatRoomsArgs<ExtArgs>
@@ -5619,6 +5923,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     passwordResetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
     emailVerificationTokens: Prisma.$EmailVerificationTokenPayload<ExtArgs>[]
+    emailVerificationLoginTokens: Prisma.$EmailVerificationLoginTokenPayload<ExtArgs>[]
     adminInviteTokens: Prisma.$AdminInviteTokenPayload<ExtArgs>[]
     adminInvitesCreated: Prisma.$AdminInviteTokenPayload<ExtArgs>[]
     buyerChatRooms: Prisma.$ChatRoomPayload<ExtArgs>[]
@@ -6050,6 +6355,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   passwordResetTokens<T extends Prisma.User$passwordResetTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   emailVerificationTokens<T extends Prisma.User$emailVerificationTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emailVerificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailVerificationTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  emailVerificationLoginTokens<T extends Prisma.User$emailVerificationLoginTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emailVerificationLoginTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailVerificationLoginTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   adminInviteTokens<T extends Prisma.User$adminInviteTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminInviteTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminInviteTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   adminInvitesCreated<T extends Prisma.User$adminInvitesCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminInvitesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminInviteTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   buyerChatRooms<T extends Prisma.User$buyerChatRoomsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$buyerChatRoomsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatRoomPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -6959,6 +7265,30 @@ export type User$emailVerificationTokensArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.EmailVerificationTokenScalarFieldEnum | Prisma.EmailVerificationTokenScalarFieldEnum[]
+}
+
+/**
+ * User.emailVerificationLoginTokens
+ */
+export type User$emailVerificationLoginTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailVerificationLoginToken
+   */
+  select?: Prisma.EmailVerificationLoginTokenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailVerificationLoginToken
+   */
+  omit?: Prisma.EmailVerificationLoginTokenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmailVerificationLoginTokenInclude<ExtArgs> | null
+  where?: Prisma.EmailVerificationLoginTokenWhereInput
+  orderBy?: Prisma.EmailVerificationLoginTokenOrderByWithRelationInput | Prisma.EmailVerificationLoginTokenOrderByWithRelationInput[]
+  cursor?: Prisma.EmailVerificationLoginTokenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmailVerificationLoginTokenScalarFieldEnum | Prisma.EmailVerificationLoginTokenScalarFieldEnum[]
 }
 
 /**

@@ -11,6 +11,7 @@ import { COUNTRY_CHANGE_EVENT, getCurrentCountryCode } from "@/app/country-text"
 import { getLocalizedGameName } from "@/app/game-name-text";
 import type { LocalizedGameNames } from "@/lib/market/game-localization";
 import { accountTransferTypeOptions } from "@/lib/market/account-transfer-types";
+import { getServerDetailOptionsForGameCode } from "@/lib/market/server-detail-options";
 
 type ListingCategory = "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
 type TFunction = (key: TranslationKey) => string;
@@ -35,6 +36,7 @@ export default function CreateListingForm({
   categoryOptions: Array<{ value: ListingCategory; label: string }>;
   games: Array<{
     gameId: string;
+    code: string;
     name: string;
     localizedNames: LocalizedGameNames;
     servers: Array<{ serverId: string; name: string }>;
@@ -44,6 +46,7 @@ export default function CreateListingForm({
   const { t } = useCountryTranslation();
   const [gameId, setGameId] = useState(games[0]?.gameId ?? "");
   const [serverId, setServerId] = useState(games[0]?.servers[0]?.serverId ?? "");
+  const [serverDetail, setServerDetail] = useState("");
   const [category, setCategory] = useState<ListingCategory>("GAME_MONEY");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState(t(defaultDescriptionKey.GAME_MONEY));
@@ -66,6 +69,10 @@ export default function CreateListingForm({
     [gameId, games],
   );
   const availableServers = selectedGame?.servers ?? [];
+  const serverDetailOptions = useMemo(
+    () => getServerDetailOptionsForGameCode(selectedGame?.code),
+    [selectedGame?.code],
+  );
   const selectedServer = useMemo(
     () => availableServers.find((server) => server.serverId === serverId) ?? null,
     [availableServers, serverId],
@@ -91,6 +98,12 @@ export default function CreateListingForm({
       maximumFractionDigits: 6,
     });
   }, [saleQuantity, unitPrice]);
+
+  useEffect(() => {
+    if (serverDetail && !serverDetailOptions.includes(serverDetail)) {
+      setServerDetail("");
+    }
+  }, [serverDetail, serverDetailOptions]);
 
   useEffect(() => {
     const handleCountryChange = () => setCountryCode(getCurrentCountryCode());
@@ -158,7 +171,10 @@ export default function CreateListingForm({
 
   function fillSampleListing() {
     const gameName = selectedGameName;
-    const serverName = selectedServer?.name ?? t("listingForm.server");
+    const serverName = formatServerLabel(
+      selectedServer?.name ?? t("listingForm.server"),
+      serverDetail,
+    );
 
     handleCategoryChange("GAME_MONEY");
     setTitle(`${gameName} ${serverName} ${t("common.gameMoney")} ${t("listingForm.createSell")}`);
@@ -212,6 +228,7 @@ export default function CreateListingForm({
         body: JSON.stringify({
           gameId,
           serverId,
+          serverDetail: serverDetail || undefined,
           category,
           accountTransferType: isAccountListing ? accountTransferType : undefined,
           title: title.trim(),
@@ -302,6 +319,7 @@ export default function CreateListingForm({
                   const nextGame = games.find((game) => game.gameId === nextGameId);
                   setGameId(nextGameId);
                   setServerId(nextGame?.servers[0]?.serverId ?? "");
+                  setServerDetail("");
                 }}
                 className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
               >
@@ -325,6 +343,22 @@ export default function CreateListingForm({
                 ))}
               </select>
             </FieldLabel>
+            {serverDetailOptions.length > 0 ? (
+              <FieldLabel label="서버 상세">
+                <select
+                  value={serverDetail}
+                  onChange={(event) => setServerDetail(event.target.value)}
+                  className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                >
+                  <option value="">전체</option>
+                  {serverDetailOptions.map((detail) => (
+                    <option key={detail} value={detail}>
+                      {detail}
+                    </option>
+                  ))}
+                </select>
+              </FieldLabel>
+            ) : null}
           </div>
         </Panel>
 
@@ -601,4 +635,8 @@ function accountTransferLabel(value: string, t: TFunction) {
 function isPositiveNumber(value: string) {
   const normalized = value.trim();
   return normalized !== "" && Number.isFinite(Number(normalized)) && Number(normalized) > 0;
+}
+
+function formatServerLabel(serverName: string, serverDetail: string) {
+  return serverDetail ? `${serverName} ${serverDetail}` : serverName;
 }

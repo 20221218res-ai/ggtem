@@ -16,6 +16,7 @@ import {
   accountTransferTypeOptions,
   normalizeAccountTransferType,
 } from "@/lib/market/account-transfer-types";
+import { getServerDetailOptionsForGameCode } from "@/lib/market/server-detail-options";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,7 @@ type ListingsPageProps = {
     query?: string;
     sort?: string;
     server?: string;
+    serverDetail?: string;
     minPrice?: string;
     maxPrice?: string;
     accountType?: string;
@@ -77,6 +79,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
   const gameSearch = resolvedSearchParams?.gameSearch?.trim() ?? "";
   const query = resolvedSearchParams?.query?.trim() ?? "";
   const selectedServer = resolvedSearchParams?.server?.trim() ?? "";
+  const selectedServerDetail = resolvedSearchParams?.serverDetail?.trim() ?? "";
   const minPrice = resolvedSearchParams?.minPrice?.trim() ?? "";
   const maxPrice = resolvedSearchParams?.maxPrice?.trim() ?? "";
   const selectedAccountType =
@@ -91,6 +94,8 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
           category: buyRequestCategoryFilter,
           game: selectedGame,
           query: resolvedSearchParams?.query,
+          server: selectedServer || undefined,
+          serverDetail: selectedServerDetail || undefined,
           sort: resolvedSearchParams?.sort,
           accountTransferType: selectedAccountType || undefined,
         })
@@ -98,6 +103,8 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
           category: selectedCategory,
           game: selectedGame,
           query: resolvedSearchParams?.query,
+          server: selectedServer || undefined,
+          serverDetail: selectedServerDetail || undefined,
           sort: resolvedSearchParams?.sort,
           accountTransferType: selectedAccountType || undefined,
         });
@@ -126,6 +133,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
   const visibleItems = filterMarketItemsByServerAndPrice(
     itemsForSelectedGame,
     selectedServer,
+    selectedServerDetail,
     minPrice,
     maxPrice,
     selectedAccountType,
@@ -155,7 +163,11 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
                 selectedMode={selectedMode}
                 selectedGame={selectedGame}
                 selectedServer={selectedServer}
+                selectedServerDetail={selectedServerDetail}
                 serverOptions={view.filterOptions.serverOptions}
+                serverDetailOptions={getServerDetailOptionsForGameCode(
+                  view.filterOptions.gameOptions.find((game) => game.name === selectedGame)?.code,
+                )}
                 minPrice={minPrice}
                 maxPrice={maxPrice}
                 selectedAccountType={selectedAccountType}
@@ -168,6 +180,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
               selectedGame={selectedGame}
               query={query}
               selectedServer={selectedServer}
+              selectedServerDetail={selectedServerDetail}
               minPrice={minPrice}
               maxPrice={maxPrice}
               selectedAccountType={selectedAccountType}
@@ -191,7 +204,9 @@ function ServerPriceSelector({
   selectedMode,
   selectedGame,
   selectedServer,
+  selectedServerDetail,
   serverOptions,
+  serverDetailOptions,
   minPrice,
   maxPrice,
   selectedAccountType,
@@ -200,7 +215,9 @@ function ServerPriceSelector({
   selectedMode: string;
   selectedGame: string;
   selectedServer: string;
+  selectedServerDetail: string;
   serverOptions: string[];
+  serverDetailOptions: string[];
   minPrice: string;
   maxPrice: string;
   selectedAccountType: string;
@@ -232,6 +249,7 @@ function ServerPriceSelector({
                   selectedMode,
                   selectedGame,
                   server: server.value,
+                  serverDetail: "",
                   minPrice,
                   maxPrice,
                   accountType: selectedAccountType,
@@ -244,6 +262,38 @@ function ServerPriceSelector({
           })}
         </div>
       </FilterRow>
+
+      {serverDetailOptions.length > 0 ? (
+        <FilterRow label="서버 상세">
+          <div className="flex flex-wrap gap-3">
+            {[
+              { key: "__all__", label: <CountryText id="listings.all" />, value: "" },
+              ...serverDetailOptions.map((detail) => ({ key: detail, label: detail, value: detail })),
+            ].map((detail) => {
+              const active = selectedServerDetail === detail.value;
+
+              return (
+                <Link
+                  key={detail.key}
+                  href={buildListingFilterHref({
+                    selectedCategory,
+                    selectedMode,
+                    selectedGame,
+                    server: selectedServer,
+                    serverDetail: detail.value,
+                    minPrice,
+                    maxPrice,
+                    accountType: selectedAccountType,
+                  })}
+                  className={active ? filterActiveClass : filterIdleClass}
+                >
+                  {detail.label}
+                </Link>
+              );
+            })}
+          </div>
+        </FilterRow>
+      ) : null}
 
       {selectedCategory === "GAME_ACCOUNT" ? (
         <FilterRow label={<CountryText id="listings.accountType" />}>
@@ -263,10 +313,11 @@ function ServerPriceSelector({
                   href={buildListingFilterHref({
                     selectedCategory,
                     selectedMode,
-                    selectedGame,
-                    server: selectedServer,
-                    minPrice,
-                    maxPrice,
+                  selectedGame,
+                  server: selectedServer,
+                  serverDetail: selectedServerDetail,
+                  minPrice,
+                  maxPrice,
                     accountType: option.value,
                   })}
                   className={active ? filterActiveClass : filterIdleClass}
@@ -285,6 +336,7 @@ function ServerPriceSelector({
           <input type="hidden" name="mode" value={selectedMode} />
           <input type="hidden" name="game" value={selectedGame} />
           <input type="hidden" name="server" value={selectedServer} />
+          <input type="hidden" name="serverDetail" value={selectedServerDetail} />
           <input type="hidden" name="accountType" value={selectedAccountType} />
           <LocalizedInput
             name="minPrice"
@@ -308,6 +360,7 @@ function ServerPriceSelector({
                 selectedMode,
                 selectedGame,
                 server: selectedServer,
+                serverDetail: selectedServerDetail,
                 minPrice: preset.minPrice,
                 maxPrice: preset.maxPrice,
                 accountType: selectedAccountType,
@@ -336,6 +389,7 @@ function ServerPriceSelector({
           <input type="hidden" name="mode" value={selectedMode} />
           <input type="hidden" name="game" value={selectedGame} />
           <input type="hidden" name="server" value={selectedServer} />
+          <input type="hidden" name="serverDetail" value={selectedServerDetail} />
           <input type="hidden" name="minPrice" value={minPrice} />
           <input type="hidden" name="maxPrice" value={maxPrice} />
           <input type="hidden" name="accountType" value={selectedAccountType} />
@@ -362,6 +416,7 @@ function ServerPriceSelector({
               selectedMode,
               selectedGame,
               server: selectedServer,
+              serverDetail: selectedServerDetail,
               minPrice,
               maxPrice,
               accountType: selectedAccountType,
@@ -592,6 +647,7 @@ function GameListingView({
   selectedGame,
   query,
   selectedServer,
+  selectedServerDetail,
   minPrice,
   maxPrice,
   selectedAccountType,
@@ -602,6 +658,7 @@ function GameListingView({
   selectedGame: string;
   query: string;
   selectedServer: string;
+  selectedServerDetail: string;
   minPrice: string;
   maxPrice: string;
   selectedAccountType: string;
@@ -626,7 +683,7 @@ function GameListingView({
               <CountryText id={selectedMode === "buy" ? "listings.buyRequestChip" : "listings.sellMarketChip"} />
             </StatusChip>
             <StatusChip>
-              {selectedServer || <CountryText id="home.allServers" />}
+              {formatServerLabel(selectedServer, selectedServerDetail) || <CountryText id="home.allServers" />}
             </StatusChip>
             <StatusChip>
               {minPrice || maxPrice ? (
@@ -785,7 +842,8 @@ function ListingRow({
           <UserContentText text={listing.title} />
         </h3>
         <p className="mt-2 text-sm font-bold text-[var(--gg-muted)]">
-          <SourceCountryFlag text={listing.title} /> {listing.serverName ?? <CountryText id="listings.noServer" />} /{" "}
+          <SourceCountryFlag text={listing.title} />{" "}
+          {formatServerLabel(listing.serverName, listing.serverDetail) || <CountryText id="listings.noServer" />} /{" "}
           <CountryText id="listings.seller" /> {listing.sellerName}
         </p>
         <div className="mt-3 flex flex-wrap gap-2 text-xs font-black text-[var(--gg-muted)]">
@@ -853,7 +911,7 @@ function BuyRequestRow({
         </h3>
         <p className="mt-2 text-sm font-bold text-[var(--gg-muted)]">
           <SourceCountryFlag text={request.title || request.description || "Buy request"} />{" "}
-          {request.serverName ?? <CountryText id="listings.noServer" />} /{" "}
+          {formatServerLabel(request.serverName, request.serverDetail) || <CountryText id="listings.noServer" />} /{" "}
           <CountryText id="listings.buyer" /> {request.buyerName}
         </p>
         <div className="mt-3 flex flex-wrap gap-2 text-xs font-black text-[var(--gg-muted)]">
@@ -1065,6 +1123,7 @@ function getMarketItems(view: Awaited<ReturnType<typeof getMarketplaceListings |
 function filterMarketItemsByServerAndPrice(
   items: MarketFeedItem[],
   selectedServer: string,
+  selectedServerDetail: string,
   minPrice: string,
   maxPrice: string,
   selectedAccountType: string,
@@ -1077,6 +1136,10 @@ function filterMarketItemsByServerAndPrice(
     const item = entry.item;
 
     if (selectedServer && item.serverName !== selectedServer) {
+      return false;
+    }
+
+    if (selectedServerDetail && item.serverDetail !== selectedServerDetail) {
       return false;
     }
 
@@ -1151,6 +1214,7 @@ function buildListingFilterHref({
   selectedMode,
   selectedGame,
   server,
+  serverDetail,
   minPrice,
   maxPrice,
   accountType,
@@ -1159,6 +1223,7 @@ function buildListingFilterHref({
   selectedMode: string;
   selectedGame: string;
   server: string;
+  serverDetail?: string | null;
   minPrice: string;
   maxPrice: string;
   accountType?: string | null;
@@ -1175,6 +1240,10 @@ function buildListingFilterHref({
     params.set("server", server);
   }
 
+  if (serverDetail) {
+    params.set("serverDetail", serverDetail);
+  }
+
   if (minPrice) {
     params.set("minPrice", minPrice);
   }
@@ -1189,6 +1258,11 @@ function buildListingFilterHref({
   }
 
   return `/listings?${params.toString()}`;
+}
+
+function formatServerLabel(serverName?: string | null, serverDetail?: string | null) {
+  if (!serverName) return "";
+  return serverDetail ? `${serverName} ${serverDetail}` : serverName;
 }
 
 function CategoryName({ category }: { category: string }) {

@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as {
       gameId?: string;
       serverId?: string;
+      serverDetail?: string;
       category?: "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
       accountTransferType?: string;
       title?: string;
@@ -44,6 +45,7 @@ export async function POST(request: NextRequest) {
     const result = await createMarketplaceSellerListing({
       gameId: body.gameId,
       serverId: body.serverId,
+      serverDetail: body.serverDetail,
       category: body.category,
       accountTransferType: body.accountTransferType,
       title: body.title,

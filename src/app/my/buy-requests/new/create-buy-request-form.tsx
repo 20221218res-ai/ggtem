@@ -10,6 +10,7 @@ import { COUNTRY_CHANGE_EVENT, getCurrentCountryCode } from "@/app/country-text"
 import { getLocalizedGameName } from "@/app/game-name-text";
 import type { LocalizedGameNames } from "@/lib/market/game-localization";
 import { accountTransferTypeOptions } from "@/lib/market/account-transfer-types";
+import { getServerDetailOptionsForGameCode } from "@/lib/market/server-detail-options";
 
 type ListingCategory = "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
 type TFunction = (key: TranslationKey) => string;
@@ -30,6 +31,7 @@ export default function CreateBuyRequestForm({
   categoryOptions: Array<{ value: ListingCategory; label: string }>;
   games: Array<{
     gameId: string;
+    code: string;
     name: string;
     localizedNames: LocalizedGameNames;
     servers: Array<{ serverId: string; name: string }>;
@@ -39,6 +41,7 @@ export default function CreateBuyRequestForm({
   const { t } = useCountryTranslation();
   const [gameId, setGameId] = useState(games[0]?.gameId ?? "");
   const [serverId, setServerId] = useState(games[0]?.servers[0]?.serverId ?? "");
+  const [serverDetail, setServerDetail] = useState("");
   const [category, setCategory] = useState<ListingCategory>("GAME_MONEY");
   const [quantity, setQuantity] = useState("1");
   const [unitPrice, setUnitPrice] = useState("0.0005");
@@ -61,6 +64,10 @@ export default function CreateBuyRequestForm({
     [gameId, games],
   );
   const availableServers = selectedGame?.servers ?? [];
+  const serverDetailOptions = useMemo(
+    () => getServerDetailOptionsForGameCode(selectedGame?.code),
+    [selectedGame?.code],
+  );
   const selectedServer = useMemo(
     () => availableServers.find((server) => server.serverId === serverId) ?? null,
     [availableServers, serverId],
@@ -93,6 +100,12 @@ export default function CreateBuyRequestForm({
     estimatedReserveAmount > 0 &&
     Number.isFinite(availableBalanceAmount) &&
     requiredBalanceAmount <= availableBalanceAmount;
+
+  useEffect(() => {
+    if (serverDetail && !serverDetailOptions.includes(serverDetail)) {
+      setServerDetail("");
+    }
+  }, [serverDetail, serverDetailOptions]);
 
   useEffect(() => {
     const handleCountryChange = () => setCountryCode(getCurrentCountryCode());
@@ -192,6 +205,7 @@ export default function CreateBuyRequestForm({
         body: JSON.stringify({
           gameId,
           serverId,
+          serverDetail: serverDetail || undefined,
           category,
           title:
             title.trim() ||
@@ -199,6 +213,7 @@ export default function CreateBuyRequestForm({
               category,
               gameName: selectedGame?.name,
               serverName: selectedServer?.name,
+              serverDetail,
               t,
             }),
           description: isAccountRequest ? accountMemo.trim() : description.trim(),
@@ -267,6 +282,7 @@ export default function CreateBuyRequestForm({
                   const nextGame = games.find((game) => game.gameId === nextGameId);
                   setGameId(nextGameId);
                   setServerId(nextGame?.servers[0]?.serverId ?? "");
+                  setServerDetail("");
                 }}
                 className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
               >
@@ -290,6 +306,22 @@ export default function CreateBuyRequestForm({
                 ))}
               </select>
             </FieldLabel>
+            {serverDetailOptions.length > 0 ? (
+              <FieldLabel label="서버 상세">
+                <select
+                  value={serverDetail}
+                  onChange={(event) => setServerDetail(event.target.value)}
+                  className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                >
+                  <option value="">전체</option>
+                  {serverDetailOptions.map((detail) => (
+                    <option key={detail} value={detail}>
+                      {detail}
+                    </option>
+                  ))}
+                </select>
+              </FieldLabel>
+            ) : null}
           </div>
         </Panel>
 
@@ -580,19 +612,25 @@ function defaultBuyRequestTitle({
   category,
   gameName,
   serverName,
+  serverDetail,
   t,
 }: {
   category: ListingCategory;
   gameName?: string;
   serverName?: string;
+  serverDetail?: string;
   t: TFunction;
 }) {
   const nextGameName = gameName ?? "GGtem";
-  const nextServerName = serverName ?? t("listingForm.server");
+  const nextServerName = formatServerLabel(serverName ?? t("listingForm.server"), serverDetail ?? "");
   return `${nextGameName} ${nextServerName} ${categoryLabel(category, t)} ${t("listingForm.createBuy")}`;
 }
 
 function isPositiveNumber(value: string) {
   const normalized = value.trim();
   return normalized !== "" && Number.isFinite(Number(normalized)) && Number(normalized) > 0;
+}
+
+function formatServerLabel(serverName: string, serverDetail: string) {
+  return serverDetail ? `${serverName} ${serverDetail}` : serverName;
 }

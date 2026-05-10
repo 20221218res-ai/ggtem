@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
       buyRequestId?: string;
       gameId?: string;
       serverId?: string;
+      serverDetail?: string;
       category?: "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
       title?: string;
       description?: string;
@@ -59,6 +60,7 @@ export async function POST(request: NextRequest) {
     const result = await createMarketplaceBuyRequest({
       gameId: body.gameId,
       serverId: body.serverId,
+      serverDetail: body.serverDetail,
       category: body.category,
       title: body.title,
       description: body.description,

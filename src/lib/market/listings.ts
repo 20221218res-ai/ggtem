@@ -13,6 +13,7 @@ import {
   type LocalizedGameNames,
   mapGameLocalizedNames,
 } from "@/lib/market/game-localization";
+import { normalizeServerDetail } from "@/lib/market/server-detail-options";
 
 const MARKET_USER_EMAIL = "user-demo@ggitem.local";
 const MARKET_USER_ROLES = ["CUSTOMER", "SELLER"];
@@ -31,6 +32,7 @@ export type MarketplaceListingSummary = {
   gameLocalizedNames: LocalizedGameNames;
   moneyUnitName: string;
   serverName: string | null;
+  serverDetail: string | null;
   category: string;
   accountTransferType: string | null;
   categoryLabel: string;
@@ -97,6 +99,8 @@ export type MarketplaceListingFilters = {
   category?: string;
   accountTransferType?: string;
   sort?: string;
+  server?: string;
+  serverDetail?: string;
   limit?: number;
 };
 
@@ -114,6 +118,8 @@ export type MarketplaceListingsView = {
     category: string;
     accountTransferType: string;
     sort: string;
+    server: string;
+    serverDetail: string;
   };
 };
 
@@ -128,6 +134,7 @@ export async function getMarketplaceListings(
     filters?.accountTransferType,
   );
   const normalizedSort = filters?.sort?.trim() || "latest";
+  const normalizedServer = filters?.server?.trim() ?? "";
   const take = clampListingLimit(filters?.limit ?? 100);
   const where: Prisma.ListingWhereInput = {
     status: "ACTIVE",
@@ -161,6 +168,32 @@ export async function getMarketplaceListings(
       isActive: true,
       name: normalizedGame,
     };
+  }
+
+  if (normalizedServer) {
+    where.server = {
+      is: {
+        isActive: true,
+        name: normalizedServer,
+      },
+    };
+  }
+
+  if (filters?.serverDetail) {
+    const detailGame = normalizedGame
+      ? await prisma.game.findFirst({
+          where: { name: normalizedGame, isActive: true },
+          select: { code: true },
+        })
+      : null;
+    const normalizedServerDetail = normalizeServerDetail(
+      filters.serverDetail,
+      detailGame?.code,
+    );
+
+    if (normalizedServerDetail) {
+      where.serverDetail = normalizedServerDetail;
+    }
   }
 
   if (normalizedQuery) {
@@ -312,6 +345,7 @@ export async function getMarketplaceListings(
       gameLocalizedNames: mapGameLocalizedNames(listing.game),
       moneyUnitName: getGameMoneyUnitName(listing.game.moneyUnitName, listing.game.name),
       serverName: listing.server?.name ?? null,
+      serverDetail: listing.serverDetail ?? null,
       category: listing.category,
       accountTransferType: listing.accountTransferType ?? null,
       categoryLabel: getCategoryLabel(listing.category),
@@ -342,6 +376,8 @@ export async function getMarketplaceListings(
       category: normalizedCategory,
       accountTransferType: normalizedAccountTransferType ?? "",
       sort: normalizedSort,
+      server: normalizedServer,
+      serverDetail: filters?.serverDetail?.trim() ?? "",
     },
   };
 }
@@ -571,6 +607,7 @@ export async function getMarketplaceListingDetail(
     moneyUnitName: getGameMoneyUnitName(listing.game.moneyUnitName, listing.game.name),
     primaryImageAlt: listing.images[0]?.altText ?? null,
     serverName: listing.server?.name ?? null,
+    serverDetail: listing.serverDetail ?? null,
     sellerRecentReviews: sellerRecentReviews.map((review) => ({
       reviewId: review.id,
       rating: review.rating,
@@ -595,6 +632,7 @@ export async function getMarketplaceListingDetail(
       gameLocalizedNames: mapGameLocalizedNames(item.game),
       moneyUnitName: getGameMoneyUnitName(item.game.moneyUnitName, item.game.name),
       serverName: item.server?.name ?? null,
+      serverDetail: item.serverDetail ?? null,
       category: item.category,
       accountTransferType: item.accountTransferType ?? null,
       categoryLabel: getCategoryLabel(item.category),

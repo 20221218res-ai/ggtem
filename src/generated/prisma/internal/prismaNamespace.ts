@@ -389,6 +389,7 @@ export const ModelName = {
   LoginAttempt: 'LoginAttempt',
   PasswordResetToken: 'PasswordResetToken',
   EmailVerificationToken: 'EmailVerificationToken',
+  EmailVerificationLoginToken: 'EmailVerificationLoginToken',
   AdminInviteToken: 'AdminInviteToken',
   Wallet: 'Wallet',
   WalletLedgerEntry: 'WalletLedgerEntry',
@@ -435,7 +436,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "loginAttempt" | "passwordResetToken" | "emailVerificationToken" | "adminInviteToken" | "wallet" | "walletLedgerEntry" | "game" | "gameServer" | "listing" | "listingImage" | "listingInventory" | "buyRequest" | "buyRequestOffer" | "order" | "orderAccountCredential" | "chatRoom" | "chatMessage" | "orderEvent" | "orderReview" | "orderReviewModeration" | "depositRequest" | "depositWalletAddress" | "withdrawalRequest" | "withdrawalLog" | "adminAuditLog" | "cmsDocument" | "cmsDocumentVersion" | "adminSlaIncident" | "adminSlaIncidentNote" | "adminFinanceCloseReport" | "trustReport" | "adminUserNote" | "adminGameNote" | "notification"
+    modelProps: "user" | "session" | "loginAttempt" | "passwordResetToken" | "emailVerificationToken" | "emailVerificationLoginToken" | "adminInviteToken" | "wallet" | "walletLedgerEntry" | "game" | "gameServer" | "listing" | "listingImage" | "listingInventory" | "buyRequest" | "buyRequestOffer" | "order" | "orderAccountCredential" | "chatRoom" | "chatMessage" | "orderEvent" | "orderReview" | "orderReviewModeration" | "depositRequest" | "depositWalletAddress" | "withdrawalRequest" | "withdrawalLog" | "adminAuditLog" | "cmsDocument" | "cmsDocumentVersion" | "adminSlaIncident" | "adminSlaIncidentNote" | "adminFinanceCloseReport" | "trustReport" | "adminUserNote" | "adminGameNote" | "notification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -806,6 +807,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.EmailVerificationTokenCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.EmailVerificationTokenCountAggregateOutputType> | number
+        }
+      }
+    }
+    EmailVerificationLoginToken: {
+      payload: Prisma.$EmailVerificationLoginTokenPayload<ExtArgs>
+      fields: Prisma.EmailVerificationLoginTokenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EmailVerificationLoginTokenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationLoginTokenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EmailVerificationLoginTokenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationLoginTokenPayload>
+        }
+        findFirst: {
+          args: Prisma.EmailVerificationLoginTokenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationLoginTokenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EmailVerificationLoginTokenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationLoginTokenPayload>
+        }
+        findMany: {
+          args: Prisma.EmailVerificationLoginTokenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationLoginTokenPayload>[]
+        }
+        create: {
+          args: Prisma.EmailVerificationLoginTokenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationLoginTokenPayload>
+        }
+        createMany: {
+          args: Prisma.EmailVerificationLoginTokenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EmailVerificationLoginTokenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationLoginTokenPayload>[]
+        }
+        delete: {
+          args: Prisma.EmailVerificationLoginTokenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationLoginTokenPayload>
+        }
+        update: {
+          args: Prisma.EmailVerificationLoginTokenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationLoginTokenPayload>
+        }
+        deleteMany: {
+          args: Prisma.EmailVerificationLoginTokenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EmailVerificationLoginTokenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EmailVerificationLoginTokenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationLoginTokenPayload>[]
+        }
+        upsert: {
+          args: Prisma.EmailVerificationLoginTokenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationLoginTokenPayload>
+        }
+        aggregate: {
+          args: Prisma.EmailVerificationLoginTokenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmailVerificationLoginToken>
+        }
+        groupBy: {
+          args: Prisma.EmailVerificationLoginTokenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailVerificationLoginTokenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EmailVerificationLoginTokenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailVerificationLoginTokenCountAggregateOutputType> | number
         }
       }
     }
@@ -3208,6 +3283,18 @@ export const EmailVerificationTokenScalarFieldEnum = {
 export type EmailVerificationTokenScalarFieldEnum = (typeof EmailVerificationTokenScalarFieldEnum)[keyof typeof EmailVerificationTokenScalarFieldEnum]
 
 
+export const EmailVerificationLoginTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailVerificationLoginTokenScalarFieldEnum = (typeof EmailVerificationLoginTokenScalarFieldEnum)[keyof typeof EmailVerificationLoginTokenScalarFieldEnum]
+
+
 export const AdminInviteTokenScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -3294,6 +3381,7 @@ export const ListingScalarFieldEnum = {
   sellerId: 'sellerId',
   gameId: 'gameId',
   serverId: 'serverId',
+  serverDetail: 'serverDetail',
   category: 'category',
   accountTransferType: 'accountTransferType',
   title: 'title',
@@ -3346,6 +3434,7 @@ export const BuyRequestScalarFieldEnum = {
   buyerId: 'buyerId',
   gameId: 'gameId',
   serverId: 'serverId',
+  serverDetail: 'serverDetail',
   category: 'category',
   title: 'title',
   description: 'description',
@@ -4176,6 +4265,7 @@ export type GlobalOmitConfig = {
   loginAttempt?: Prisma.LoginAttemptOmit
   passwordResetToken?: Prisma.PasswordResetTokenOmit
   emailVerificationToken?: Prisma.EmailVerificationTokenOmit
+  emailVerificationLoginToken?: Prisma.EmailVerificationLoginTokenOmit
   adminInviteToken?: Prisma.AdminInviteTokenOmit
   wallet?: Prisma.WalletOmit
   walletLedgerEntry?: Prisma.WalletLedgerEntryOmit

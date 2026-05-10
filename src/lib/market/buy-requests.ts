@@ -21,6 +21,7 @@ import {
   type LocalizedGameNames,
   mapGameLocalizedNames,
 } from "@/lib/market/game-localization";
+import { normalizeServerDetail, validateServerDetail } from "@/lib/market/server-detail-options";
 
 const MARKET_USER_EMAIL = "user-demo@ggitem.local";
 const MARKET_USER_ROLES = ["CUSTOMER", "SELLER"];
@@ -41,6 +42,7 @@ export type MarketplaceBuyRequestFormView = {
   }>;
   games: Array<{
     gameId: string;
+    code: string;
     name: string;
     localizedNames: LocalizedGameNames;
     servers: Array<{
@@ -67,6 +69,7 @@ export type MarketplaceBuyRequestSummary = {
   gameLocalizedNames: LocalizedGameNames;
   moneyUnitName: string;
   serverName: string | null;
+  serverDetail: string | null;
   category: string;
   categoryLabel: string;
   title: string | null;
@@ -129,6 +132,8 @@ export type MarketplaceBuyRequestsView = {
     category: string;
     sort: string;
     accountTransferType: string;
+    server: string;
+    serverDetail: string;
   };
 };
 
@@ -147,6 +152,8 @@ export type MarketplaceMyBuyRequestsView = {
 export type MarketplaceBuyRequestFilters = {
   query?: string;
   game?: string;
+  server?: string;
+  serverDetail?: string;
   category?: string;
   accountTransferType?: string;
   sort?: string;
@@ -157,6 +164,7 @@ type BuyRequestRow = {
   buyerId: string;
   gameId: string;
   serverId: string | null;
+  serverDetail: string | null;
   category: string;
   title: string | null;
   description: string | null;
@@ -256,6 +264,7 @@ export async function getMarketplaceBuyRequestFormView(): Promise<MarketplaceBuy
     ],
     games: games.map((game) => ({
       gameId: game.id,
+      code: game.code,
       name: game.name,
       localizedNames: mapGameLocalizedNames(game),
       servers: game.servers.map((server) => ({
@@ -274,6 +283,7 @@ export async function getMarketplaceBuyRequests(
   const normalizedGame = filters?.game?.trim() ?? "";
   const normalizedCategory = filters?.category?.trim() ?? "";
   const normalizedSort = filters?.sort?.trim() || "latest";
+  const normalizedServer = filters?.server?.trim() ?? "";
   const normalizedAccountTransferType = normalizeAccountTransferType(
     filters?.accountTransferType,
   );
@@ -304,6 +314,13 @@ export async function getMarketplaceBuyRequests(
   const game = normalizedGame
     ? games.find((item) => item.name === normalizedGame)
     : null;
+  const normalizedServerDetail = normalizeServerDetail(
+    filters?.serverDetail,
+    game?.code,
+  );
+  const selectedServer = normalizedServer
+    ? game?.servers.find((server) => server.name === normalizedServer)
+    : null;
 
   const buyRequests = await prisma.buyRequest.findMany({
     where: {
@@ -316,11 +333,13 @@ export async function getMarketplaceBuyRequests(
             : ["__missing_game__"],
       },
       serverId: {
-        in:
-          activeServerIds.length > 0
+        in: selectedServer
+          ? [selectedServer.id]
+          : activeServerIds.length > 0
             ? activeServerIds
             : ["__missing_server__"],
       },
+      ...(normalizedServerDetail ? { serverDetail: normalizedServerDetail } : {}),
       ...(normalizedCategory ? { category: normalizedCategory as never } : {}),
       ...(normalizedCategory === "GAME_ACCOUNT" && normalizedAccountTransferType
         ? { accountTransferType: normalizedAccountTransferType }
@@ -415,6 +434,8 @@ export async function getMarketplaceBuyRequests(
       category: normalizedCategory,
       sort: normalizedSort,
       accountTransferType: normalizedAccountTransferType ?? "",
+      server: normalizedServer,
+      serverDetail: filters?.serverDetail?.trim() ?? "",
     },
   };
 }
@@ -515,6 +536,7 @@ export async function getMarketplaceMyBuyRequests(): Promise<MarketplaceMyBuyReq
 export async function createMarketplaceBuyRequest(input: {
   gameId: string;
   serverId?: string;
+  serverDetail?: string;
   category: "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
   title?: string;
   description?: string;
@@ -612,6 +634,7 @@ export async function createMarketplaceBuyRequest(input: {
     throw new Error("선택한 서버가 해당 게임에 속하지 않습니다.");
   }
 
+  const normalizedServerDetail = validateServerDetail(input.serverDetail, game.code);
   const totalAmount = (quantity * unitPrice) / FIXED_AMOUNT_SCALE;
   const requiredAvailableAmount = totalAmount + premiumFeeAmount;
   const buyerAvailable = parseFixedAmount(buyerWallet.availableBalance.toString());
@@ -642,6 +665,7 @@ export async function createMarketplaceBuyRequest(input: {
         buyerId: buyer.id,
         gameId: game.id,
         serverId: normalizedServerId,
+        serverDetail: normalizedServerDetail,
         category: input.category,
         title: trimmedTitle,
         description: trimmedDescription,
@@ -972,6 +996,7 @@ export async function createMarketplaceBuyRequestOffer(input: {
     sellerId: string;
     gameId: string;
     serverId: string | null;
+    serverDetail: string | null;
     category: string;
     status: string;
     currency: string;
@@ -988,6 +1013,7 @@ export async function createMarketplaceBuyRequestOffer(input: {
         sellerId: true,
         gameId: true,
         serverId: true,
+        serverDetail: true,
         category: true,
         status: true,
         currency: true,
@@ -1005,6 +1031,7 @@ export async function createMarketplaceBuyRequestOffer(input: {
     if (
       listing.gameId !== buyRequest.gameId ||
       listing.serverId !== buyRequest.serverId ||
+      (listing.serverDetail ?? null) !== (buyRequest.serverDetail ?? null) ||
       listing.category !== buyRequest.category
     ) {
       throw new Error("선택한 판매글이 이 구매요청 조건과 일치하지 않습니다.");
@@ -1185,6 +1212,7 @@ export async function sellToMarketplaceBuyRequest(input: {
         sellerId: seller.id,
         gameId: buyRequest.gameId,
         serverId: buyRequest.serverId,
+        serverDetail: buyRequest.serverDetail,
         category: buyRequest.category,
         accountTransferType: buyRequest.accountTransferType,
         title: listingTitle,
@@ -1514,6 +1542,7 @@ function mapBuyRequestSummary({
       : { KR: null, CN: null, VN: null, PH: null, TH: null },
     moneyUnitName: getGameMoneyUnitName(requestGame?.moneyUnitName, requestGame?.name),
     serverName: requestServer?.name ?? null,
+    serverDetail: request.serverDetail ?? null,
     category: request.category,
     categoryLabel: getCategoryLabel(request.category),
     title: request.title,
