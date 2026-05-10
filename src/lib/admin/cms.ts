@@ -23,32 +23,8 @@ export type AdminCmsState = {
     latestChangeNote: string;
     updatedAt: string;
     versionCount: number;
-  }>;
-  selectedDocument: {
-    documentId: string;
-    slug: string;
-    type: string;
-    typeLabel: string;
-    title: string;
-    status: string;
-    statusLabel: string;
-    latestVersion: string;
-    latestLocale: string;
-    latestStatus: string;
-    latestUpdatedAt: string;
     latestBody: string;
-    latestChangeNote: string;
-    versions: Array<{
-      versionId: string;
-      version: string;
-      locale: string;
-      title: string;
-      status: string;
-      statusLabel: string;
-      changeNote: string;
-      updatedAt: string;
-    }>;
-  } | null;
+  }>;
   typeBreakdown: Array<{
     type: string;
     label: string;
@@ -61,6 +37,17 @@ const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
   timeStyle: "short",
   timeZone: "Asia/Seoul",
 });
+
+export const CMS_TYPES = [
+  "NOTICE",
+  "FAQ",
+  "POLICY",
+  "PAID_SERVICE",
+  "GAME_SERVER_REQUEST",
+  "TERMS",
+  "PRIVACY",
+  "GUIDE",
+] as const;
 
 export async function getAdminCmsState(): Promise<AdminCmsState> {
   const prisma = getPrismaClient();
@@ -103,7 +90,6 @@ export async function getAdminCmsState(): Promise<AdminCmsState> {
   ]);
 
   const statusCounts = new Map(statusGroups.map((group) => [group.status, group._count.status]));
-  const selectedDocument = documents[0] ?? null;
 
   return {
     summary: {
@@ -115,53 +101,28 @@ export async function getAdminCmsState(): Promise<AdminCmsState> {
       totalVersions,
     },
     documents: documents.map((document) => {
-      const latestVersion = document.versions[0] ?? null;
+      const currentVersion =
+        document.versions.find((version) => version.id === document.currentVersionId) ??
+        document.versions[0] ??
+        null;
 
       return {
         documentId: document.id,
         slug: document.slug,
         type: document.type,
         typeLabel: cmsTypeLabel(document.type),
-        title: document.title,
+        title: currentVersion?.title ?? document.title,
         status: document.status,
         statusLabel: cmsStatusLabel(document.status),
-        latestVersion: latestVersion?.version ?? "-",
-        latestLocale: latestVersion?.locale ?? "-",
-        latestStatus: latestVersion?.status ?? "-",
-        latestChangeNote: latestVersion?.changeNote ?? "변경 메모 없음",
+        latestVersion: currentVersion?.version ?? "-",
+        latestLocale: currentVersion?.locale ?? "-",
+        latestStatus: currentVersion?.status ?? "-",
+        latestChangeNote: currentVersion?.changeNote ?? "변경 메모 없음",
         updatedAt: dateFormatter.format(document.updatedAt),
         versionCount: document.versions.length,
+        latestBody: currentVersion?.body ?? "",
       };
     }),
-    selectedDocument: selectedDocument
-      ? {
-          documentId: selectedDocument.id,
-          slug: selectedDocument.slug,
-          type: selectedDocument.type,
-          typeLabel: cmsTypeLabel(selectedDocument.type),
-          title: selectedDocument.title,
-          status: selectedDocument.status,
-          statusLabel: cmsStatusLabel(selectedDocument.status),
-          latestVersion: selectedDocument.versions[0]?.version ?? "-",
-          latestLocale: selectedDocument.versions[0]?.locale ?? "-",
-          latestStatus: selectedDocument.versions[0]?.status ?? "-",
-          latestUpdatedAt: selectedDocument.versions[0]
-            ? dateFormatter.format(selectedDocument.versions[0].updatedAt)
-            : "-",
-          latestBody: selectedDocument.versions[0]?.body ?? "아직 버전 본문이 없습니다.",
-          latestChangeNote: selectedDocument.versions[0]?.changeNote ?? "변경 메모 없음",
-          versions: selectedDocument.versions.map((version) => ({
-            versionId: version.id,
-            version: version.version,
-            locale: version.locale,
-            title: version.title,
-            status: version.status,
-            statusLabel: cmsStatusLabel(version.status),
-            changeNote: version.changeNote ?? "변경 메모 없음",
-            updatedAt: dateFormatter.format(version.updatedAt),
-          })),
-        }
-      : null,
     typeBreakdown: typeGroups.map((group) => ({
       type: group.type,
       label: cmsTypeLabel(group.type),
@@ -181,23 +142,26 @@ export function cmsStatusTone(status: string): "red" | "amber" | "green" | "blue
   return tones[status] ?? "slate";
 }
 
-function cmsTypeLabel(type: string) {
+export function cmsTypeLabel(type: string) {
   const labels: Record<string, string> = {
-    TERMS: "약관",
+    NOTICE: "공지사항",
+    FAQ: "자주묻는질문",
+    POLICY: "회원정책",
+    PAID_SERVICE: "유료 서비스",
+    GAME_SERVER_REQUEST: "게임/서버 신청",
+    TERMS: "이용약관",
     PRIVACY: "개인정보",
     GUIDE: "가이드",
-    FAQ: "FAQ",
-    NOTICE: "공지",
   };
 
   return labels[type] ?? type;
 }
 
-function cmsStatusLabel(status: string) {
+export function cmsStatusLabel(status: string) {
   const labels: Record<string, string> = {
     DRAFT: "초안",
-    REVIEW_REQUESTED: "게시 검토",
-    PUBLISHED: "게시",
+    REVIEW_REQUESTED: "검토 요청",
+    PUBLISHED: "게시중",
     ARCHIVED: "보관",
   };
 
