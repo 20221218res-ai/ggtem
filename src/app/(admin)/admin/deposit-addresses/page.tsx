@@ -9,7 +9,7 @@ import {
   SoftNotice,
   StatusPill,
 } from "../admin-prototype-ui";
-import { updateDepositWalletAddressAction } from "./actions";
+import { DepositAddressForm } from "./deposit-address-form";
 
 type DepositAddressesPageProps = {
   searchParams?: Promise<{
@@ -93,58 +93,22 @@ export default async function AdminDepositAddressesPage({
 
           return (
             <Panel key={chain} title={`${chain} 주소 변경`}>
-              <form action={updateDepositWalletAddressAction} className="grid gap-4">
-                <input type="hidden" name="chain" value={chain} />
-                <input type="hidden" name="asset" value={defaults.asset} />
-
-                <Field label="표시 이름" name="label" defaultValue={current?.label ?? defaults.label} />
-                <Field
-                  label="네트워크"
-                  name="networkName"
-                  defaultValue={current?.networkName ?? defaults.networkName}
-                />
-                <Field
-                  label="입금 주소"
-                  name="address"
-                  defaultValue={current?.address ?? ""}
-                  placeholder={chain === "TRC20" ? "T로 시작하는 TRC20 주소" : "0x로 시작하는 BEP20 주소"}
-                  monospace
-                />
-                <Field
-                  label="최소 입금액"
-                  name="minimumAmount"
-                  defaultValue={current?.minimumAmount ?? defaults.minimumAmount}
-                  inputMode="decimal"
-                />
-                <label className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-black">
-                  <input
-                    name="isActive"
-                    type="checkbox"
-                    defaultChecked={current?.isActive ?? true}
-                    className="h-4 w-4 accent-[var(--color-primary)]"
-                  />
-                  유저 충전 화면에 노출
-                </label>
-                <Field
-                  label="변경 사유"
-                  name="reason"
-                  defaultValue=""
-                  placeholder="예: 운영 지갑 주소 교체 또는 보안 주소 변경"
-                />
-                <Field
-                  label="최고관리자 비밀번호"
-                  name="adminPassword"
-                  defaultValue=""
-                  type="password"
-                  placeholder="주소 변경을 위해 비밀번호 재확인"
-                />
-                <button
-                  type="submit"
-                  className="h-12 rounded-md bg-[var(--color-primary)] px-4 text-sm font-black text-black hover:bg-[var(--color-primary-hover)]"
-                >
-                  {chain} 주소 저장
-                </button>
-              </form>
+              <DepositAddressForm
+                chain={chain}
+                defaults={defaults}
+                current={
+                  current
+                    ? {
+                        label: current.label,
+                        asset: current.asset,
+                        networkName: current.networkName,
+                        address: current.address,
+                        minimumAmount: current.minimumAmount,
+                        isActive: current.isActive,
+                      }
+                    : undefined
+                }
+              />
             </Panel>
           );
         })}
@@ -155,39 +119,5 @@ export default async function AdminDepositAddressesPage({
         잘못된 주소가 노출되면 실제 입금 손실이 발생할 수 있으므로 체인과 주소를 반드시 대조하세요.
       </SoftNotice>
     </AdminMockPage>
-  );
-}
-
-function Field({
-  label,
-  name,
-  defaultValue,
-  placeholder,
-  inputMode,
-  type = "text",
-  monospace = false,
-}: {
-  label: string;
-  name: string;
-  defaultValue: string;
-  placeholder?: string;
-  inputMode?: "decimal";
-  type?: "text" | "password";
-  monospace?: boolean;
-}) {
-  return (
-    <label className="grid gap-2 text-sm font-black text-slate-700">
-      {label}
-      <input
-        name={name}
-        type={type}
-        defaultValue={defaultValue}
-        placeholder={placeholder}
-        inputMode={inputMode}
-        className={`h-12 rounded-md border border-slate-200 bg-white px-4 text-sm font-bold text-slate-950 outline-none focus:border-[var(--color-primary)] ${
-          monospace ? "font-mono" : ""
-        }`}
-      />
-    </label>
   );
 }

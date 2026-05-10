@@ -1,66 +1,70 @@
-"use server";
-
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { Prisma, type WithdrawalChain } from "@/generated/prisma/client";
-import { requirePageRole } from "@/lib/auth/guards";
 import { verifyCurrentUserPassword } from "@/lib/auth/session";
 import { getPrismaClient } from "@/lib/prisma";
 import { DEFAULT_DEPOSIT_WALLET_ADDRESSES } from "@/lib/wallet/deposit-address-defaults";
 
-export async function updateDepositWalletAddressAction(formData: FormData) {
-  const admin = await requirePageRole(["SUPER"], {
-    signInPath: "/admin/sign-in",
-    forbiddenPath: "/admin",
-  });
-  const chain = parseChain(getText(formData, "chain"));
+export type UpdateDepositWalletAddressInput = {
+  adminUserId: string;
+  chain: string;
+  label?: string;
+  asset?: string;
+  networkName?: string;
+  address?: string;
+  minimumAmount?: string;
+  reason?: string;
+  adminPassword?: string;
+  isActive?: boolean;
+};
+
+export async function updateDepositWalletAddress(input: UpdateDepositWalletAddressInput) {
+  const chain = parseChain(input.chain);
   const defaults = chain ? DEFAULT_DEPOSIT_WALLET_ADDRESSES[chain] : null;
-  const label = getText(formData, "label") || defaults?.label || "";
-  const asset = getText(formData, "asset") || defaults?.asset || "USDT";
-  const networkName = getText(formData, "networkName") || defaults?.networkName || "";
-  const address = getText(formData, "address");
-  const minimumAmount = getText(formData, "minimumAmount") || defaults?.minimumAmount || "10";
-  const reason = getText(formData, "reason");
-  const adminPassword = getText(formData, "adminPassword");
-  const isActive = formData.get("isActive") === "on";
+  const label = input.label?.trim() || defaults?.label || "";
+  const asset = input.asset?.trim() || defaults?.asset || "USDT";
+  const networkName = input.networkName?.trim() || defaults?.networkName || "";
+  const address = input.address?.trim() || "";
+  const minimumAmount = input.minimumAmount?.trim() || defaults?.minimumAmount || "10";
+  const reason = input.reason?.trim() || "";
+  const adminPassword = input.adminPassword || "";
+  const isActive = input.isActive ?? false;
 
   if (!chain || !label || !networkName || !address) {
-    redirectWithError("체인, 이름, 네트워크, 입금 주소를 모두 입력해 주세요.");
+    throw new Error("체인, 이름, 네트워크, 입금 주소를 모두 입력해 주세요.");
   }
 
   if (!/^\d+(\.\d+)?$/.test(minimumAmount) || Number(minimumAmount) <= 0) {
-    redirectWithError("최소 입금액은 0보다 큰 숫자로 입력해 주세요.");
+    throw new Error("최소 입금액은 0보다 큰 숫자로 입력해 주세요.");
   }
 
   const addressError = validateAddressForChain(chain, address);
   if (addressError) {
-    redirectWithError(addressError);
+    throw new Error(addressError);
   }
 
   if (reason.length < 10) {
-    redirectWithError("변경 사유를 10자 이상 입력해 주세요.");
+    throw new Error("변경 사유를 10자 이상 입력해 주세요.");
   }
 
   if (!adminPassword) {
-    redirectWithError("최고관리자 비밀번호를 입력해야 주소를 변경할 수 있습니다.");
+    throw new Error("최고관리자 비밀번호를 입력해야 주소를 변경할 수 있습니다.");
   }
 
   const passwordOk = await verifyCurrentUserPassword({
-    userId: admin.userId,
+    userId: input.adminUserId,
     password: adminPassword,
   });
 
   if (!passwordOk) {
-    redirectWithError("비밀번호가 일치하지 않습니다.");
+    throw new Error("비밀번호가 일치하지 않습니다.");
   }
 
   const prisma = getPrismaClient();
-  await prisma.$transaction(async (tx) => {
+  const updated = await prisma.$transaction(async (tx) => {
     const before = await tx.depositWalletAddress.findUnique({
       where: { chain },
     });
 
-    const updated = await tx.depositWalletAddress.upsert({
+    const saved = await tx.depositWalletAddress.upsert({
       where: { chain },
       create: {
         chain,
@@ -71,7 +75,7 @@ export async function updateDepositWalletAddressAction(formData: FormData) {
         minimumAmount,
         isActive,
         sortOrder: defaults?.sortOrder ?? (chain === "TRC20" ? 10 : 20),
-        updatedByAdminId: admin.userId,
+        updatedByAdminId: input.adminUserId,
       },
       update: {
         label,
@@ -80,16 +84,16 @@ export async function updateDepositWalletAddressAction(formData: FormData) {
         address,
         minimumAmount,
         isActive,
-        updatedByAdminId: admin.userId,
+        updatedByAdminId: input.adminUserId,
       },
     });
 
     await tx.adminAuditLog.create({
       data: {
-        adminId: admin.userId,
+        adminId: input.adminUserId,
         action: before ? "DEPOSIT_ADDRESS_UPDATED" : "DEPOSIT_ADDRESS_CREATED",
         targetType: "DEPOSIT_WALLET_ADDRESS",
-        targetId: updated.id,
+        targetId: saved.id,
         reason,
         before: before
           ? {
@@ -103,25 +107,33 @@ export async function updateDepositWalletAddressAction(formData: FormData) {
             }
           : Prisma.JsonNull,
         after: {
-          chain: updated.chain,
-          label: updated.label,
-          asset: updated.asset,
-          networkName: updated.networkName,
-          address: maskAddress(updated.address),
-          minimumAmount: updated.minimumAmount.toString(),
-          isActive: updated.isActive,
+          chain: saved.chain,
+          label: saved.label,
+          asset: saved.asset,
+          networkName: saved.networkName,
+          address: maskAddress(saved.address),
+          minimumAmount: saved.minimumAmount.toString(),
+          isActive: saved.isActive,
           passwordRechecked: true,
         },
       },
     });
+
+    return saved;
   });
 
-  revalidatePath("/admin/deposit-addresses");
-  revalidatePath("/my/wallet");
-  redirect(`/admin/deposit-addresses?notice=${chain.toLowerCase()}-updated`);
+  return {
+    id: updated.id,
+    chain: updated.chain,
+    label: updated.label,
+    networkName: updated.networkName,
+    address: updated.address,
+    minimumAmount: updated.minimumAmount.toString(),
+    isActive: updated.isActive,
+  };
 }
 
-function parseChain(value: string): WithdrawalChain | null {
+export function parseChain(value: string): WithdrawalChain | null {
   if (value === "TRC20" || value === "BEP20") {
     return value;
   }
@@ -139,14 +151,6 @@ function validateAddressForChain(chain: WithdrawalChain, address: string) {
   }
 
   return null;
-}
-
-function getText(formData: FormData, key: string) {
-  return String(formData.get(key) ?? "").trim();
-}
-
-function redirectWithError(message: string): never {
-  redirect(`/admin/deposit-addresses?error=${encodeURIComponent(message)}`);
 }
 
 function maskAddress(address: string) {
