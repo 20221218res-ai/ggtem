@@ -16,6 +16,11 @@ import {
   isPremiumActive,
   normalizePremiumDurationHours,
 } from "@/lib/market/premium-promotion";
+import {
+  type GameCatalogOption,
+  type LocalizedGameNames,
+  mapGameLocalizedNames,
+} from "@/lib/market/game-localization";
 
 const MARKET_USER_EMAIL = "user-demo@ggitem.local";
 const MARKET_USER_ROLES = ["CUSTOMER", "SELLER"];
@@ -37,6 +42,7 @@ export type MarketplaceBuyRequestFormView = {
   games: Array<{
     gameId: string;
     name: string;
+    localizedNames: LocalizedGameNames;
     servers: Array<{
       serverId: string;
       name: string;
@@ -56,6 +62,9 @@ export type MarketplaceBuyRequestSummary = {
   buyerId: string;
   buyerName: string;
   gameName: string;
+  gameCode: string;
+  gameImageUrl: string | null;
+  gameLocalizedNames: LocalizedGameNames;
   moneyUnitName: string;
   serverName: string | null;
   category: string;
@@ -110,6 +119,7 @@ export type MarketplaceBuyRequestsView = {
   buyRequests: MarketplaceBuyRequestSummary[];
   filterOptions: {
     games: string[];
+    gameOptions: GameCatalogOption[];
     categories: string[];
   };
   appliedFilters: {
@@ -248,6 +258,7 @@ export async function getMarketplaceBuyRequestFormView(): Promise<MarketplaceBuy
     games: games.map((game) => ({
       gameId: game.id,
       name: game.name,
+      localizedNames: mapGameLocalizedNames(game),
       servers: game.servers.map((server) => ({
         serverId: server.id,
         name: server.name,
@@ -398,6 +409,9 @@ export async function getMarketplaceBuyRequests(
             .filter((name): name is string => Boolean(name)),
         ),
       ),
+      gameOptions: mapGameOptions(games.filter((game) =>
+        allActiveBuyRequests.some((request) => request.gameId === game.id),
+      )),
       categories: Array.from(
         new Set(allActiveBuyRequests.map((request) => request.category)),
       ),
@@ -1475,7 +1489,20 @@ function mapBuyRequestSummary({
   serverById,
 }: {
   request: BuyRequestRow;
-  gameById: Map<string, { name: string; moneyUnitName?: string | null }>;
+  gameById: Map<
+    string,
+    {
+      name: string;
+      code: string;
+      imageUrl: string | null;
+      moneyUnitName?: string | null;
+      nameKo?: string | null;
+      nameCn?: string | null;
+      nameVn?: string | null;
+      namePh?: string | null;
+      nameTh?: string | null;
+    }
+  >;
   serverById: Map<string, { name: string }>;
 }): MarketplaceBuyRequestSummary {
   const requestGame = gameById.get(request.gameId);
@@ -1486,6 +1513,11 @@ function mapBuyRequestSummary({
     buyerId: request.buyerId,
     buyerName: request.buyer.displayName,
     gameName: requestGame?.name ?? "Unknown Game",
+    gameCode: requestGame?.code ?? "unknown",
+    gameImageUrl: requestGame?.imageUrl ?? null,
+    gameLocalizedNames: requestGame
+      ? mapGameLocalizedNames(requestGame)
+      : { KR: null, CN: null, VN: null, PH: null, TH: null },
     moneyUnitName: getGameMoneyUnitName(requestGame?.moneyUnitName, requestGame?.name),
     serverName: requestServer?.name ?? null,
     category: request.category,
@@ -1521,6 +1553,44 @@ function mapBuyRequestSummary({
       createdAt: formatKoreanDate(offer.createdAt),
     })),
   };
+}
+
+function mapGameOptions(
+  games: Array<{
+    name: string;
+    code: string;
+    imageUrl: string | null;
+    nameKo?: string | null;
+    nameCn?: string | null;
+    nameVn?: string | null;
+    namePh?: string | null;
+    nameTh?: string | null;
+  }>,
+): GameCatalogOption[] {
+  return games.map((game) => ({
+    name: game.name,
+    code: game.code,
+    imageUrl: game.imageUrl,
+    region: getGameRegion(game.name),
+    localizedNames: mapGameLocalizedNames(game),
+  }));
+}
+
+function getGameRegion(gameName: string) {
+  if (
+    gameName.includes("Lineage") ||
+    gameName.includes("Lord Nine") ||
+    gameName.includes("Night Crows") ||
+    gameName.includes("Vampir")
+  ) {
+    return "KR";
+  }
+
+  if (gameName.includes("Dungeon")) {
+    return "KR/CN";
+  }
+
+  return "Global";
 }
 
 function formatKoreanDate(date: Date) {

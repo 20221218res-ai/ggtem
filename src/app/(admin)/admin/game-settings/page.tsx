@@ -143,6 +143,11 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
               <Field name="name" label="게임명" placeholder="Lineage W" />
               <Field name="code" label="게임 코드" placeholder="lineage-w" />
               <Field name="moneyUnitName" label="게임머니 단위" placeholder="아데나" />
+              <Field name="nameKo" label="한국어 게임명" placeholder="리니지W" />
+              <Field name="nameCn" label="중국어 게임명" placeholder="天堂W" />
+              <Field name="nameVn" label="베트남어 게임명" placeholder="Lineage W" />
+              <Field name="namePh" label="필리핀/영어 게임명" placeholder="Lineage W" />
+              <Field name="nameTh" label="태국어 게임명" placeholder="ไลน์เอจ W" />
               <Field name="imageAlt" label="이미지 설명" placeholder="Lineage W 대표 이미지" />
               <FileField name="image" label="게임 이미지" />
               <button className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
@@ -282,6 +287,11 @@ function GameCard({ game }: { game: GameRow }) {
             <Field name="name" label="게임명" defaultValue={game.name} />
             <Field name="code" label="게임 코드" defaultValue={game.code} />
             <Field name="moneyUnitName" label="게임머니 단위" defaultValue={game.moneyUnitName} />
+            <Field name="nameKo" label="한국어 게임명" defaultValue={game.nameKo || ""} />
+            <Field name="nameCn" label="중국어 게임명" defaultValue={game.nameCn || ""} />
+            <Field name="nameVn" label="베트남어 게임명" defaultValue={game.nameVn || ""} />
+            <Field name="namePh" label="필리핀/영어 게임명" defaultValue={game.namePh || ""} />
+            <Field name="nameTh" label="태국어 게임명" defaultValue={game.nameTh || ""} />
             <Field name="imageAlt" label="이미지 설명" defaultValue={game.imageAlt || game.name} />
             <FileField name="image" label="이미지 교체" />
             <button className="w-full rounded-lg bg-slate-950 px-4 py-3 text-sm font-black text-white">

@@ -4,9 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TranslationKey } from "@/app/i18n";
 import useCountryTranslation from "@/app/use-country-translation";
+import { COUNTRY_CHANGE_EVENT, getCurrentCountryCode } from "@/app/country-text";
+import { getLocalizedGameName } from "@/app/game-name-text";
+import type { LocalizedGameNames } from "@/lib/market/game-localization";
 import { accountTransferTypeOptions } from "@/lib/market/account-transfer-types";
 
 type ListingCategory = "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
@@ -33,6 +36,7 @@ export default function CreateListingForm({
   games: Array<{
     gameId: string;
     name: string;
+    localizedNames: LocalizedGameNames;
     servers: Array<{ serverId: string; name: string }>;
   }>;
 }) {
@@ -54,6 +58,7 @@ export default function CreateListingForm({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [countryCode, setCountryCode] = useState(() => getCurrentCountryCode());
 
   const isAccountListing = category === "GAME_ACCOUNT";
   const selectedGame = useMemo(
@@ -72,6 +77,9 @@ export default function CreateListingForm({
   }, [selectedImage]);
   const saleQuantity = isAccountListing ? "1" : quantity;
   const saleMinimumQuantity = isAccountListing ? "1" : minimumQuantity;
+  const selectedGameName = selectedGame
+    ? getLocalizedGameName(selectedGame.name, selectedGame.localizedNames, countryCode)
+    : "GGtem";
   const premiumUnits = Number(premiumDurationHours) > 0 ? Number(premiumDurationHours) / 30 : 0;
   const premiumFee = premiumUnits;
   const availableBalanceAmount = Number(availableBalance || "0");
@@ -83,6 +91,17 @@ export default function CreateListingForm({
       maximumFractionDigits: 6,
     });
   }, [saleQuantity, unitPrice]);
+
+  useEffect(() => {
+    const handleCountryChange = () => setCountryCode(getCurrentCountryCode());
+    window.addEventListener(COUNTRY_CHANGE_EVENT, handleCountryChange);
+    window.addEventListener("storage", handleCountryChange);
+
+    return () => {
+      window.removeEventListener(COUNTRY_CHANGE_EVENT, handleCountryChange);
+      window.removeEventListener("storage", handleCountryChange);
+    };
+  }, []);
 
   function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
     setError("");
@@ -138,7 +157,7 @@ export default function CreateListingForm({
   }
 
   function fillSampleListing() {
-    const gameName = selectedGame?.name ?? "GGtem";
+    const gameName = selectedGameName;
     const serverName = selectedServer?.name ?? t("listingForm.server");
 
     handleCategoryChange("GAME_MONEY");
@@ -288,7 +307,7 @@ export default function CreateListingForm({
               >
                 {games.map((game) => (
                   <option key={game.gameId} value={game.gameId}>
-                    {game.name}
+                    {getLocalizedGameName(game.name, game.localizedNames, countryCode)}
                   </option>
                 ))}
               </select>

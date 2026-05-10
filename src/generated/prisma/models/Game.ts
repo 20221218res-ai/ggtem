@@ -28,6 +28,11 @@ export type GameMinAggregateOutputType = {
   id: string | null
   name: string | null
   code: string | null
+  nameKo: string | null
+  nameCn: string | null
+  nameVn: string | null
+  namePh: string | null
+  nameTh: string | null
   moneyUnitName: string | null
   imageUrl: string | null
   imageStoragePath: string | null
@@ -40,6 +45,11 @@ export type GameMaxAggregateOutputType = {
   id: string | null
   name: string | null
   code: string | null
+  nameKo: string | null
+  nameCn: string | null
+  nameVn: string | null
+  namePh: string | null
+  nameTh: string | null
   moneyUnitName: string | null
   imageUrl: string | null
   imageStoragePath: string | null
@@ -52,6 +62,11 @@ export type GameCountAggregateOutputType = {
   id: number
   name: number
   code: number
+  nameKo: number
+  nameCn: number
+  nameVn: number
+  namePh: number
+  nameTh: number
   moneyUnitName: number
   imageUrl: number
   imageStoragePath: number
@@ -66,6 +81,11 @@ export type GameMinAggregateInputType = {
   id?: true
   name?: true
   code?: true
+  nameKo?: true
+  nameCn?: true
+  nameVn?: true
+  namePh?: true
+  nameTh?: true
   moneyUnitName?: true
   imageUrl?: true
   imageStoragePath?: true
@@ -78,6 +98,11 @@ export type GameMaxAggregateInputType = {
   id?: true
   name?: true
   code?: true
+  nameKo?: true
+  nameCn?: true
+  nameVn?: true
+  namePh?: true
+  nameTh?: true
   moneyUnitName?: true
   imageUrl?: true
   imageStoragePath?: true
@@ -90,6 +115,11 @@ export type GameCountAggregateInputType = {
   id?: true
   name?: true
   code?: true
+  nameKo?: true
+  nameCn?: true
+  nameVn?: true
+  namePh?: true
+  nameTh?: true
   moneyUnitName?: true
   imageUrl?: true
   imageStoragePath?: true
@@ -175,6 +205,11 @@ export type GameGroupByOutputType = {
   id: string
   name: string
   code: string
+  nameKo: string | null
+  nameCn: string | null
+  nameVn: string | null
+  namePh: string | null
+  nameTh: string | null
   moneyUnitName: string
   imageUrl: string | null
   imageStoragePath: string | null
@@ -208,6 +243,11 @@ export type GameWhereInput = {
   id?: Prisma.StringFilter<"Game"> | string
   name?: Prisma.StringFilter<"Game"> | string
   code?: Prisma.StringFilter<"Game"> | string
+  nameKo?: Prisma.StringNullableFilter<"Game"> | string | null
+  nameCn?: Prisma.StringNullableFilter<"Game"> | string | null
+  nameVn?: Prisma.StringNullableFilter<"Game"> | string | null
+  namePh?: Prisma.StringNullableFilter<"Game"> | string | null
+  nameTh?: Prisma.StringNullableFilter<"Game"> | string | null
   moneyUnitName?: Prisma.StringFilter<"Game"> | string
   imageUrl?: Prisma.StringNullableFilter<"Game"> | string | null
   imageStoragePath?: Prisma.StringNullableFilter<"Game"> | string | null
@@ -223,6 +263,11 @@ export type GameOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
+  nameKo?: Prisma.SortOrderInput | Prisma.SortOrder
+  nameCn?: Prisma.SortOrderInput | Prisma.SortOrder
+  nameVn?: Prisma.SortOrderInput | Prisma.SortOrder
+  namePh?: Prisma.SortOrderInput | Prisma.SortOrder
+  nameTh?: Prisma.SortOrderInput | Prisma.SortOrder
   moneyUnitName?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   imageStoragePath?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -241,6 +286,11 @@ export type GameWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.GameWhereInput | Prisma.GameWhereInput[]
   OR?: Prisma.GameWhereInput[]
   NOT?: Prisma.GameWhereInput | Prisma.GameWhereInput[]
+  nameKo?: Prisma.StringNullableFilter<"Game"> | string | null
+  nameCn?: Prisma.StringNullableFilter<"Game"> | string | null
+  nameVn?: Prisma.StringNullableFilter<"Game"> | string | null
+  namePh?: Prisma.StringNullableFilter<"Game"> | string | null
+  nameTh?: Prisma.StringNullableFilter<"Game"> | string | null
   moneyUnitName?: Prisma.StringFilter<"Game"> | string
   imageUrl?: Prisma.StringNullableFilter<"Game"> | string | null
   imageStoragePath?: Prisma.StringNullableFilter<"Game"> | string | null
@@ -256,6 +306,11 @@ export type GameOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
+  nameKo?: Prisma.SortOrderInput | Prisma.SortOrder
+  nameCn?: Prisma.SortOrderInput | Prisma.SortOrder
+  nameVn?: Prisma.SortOrderInput | Prisma.SortOrder
+  namePh?: Prisma.SortOrderInput | Prisma.SortOrder
+  nameTh?: Prisma.SortOrderInput | Prisma.SortOrder
   moneyUnitName?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   imageStoragePath?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -274,6 +329,11 @@ export type GameScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Game"> | string
   name?: Prisma.StringWithAggregatesFilter<"Game"> | string
   code?: Prisma.StringWithAggregatesFilter<"Game"> | string
+  nameKo?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
+  nameCn?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
+  nameVn?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
+  namePh?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
+  nameTh?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
   moneyUnitName?: Prisma.StringWithAggregatesFilter<"Game"> | string
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
   imageStoragePath?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
@@ -286,6 +346,11 @@ export type GameCreateInput = {
   id?: string
   name: string
   code: string
+  nameKo?: string | null
+  nameCn?: string | null
+  nameVn?: string | null
+  namePh?: string | null
+  nameTh?: string | null
   moneyUnitName?: string
   imageUrl?: string | null
   imageStoragePath?: string | null
@@ -301,6 +366,11 @@ export type GameUncheckedCreateInput = {
   id?: string
   name: string
   code: string
+  nameKo?: string | null
+  nameCn?: string | null
+  nameVn?: string | null
+  namePh?: string | null
+  nameTh?: string | null
   moneyUnitName?: string
   imageUrl?: string | null
   imageStoragePath?: string | null
@@ -316,6 +386,11 @@ export type GameUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  nameKo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameCn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameVn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namePh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moneyUnitName?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -331,6 +406,11 @@ export type GameUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  nameKo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameCn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameVn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namePh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moneyUnitName?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -346,6 +426,11 @@ export type GameCreateManyInput = {
   id?: string
   name: string
   code: string
+  nameKo?: string | null
+  nameCn?: string | null
+  nameVn?: string | null
+  namePh?: string | null
+  nameTh?: string | null
   moneyUnitName?: string
   imageUrl?: string | null
   imageStoragePath?: string | null
@@ -358,6 +443,11 @@ export type GameUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  nameKo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameCn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameVn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namePh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moneyUnitName?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -370,6 +460,11 @@ export type GameUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  nameKo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameCn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameVn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namePh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moneyUnitName?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -382,6 +477,11 @@ export type GameCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
+  nameKo?: Prisma.SortOrder
+  nameCn?: Prisma.SortOrder
+  nameVn?: Prisma.SortOrder
+  namePh?: Prisma.SortOrder
+  nameTh?: Prisma.SortOrder
   moneyUnitName?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   imageStoragePath?: Prisma.SortOrder
@@ -394,6 +494,11 @@ export type GameMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
+  nameKo?: Prisma.SortOrder
+  nameCn?: Prisma.SortOrder
+  nameVn?: Prisma.SortOrder
+  namePh?: Prisma.SortOrder
+  nameTh?: Prisma.SortOrder
   moneyUnitName?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   imageStoragePath?: Prisma.SortOrder
@@ -406,6 +511,11 @@ export type GameMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
+  nameKo?: Prisma.SortOrder
+  nameCn?: Prisma.SortOrder
+  nameVn?: Prisma.SortOrder
+  namePh?: Prisma.SortOrder
+  nameTh?: Prisma.SortOrder
   moneyUnitName?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   imageStoragePath?: Prisma.SortOrder
@@ -469,6 +579,11 @@ export type GameCreateWithoutServersInput = {
   id?: string
   name: string
   code: string
+  nameKo?: string | null
+  nameCn?: string | null
+  nameVn?: string | null
+  namePh?: string | null
+  nameTh?: string | null
   moneyUnitName?: string
   imageUrl?: string | null
   imageStoragePath?: string | null
@@ -483,6 +598,11 @@ export type GameUncheckedCreateWithoutServersInput = {
   id?: string
   name: string
   code: string
+  nameKo?: string | null
+  nameCn?: string | null
+  nameVn?: string | null
+  namePh?: string | null
+  nameTh?: string | null
   moneyUnitName?: string
   imageUrl?: string | null
   imageStoragePath?: string | null
@@ -513,6 +633,11 @@ export type GameUpdateWithoutServersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  nameKo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameCn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameVn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namePh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moneyUnitName?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -527,6 +652,11 @@ export type GameUncheckedUpdateWithoutServersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  nameKo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameCn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameVn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namePh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moneyUnitName?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -541,6 +671,11 @@ export type GameCreateWithoutListingsInput = {
   id?: string
   name: string
   code: string
+  nameKo?: string | null
+  nameCn?: string | null
+  nameVn?: string | null
+  namePh?: string | null
+  nameTh?: string | null
   moneyUnitName?: string
   imageUrl?: string | null
   imageStoragePath?: string | null
@@ -555,6 +690,11 @@ export type GameUncheckedCreateWithoutListingsInput = {
   id?: string
   name: string
   code: string
+  nameKo?: string | null
+  nameCn?: string | null
+  nameVn?: string | null
+  namePh?: string | null
+  nameTh?: string | null
   moneyUnitName?: string
   imageUrl?: string | null
   imageStoragePath?: string | null
@@ -585,6 +725,11 @@ export type GameUpdateWithoutListingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  nameKo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameCn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameVn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namePh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moneyUnitName?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -599,6 +744,11 @@ export type GameUncheckedUpdateWithoutListingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  nameKo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameCn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameVn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namePh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moneyUnitName?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -613,6 +763,11 @@ export type GameCreateWithoutAdminNotesInput = {
   id?: string
   name: string
   code: string
+  nameKo?: string | null
+  nameCn?: string | null
+  nameVn?: string | null
+  namePh?: string | null
+  nameTh?: string | null
   moneyUnitName?: string
   imageUrl?: string | null
   imageStoragePath?: string | null
@@ -627,6 +782,11 @@ export type GameUncheckedCreateWithoutAdminNotesInput = {
   id?: string
   name: string
   code: string
+  nameKo?: string | null
+  nameCn?: string | null
+  nameVn?: string | null
+  namePh?: string | null
+  nameTh?: string | null
   moneyUnitName?: string
   imageUrl?: string | null
   imageStoragePath?: string | null
@@ -657,6 +817,11 @@ export type GameUpdateWithoutAdminNotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  nameKo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameCn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameVn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namePh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moneyUnitName?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -671,6 +836,11 @@ export type GameUncheckedUpdateWithoutAdminNotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  nameKo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameCn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameVn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namePh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nameTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moneyUnitName?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -734,6 +904,11 @@ export type GameSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   name?: boolean
   code?: boolean
+  nameKo?: boolean
+  nameCn?: boolean
+  nameVn?: boolean
+  namePh?: boolean
+  nameTh?: boolean
   moneyUnitName?: boolean
   imageUrl?: boolean
   imageStoragePath?: boolean
@@ -750,6 +925,11 @@ export type GameSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   name?: boolean
   code?: boolean
+  nameKo?: boolean
+  nameCn?: boolean
+  nameVn?: boolean
+  namePh?: boolean
+  nameTh?: boolean
   moneyUnitName?: boolean
   imageUrl?: boolean
   imageStoragePath?: boolean
@@ -762,6 +942,11 @@ export type GameSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   name?: boolean
   code?: boolean
+  nameKo?: boolean
+  nameCn?: boolean
+  nameVn?: boolean
+  namePh?: boolean
+  nameTh?: boolean
   moneyUnitName?: boolean
   imageUrl?: boolean
   imageStoragePath?: boolean
@@ -774,6 +959,11 @@ export type GameSelectScalar = {
   id?: boolean
   name?: boolean
   code?: boolean
+  nameKo?: boolean
+  nameCn?: boolean
+  nameVn?: boolean
+  namePh?: boolean
+  nameTh?: boolean
   moneyUnitName?: boolean
   imageUrl?: boolean
   imageStoragePath?: boolean
@@ -782,7 +972,7 @@ export type GameSelectScalar = {
   createdAt?: boolean
 }
 
-export type GameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "moneyUnitName" | "imageUrl" | "imageStoragePath" | "imageAlt" | "isActive" | "createdAt", ExtArgs["result"]["game"]>
+export type GameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "nameKo" | "nameCn" | "nameVn" | "namePh" | "nameTh" | "moneyUnitName" | "imageUrl" | "imageStoragePath" | "imageAlt" | "isActive" | "createdAt", ExtArgs["result"]["game"]>
 export type GameInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   servers?: boolean | Prisma.Game$serversArgs<ExtArgs>
   listings?: boolean | Prisma.Game$listingsArgs<ExtArgs>
@@ -803,6 +993,11 @@ export type $GamePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     name: string
     code: string
+    nameKo: string | null
+    nameCn: string | null
+    nameVn: string | null
+    namePh: string | null
+    nameTh: string | null
     moneyUnitName: string
     imageUrl: string | null
     imageStoragePath: string | null
@@ -1238,6 +1433,11 @@ export interface GameFieldRefs {
   readonly id: Prisma.FieldRef<"Game", 'String'>
   readonly name: Prisma.FieldRef<"Game", 'String'>
   readonly code: Prisma.FieldRef<"Game", 'String'>
+  readonly nameKo: Prisma.FieldRef<"Game", 'String'>
+  readonly nameCn: Prisma.FieldRef<"Game", 'String'>
+  readonly nameVn: Prisma.FieldRef<"Game", 'String'>
+  readonly namePh: Prisma.FieldRef<"Game", 'String'>
+  readonly nameTh: Prisma.FieldRef<"Game", 'String'>
   readonly moneyUnitName: Prisma.FieldRef<"Game", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Game", 'String'>
   readonly imageStoragePath: Prisma.FieldRef<"Game", 'String'>

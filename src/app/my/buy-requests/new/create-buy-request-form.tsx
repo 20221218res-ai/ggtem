@@ -3,9 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FormEvent, ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TranslationKey } from "@/app/i18n";
 import useCountryTranslation from "@/app/use-country-translation";
+import { COUNTRY_CHANGE_EVENT, getCurrentCountryCode } from "@/app/country-text";
+import { getLocalizedGameName } from "@/app/game-name-text";
+import type { LocalizedGameNames } from "@/lib/market/game-localization";
 import { accountTransferTypeOptions } from "@/lib/market/account-transfer-types";
 
 type ListingCategory = "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
@@ -28,6 +31,7 @@ export default function CreateBuyRequestForm({
   games: Array<{
     gameId: string;
     name: string;
+    localizedNames: LocalizedGameNames;
     servers: Array<{ serverId: string; name: string }>;
   }>;
 }) {
@@ -49,6 +53,7 @@ export default function CreateBuyRequestForm({
   const [success, setSuccess] = useState("");
   const [createdBuyRequestId, setCreatedBuyRequestId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [countryCode, setCountryCode] = useState(() => getCurrentCountryCode());
 
   const isAccountRequest = category === "GAME_ACCOUNT";
   const selectedGame = useMemo(
@@ -88,6 +93,17 @@ export default function CreateBuyRequestForm({
     estimatedReserveAmount > 0 &&
     Number.isFinite(availableBalanceAmount) &&
     requiredBalanceAmount <= availableBalanceAmount;
+
+  useEffect(() => {
+    const handleCountryChange = () => setCountryCode(getCurrentCountryCode());
+    window.addEventListener(COUNTRY_CHANGE_EVENT, handleCountryChange);
+    window.addEventListener("storage", handleCountryChange);
+
+    return () => {
+      window.removeEventListener(COUNTRY_CHANGE_EVENT, handleCountryChange);
+      window.removeEventListener("storage", handleCountryChange);
+    };
+  }, []);
 
   function handleCategoryChange(nextCategory: ListingCategory) {
     setCategory(nextCategory);
@@ -256,7 +272,7 @@ export default function CreateBuyRequestForm({
               >
                 {games.map((game) => (
                   <option key={game.gameId} value={game.gameId}>
-                    {game.name}
+                    {getLocalizedGameName(game.name, game.localizedNames, countryCode)}
                   </option>
                 ))}
               </select>

@@ -11,6 +11,10 @@ import {
   getPremiumPromotionWindow,
   normalizePremiumDurationHours,
 } from "@/lib/market/premium-promotion";
+import {
+  type LocalizedGameNames,
+  mapGameLocalizedNames,
+} from "@/lib/market/game-localization";
 import { copyFile, mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -107,6 +111,7 @@ export type MarketplaceSellerListingFormView = {
   games: Array<{
     gameId: string;
     name: string;
+    localizedNames: LocalizedGameNames;
     servers: Array<{
       serverId: string;
       name: string;
@@ -406,6 +411,7 @@ export async function getMarketplaceSellerListingFormView(): Promise<Marketplace
     games: games.map((game) => ({
       gameId: game.id,
       name: game.name,
+      localizedNames: mapGameLocalizedNames(game),
       servers: game.servers.map((server) => ({
         serverId: server.id,
         name: server.name,

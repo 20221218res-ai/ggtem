@@ -8,6 +8,11 @@ import { getCurrentUserEmailForRole } from "@/lib/auth/session";
 import { getGameMoneyUnitName } from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
 import { isPremiumActive } from "@/lib/market/premium-promotion";
+import {
+  type GameCatalogOption,
+  type LocalizedGameNames,
+  mapGameLocalizedNames,
+} from "@/lib/market/game-localization";
 
 const MARKET_USER_EMAIL = "user-demo@ggitem.local";
 const MARKET_USER_ROLES = ["CUSTOMER", "SELLER"];
@@ -21,6 +26,9 @@ export type MarketplaceListingSummary = {
   sellerName: string;
   sellerReviewSummary: SellerReviewSummary;
   gameName: string;
+  gameCode: string;
+  gameImageUrl: string | null;
+  gameLocalizedNames: LocalizedGameNames;
   moneyUnitName: string;
   serverName: string | null;
   category: string;
@@ -96,6 +104,7 @@ export type MarketplaceListingsView = {
   listings: MarketplaceListingSummary[];
   filterOptions: {
     games: string[];
+    gameOptions: GameCatalogOption[];
     categories: string[];
   };
   appliedFilters: {
@@ -214,6 +223,13 @@ export async function getMarketplaceListings(
         game: {
           select: {
             name: true,
+            code: true,
+            imageUrl: true,
+            nameKo: true,
+            nameCn: true,
+            nameVn: true,
+            namePh: true,
+            nameTh: true,
           },
         },
       },
@@ -258,6 +274,9 @@ export async function getMarketplaceListings(
         listing.sellerId,
       ),
       gameName: listing.game.name,
+      gameCode: listing.game.code,
+      gameImageUrl: listing.game.imageUrl,
+      gameLocalizedNames: mapGameLocalizedNames(listing.game),
       moneyUnitName: getGameMoneyUnitName(listing.game.moneyUnitName, listing.game.name),
       serverName: listing.server?.name ?? null,
       category: listing.category,
@@ -278,6 +297,7 @@ export async function getMarketplaceListings(
     })),
     filterOptions: {
       games: Array.from(new Set(allActiveListings.map((listing) => listing.game.name))),
+      gameOptions: mapGameOptions(allActiveListings.map((listing) => listing.game)),
       categories: Array.from(
         new Set(allActiveListings.map((listing) => listing.category)),
       ),
@@ -310,6 +330,56 @@ function getListingOrderBy(sort: string): Prisma.ListingOrderByWithRelationInput
   }
 
   return { createdAt: "desc" };
+}
+
+function mapGameOptions(
+  games: Array<{
+    name: string;
+    code: string;
+    imageUrl: string | null;
+    nameKo?: string | null;
+    nameCn?: string | null;
+    nameVn?: string | null;
+    namePh?: string | null;
+    nameTh?: string | null;
+  }>,
+): GameCatalogOption[] {
+  const seen = new Set<string>();
+  const options: GameCatalogOption[] = [];
+
+  for (const game of games) {
+    if (seen.has(game.name)) {
+      continue;
+    }
+
+    seen.add(game.name);
+    options.push({
+      name: game.name,
+      code: game.code,
+      imageUrl: game.imageUrl,
+      region: getGameRegion(game.name),
+      localizedNames: mapGameLocalizedNames(game),
+    });
+  }
+
+  return options;
+}
+
+function getGameRegion(gameName: string) {
+  if (
+    gameName.includes("Lineage") ||
+    gameName.includes("Lord Nine") ||
+    gameName.includes("Night Crows") ||
+    gameName.includes("Vampir")
+  ) {
+    return "KR";
+  }
+
+  if (gameName.includes("Dungeon")) {
+    return "KR/CN";
+  }
+
+  return "Global";
 }
 
 export async function getMarketplaceListingDetail(
@@ -444,6 +514,9 @@ export async function getMarketplaceListingDetail(
     description: listing.description,
     status: listing.status,
     gameName: listing.game.name,
+    gameCode: listing.game.code,
+    gameImageUrl: listing.game.imageUrl,
+    gameLocalizedNames: mapGameLocalizedNames(listing.game),
     moneyUnitName: getGameMoneyUnitName(listing.game.moneyUnitName, listing.game.name),
     primaryImageAlt: listing.images[0]?.altText ?? null,
     serverName: listing.server?.name ?? null,
@@ -466,6 +539,9 @@ export async function getMarketplaceListingDetail(
         item.sellerId,
       ),
       gameName: item.game.name,
+      gameCode: item.game.code,
+      gameImageUrl: item.game.imageUrl,
+      gameLocalizedNames: mapGameLocalizedNames(item.game),
       moneyUnitName: getGameMoneyUnitName(item.game.moneyUnitName, item.game.name),
       serverName: item.server?.name ?? null,
       category: item.category,

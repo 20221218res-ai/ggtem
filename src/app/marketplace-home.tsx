@@ -10,6 +10,8 @@ import type { TranslationKey } from "./i18n";
 import LocalizedInput from "./localized-input";
 import UserContentText, { SourceCountryFlag } from "./user-content-text";
 import UserMarketHeader from "./user-market-header";
+import GameNameText from "./game-name-text";
+import type { GameCatalogOption } from "@/lib/market/game-localization";
 
 type MarketplaceHomeProps = MarketplaceListingsView;
 
@@ -32,12 +34,14 @@ const categoryLinks = [
 }>;
 
 const defaultGames = [
-  { name: "Lineage W", code: "LW", region: "KR" },
-  { name: "Lineage M", code: "LM", region: "KR" },
-  { name: "Genshin Impact", code: "GI", region: "Global" },
-  { name: "Dungeon & Fighter", code: "DF", region: "KR/CN" },
-  { name: "Odin: Valhalla", code: "OD", region: "KR" },
-  { name: "Ragnarok Online", code: "RO", region: "SEA" },
+  { name: "Lineage W", code: "lineage-w", region: "KR", imageUrl: "/api/game-card/lineage-w" },
+  { name: "Lineage Classic", code: "lineage-classic", region: "KR", imageUrl: "/api/game-card/lineage-classic" },
+  { name: "Aion 2", code: "aion-2", region: "KR", imageUrl: "/api/game-card/aion-2" },
+  { name: "Lineage M", code: "lineage-m", region: "KR", imageUrl: "/api/game-card/lineage-m" },
+  { name: "MapleStory Worlds", code: "maplestory-worlds", region: "KR", imageUrl: "/api/game-card/maplestory-worlds" },
+  { name: "Lord Nine", code: "lord-nine", region: "KR", imageUrl: "/api/game-card/lord-nine" },
+  { name: "Night Crows", code: "night-crows", region: "KR", imageUrl: "/api/game-card/night-crows" },
+  { name: "RF Online Next", code: "rf-online-next", region: "KR", imageUrl: "/api/game-card/rf-online-next" },
 ];
 
 export function MarketplaceHome({
@@ -46,7 +50,7 @@ export function MarketplaceHome({
 }: MarketplaceHomeProps) {
   const featuredListings = listings.slice(0, 6);
   const liveListings = listings.slice(0, 5);
-  const games = buildGameCards(listings, filterOptions.games);
+  const games = buildGameCards(listings, filterOptions.gameOptions ?? []);
 
   return (
     <main className="min-h-screen bg-[var(--gg-page-bg)] text-[var(--gg-text)] transition-colors">
@@ -54,7 +58,7 @@ export function MarketplaceHome({
 
       <section className="mx-auto grid max-w-[1360px] gap-8 px-5 py-8 lg:px-8">
         <section className="grid gap-6 xl:grid-cols-[1fr_360px]">
-          <HeroSearch games={filterOptions.games} />
+          <HeroSearch games={filterOptions.gameOptions ?? []} />
           <LiveTradeBoard listings={liveListings} />
         </section>
 
@@ -101,7 +105,7 @@ export async function MarketplaceHeader() {
   return <UserMarketHeader />;
 }
 
-function HeroSearch({ games }: { games: string[] }) {
+function HeroSearch({ games }: { games: GameCatalogOption[] }) {
   return (
     <section className="overflow-hidden rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] shadow-xl shadow-[var(--gg-shadow)]">
       <div className="p-6 lg:p-8">
@@ -140,8 +144,8 @@ function HeroSearch({ games }: { games: string[] }) {
               <CountryText id="home.allGames" />
             </option>
             {games.map((game) => (
-              <option key={game} value={game}>
-                {game}
+              <option key={game.name} value={game.name}>
+                {game.localizedNames.KR || game.name}
               </option>
             ))}
           </select>
@@ -273,7 +277,9 @@ function LiveTradeBoard({ listings }: { listings: MarketplaceListingSummary[] })
             className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)]"
           >
             <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-black">{listing.gameName}</p>
+              <p className="text-sm font-black">
+                <GameNameText name={listing.gameName} localizedNames={listing.gameLocalizedNames} />
+              </p>
               <span className="text-xs text-[var(--gg-subtle)]">
                 {index === 0 ? (
                   <CountryText id="home.justNow" />
@@ -306,7 +312,7 @@ function LiveTradeBoard({ listings }: { listings: MarketplaceListingSummary[] })
 function GameIndex({
   games,
 }: {
-  games: Array<{ name: string; code: string; region: string; count: string }>;
+  games: Array<GameCatalogOption & { count: string }>;
 }) {
   return (
     <aside className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5">
@@ -325,11 +331,15 @@ function GameIndex({
             className="flex items-center justify-between gap-3 rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 hover:border-[var(--gg-accent)]"
           >
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--gg-accent)] text-xs font-black text-[var(--gg-inverse-text)]">
-                {game.code}
-              </span>
+              <img
+                src={game.imageUrl ?? `/api/game-card/${game.code}`}
+                alt={game.name}
+                className="h-12 w-12 rounded-lg border border-[var(--gg-border)] object-cover"
+              />
               <div>
-                <p className="text-sm font-black">{game.name}</p>
+                <p className="text-sm font-black">
+                  <GameNameText name={game.name} localizedNames={game.localizedNames} />
+                </p>
                 <p className="text-xs text-[var(--gg-muted)]">{game.region}</p>
               </div>
             </div>
@@ -406,7 +416,7 @@ export function ListingCard({ listing }: { listing: MarketplaceListingSummary })
       <div className="min-w-0">
         <div className="flex flex-wrap gap-2">
           <span className="rounded-md bg-[var(--gg-control-bg)] px-2 py-1 text-xs font-bold text-[var(--gg-muted)]">
-            {listing.gameName}
+            <GameNameText name={listing.gameName} localizedNames={listing.gameLocalizedNames} />
           </span>
           <span className="rounded-md bg-emerald-400/10 px-2 py-1 text-xs font-bold text-[var(--gg-accent)]">
             <CategoryName category={listing.category} />
@@ -460,7 +470,7 @@ function EmptyListingNotice() {
 
 function buildGameCards(
   listings: MarketplaceListingSummary[],
-  games: string[],
+  games: GameCatalogOption[],
 ) {
   const counts = new Map<string, number>();
 
@@ -468,17 +478,24 @@ function buildGameCards(
     counts.set(listing.gameName, (counts.get(listing.gameName) ?? 0) + 1);
   }
 
-  const names = Array.from(
-    new Set([...games, ...defaultGames.map((game) => game.name)]),
-  ).slice(0, 6);
+  const byName = new Map<string, GameCatalogOption>();
 
-  return names.map((name, index) => {
+  for (const game of [...games, ...defaultGames.map((game) => ({
+    ...game,
+    localizedNames: { KR: null, CN: null, VN: null, PH: null, TH: null },
+  }))]) {
+    if (!byName.has(game.name)) {
+      byName.set(game.name, game);
+    }
+  }
+
+  return Array.from(byName.values()).slice(0, 8).map((game, index) => {
     const fallback = defaultGames[index % defaultGames.length];
 
     return {
       ...fallback,
-      name,
-      count: Math.max(counts.get(name) ?? 0, index + 4).toLocaleString(),
+      ...game,
+      count: Math.max(counts.get(game.name) ?? 0, index + 4).toLocaleString(),
     };
   });
 }

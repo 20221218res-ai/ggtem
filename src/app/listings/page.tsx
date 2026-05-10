@@ -9,6 +9,8 @@ import CountryText from "../country-text";
 import LocalizedInput from "../localized-input";
 import UserContentText, { SourceCountryFlag } from "../user-content-text";
 import type { TranslationKey } from "../i18n";
+import GameNameText from "../game-name-text";
+import type { GameCatalogOption, LocalizedGameNames } from "@/lib/market/game-localization";
 import { getTradeUnitLabel } from "@/lib/market/trade-unit";
 import {
   accountTransferTypeOptions,
@@ -42,6 +44,8 @@ type GameCard = {
   name: string;
   code: string;
   region: string;
+  imageUrl: string | null;
+  localizedNames: LocalizedGameNames;
   sellCount: number;
   buyCount: number;
 };
@@ -58,14 +62,14 @@ const tradeModeTabs = [
 ] satisfies Array<{ labelKey: TranslationKey; value: string }>;
 
 const fallbackGames = [
-  { name: "Lineage W", region: "KR", code: "LW" },
-  { name: "Lineage M", region: "KR", code: "LM" },
-  { name: "Genshin Impact", region: "Global", code: "GI" },
-  { name: "Dungeon & Fighter", region: "KR/CN", code: "DF" },
-  { name: "Odin: Valhalla", region: "KR", code: "OD" },
-  { name: "Ragnarok Online", region: "SEA", code: "RO" },
-  { name: "Lost Ark", region: "KR", code: "LA" },
-  { name: "MapleStory", region: "KR", code: "MS" },
+  { name: "Lineage W", region: "KR", code: "lineage-w", imageUrl: "/api/game-card/lineage-w" },
+  { name: "Lineage Classic", region: "KR", code: "lineage-classic", imageUrl: "/api/game-card/lineage-classic" },
+  { name: "Aion 2", region: "KR", code: "aion-2", imageUrl: "/api/game-card/aion-2" },
+  { name: "Lineage M", region: "KR", code: "lineage-m", imageUrl: "/api/game-card/lineage-m" },
+  { name: "MapleStory Worlds", region: "KR", code: "maplestory-worlds", imageUrl: "/api/game-card/maplestory-worlds" },
+  { name: "Lord Nine", region: "KR", code: "lord-nine", imageUrl: "/api/game-card/lord-nine" },
+  { name: "Night Crows", region: "KR", code: "night-crows", imageUrl: "/api/game-card/night-crows" },
+  { name: "RF Online Next", region: "KR", code: "rf-online-next", imageUrl: "/api/game-card/rf-online-next" },
 ];
 
 const serverPresets = [
@@ -156,7 +160,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
   const gameSeedItems = getMarketItems(gameSeedView);
   const gameCards = buildGameCards(
     gameSeedItems,
-    gameSeedView.filterOptions.games,
+    gameSeedView.filterOptions.gameOptions ?? [],
     gameSearch,
   );
   const itemsForSelectedGame =
@@ -593,10 +597,14 @@ function GameCardSelector({
             href={`/listings?category=${selectedCategory}&mode=${selectedMode}&game=${encodeURIComponent(game.name)}`}
             className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)]"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--gg-accent)] text-sm font-black text-[var(--gg-inverse-text)]">
-              {game.code}
-            </span>
-            <h3 className="mt-4 text-base font-black">{game.name}</h3>
+            <img
+              src={game.imageUrl ?? `/api/game-card/${game.code}`}
+              alt={game.name}
+              className="h-24 w-full rounded-xl border border-[var(--gg-border)] object-cover"
+            />
+            <h3 className="mt-4 text-base font-black">
+              <GameNameText name={game.name} localizedNames={game.localizedNames} />
+            </h3>
             <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">{game.region}</p>
             <p className="mt-3 text-sm font-black text-[var(--gg-accent)]">
               {selectedMode === "buy" ? game.buyCount : game.sellCount}
@@ -1133,7 +1141,7 @@ function filterMarketItemsByServerAndPrice(
 
 function buildGameCards(
   items: MarketFeedItem[],
-  games: string[],
+  games: GameCatalogOption[],
   gameSearch: string,
 ) {
   const counts = new Map<string, { sellCount: number; buyCount: number }>();
@@ -1151,19 +1159,32 @@ function buildGameCards(
     counts.set(gameName, current);
   }
 
-  const names = Array.from(new Set([...games, ...fallbackGames.map((game) => game.name)]));
+  const byName = new Map<string, GameCatalogOption>();
+
+  for (const game of [
+    ...games,
+    ...fallbackGames.map((game) => ({
+      ...game,
+      localizedNames: { KR: null, CN: null, VN: null, PH: null, TH: null },
+    })),
+  ]) {
+    if (!byName.has(game.name)) {
+      byName.set(game.name, game);
+    }
+  }
+
   const normalizedSearch = gameSearch.toLowerCase();
 
-  return names
-    .filter((name) => !normalizedSearch || name.toLowerCase().includes(normalizedSearch))
+  return Array.from(byName.values())
+    .filter((game) => !normalizedSearch || game.name.toLowerCase().includes(normalizedSearch))
     .slice(0, 12)
-    .map((name, index) => {
-      const fallback = fallbackGames.find((game) => game.name === name) ?? fallbackGames[index % fallbackGames.length];
-      const count = counts.get(name) ?? { sellCount: 0, buyCount: 0 };
+    .map((game, index) => {
+      const fallback = fallbackGames.find((item) => item.name === game.name) ?? fallbackGames[index % fallbackGames.length];
+      const count = counts.get(game.name) ?? { sellCount: 0, buyCount: 0 };
 
       return {
         ...fallback,
-        name,
+        ...game,
         sellCount: count.sellCount,
         buyCount: count.buyCount,
       };

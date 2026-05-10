@@ -7,6 +7,7 @@ import { mkdir, unlink, writeFile } from "fs/promises";
 import type { Prisma } from "@/generated/prisma/client";
 import { normalizeCatalogCode } from "@/lib/admin/game-settings";
 import { ROLE_GROUPS, requirePageRole } from "@/lib/auth/guards";
+import { getLocalizedGameNameInput } from "@/lib/market/game-localization";
 import { getPrismaClient } from "@/lib/prisma";
 
 const GAME_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
@@ -25,6 +26,7 @@ export async function createGameAction(formData: FormData) {
   const name = getText(formData, "name");
   const code = normalizeCatalogCode(getText(formData, "code"));
   const moneyUnitName = normalizeMoneyUnitName(getText(formData, "moneyUnitName"));
+  const localizedNames = getLocalizedGameNameInput(formData);
   const image = getFile(formData, "image");
   const imageAlt = getText(formData, "imageAlt") || name;
 
@@ -42,7 +44,9 @@ export async function createGameAction(formData: FormData) {
     redirectWithError("이미 같은 게임명 또는 게임 코드가 등록되어 있습니다.");
   }
 
-  const game = await prisma.game.create({ data: { name, code, moneyUnitName } });
+  const game = await prisma.game.create({
+    data: { name, code, moneyUnitName, ...localizedNames },
+  });
   const uploadedImage = image ? await saveGameImage(game.id, image) : null;
   const createdGame = uploadedImage
     ? await prisma.game.update({
@@ -64,6 +68,11 @@ export async function createGameAction(formData: FormData) {
       name: createdGame.name,
       code: createdGame.code,
       moneyUnitName: createdGame.moneyUnitName,
+      nameKo: createdGame.nameKo,
+      nameCn: createdGame.nameCn,
+      nameVn: createdGame.nameVn,
+      namePh: createdGame.namePh,
+      nameTh: createdGame.nameTh,
       imageUrl: createdGame.imageUrl,
       imageAlt: createdGame.imageAlt,
       isActive: createdGame.isActive,
@@ -210,6 +219,7 @@ export async function updateGameAction(formData: FormData) {
   const name = getText(formData, "name");
   const code = normalizeCatalogCode(getText(formData, "code"));
   const moneyUnitName = normalizeMoneyUnitName(getText(formData, "moneyUnitName"));
+  const localizedNames = getLocalizedGameNameInput(formData);
   const image = getFile(formData, "image");
   const imageAlt = getText(formData, "imageAlt") || name;
 
@@ -226,6 +236,11 @@ export async function updateGameAction(formData: FormData) {
         name: true,
         code: true,
         moneyUnitName: true,
+        nameKo: true,
+        nameCn: true,
+        nameVn: true,
+        namePh: true,
+        nameTh: true,
         imageUrl: true,
         imageStoragePath: true,
         imageAlt: true,
@@ -253,6 +268,7 @@ export async function updateGameAction(formData: FormData) {
       name,
       code,
       moneyUnitName,
+      ...localizedNames,
       imageAlt: uploadedImage || existing.imageUrl ? imageAlt : existing.imageAlt,
       ...(uploadedImage
         ? {
@@ -277,6 +293,11 @@ export async function updateGameAction(formData: FormData) {
       name: updated.name,
       code: updated.code,
       moneyUnitName: updated.moneyUnitName,
+      nameKo: updated.nameKo,
+      nameCn: updated.nameCn,
+      nameVn: updated.nameVn,
+      namePh: updated.namePh,
+      nameTh: updated.nameTh,
       imageUrl: updated.imageUrl,
       imageAlt: updated.imageAlt,
       isActive: updated.isActive,

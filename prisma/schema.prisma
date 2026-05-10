@@ -272,6 +272,11 @@ model Game {
   id            String          @id @default(cuid())
   name          String          @unique
   code          String          @unique
+  nameKo        String?
+  nameCn        String?
+  nameVn        String?
+  namePh        String?
+  nameTh        String?
   moneyUnitName String          @default("게임머니")
   imageUrl         String?
   imageStoragePath String?
