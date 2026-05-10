@@ -1,4 +1,6 @@
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
 import { requirePageRole, ROLE_GROUPS } from "@/lib/auth/guards";
 import { getPrismaClient } from "@/lib/prisma";
 import {
@@ -8,6 +10,7 @@ import {
   Panel,
   StatusPill,
 } from "../admin-prototype-ui";
+import { FormSubmitButton } from "../form-submit-button";
 
 const inquiryStatusOptions = [
   { value: "OPEN", label: "접수" },
@@ -16,12 +19,22 @@ const inquiryStatusOptions = [
   { value: "CLOSED", label: "종료" },
 ] as const;
 
-export default async function AdminSupportInquiriesPage() {
+type AdminSupportInquiriesPageProps = {
+  searchParams?: Promise<{
+    notice?: string;
+    error?: string;
+  }>;
+};
+
+export default async function AdminSupportInquiriesPage({
+  searchParams,
+}: AdminSupportInquiriesPageProps) {
   await requirePageRole(ROLE_GROUPS.ADMIN_OPERATORS, {
     signInPath: "/admin/sign-in",
     forbiddenPath: "/admin",
   });
 
+  const params = searchParams ? await searchParams : {};
   const prisma = getPrismaClient();
   const [inquiries, statusGroups] = await Promise.all([
     prisma.supportInquiry.findMany({
@@ -58,6 +71,11 @@ export default async function AdminSupportInquiriesPage() {
         ]}
       />
 
+      {params.notice === "updated" ? (
+        <InlineBanner tone="success">문의 답변과 상태를 저장했습니다. 유저 고객센터 화면에 반영됩니다.</InlineBanner>
+      ) : null}
+      {params.error ? <InlineBanner tone="error">{params.error}</InlineBanner> : null}
+
       <Panel title="문의 목록">
         <DataTable
           headers={["종류", "회원", "문의 내용", "상태", "접수일"]}
@@ -93,9 +111,9 @@ export default async function AdminSupportInquiriesPage() {
                   placeholder="유저에게 보여줄 답변을 입력하세요."
                   className="rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold leading-6"
                 />
-                <button type="submit" className="rounded-md bg-slate-950 px-3 py-2 text-xs font-black text-white">
+                <FormSubmitButton className="rounded-md bg-slate-950 px-3 py-2 text-xs font-black text-white">
                   답변 저장
-                </button>
+                </FormSubmitButton>
               </form>
             </details>,
             <StatusPill key={`${inquiry.id}-status`} tone={statusTone(inquiry.status)}>
@@ -123,7 +141,7 @@ async function updateSupportInquiryAction(formData: FormData) {
   const safeStatus = inquiryStatusOptions.some((item) => item.value === status) ? status : "OPEN";
 
   if (!inquiryId) {
-    return;
+    redirect("/admin/support-inquiries?error=" + encodeURIComponent("문의 ID를 찾을 수 없습니다. 새로고침 후 다시 시도해 주세요."));
   }
 
   const prisma = getPrismaClient();
@@ -137,6 +155,21 @@ async function updateSupportInquiryAction(formData: FormData) {
 
   revalidatePath("/admin/support-inquiries");
   revalidatePath("/support");
+  redirect("/admin/support-inquiries?notice=updated");
+}
+
+function InlineBanner({ tone, children }: { tone: "success" | "error"; children: ReactNode }) {
+  return (
+    <div
+      className={`rounded-lg border-l-4 px-4 py-3 text-sm font-black ${
+        tone === "success"
+          ? "border-emerald-500 bg-emerald-50 text-emerald-800"
+          : "border-red-500 bg-red-50 text-red-800"
+      }`}
+    >
+      {children}
+    </div>
+  );
 }
 
 function inquiryCategoryLabel(category: string) {

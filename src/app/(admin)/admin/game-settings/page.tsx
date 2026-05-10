@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { getAdminGameSettingsState } from "@/lib/admin/game-settings";
 import { ROLE_GROUPS, requirePageRole } from "@/lib/auth/guards";
+import { FormSubmitButton } from "../form-submit-button";
 import {
   createAdminGameNoteAction,
   createGameAction,
@@ -151,9 +152,9 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
               <Field name="nameTh" label="태국어 게임명" placeholder="ไลน์เอจ W" />
               <Field name="imageAlt" label="이미지 설명" placeholder="Lineage W 대표 이미지" />
               <FileField name="image" label="게임 이미지" />
-              <button className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
+              <FormSubmitButton className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
                 게임 추가
-              </button>
+              </FormSubmitButton>
             </form>
           </Panel>
 
@@ -162,9 +163,9 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
               <SelectGame games={state.games} name="gameId" label="게임" />
               <Field name="name" label="서버명" placeholder="Aphrodite" />
               <Field name="code" label="서버 코드" placeholder="aphrodite" />
-              <button className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black sm:col-span-2">
+              <FormSubmitButton className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black sm:col-span-2">
                 서버 추가
-              </button>
+              </FormSubmitButton>
             </form>
           </Panel>
         </section>
@@ -180,9 +181,9 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
                 placeholder={"Aphrodite, aphrodite\nKerenis, kerenis\nJillian, jillian"}
               />
             </label>
-            <button className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
+            <FormSubmitButton className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
               일괄 추가
-            </button>
+            </FormSubmitButton>
           </form>
         </Panel>
 
@@ -272,13 +273,13 @@ function GameCard({ game }: { game: GameRow }) {
         <form action={toggleGameActiveAction} className="flex items-end gap-2 xl:justify-end">
           <input type="hidden" name="gameId" value={game.id} />
           <input type="hidden" name="nextActive" value={String(!game.isActive)} />
-          <button
+          <FormSubmitButton
             className={`rounded-lg px-4 py-3 text-sm font-black ${
               game.isActive ? "bg-slate-100 text-slate-700" : "bg-[var(--color-primary)] text-black"
             }`}
           >
             {game.isActive ? "게임 숨김" : "게임 활성화"}
-          </button>
+          </FormSubmitButton>
         </form>
       </div>
 
@@ -297,9 +298,9 @@ function GameCard({ game }: { game: GameRow }) {
             <Field name="nameTh" label="태국어 게임명" defaultValue={game.nameTh || ""} />
             <Field name="imageAlt" label="이미지 설명" defaultValue={game.imageAlt || game.name} />
             <FileField name="image" label="이미지 교체" />
-            <button className="w-full rounded-lg bg-slate-950 px-4 py-3 text-sm font-black text-white">
+            <FormSubmitButton className="w-full rounded-lg bg-slate-950 px-4 py-3 text-sm font-black text-white">
               게임 정보 저장
-            </button>
+            </FormSubmitButton>
           </form>
 
           <form action={createAdminGameNoteAction} className="space-y-3 rounded-lg border border-slate-200 bg-white p-4">
@@ -312,9 +313,9 @@ function GameCard({ game }: { game: GameRow }) {
                 placeholder="운영 중 확인한 내용을 남깁니다."
               />
             </label>
-            <button className="w-full rounded-lg border border-[var(--color-primary)] px-4 py-3 text-sm font-black text-[var(--color-primary)]">
+            <FormSubmitButton className="w-full rounded-lg border border-[var(--color-primary)] px-4 py-3 text-sm font-black text-[var(--color-primary)]">
               메모 저장
-            </button>
+            </FormSubmitButton>
           </form>
 
           {game.adminNotes.length > 0 ? (
@@ -365,14 +366,14 @@ function ServerItem({ server }: { server: ServerRow }) {
           <input type="hidden" name="serverId" value={server.id} />
           <input name="name" defaultValue={server.name} className={inputClass} />
           <input name="code" defaultValue={server.code} className={inputClass} />
-          <button className="rounded-lg bg-slate-950 px-3 py-2 text-sm font-black text-white">저장</button>
+          <FormSubmitButton className="rounded-lg bg-slate-950 px-3 py-2 text-sm font-black text-white">저장</FormSubmitButton>
         </form>
         <form action={toggleGameServerActiveAction}>
           <input type="hidden" name="serverId" value={server.id} />
           <input type="hidden" name="nextActive" value={String(!server.isActive)} />
-          <button className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-black text-slate-700">
+          <FormSubmitButton className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-black text-slate-700">
             {server.isActive ? "숨김" : "활성"}
-          </button>
+          </FormSubmitButton>
         </form>
       </div>
     </div>
