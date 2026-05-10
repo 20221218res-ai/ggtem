@@ -160,9 +160,27 @@ export type AdminUserDetail = {
   }>;
   offPlatformRisk: {
     count30d: number;
+    attemptCount30d: number;
+    receivedCount30d: number;
     openCount: number;
     highSeverityCount: number;
     latestSignalAt: string | null;
+    latestAttemptAt: string | null;
+    escalationStage: "NONE" | "USER_WARNING" | "ADMIN_REVIEW" | "WITHDRAWAL_HOLD_REVIEW";
+    escalationLabel: string;
+    recommendedAction: string;
+    attemptReports: Array<{
+      reportId: string;
+      category: string;
+      status: string;
+      severity: string;
+      sourceType: string | null;
+      description: string;
+      orderId: string | null;
+      orderNumber: string | null;
+      targetName: string;
+      createdAt: string;
+    }>;
     reports: Array<{
       reportId: string;
       category: string;
@@ -473,22 +491,29 @@ export async function getAdminUserDetail(
   }
 
   const offPlatformSince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const offPlatformCondition = [
+    {
+      category: "OFF_PLATFORM_PAYMENT",
+    },
+    {
+      sourceType: "OFF_PLATFORM_CONTACT",
+    },
+  ] satisfies Prisma.TrustReportWhereInput["OR"];
+  const offPlatformAttemptWhere = {
+    reporterId: user.id,
+    OR: offPlatformCondition,
+  } satisfies Prisma.TrustReportWhereInput;
   const offPlatformReportWhere = {
     targetUserId: user.id,
-    OR: [
-      {
-        category: "OFF_PLATFORM_PAYMENT",
-      },
-      {
-        sourceType: "OFF_PLATFORM_CONTACT",
-      },
-    ],
+    OR: offPlatformCondition,
   } satisfies Prisma.TrustReportWhereInput;
 
   const [
     restrictionTimeline,
     walletLedgerEntries,
     linkedAccountSignals,
+    offPlatformAttemptReports,
+    offPlatformAttemptCount30d,
     offPlatformReports,
     offPlatformReportCount30d,
   ] =
@@ -524,6 +549,25 @@ export async function getAdminUserDetail(
       }),
       getLinkedAccountSignalsForUser(user.id),
       prisma.trustReport.findMany({
+        where: offPlatformAttemptWhere,
+        include: {
+          order: true,
+          targetUser: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 8,
+      }),
+      prisma.trustReport.count({
+        where: {
+          ...offPlatformAttemptWhere,
+          createdAt: {
+            gte: offPlatformSince,
+          },
+        },
+      }),
+      prisma.trustReport.findMany({
         where: offPlatformReportWhere,
         include: {
           order: true,
@@ -542,6 +586,11 @@ export async function getAdminUserDetail(
         },
       }),
     ]);
+
+  const offPlatformEscalation = getOffPlatformEscalation({
+    attemptCount30d: offPlatformAttemptCount30d,
+    status: user.status,
+  });
 
   return {
     user: {
@@ -654,16 +703,36 @@ export async function getAdminUserDetail(
       createdAt: formatKoreanDate(log.createdAt),
     })),
     offPlatformRisk: {
-      count30d: offPlatformReportCount30d,
-      openCount: offPlatformReports.filter((report) =>
+      count30d: offPlatformAttemptCount30d,
+      attemptCount30d: offPlatformAttemptCount30d,
+      receivedCount30d: offPlatformReportCount30d,
+      openCount: offPlatformAttemptReports.filter((report) =>
         ["OPEN", "UNDER_REVIEW"].includes(report.status),
       ).length,
-      highSeverityCount: offPlatformReports.filter((report) =>
+      highSeverityCount: offPlatformAttemptReports.filter((report) =>
         ["HIGH", "CRITICAL"].includes(report.severity),
       ).length,
-      latestSignalAt: offPlatformReports[0]
-        ? formatKoreanDate(offPlatformReports[0].createdAt)
+      latestSignalAt: offPlatformAttemptReports[0]
+        ? formatKoreanDate(offPlatformAttemptReports[0].createdAt)
         : null,
+      latestAttemptAt: offPlatformAttemptReports[0]
+        ? formatKoreanDate(offPlatformAttemptReports[0].createdAt)
+        : null,
+      escalationStage: offPlatformEscalation.stage,
+      escalationLabel: offPlatformEscalation.label,
+      recommendedAction: offPlatformEscalation.recommendedAction,
+      attemptReports: offPlatformAttemptReports.map((report) => ({
+        reportId: report.id,
+        category: report.category,
+        status: report.status,
+        severity: report.severity,
+        sourceType: report.sourceType,
+        description: report.description,
+        orderId: report.orderId,
+        orderNumber: report.order?.orderNumber ?? null,
+        targetName: report.targetUser.displayName,
+        createdAt: formatKoreanDate(report.createdAt),
+      })),
       reports: offPlatformReports.map((report) => ({
         reportId: report.id,
         category: report.category,
@@ -865,6 +934,48 @@ export async function updateAdminUserAccess(input: {
       message: "유저 계정 접근 권한을 변경했습니다.",
     };
   });
+}
+
+function getOffPlatformEscalation({
+  attemptCount30d,
+  status,
+}: {
+  attemptCount30d: number;
+  status: string;
+}) {
+  if (attemptCount30d >= 3 || status === "WITHDRAWAL_HOLD") {
+    return {
+      stage: "WITHDRAWAL_HOLD_REVIEW" as const,
+      label: "3단계: 출금 보류 검토",
+      recommendedAction:
+        "반복 외부거래 시도가 감지되었습니다. 주문 채팅 원문과 감사 로그를 확인하고 출금 보류 유지 여부를 판단하세요.",
+    };
+  }
+
+  if (attemptCount30d >= 2) {
+    return {
+      stage: "ADMIN_REVIEW" as const,
+      label: "2단계: 운영자 검토",
+      recommendedAction:
+        "같은 유저가 30일 안에 2회 이상 외부거래를 시도했습니다. 운영 메모를 남기고 추가 시도 여부를 모니터링하세요.",
+    };
+  }
+
+  if (attemptCount30d >= 1) {
+    return {
+      stage: "USER_WARNING" as const,
+      label: "1단계: 유저 경고",
+      recommendedAction:
+        "첫 외부거래 시도입니다. 자동 경고가 발송되었는지 확인하고 같은 주문의 채팅 흐름을 살펴보세요.",
+    };
+  }
+
+  return {
+    stage: "NONE" as const,
+    label: "탐지 없음",
+    recommendedAction:
+      "최근 30일 기준 이 유저가 외부거래를 시도한 기록이 없습니다.",
+  };
 }
 
 function normalizeRole(role?: string | null) {

@@ -400,7 +400,11 @@ export default async function AdminUserDetailPage({
 
 function OffPlatformRiskSection({ detail }: { detail: UserDetail }) {
   const risk = detail.offPlatformRisk;
-  const hasSignals = risk.reports.length > 0 || risk.count30d > 0;
+  const hasSignals =
+    risk.attemptReports.length > 0 ||
+    risk.reports.length > 0 ||
+    risk.attemptCount30d > 0 ||
+    risk.receivedCount30d > 0;
 
   return (
     <section
@@ -414,14 +418,17 @@ function OffPlatformRiskSection({ detail }: { detail: UserDetail }) {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className={`text-sm font-black ${hasSignals ? "text-red-700" : "text-slate-500"}`}>
-            외부거래 탐지 근거
+            외부거래 탐지/제재 단계
           </p>
           <h2 className="mt-1 text-xl font-black text-slate-950">
-            최근 30일 {risk.count30d.toLocaleString("ko-KR")}건 탐지
+            {risk.escalationLabel}
           </h2>
           <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-            SNS, 전화번호, 이메일, 개인 지갑주소, 외부거래 유도 문구가 차단된 기록입니다.
-            계정 제한이나 출금 보류를 판단하기 전에 주문 채팅과 감사 로그를 함께 확인하세요.
+            이 화면은 “이 유저가 시도한 외부거래”와 “이 유저가 대상이 된 외부거래”를 분리해서 보여줍니다.
+            제재 단계는 최근 30일간 이 유저가 직접 시도한 차단 기록을 기준으로 계산합니다.
+          </p>
+          <p className="mt-3 rounded-lg border border-white/70 bg-white/70 p-3 text-sm font-semibold leading-6 text-slate-700">
+            {risk.recommendedAction}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -437,19 +444,31 @@ function OffPlatformRiskSection({ detail }: { detail: UserDetail }) {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-2 md:grid-cols-3">
-        <SignalBox label="미처리" value={`${risk.openCount}건`} />
-        <SignalBox label="고위험" value={`${risk.highSeverityCount}건`} />
-        <SignalBox label="최근 탐지" value={risk.latestSignalAt ?? "없음"} />
+      <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-5">
+        <SignalBox
+          label="이 유저가 시도"
+          value={`${risk.attemptCount30d.toLocaleString("ko-KR")}건`}
+        />
+        <SignalBox
+          label="이 유저가 대상"
+          value={`${risk.receivedCount30d.toLocaleString("ko-KR")}건`}
+        />
+        <SignalBox label="미처리 시도" value={`${risk.openCount}건`} />
+        <SignalBox label="고위험 시도" value={`${risk.highSeverityCount}건`} />
+        <SignalBox label="최근 시도" value={risk.latestAttemptAt ?? "없음"} />
       </div>
 
-      <div className="mt-4 space-y-3">
-        {risk.reports.map((report) => (
+      <div className="mt-5 space-y-3">
+        <h3 className="text-sm font-black text-slate-950">
+          이 유저가 시도한 외부거래
+        </h3>
+        {risk.attemptReports.map((report) => (
           <div key={report.reportId} className="rounded-lg border border-red-200 bg-white p-4">
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone="red">{reportCategoryLabel(report.category)}</Badge>
               <Badge tone={severityTone(report.severity)}>{severityLabel(report.severity)}</Badge>
               <Badge tone={statusTone(report.status)}>{statusLabel(report.status)}</Badge>
+              <Badge tone="amber">대상 {report.targetName}</Badge>
               {report.sourceType === "OFF_PLATFORM_CONTACT" ? (
                 <Badge tone="red">자동 탐지</Badge>
               ) : null}
@@ -484,10 +503,63 @@ function OffPlatformRiskSection({ detail }: { detail: UserDetail }) {
           </div>
         ))}
 
-        {!hasSignals ? (
-          <EmptyState label="외부거래 또는 연락처 교환 자동탐지 이력이 없습니다." />
+        {risk.attemptReports.length === 0 ? (
+          <EmptyState label="이 유저가 외부거래 또는 연락처 교환을 시도한 자동탐지 이력이 없습니다." />
         ) : null}
       </div>
+
+      {risk.reports.length > 0 ? (
+        <div className="mt-6 space-y-3">
+          <h3 className="text-sm font-black text-slate-950">
+            이 유저가 대상이 된 외부거래
+          </h3>
+          {risk.reports.map((report) => (
+            <div key={report.reportId} className="rounded-lg border border-amber-200 bg-white p-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge tone="amber">{reportCategoryLabel(report.category)}</Badge>
+                <Badge tone={severityTone(report.severity)}>{severityLabel(report.severity)}</Badge>
+                <Badge tone={statusTone(report.status)}>{statusLabel(report.status)}</Badge>
+                {report.sourceType === "OFF_PLATFORM_CONTACT" ? (
+                  <Badge tone="red">자동 탐지</Badge>
+                ) : null}
+              </div>
+              <p className="mt-3 whitespace-pre-wrap text-sm font-semibold leading-6 text-slate-700">
+                {report.description}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {extractDetectionLabels(report.description).map((label) => (
+                  <Badge key={label} tone="amber">
+                    {label}
+                  </Badge>
+                ))}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2 text-sm">
+                {report.orderId ? (
+                  <LinkButton
+                    href={`/admin/orders?orderId=${report.orderId}`}
+                    label={`주문 ${report.orderNumber ?? ""}`.trim()}
+                    tone="dark"
+                  />
+                ) : null}
+                <LinkButton
+                  href={`/admin/risk?query=${encodeURIComponent(report.reportId)}`}
+                  label="신고 상세"
+                  tone="amber"
+                />
+                <span className="rounded-md bg-slate-100 px-3 py-2 text-xs font-bold text-slate-500">
+                  {report.createdAt}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {!hasSignals ? (
+        <div className="mt-4">
+          <EmptyState label="외부거래 또는 연락처 교환 자동탐지 이력이 없습니다." />
+        </div>
+      ) : null}
     </section>
   );
 }
