@@ -6,6 +6,7 @@ import type { TranslationKey } from "./i18n";
 import LiveRefreshControl from "./live-refresh-control";
 import useCountryTranslation from "./use-country-translation";
 import UserContentText from "./user-content-text";
+import { detectOffPlatformContact } from "@/lib/risk/off-platform-detector";
 
 type ChatMessage = {
   id?: string;
@@ -52,6 +53,7 @@ export default function OrderChatPanel({
   const [body, setBody] = useState("");
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [riskWarning, setRiskWarning] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function submit() {
@@ -62,9 +64,18 @@ export default function OrderChatPanel({
       return;
     }
 
+    const detection = detectOffPlatformContact(trimmedBody);
+    if (detection.blocked) {
+      setRiskWarning(detection.signals.map((signal) => signal.label));
+      setError("");
+      setNotice("");
+      return;
+    }
+
     setIsSubmitting(true);
     setNotice("");
     setError("");
+    setRiskWarning([]);
 
     const response = await fetch("/api/market/order-chat", {
       method: "POST",
@@ -186,17 +197,39 @@ export default function OrderChatPanel({
         ) : null}
 
         <div className="grid gap-2 sm:grid-cols-[1fr_120px]">
-          <textarea
-            value={body}
-            onChange={(event) => setBody(event.target.value)}
-            rows={2}
-            className="min-h-14 resize-none rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-4 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
-            placeholder={t("chat.messagePlaceholder")}
-          />
+          <div>
+            <textarea
+              value={body}
+              onChange={(event) => {
+                const nextBody = event.target.value;
+                setBody(nextBody);
+
+                const detection = detectOffPlatformContact(nextBody);
+                setRiskWarning(
+                  detection.blocked
+                    ? detection.signals.map((signal) => signal.label)
+                    : [],
+                );
+              }}
+              rows={2}
+              className={`min-h-14 w-full resize-none rounded-xl border bg-[var(--gg-card-bg)] px-4 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)] ${
+                riskWarning.length > 0 ? "border-red-400" : "border-[var(--gg-border)]"
+              }`}
+              placeholder={t("chat.messagePlaceholder")}
+            />
+            {riskWarning.length > 0 ? (
+              <div className="mt-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-800">
+                <p className="font-black">외부거래/연락처 교환 의심 문구가 감지되었습니다.</p>
+                <p className="mt-1">
+                  감지 항목: {riskWarning.join(", ")}. GGtem 채팅과 에스크로 안에서만 거래해 주세요.
+                </p>
+              </div>
+            ) : null}
+          </div>
           <button
             type="button"
             onClick={submit}
-            disabled={isSubmitting}
+            disabled={isSubmitting || riskWarning.length > 0}
             className="rounded-xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] disabled:opacity-60"
           >
             {isSubmitting ? t("chat.sending") : t("chat.send")}
