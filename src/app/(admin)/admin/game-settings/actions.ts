@@ -26,6 +26,7 @@ export async function createGameAction(formData: FormData) {
   const name = getText(formData, "name");
   const code = normalizeCatalogCode(getText(formData, "code"));
   const moneyUnitName = normalizeMoneyUnitName(getText(formData, "moneyUnitName"));
+  const sortOrder = normalizeSortOrder(getText(formData, "sortOrder"));
   const localizedNames = getLocalizedGameNameInput(formData);
   const image = getFile(formData, "image");
   const imageAlt = getText(formData, "imageAlt") || name;
@@ -45,7 +46,7 @@ export async function createGameAction(formData: FormData) {
   }
 
   const game = await prisma.game.create({
-    data: { name, code, moneyUnitName, ...localizedNames },
+    data: { name, code, moneyUnitName, sortOrder, ...localizedNames },
   });
   const uploadedImage = image ? await saveGameImage(game.id, image) : null;
   const createdGame = uploadedImage
@@ -68,6 +69,7 @@ export async function createGameAction(formData: FormData) {
       name: createdGame.name,
       code: createdGame.code,
       moneyUnitName: createdGame.moneyUnitName,
+      sortOrder: createdGame.sortOrder,
       nameKo: createdGame.nameKo,
       nameCn: createdGame.nameCn,
       nameVn: createdGame.nameVn,
@@ -219,6 +221,7 @@ export async function updateGameAction(formData: FormData) {
   const name = getText(formData, "name");
   const code = normalizeCatalogCode(getText(formData, "code"));
   const moneyUnitName = normalizeMoneyUnitName(getText(formData, "moneyUnitName"));
+  const sortOrder = normalizeSortOrder(getText(formData, "sortOrder"));
   const localizedNames = getLocalizedGameNameInput(formData);
   const image = getFile(formData, "image");
   const imageAlt = getText(formData, "imageAlt") || name;
@@ -236,6 +239,7 @@ export async function updateGameAction(formData: FormData) {
         name: true,
         code: true,
         moneyUnitName: true,
+        sortOrder: true,
         nameKo: true,
         nameCn: true,
         nameVn: true,
@@ -268,6 +272,7 @@ export async function updateGameAction(formData: FormData) {
       name,
       code,
       moneyUnitName,
+      sortOrder,
       ...localizedNames,
       imageAlt: uploadedImage || existing.imageUrl ? imageAlt : existing.imageAlt,
       ...(uploadedImage
@@ -293,6 +298,7 @@ export async function updateGameAction(formData: FormData) {
       name: updated.name,
       code: updated.code,
       moneyUnitName: updated.moneyUnitName,
+      sortOrder: updated.sortOrder,
       nameKo: updated.nameKo,
       nameCn: updated.nameCn,
       nameVn: updated.nameVn,
@@ -503,6 +509,11 @@ function getFile(formData: FormData, key: string) {
 
 function normalizeMoneyUnitName(value: string) {
   return value.trim() || "게임머니";
+}
+
+function normalizeSortOrder(value: string) {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 100;
 }
 
 async function saveGameImage(gameId: string, image: File) {

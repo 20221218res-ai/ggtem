@@ -257,9 +257,7 @@ export async function getMarketplaceListings(
         namePh: true,
         nameTh: true,
       },
-      orderBy: {
-        name: "asc",
-      },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     }),
   ]);
 

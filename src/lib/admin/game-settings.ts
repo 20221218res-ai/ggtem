@@ -8,7 +8,7 @@ export async function getAdminGameSettingsState() {
   const [games, totalBuyRequests, buyRequestsByGame, buyRequestsByServer, recentChanges] =
     await Promise.all([
       prisma.game.findMany({
-        orderBy: [{ isActive: "desc" }, { name: "asc" }],
+        orderBy: [{ isActive: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
         include: {
           servers: {
             orderBy: [{ isActive: "desc" }, { name: "asc" }],
@@ -69,6 +69,7 @@ export async function getAdminGameSettingsState() {
       imageUrl: game.imageUrl,
       imageStoragePath: game.imageStoragePath,
       imageAlt: game.imageAlt,
+      sortOrder: game.sortOrder,
       isActive: game.isActive,
       listingCount: game._count.listings,
       buyRequestCount: buyRequestCountByGame.get(game.id) ?? 0,

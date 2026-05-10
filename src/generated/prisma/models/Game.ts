@@ -20,8 +20,18 @@ export type GameModel = runtime.Types.Result.DefaultSelection<Prisma.$GamePayloa
 
 export type AggregateGame = {
   _count: GameCountAggregateOutputType | null
+  _avg: GameAvgAggregateOutputType | null
+  _sum: GameSumAggregateOutputType | null
   _min: GameMinAggregateOutputType | null
   _max: GameMaxAggregateOutputType | null
+}
+
+export type GameAvgAggregateOutputType = {
+  sortOrder: number | null
+}
+
+export type GameSumAggregateOutputType = {
+  sortOrder: number | null
 }
 
 export type GameMinAggregateOutputType = {
@@ -37,6 +47,7 @@ export type GameMinAggregateOutputType = {
   imageUrl: string | null
   imageStoragePath: string | null
   imageAlt: string | null
+  sortOrder: number | null
   isActive: boolean | null
   createdAt: Date | null
 }
@@ -54,6 +65,7 @@ export type GameMaxAggregateOutputType = {
   imageUrl: string | null
   imageStoragePath: string | null
   imageAlt: string | null
+  sortOrder: number | null
   isActive: boolean | null
   createdAt: Date | null
 }
@@ -71,11 +83,20 @@ export type GameCountAggregateOutputType = {
   imageUrl: number
   imageStoragePath: number
   imageAlt: number
+  sortOrder: number
   isActive: number
   createdAt: number
   _all: number
 }
 
+
+export type GameAvgAggregateInputType = {
+  sortOrder?: true
+}
+
+export type GameSumAggregateInputType = {
+  sortOrder?: true
+}
 
 export type GameMinAggregateInputType = {
   id?: true
@@ -90,6 +111,7 @@ export type GameMinAggregateInputType = {
   imageUrl?: true
   imageStoragePath?: true
   imageAlt?: true
+  sortOrder?: true
   isActive?: true
   createdAt?: true
 }
@@ -107,6 +129,7 @@ export type GameMaxAggregateInputType = {
   imageUrl?: true
   imageStoragePath?: true
   imageAlt?: true
+  sortOrder?: true
   isActive?: true
   createdAt?: true
 }
@@ -124,6 +147,7 @@ export type GameCountAggregateInputType = {
   imageUrl?: true
   imageStoragePath?: true
   imageAlt?: true
+  sortOrder?: true
   isActive?: true
   createdAt?: true
   _all?: true
@@ -167,6 +191,18 @@ export type GameAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: GameAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: GameSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: GameMinAggregateInputType
@@ -197,6 +233,8 @@ export type GameGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: GameCountAggregateInputType | true
+  _avg?: GameAvgAggregateInputType
+  _sum?: GameSumAggregateInputType
   _min?: GameMinAggregateInputType
   _max?: GameMaxAggregateInputType
 }
@@ -214,9 +252,12 @@ export type GameGroupByOutputType = {
   imageUrl: string | null
   imageStoragePath: string | null
   imageAlt: string | null
+  sortOrder: number
   isActive: boolean
   createdAt: Date
   _count: GameCountAggregateOutputType | null
+  _avg: GameAvgAggregateOutputType | null
+  _sum: GameSumAggregateOutputType | null
   _min: GameMinAggregateOutputType | null
   _max: GameMaxAggregateOutputType | null
 }
@@ -252,6 +293,7 @@ export type GameWhereInput = {
   imageUrl?: Prisma.StringNullableFilter<"Game"> | string | null
   imageStoragePath?: Prisma.StringNullableFilter<"Game"> | string | null
   imageAlt?: Prisma.StringNullableFilter<"Game"> | string | null
+  sortOrder?: Prisma.IntFilter<"Game"> | number
   isActive?: Prisma.BoolFilter<"Game"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Game"> | Date | string
   servers?: Prisma.GameServerListRelationFilter
@@ -272,6 +314,7 @@ export type GameOrderByWithRelationInput = {
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   imageStoragePath?: Prisma.SortOrderInput | Prisma.SortOrder
   imageAlt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   servers?: Prisma.GameServerOrderByRelationAggregateInput
@@ -295,6 +338,7 @@ export type GameWhereUniqueInput = Prisma.AtLeast<{
   imageUrl?: Prisma.StringNullableFilter<"Game"> | string | null
   imageStoragePath?: Prisma.StringNullableFilter<"Game"> | string | null
   imageAlt?: Prisma.StringNullableFilter<"Game"> | string | null
+  sortOrder?: Prisma.IntFilter<"Game"> | number
   isActive?: Prisma.BoolFilter<"Game"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Game"> | Date | string
   servers?: Prisma.GameServerListRelationFilter
@@ -315,11 +359,14 @@ export type GameOrderByWithAggregationInput = {
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   imageStoragePath?: Prisma.SortOrderInput | Prisma.SortOrder
   imageAlt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.GameCountOrderByAggregateInput
+  _avg?: Prisma.GameAvgOrderByAggregateInput
   _max?: Prisma.GameMaxOrderByAggregateInput
   _min?: Prisma.GameMinOrderByAggregateInput
+  _sum?: Prisma.GameSumOrderByAggregateInput
 }
 
 export type GameScalarWhereWithAggregatesInput = {
@@ -338,6 +385,7 @@ export type GameScalarWhereWithAggregatesInput = {
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
   imageStoragePath?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
   imageAlt?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
+  sortOrder?: Prisma.IntWithAggregatesFilter<"Game"> | number
   isActive?: Prisma.BoolWithAggregatesFilter<"Game"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Game"> | Date | string
 }
@@ -355,6 +403,7 @@ export type GameCreateInput = {
   imageUrl?: string | null
   imageStoragePath?: string | null
   imageAlt?: string | null
+  sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
   servers?: Prisma.GameServerCreateNestedManyWithoutGameInput
@@ -375,6 +424,7 @@ export type GameUncheckedCreateInput = {
   imageUrl?: string | null
   imageStoragePath?: string | null
   imageAlt?: string | null
+  sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
   servers?: Prisma.GameServerUncheckedCreateNestedManyWithoutGameInput
@@ -395,6 +445,7 @@ export type GameUpdateInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   servers?: Prisma.GameServerUpdateManyWithoutGameNestedInput
@@ -415,6 +466,7 @@ export type GameUncheckedUpdateInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   servers?: Prisma.GameServerUncheckedUpdateManyWithoutGameNestedInput
@@ -435,6 +487,7 @@ export type GameCreateManyInput = {
   imageUrl?: string | null
   imageStoragePath?: string | null
   imageAlt?: string | null
+  sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
 }
@@ -452,6 +505,7 @@ export type GameUpdateManyMutationInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -469,6 +523,7 @@ export type GameUncheckedUpdateManyInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -486,8 +541,13 @@ export type GameCountOrderByAggregateInput = {
   imageUrl?: Prisma.SortOrder
   imageStoragePath?: Prisma.SortOrder
   imageAlt?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type GameAvgOrderByAggregateInput = {
+  sortOrder?: Prisma.SortOrder
 }
 
 export type GameMaxOrderByAggregateInput = {
@@ -503,6 +563,7 @@ export type GameMaxOrderByAggregateInput = {
   imageUrl?: Prisma.SortOrder
   imageStoragePath?: Prisma.SortOrder
   imageAlt?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -520,8 +581,13 @@ export type GameMinOrderByAggregateInput = {
   imageUrl?: Prisma.SortOrder
   imageStoragePath?: Prisma.SortOrder
   imageAlt?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type GameSumOrderByAggregateInput = {
+  sortOrder?: Prisma.SortOrder
 }
 
 export type GameScalarRelationFilter = {
@@ -588,6 +654,7 @@ export type GameCreateWithoutServersInput = {
   imageUrl?: string | null
   imageStoragePath?: string | null
   imageAlt?: string | null
+  sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
   listings?: Prisma.ListingCreateNestedManyWithoutGameInput
@@ -607,6 +674,7 @@ export type GameUncheckedCreateWithoutServersInput = {
   imageUrl?: string | null
   imageStoragePath?: string | null
   imageAlt?: string | null
+  sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutGameInput
@@ -642,6 +710,7 @@ export type GameUpdateWithoutServersInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   listings?: Prisma.ListingUpdateManyWithoutGameNestedInput
@@ -661,6 +730,7 @@ export type GameUncheckedUpdateWithoutServersInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   listings?: Prisma.ListingUncheckedUpdateManyWithoutGameNestedInput
@@ -680,6 +750,7 @@ export type GameCreateWithoutListingsInput = {
   imageUrl?: string | null
   imageStoragePath?: string | null
   imageAlt?: string | null
+  sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
   servers?: Prisma.GameServerCreateNestedManyWithoutGameInput
@@ -699,6 +770,7 @@ export type GameUncheckedCreateWithoutListingsInput = {
   imageUrl?: string | null
   imageStoragePath?: string | null
   imageAlt?: string | null
+  sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
   servers?: Prisma.GameServerUncheckedCreateNestedManyWithoutGameInput
@@ -734,6 +806,7 @@ export type GameUpdateWithoutListingsInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   servers?: Prisma.GameServerUpdateManyWithoutGameNestedInput
@@ -753,6 +826,7 @@ export type GameUncheckedUpdateWithoutListingsInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   servers?: Prisma.GameServerUncheckedUpdateManyWithoutGameNestedInput
@@ -772,6 +846,7 @@ export type GameCreateWithoutAdminNotesInput = {
   imageUrl?: string | null
   imageStoragePath?: string | null
   imageAlt?: string | null
+  sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
   servers?: Prisma.GameServerCreateNestedManyWithoutGameInput
@@ -791,6 +866,7 @@ export type GameUncheckedCreateWithoutAdminNotesInput = {
   imageUrl?: string | null
   imageStoragePath?: string | null
   imageAlt?: string | null
+  sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
   servers?: Prisma.GameServerUncheckedCreateNestedManyWithoutGameInput
@@ -826,6 +902,7 @@ export type GameUpdateWithoutAdminNotesInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   servers?: Prisma.GameServerUpdateManyWithoutGameNestedInput
@@ -845,6 +922,7 @@ export type GameUncheckedUpdateWithoutAdminNotesInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageStoragePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   servers?: Prisma.GameServerUncheckedUpdateManyWithoutGameNestedInput
@@ -913,6 +991,7 @@ export type GameSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   imageUrl?: boolean
   imageStoragePath?: boolean
   imageAlt?: boolean
+  sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
   servers?: boolean | Prisma.Game$serversArgs<ExtArgs>
@@ -934,6 +1013,7 @@ export type GameSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   imageUrl?: boolean
   imageStoragePath?: boolean
   imageAlt?: boolean
+  sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["game"]>
@@ -951,6 +1031,7 @@ export type GameSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   imageUrl?: boolean
   imageStoragePath?: boolean
   imageAlt?: boolean
+  sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["game"]>
@@ -968,11 +1049,12 @@ export type GameSelectScalar = {
   imageUrl?: boolean
   imageStoragePath?: boolean
   imageAlt?: boolean
+  sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
 }
 
-export type GameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "nameKo" | "nameCn" | "nameVn" | "namePh" | "nameTh" | "moneyUnitName" | "imageUrl" | "imageStoragePath" | "imageAlt" | "isActive" | "createdAt", ExtArgs["result"]["game"]>
+export type GameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "nameKo" | "nameCn" | "nameVn" | "namePh" | "nameTh" | "moneyUnitName" | "imageUrl" | "imageStoragePath" | "imageAlt" | "sortOrder" | "isActive" | "createdAt", ExtArgs["result"]["game"]>
 export type GameInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   servers?: boolean | Prisma.Game$serversArgs<ExtArgs>
   listings?: boolean | Prisma.Game$listingsArgs<ExtArgs>
@@ -1002,6 +1084,7 @@ export type $GamePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     imageUrl: string | null
     imageStoragePath: string | null
     imageAlt: string | null
+    sortOrder: number
     isActive: boolean
     createdAt: Date
   }, ExtArgs["result"]["game"]>
@@ -1442,6 +1525,7 @@ export interface GameFieldRefs {
   readonly imageUrl: Prisma.FieldRef<"Game", 'String'>
   readonly imageStoragePath: Prisma.FieldRef<"Game", 'String'>
   readonly imageAlt: Prisma.FieldRef<"Game", 'String'>
+  readonly sortOrder: Prisma.FieldRef<"Game", 'Int'>
   readonly isActive: Prisma.FieldRef<"Game", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Game", 'DateTime'>
 }

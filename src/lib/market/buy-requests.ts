@@ -231,9 +231,7 @@ export async function getMarketplaceBuyRequestFormView(): Promise<MarketplaceBuy
           },
         },
       },
-      orderBy: {
-        name: "asc",
-      },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     }),
   ]);
 
@@ -289,9 +287,7 @@ export async function getMarketplaceBuyRequests(
         },
       },
     },
-    orderBy: {
-      name: "asc",
-    },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
   const gameById = new Map(games.map((item) => [item.id, item]));
   const serverById = new Map(
@@ -475,6 +471,7 @@ export async function getMarketplaceMyBuyRequests(): Promise<MarketplaceMyBuyReq
       include: {
         servers: true,
       },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     }),
   ]);
   const gameById = new Map(games.map((game) => [game.id, game]));

@@ -395,9 +395,7 @@ export async function getMarketplaceSellerListingFormView(): Promise<Marketplace
         },
       },
     },
-    orderBy: {
-      name: "asc",
-    },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
 
   return {

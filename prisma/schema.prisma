@@ -281,11 +281,14 @@ model Game {
   imageUrl         String?
   imageStoragePath String?
   imageAlt         String?
+  sortOrder         Int             @default(100)
   isActive      Boolean         @default(true)
   createdAt     DateTime        @default(now())
   servers       GameServer[]
   listings      Listing[]
   adminNotes AdminGameNote[]
+
+  @@index([isActive, sortOrder])
 }
 
 model GameServer {

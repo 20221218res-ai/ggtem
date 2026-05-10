@@ -143,6 +143,7 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
               <Field name="name" label="게임명" placeholder="Lineage W" />
               <Field name="code" label="게임 코드" placeholder="lineage-w" />
               <Field name="moneyUnitName" label="게임머니 단위" placeholder="아데나" />
+              <Field name="sortOrder" label="노출 순서" placeholder="1" />
               <Field name="nameKo" label="한국어 게임명" placeholder="리니지W" />
               <Field name="nameCn" label="중국어 게임명" placeholder="天堂W" />
               <Field name="nameVn" label="베트남어 게임명" placeholder="Lineage W" />
@@ -258,6 +259,7 @@ function GameCard({ game }: { game: GameRow }) {
               <h2 className="truncate text-2xl font-black">{game.name}</h2>
               <Pill tone={game.isActive ? "green" : "slate"}>{game.isActive ? "활성" : "숨김"}</Pill>
               <Pill tone="cyan">{game.code}</Pill>
+              <Pill tone="slate">순서 {game.sortOrder}</Pill>
             </div>
             <p className="mt-2 text-sm font-bold text-slate-500">
               서버 {game.servers.length}개 / 판매글 {game.listingCount}개 / 구매요청 {game.buyRequestCount}개
@@ -287,6 +289,7 @@ function GameCard({ game }: { game: GameRow }) {
             <Field name="name" label="게임명" defaultValue={game.name} />
             <Field name="code" label="게임 코드" defaultValue={game.code} />
             <Field name="moneyUnitName" label="게임머니 단위" defaultValue={game.moneyUnitName} />
+            <Field name="sortOrder" label="노출 순서" defaultValue={String(game.sortOrder)} />
             <Field name="nameKo" label="한국어 게임명" defaultValue={game.nameKo || ""} />
             <Field name="nameCn" label="중국어 게임명" defaultValue={game.nameCn || ""} />
             <Field name="nameVn" label="베트남어 게임명" defaultValue={game.nameVn || ""} />

@@ -3270,6 +3270,7 @@ export const GameScalarFieldEnum = {
   imageUrl: 'imageUrl',
   imageStoragePath: 'imageStoragePath',
   imageAlt: 'imageAlt',
+  sortOrder: 'sortOrder',
   isActive: 'isActive',
   createdAt: 'createdAt'
 } as const

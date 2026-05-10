@@ -320,7 +320,7 @@ export async function getAdminReportsState(filters?: AdminReportFilters) {
     prisma.user.count({ where: userWhere }),
     prisma.adminAuditLog.count({ where: auditWhere }),
     prisma.game.findMany({
-      orderBy: { name: "asc" },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       include: { servers: { orderBy: { name: "asc" } } },
     }),
   ]);
