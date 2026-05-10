@@ -33,7 +33,7 @@ export default async function AdminCmsPage() {
     >
       <MetricGrid
         items={[
-          { label: "전체 문서", value: String(state.summary.totalDocuments), hint: "CMS 문서 수", tone: "blue" },
+          { label: "전체 문서", value: String(state.summary.totalDocuments), hint: "CMS 문서", tone: "blue" },
           { label: "게시중", value: String(state.summary.publishedDocuments), hint: "유저에게 노출", tone: "green" },
           { label: "초안", value: String(state.summary.draftDocuments), hint: "작성 중", tone: "amber" },
           { label: "검토 요청", value: String(state.summary.reviewRequestedDocuments), hint: "승인 필요", tone: "cyan" },
@@ -45,7 +45,7 @@ export default async function AdminCmsPage() {
       <section className="grid gap-5 xl:grid-cols-[420px_1fr]">
         <Panel title="고객센터 문서 작성">
           <SoftNotice tone="cyan">
-            공지사항, FAQ, 회원정책, 유료 서비스, 게임/서버 신청 안내는 유저 고객센터에 바로 반영됩니다.
+            공지사항, FAQ, 회원정책, 유료 서비스, 게임/서버 신청 안내는 게시중으로 저장하면 유저 고객센터에 바로 반영됩니다.
           </SoftNotice>
           <form action={saveCmsDocumentAction} className="mt-5 grid gap-4">
             <label className="grid gap-2 text-sm font-black">
@@ -72,7 +72,7 @@ export default async function AdminCmsPage() {
               <input
                 name="title"
                 required
-                placeholder="고객센터에 표시할 제목"
+                placeholder="고객센터에 표시될 제목"
                 className="h-11 rounded-md border border-slate-200 px-3 font-bold"
               />
             </label>
@@ -99,7 +99,7 @@ export default async function AdminCmsPage() {
               변경 메모
               <input
                 name="changeNote"
-                placeholder="예: 고객센터 초기 문구 정리"
+                placeholder="예: 고객센터 운영 문구 수정"
                 className="h-11 rounded-md border border-slate-200 px-3 font-bold"
               />
             </label>
@@ -139,7 +139,7 @@ export default async function AdminCmsPage() {
               <input type="hidden" name="slug" value={document.slug} />
               <input type="hidden" name="type" value={document.type} />
               <div className="flex items-center justify-between gap-3">
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-xs font-black text-[var(--color-primary)]">{document.typeLabel}</p>
                   <input
                     name="title"

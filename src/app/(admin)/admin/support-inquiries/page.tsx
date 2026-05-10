@@ -12,7 +12,7 @@ import {
 const inquiryStatusOptions = [
   { value: "OPEN", label: "접수" },
   { value: "IN_PROGRESS", label: "확인중" },
-  { value: "ANSWERED", label: "답변완료" },
+  { value: "ANSWERED", label: "답변 완료" },
   { value: "CLOSED", label: "종료" },
 ] as const;
 
@@ -47,20 +47,20 @@ export default async function AdminSupportInquiriesPage() {
     <AdminMockPage
       icon="문의"
       title="1:1 문의"
-      subtitle="유저 고객센터에서 접수된 문의를 확인하고 답변 메모를 남깁니다."
+      subtitle="유저 고객센터에서 접수된 문의와 신규 게임/서버 신청을 확인하고 답변을 남깁니다."
     >
       <MetricGrid
         items={[
           { label: "전체 문의", value: String(inquiries.length), hint: "최근 80건", tone: "blue" },
           { label: "접수", value: String(statusCounts.get("OPEN") ?? 0), hint: "확인 필요", tone: "amber" },
           { label: "확인중", value: String(statusCounts.get("IN_PROGRESS") ?? 0), hint: "처리 중", tone: "cyan" },
-          { label: "답변완료", value: String(statusCounts.get("ANSWERED") ?? 0), hint: "유저 노출", tone: "green" },
+          { label: "답변 완료", value: String(statusCounts.get("ANSWERED") ?? 0), hint: "유저 화면 노출", tone: "green" },
         ]}
       />
 
       <Panel title="문의 목록">
         <DataTable
-          headers={["종류", "회원", "문의", "상태", "접수일"]}
+          headers={["종류", "회원", "문의 내용", "상태", "접수일"]}
           rows={inquiries.map((inquiry) => [
             inquiryCategoryLabel(inquiry.category),
             <div key={`${inquiry.id}-user`}>
@@ -89,8 +89,8 @@ export default async function AdminSupportInquiriesPage() {
                 <textarea
                   name="adminNote"
                   defaultValue={inquiry.adminNote ?? ""}
-                  rows={3}
-                  placeholder="유저에게 보여줄 답변 메모를 입력하세요."
+                  rows={4}
+                  placeholder="유저에게 보여줄 답변을 입력하세요."
                   className="rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold leading-6"
                 />
                 <button type="submit" className="rounded-md bg-slate-950 px-3 py-2 text-xs font-black text-white">

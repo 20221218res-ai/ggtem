@@ -58,10 +58,7 @@ export async function getCustomerCenterDocuments() {
         },
       },
     },
-    orderBy: [
-      { type: "asc" },
-      { updatedAt: "desc" },
-    ],
+    orderBy: [{ type: "asc" }, { updatedAt: "desc" }],
   });
 
   return documents.flatMap((document) => {

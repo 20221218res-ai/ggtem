@@ -60,14 +60,7 @@ export async function getAdminCmsState(): Promise<AdminCmsState> {
           },
         },
       },
-      orderBy: [
-        {
-          type: "asc",
-        },
-        {
-          updatedAt: "desc",
-        },
-      ],
+      orderBy: [{ type: "asc" }, { updatedAt: "desc" }],
     }),
     prisma.cmsDocument.groupBy({
       by: ["status"],

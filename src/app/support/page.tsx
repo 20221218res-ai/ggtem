@@ -85,14 +85,13 @@ export default async function CustomerCenterPage({
             ))}
           </nav>
 
-          {selected.key === "faq" ? (
-            <FaqSearch query={query} />
-          ) : null}
+          {selected.key === "faq" ? <FaqSearch query={query} /> : null}
 
           {selected.key === "inquiry" ? (
             <InquiryPanel
               isSignedIn={Boolean(currentUser)}
               submitted={params.submitted === "1"}
+              error={params.error === "invalid"}
               inquiries={myInquiries.map((inquiry) => ({
                 id: inquiry.id,
                 category: inquiry.category,
@@ -107,6 +106,7 @@ export default async function CustomerCenterPage({
               documents={searchedDocuments}
               isSignedIn={Boolean(currentUser)}
               submitted={params.submitted === "1"}
+              error={params.error === "invalid"}
             />
           ) : (
             <DocumentList title={selected.label} documents={searchedDocuments} />
@@ -134,7 +134,7 @@ function CustomerSidebar() {
         <p className="text-sm font-black text-slate-500">고객지원센터</p>
         <p className="mt-2 text-2xl font-black text-slate-950">온라인 문의</p>
         <p className="mt-3 text-sm font-bold leading-6 text-slate-600">
-          충전, 출금, 분쟁, 계정 거래 문의는 로그인 후 주문/지갑 화면에서 접수하면 더 빠르게 확인할 수 있습니다.
+          충전, 출금, 분쟁, 계정 거래 문의는 로그인 후 1:1 문의로 접수하면 운영자가 확인합니다.
         </p>
       </div>
       <Link
@@ -157,7 +157,7 @@ function FaqSearch({ query }: { query: string }) {
         id="support-search"
         name="q"
         defaultValue={query}
-        placeholder="궁금하신 내용을 검색해 주세요."
+        placeholder="궁금한 내용을 검색해 주세요."
         className="h-12 w-full rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
       />
     </form>
@@ -201,10 +201,12 @@ function DocumentList({
 function InquiryPanel({
   isSignedIn,
   submitted,
+  error,
   inquiries,
 }: {
   isSignedIn: boolean;
   submitted: boolean;
+  error: boolean;
   inquiries: Array<{
     id: string;
     category: string;
@@ -219,14 +221,9 @@ function InquiryPanel({
       <div className="rounded-lg border border-[var(--gg-border)] bg-white p-6">
         <h2 className="text-xl font-black">1:1 문의</h2>
         <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
-          충전, 출금, 분쟁, 계정 거래처럼 운영자 확인이 필요한 내용을 접수하세요.
-          접수 내용은 어드민 문의함에 표시되며 운영자가 확인 후 답변합니다.
+          충전, 출금, 분쟁, 계정 거래처럼 운영자 확인이 필요한 내용을 접수하세요. 답변은 내 문의 내역에 표시됩니다.
         </p>
-        {submitted ? (
-          <div className="mt-5 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm font-black text-cyan-800">
-            문의가 접수되었습니다. 운영자가 확인 후 답변 메모를 남깁니다.
-          </div>
-        ) : null}
+        <SupportNotice submitted={submitted} error={error} successText="문의가 접수되었습니다. 운영자가 확인 후 답변을 남깁니다." />
         {isSignedIn ? (
           <form action={createSupportInquiryAction} className="mt-5 grid gap-4">
             <label className="grid gap-2 text-sm font-black">
@@ -267,58 +264,11 @@ function InquiryPanel({
             </button>
           </form>
         ) : (
-          <div className="mt-5 rounded-lg border border-[var(--gg-border)] bg-slate-50 p-4">
-            <p className="text-sm font-bold text-slate-600">1:1 문의 접수는 로그인 후 이용할 수 있습니다.</p>
-            <Link
-              href="/sign-in?next=/support?tab=inquiry"
-              prefetch={false}
-              className="mt-3 inline-flex rounded-lg bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-white"
-            >
-              로그인하고 문의하기
-            </Link>
-          </div>
+          <SignInPrompt next="/support?tab=inquiry" label="로그인하고 문의하기" />
         )}
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
-        {["입금자명과 회원명이 달라요", "출금 처리가 되지 않아요", "마일리지 충전이 되지 않아요"].map((title, index) => (
-          <div key={title} className="rounded-lg border border-[var(--gg-border)] bg-white p-5">
-            <span className="rounded bg-[color-mix(in_srgb,var(--gg-accent)_18%,white)] px-2 py-1 text-xs font-black text-[var(--gg-accent)]">
-              TOP {index + 1}
-            </span>
-            <p className="mt-4 text-sm font-black leading-6">{title}</p>
-          </div>
-        ))}
-      </div>
-      {isSignedIn ? (
-        <section className="rounded-lg border border-[var(--gg-border)] bg-white">
-          <div className="border-b border-[var(--gg-border)] px-5 py-4">
-            <h3 className="text-lg font-black">내 문의 내역</h3>
-          </div>
-          <div className="divide-y divide-[var(--gg-border)]">
-            {inquiries.length ? (
-              inquiries.map((inquiry) => (
-                <div key={inquiry.id} className="grid gap-2 px-5 py-4 text-sm sm:grid-cols-[110px_1fr_100px]">
-                  <span className="font-black text-[var(--gg-accent)]">{inquiryCategoryLabel(inquiry.category)}</span>
-                  <div>
-                    <p className="font-black text-slate-950">{inquiry.title}</p>
-                    {inquiry.adminNote ? (
-                      <p className="mt-2 rounded-lg bg-slate-50 p-3 text-sm font-semibold leading-6 text-slate-600">
-                        운영자 답변: {inquiry.adminNote}
-                      </p>
-                    ) : null}
-                  </div>
-                  <div className="text-right">
-                    <p className="font-black text-slate-700">{supportInquiryStatusLabel(inquiry.status)}</p>
-                    <p className="mt-1 text-xs font-bold text-slate-500">{inquiry.createdAt}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="px-5 py-8 text-sm font-bold text-slate-500">아직 접수한 문의가 없습니다.</p>
-            )}
-          </div>
-        </section>
-      ) : null}
+      <TopQuestions />
+      {isSignedIn ? <InquiryHistory inquiries={inquiries} /> : null}
     </section>
   );
 }
@@ -327,23 +277,21 @@ function GameRequestPanel({
   documents,
   isSignedIn,
   submitted,
+  error,
 }: {
   documents: Array<{ slug: string; typeLabel: string; title: string; body: string; updatedAt: string }>;
   isSignedIn: boolean;
   submitted: boolean;
+  error: boolean;
 }) {
   return (
     <section className="grid gap-5">
       <div className="rounded-lg border border-[var(--gg-border)] bg-white p-6">
         <h2 className="text-xl font-black">게임 / 서버 신청</h2>
         <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
-          원하는 게임이나 서버가 목록에 없으면 이곳에서 신청하세요. 접수 내용은 어드민 문의함에서 검토합니다.
+          원하는 게임이나 서버가 목록에 없으면 아래 폼으로 요청하세요. 접수 내용은 어드민 1:1 문의 화면에서 검토됩니다.
         </p>
-        {submitted ? (
-          <div className="mt-5 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm font-black text-cyan-800">
-            게임/서버 신청이 접수되었습니다. 운영자가 검토 후 반영 여부를 답변합니다.
-          </div>
-        ) : null}
+        <SupportNotice submitted={submitted} error={error} successText="게임/서버 신청이 접수되었습니다. 운영자가 검토 후 반영 여부를 답변합니다." />
         {isSignedIn ? (
           <form action={createGameServerRequestAction} className="mt-6 grid gap-4">
             <label className="grid gap-2 text-sm font-black">
@@ -372,7 +320,7 @@ function GameRequestPanel({
                   name="serverName"
                   maxLength={80}
                   className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold"
-                  placeholder="신규 서버 신청일 때 입력"
+                  placeholder="신규 서버 신청 시 입력"
                 />
               </label>
             </div>
@@ -394,7 +342,7 @@ function GameRequestPanel({
                 maxLength={2000}
                 rows={5}
                 className="rounded-lg border border-[var(--gg-border)] px-4 py-3 text-sm font-bold leading-6"
-                placeholder="거래 수요, 서버명, 필요한 카테고리 등을 적어 주세요."
+                placeholder="거래 수요, 서버명, 필요한 카테고리를 적어 주세요."
               />
             </label>
             <button type="submit" className="h-12 rounded-lg bg-[var(--gg-accent)] px-4 text-sm font-black text-white">
@@ -402,19 +350,112 @@ function GameRequestPanel({
             </button>
           </form>
         ) : (
-          <div className="mt-5 rounded-lg border border-[var(--gg-border)] bg-slate-50 p-4">
-            <p className="text-sm font-bold text-slate-600">게임/서버 신청은 로그인 후 접수할 수 있습니다.</p>
-            <Link
-              href="/sign-in?next=/support?tab=game-request"
-              prefetch={false}
-              className="mt-3 inline-flex rounded-lg bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-white"
-            >
-              로그인하고 신청하기
-            </Link>
-          </div>
+          <SignInPrompt next="/support?tab=game-request" label="로그인하고 신청하기" />
         )}
       </div>
       <DocumentList title="신청 안내" documents={documents} />
+    </section>
+  );
+}
+
+function SupportNotice({ submitted, error, successText }: { submitted: boolean; error: boolean; successText: string }) {
+  if (submitted) {
+    return (
+      <div className="mt-5 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm font-black text-cyan-800">
+        {successText}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-black text-red-700">
+        제목과 내용을 조금 더 자세히 입력해 주세요.
+      </div>
+    );
+  }
+
+  return null;
+}
+
+function SignInPrompt({ next, label }: { next: string; label: string }) {
+  return (
+    <div className="mt-5 rounded-lg border border-[var(--gg-border)] bg-slate-50 p-4">
+      <p className="text-sm font-bold text-slate-600">로그인 후 접수할 수 있습니다.</p>
+      <Link
+        href={`/sign-in?next=${encodeURIComponent(next)}`}
+        prefetch={false}
+        className="mt-3 inline-flex rounded-lg bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-white"
+      >
+        {label}
+      </Link>
+    </div>
+  );
+}
+
+function TopQuestions() {
+  const questions = [
+    "입금자명과 회원명이 달라요",
+    "출금 처리가 되지 않아요",
+    "마일리지 충전이 되지 않아요",
+    "계정 거래 정보는 어디에 입력하나요",
+    "분쟁은 어떻게 접수하나요",
+  ];
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
+      {questions.map((title, index) => (
+        <div key={title} className="rounded-lg border border-[var(--gg-border)] bg-white p-5">
+          <span className="rounded bg-[color-mix(in_srgb,var(--gg-accent)_18%,white)] px-2 py-1 text-xs font-black text-[var(--gg-accent)]">
+            TOP {index + 1}
+          </span>
+          <p className="mt-4 text-sm font-black leading-6">{title}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function InquiryHistory({
+  inquiries,
+}: {
+  inquiries: Array<{
+    id: string;
+    category: string;
+    title: string;
+    status: string;
+    adminNote: string | null;
+    createdAt: string;
+  }>;
+}) {
+  return (
+    <section className="rounded-lg border border-[var(--gg-border)] bg-white">
+      <div className="border-b border-[var(--gg-border)] px-5 py-4">
+        <h3 className="text-lg font-black">내 문의 내역</h3>
+      </div>
+      <div className="divide-y divide-[var(--gg-border)]">
+        {inquiries.length ? (
+          inquiries.map((inquiry) => (
+            <div key={inquiry.id} className="grid gap-2 px-5 py-4 text-sm sm:grid-cols-[110px_1fr_100px]">
+              <span className="font-black text-[var(--gg-accent)]">{inquiryCategoryLabel(inquiry.category)}</span>
+              <div>
+                <p className="font-black text-slate-950">{inquiry.title}</p>
+                {inquiry.adminNote ? (
+                  <p className="mt-2 whitespace-pre-line rounded-lg bg-slate-50 p-3 text-sm font-semibold leading-6 text-slate-600">
+                    운영자 답변: {inquiry.adminNote}
+                  </p>
+                ) : null}
+              </div>
+              <div className="text-right">
+                <p className="font-black text-slate-700">{supportInquiryStatusLabel(inquiry.status)}</p>
+                <p className="mt-1 text-xs font-bold text-slate-500">{inquiry.createdAt}</p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="px-5 py-8 text-sm font-bold text-slate-500">아직 접수한 문의가 없습니다.</p>
+        )}
+      </div>
     </section>
   );
 }
@@ -500,7 +541,7 @@ function supportInquiryStatusLabel(status: string) {
   const labels: Record<string, string> = {
     OPEN: "접수",
     IN_PROGRESS: "확인중",
-    ANSWERED: "답변완료",
+    ANSWERED: "답변 완료",
     CLOSED: "종료",
   };
 
