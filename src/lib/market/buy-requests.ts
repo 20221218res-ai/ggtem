@@ -21,6 +21,7 @@ import {
   type LocalizedGameNames,
   mapGameLocalizedNames,
 } from "@/lib/market/game-localization";
+import { resolveGameNameFilter } from "@/lib/market/game-name-filter";
 import { normalizeServerDetail, validateServerDetail } from "@/lib/market/server-detail-options";
 
 const MARKET_USER_EMAIL = "user-demo@ggitem.local";
@@ -280,7 +281,8 @@ export async function getMarketplaceBuyRequests(
 ): Promise<MarketplaceBuyRequestsView> {
   const prisma = getPrismaClient();
   const normalizedQuery = filters?.query?.trim() ?? "";
-  const normalizedGame = filters?.game?.trim() ?? "";
+  const gameFilter = await resolveGameNameFilter(prisma, filters?.game);
+  const normalizedGame = gameFilter.gameName;
   const normalizedCategory = filters?.category?.trim() ?? "";
   const normalizedSort = filters?.sort?.trim() || "latest";
   const normalizedServer = filters?.server?.trim() ?? "";

@@ -108,6 +108,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
           sort: resolvedSearchParams?.sort,
           accountTransferType: selectedAccountType || undefined,
         });
+  const canonicalSelectedGame = view.appliedFilters.game || selectedGame;
 
   const categorySeedView = selectedGame
     ? selectedMode === "buy"
@@ -147,12 +148,12 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
         <MarketCategoryHeader
           selectedCategory={selectedCategory}
           selectedMode={selectedMode}
-          selectedGame={selectedGame}
+          selectedGame={canonicalSelectedGame}
         />
         <TradeModeSelector
           selectedCategory={selectedCategory}
           selectedMode={selectedMode}
-          selectedGame={selectedGame}
+          selectedGame={canonicalSelectedGame}
         />
 
         {shouldShowResults ? (
@@ -161,12 +162,12 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
               <ServerPriceSelector
                 selectedCategory={selectedCategory}
                 selectedMode={selectedMode}
-                selectedGame={selectedGame}
+                selectedGame={canonicalSelectedGame}
                 selectedServer={selectedServer}
                 selectedServerDetail={selectedServerDetail}
                 serverOptions={view.filterOptions.serverOptions}
                 serverDetailOptions={getServerDetailOptionsForGameCode(
-                  view.filterOptions.gameOptions.find((game) => game.name === selectedGame)?.code,
+                  view.filterOptions.gameOptions.find((game) => game.name === canonicalSelectedGame)?.code,
                 )}
                 minPrice={minPrice}
                 maxPrice={maxPrice}
@@ -177,7 +178,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
               items={visibleItems}
               selectedCategory={selectedCategory}
               selectedMode={selectedMode}
-              selectedGame={selectedGame}
+              selectedGame={canonicalSelectedGame}
               query={query}
               selectedServer={selectedServer}
               selectedServerDetail={selectedServerDetail}
