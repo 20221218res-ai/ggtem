@@ -81,6 +81,7 @@ export const ModelName = {
   AdminAuditLog: 'AdminAuditLog',
   CmsDocument: 'CmsDocument',
   CmsDocumentVersion: 'CmsDocumentVersion',
+  SupportInquiry: 'SupportInquiry',
   AdminSlaIncident: 'AdminSlaIncident',
   AdminSlaIncidentNote: 'AdminSlaIncidentNote',
   AdminFinanceCloseReport: 'AdminFinanceCloseReport',
@@ -598,6 +599,21 @@ export const CmsDocumentVersionScalarFieldEnum = {
 } as const
 
 export type CmsDocumentVersionScalarFieldEnum = (typeof CmsDocumentVersionScalarFieldEnum)[keyof typeof CmsDocumentVersionScalarFieldEnum]
+
+
+export const SupportInquiryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  category: 'category',
+  title: 'title',
+  body: 'body',
+  status: 'status',
+  adminNote: 'adminNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupportInquiryScalarFieldEnum = (typeof SupportInquiryScalarFieldEnum)[keyof typeof SupportInquiryScalarFieldEnum]
 
 
 export const AdminSlaIncidentScalarFieldEnum = {

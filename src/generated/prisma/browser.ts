@@ -168,6 +168,11 @@ export type CmsDocument = Prisma.CmsDocumentModel
  */
 export type CmsDocumentVersion = Prisma.CmsDocumentVersionModel
 /**
+ * Model SupportInquiry
+ * 
+ */
+export type SupportInquiry = Prisma.SupportInquiryModel
+/**
  * Model AdminSlaIncident
  * 
  */

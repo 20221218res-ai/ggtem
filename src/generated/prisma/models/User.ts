@@ -241,6 +241,7 @@ export type UserWhereInput = {
   sellerChatRooms?: Prisma.ChatRoomListRelationFilter
   sentChatMessages?: Prisma.ChatMessageListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  supportInquiries?: Prisma.SupportInquiryListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -280,6 +281,7 @@ export type UserOrderByWithRelationInput = {
   sellerChatRooms?: Prisma.ChatRoomOrderByRelationAggregateInput
   sentChatMessages?: Prisma.ChatMessageOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
+  supportInquiries?: Prisma.SupportInquiryOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -322,6 +324,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   sellerChatRooms?: Prisma.ChatRoomListRelationFilter
   sentChatMessages?: Prisma.ChatMessageListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  supportInquiries?: Prisma.SupportInquiryListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -391,6 +394,7 @@ export type UserCreateInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -430,6 +434,7 @@ export type UserUncheckedCreateInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -469,6 +474,7 @@ export type UserUpdateInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -508,6 +514,7 @@ export type UserUncheckedUpdateInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -900,6 +907,22 @@ export type UserUpdateOneWithoutAdminAuditLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAdminAuditLogsInput, Prisma.UserUpdateWithoutAdminAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAdminAuditLogsInput>
 }
 
+export type UserCreateNestedOneWithoutSupportInquiriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportInquiriesInput, Prisma.UserUncheckedCreateWithoutSupportInquiriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportInquiriesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutSupportInquiriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportInquiriesInput, Prisma.UserUncheckedCreateWithoutSupportInquiriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportInquiriesInput
+  upsert?: Prisma.UserUpsertWithoutSupportInquiriesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSupportInquiriesInput, Prisma.UserUpdateWithoutSupportInquiriesInput>, Prisma.UserUncheckedUpdateWithoutSupportInquiriesInput>
+}
+
 export type UserCreateNestedOneWithoutSlaIncidentNotesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSlaIncidentNotesInput, Prisma.UserUncheckedCreateWithoutSlaIncidentNotesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSlaIncidentNotesInput
@@ -1034,6 +1057,7 @@ export type UserCreateWithoutSessionsInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -1072,6 +1096,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1126,6 +1151,7 @@ export type UserUpdateWithoutSessionsInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1164,6 +1190,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPasswordResetTokensInput = {
@@ -1202,6 +1229,7 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -1240,6 +1268,7 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -1294,6 +1323,7 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -1332,6 +1362,7 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailVerificationTokensInput = {
@@ -1370,6 +1401,7 @@ export type UserCreateWithoutEmailVerificationTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
@@ -1408,6 +1440,7 @@ export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailVerificationTokensInput = {
@@ -1462,6 +1495,7 @@ export type UserUpdateWithoutEmailVerificationTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
@@ -1500,6 +1534,7 @@ export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailVerificationLoginTokensInput = {
@@ -1538,6 +1573,7 @@ export type UserCreateWithoutEmailVerificationLoginTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailVerificationLoginTokensInput = {
@@ -1576,6 +1612,7 @@ export type UserUncheckedCreateWithoutEmailVerificationLoginTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailVerificationLoginTokensInput = {
@@ -1630,6 +1667,7 @@ export type UserUpdateWithoutEmailVerificationLoginTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailVerificationLoginTokensInput = {
@@ -1668,6 +1706,7 @@ export type UserUncheckedUpdateWithoutEmailVerificationLoginTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAdminInviteTokensInput = {
@@ -1706,6 +1745,7 @@ export type UserCreateWithoutAdminInviteTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminInviteTokensInput = {
@@ -1744,6 +1784,7 @@ export type UserUncheckedCreateWithoutAdminInviteTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminInviteTokensInput = {
@@ -1787,6 +1828,7 @@ export type UserCreateWithoutAdminInvitesCreatedInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminInvitesCreatedInput = {
@@ -1825,6 +1867,7 @@ export type UserUncheckedCreateWithoutAdminInvitesCreatedInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminInvitesCreatedInput = {
@@ -1879,6 +1922,7 @@ export type UserUpdateWithoutAdminInviteTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminInviteTokensInput = {
@@ -1917,6 +1961,7 @@ export type UserUncheckedUpdateWithoutAdminInviteTokensInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutAdminInvitesCreatedInput = {
@@ -1966,6 +2011,7 @@ export type UserUpdateWithoutAdminInvitesCreatedInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminInvitesCreatedInput = {
@@ -2004,6 +2050,7 @@ export type UserUncheckedUpdateWithoutAdminInvitesCreatedInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutWalletInput = {
@@ -2042,6 +2089,7 @@ export type UserCreateWithoutWalletInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWalletInput = {
@@ -2080,6 +2128,7 @@ export type UserUncheckedCreateWithoutWalletInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWalletInput = {
@@ -2134,6 +2183,7 @@ export type UserUpdateWithoutWalletInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletInput = {
@@ -2172,6 +2222,7 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutListingsInput = {
@@ -2210,6 +2261,7 @@ export type UserCreateWithoutListingsInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutListingsInput = {
@@ -2248,6 +2300,7 @@ export type UserUncheckedCreateWithoutListingsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutListingsInput = {
@@ -2302,6 +2355,7 @@ export type UserUpdateWithoutListingsInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutListingsInput = {
@@ -2340,6 +2394,7 @@ export type UserUncheckedUpdateWithoutListingsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBuyRequestsInput = {
@@ -2378,6 +2433,7 @@ export type UserCreateWithoutBuyRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBuyRequestsInput = {
@@ -2416,6 +2472,7 @@ export type UserUncheckedCreateWithoutBuyRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBuyRequestsInput = {
@@ -2470,6 +2527,7 @@ export type UserUpdateWithoutBuyRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBuyRequestsInput = {
@@ -2508,6 +2566,7 @@ export type UserUncheckedUpdateWithoutBuyRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBuyRequestOffersInput = {
@@ -2546,6 +2605,7 @@ export type UserCreateWithoutBuyRequestOffersInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBuyRequestOffersInput = {
@@ -2584,6 +2644,7 @@ export type UserUncheckedCreateWithoutBuyRequestOffersInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBuyRequestOffersInput = {
@@ -2638,6 +2699,7 @@ export type UserUpdateWithoutBuyRequestOffersInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBuyRequestOffersInput = {
@@ -2676,6 +2738,7 @@ export type UserUncheckedUpdateWithoutBuyRequestOffersInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBuyerOrdersInput = {
@@ -2714,6 +2777,7 @@ export type UserCreateWithoutBuyerOrdersInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBuyerOrdersInput = {
@@ -2752,6 +2816,7 @@ export type UserUncheckedCreateWithoutBuyerOrdersInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBuyerOrdersInput = {
@@ -2795,6 +2860,7 @@ export type UserCreateWithoutSellerOrdersInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSellerOrdersInput = {
@@ -2833,6 +2899,7 @@ export type UserUncheckedCreateWithoutSellerOrdersInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSellerOrdersInput = {
@@ -2887,6 +2954,7 @@ export type UserUpdateWithoutBuyerOrdersInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBuyerOrdersInput = {
@@ -2925,6 +2993,7 @@ export type UserUncheckedUpdateWithoutBuyerOrdersInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutSellerOrdersInput = {
@@ -2974,6 +3043,7 @@ export type UserUpdateWithoutSellerOrdersInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSellerOrdersInput = {
@@ -3012,6 +3082,7 @@ export type UserUncheckedUpdateWithoutSellerOrdersInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBuyerChatRoomsInput = {
@@ -3050,6 +3121,7 @@ export type UserCreateWithoutBuyerChatRoomsInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBuyerChatRoomsInput = {
@@ -3088,6 +3160,7 @@ export type UserUncheckedCreateWithoutBuyerChatRoomsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBuyerChatRoomsInput = {
@@ -3131,6 +3204,7 @@ export type UserCreateWithoutSellerChatRoomsInput = {
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSellerChatRoomsInput = {
@@ -3169,6 +3243,7 @@ export type UserUncheckedCreateWithoutSellerChatRoomsInput = {
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSellerChatRoomsInput = {
@@ -3223,6 +3298,7 @@ export type UserUpdateWithoutBuyerChatRoomsInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBuyerChatRoomsInput = {
@@ -3261,6 +3337,7 @@ export type UserUncheckedUpdateWithoutBuyerChatRoomsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutSellerChatRoomsInput = {
@@ -3310,6 +3387,7 @@ export type UserUpdateWithoutSellerChatRoomsInput = {
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSellerChatRoomsInput = {
@@ -3348,6 +3426,7 @@ export type UserUncheckedUpdateWithoutSellerChatRoomsInput = {
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSentChatMessagesInput = {
@@ -3386,6 +3465,7 @@ export type UserCreateWithoutSentChatMessagesInput = {
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSentChatMessagesInput = {
@@ -3424,6 +3504,7 @@ export type UserUncheckedCreateWithoutSentChatMessagesInput = {
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSentChatMessagesInput = {
@@ -3478,6 +3559,7 @@ export type UserUpdateWithoutSentChatMessagesInput = {
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentChatMessagesInput = {
@@ -3516,6 +3598,7 @@ export type UserUncheckedUpdateWithoutSentChatMessagesInput = {
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReviewsGivenInput = {
@@ -3554,6 +3637,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsGivenInput = {
@@ -3592,6 +3676,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsGivenInput = {
@@ -3635,6 +3720,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsReceivedInput = {
@@ -3673,6 +3759,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsReceivedInput = {
@@ -3727,6 +3814,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsGivenInput = {
@@ -3765,6 +3853,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReviewsReceivedInput = {
@@ -3814,6 +3903,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
@@ -3852,6 +3942,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDepositRequestsInput = {
@@ -3890,6 +3981,7 @@ export type UserCreateWithoutDepositRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDepositRequestsInput = {
@@ -3928,6 +4020,7 @@ export type UserUncheckedCreateWithoutDepositRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDepositRequestsInput = {
@@ -3982,6 +4075,7 @@ export type UserUpdateWithoutDepositRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDepositRequestsInput = {
@@ -4020,6 +4114,7 @@ export type UserUncheckedUpdateWithoutDepositRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutWithdrawalRequestsInput = {
@@ -4058,6 +4153,7 @@ export type UserCreateWithoutWithdrawalRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWithdrawalRequestsInput = {
@@ -4096,6 +4192,7 @@ export type UserUncheckedCreateWithoutWithdrawalRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWithdrawalRequestsInput = {
@@ -4150,6 +4247,7 @@ export type UserUpdateWithoutWithdrawalRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWithdrawalRequestsInput = {
@@ -4188,6 +4286,7 @@ export type UserUncheckedUpdateWithoutWithdrawalRequestsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAdminAuditLogsInput = {
@@ -4226,6 +4325,7 @@ export type UserCreateWithoutAdminAuditLogsInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminAuditLogsInput = {
@@ -4264,6 +4364,7 @@ export type UserUncheckedCreateWithoutAdminAuditLogsInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminAuditLogsInput = {
@@ -4318,6 +4419,7 @@ export type UserUpdateWithoutAdminAuditLogsInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminAuditLogsInput = {
@@ -4340,6 +4442,179 @@ export type UserUncheckedUpdateWithoutAdminAuditLogsInput = {
   reviewsReceived?: Prisma.OrderReviewUncheckedUpdateManyWithoutSellerNestedInput
   depositRequests?: Prisma.DepositRequestUncheckedUpdateManyWithoutUserNestedInput
   withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
+  adminNotesReceived?: Prisma.AdminUserNoteUncheckedUpdateManyWithoutUserNestedInput
+  adminNotesAuthored?: Prisma.AdminUserNoteUncheckedUpdateManyWithoutAdminNestedInput
+  adminGameNotes?: Prisma.AdminGameNoteUncheckedUpdateManyWithoutAdminNestedInput
+  slaIncidentNotes?: Prisma.AdminSlaIncidentNoteUncheckedUpdateManyWithoutAdminNestedInput
+  reportsMade?: Prisma.TrustReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.TrustReportUncheckedUpdateManyWithoutTargetUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedUpdateManyWithoutUserNestedInput
+  adminInviteTokens?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutUserNestedInput
+  adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
+  sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSupportInquiriesInput = {
+  id?: string
+  email: string
+  displayName: string
+  passwordHash?: string | null
+  emailVerifiedAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  listings?: Prisma.ListingCreateNestedManyWithoutSellerInput
+  buyRequests?: Prisma.BuyRequestCreateNestedManyWithoutBuyerInput
+  buyRequestOffers?: Prisma.BuyRequestOfferCreateNestedManyWithoutSellerInput
+  buyerOrders?: Prisma.OrderCreateNestedManyWithoutBuyerInput
+  sellerOrders?: Prisma.OrderCreateNestedManyWithoutSellerInput
+  reviewsGiven?: Prisma.OrderReviewCreateNestedManyWithoutBuyerInput
+  reviewsReceived?: Prisma.OrderReviewCreateNestedManyWithoutSellerInput
+  depositRequests?: Prisma.DepositRequestCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminInput
+  adminNotesReceived?: Prisma.AdminUserNoteCreateNestedManyWithoutUserInput
+  adminNotesAuthored?: Prisma.AdminUserNoteCreateNestedManyWithoutAdminInput
+  adminGameNotes?: Prisma.AdminGameNoteCreateNestedManyWithoutAdminInput
+  slaIncidentNotes?: Prisma.AdminSlaIncidentNoteCreateNestedManyWithoutAdminInput
+  reportsMade?: Prisma.TrustReportCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.TrustReportCreateNestedManyWithoutTargetUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenCreateNestedManyWithoutUserInput
+  adminInviteTokens?: Prisma.AdminInviteTokenCreateNestedManyWithoutUserInput
+  adminInvitesCreated?: Prisma.AdminInviteTokenCreateNestedManyWithoutCreatedByInput
+  buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
+  sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSupportInquiriesInput = {
+  id?: string
+  email: string
+  displayName: string
+  passwordHash?: string | null
+  emailVerifiedAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  listings?: Prisma.ListingUncheckedCreateNestedManyWithoutSellerInput
+  buyRequests?: Prisma.BuyRequestUncheckedCreateNestedManyWithoutBuyerInput
+  buyRequestOffers?: Prisma.BuyRequestOfferUncheckedCreateNestedManyWithoutSellerInput
+  buyerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutBuyerInput
+  sellerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSellerInput
+  reviewsGiven?: Prisma.OrderReviewUncheckedCreateNestedManyWithoutBuyerInput
+  reviewsReceived?: Prisma.OrderReviewUncheckedCreateNestedManyWithoutSellerInput
+  depositRequests?: Prisma.DepositRequestUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminInput
+  adminNotesReceived?: Prisma.AdminUserNoteUncheckedCreateNestedManyWithoutUserInput
+  adminNotesAuthored?: Prisma.AdminUserNoteUncheckedCreateNestedManyWithoutAdminInput
+  adminGameNotes?: Prisma.AdminGameNoteUncheckedCreateNestedManyWithoutAdminInput
+  slaIncidentNotes?: Prisma.AdminSlaIncidentNoteUncheckedCreateNestedManyWithoutAdminInput
+  reportsMade?: Prisma.TrustReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.TrustReportUncheckedCreateNestedManyWithoutTargetUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUncheckedCreateNestedManyWithoutUserInput
+  adminInviteTokens?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutUserInput
+  adminInvitesCreated?: Prisma.AdminInviteTokenUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
+  sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSupportInquiriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportInquiriesInput, Prisma.UserUncheckedCreateWithoutSupportInquiriesInput>
+}
+
+export type UserUpsertWithoutSupportInquiriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSupportInquiriesInput, Prisma.UserUncheckedUpdateWithoutSupportInquiriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportInquiriesInput, Prisma.UserUncheckedCreateWithoutSupportInquiriesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSupportInquiriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSupportInquiriesInput, Prisma.UserUncheckedUpdateWithoutSupportInquiriesInput>
+}
+
+export type UserUpdateWithoutSupportInquiriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  listings?: Prisma.ListingUpdateManyWithoutSellerNestedInput
+  buyRequests?: Prisma.BuyRequestUpdateManyWithoutBuyerNestedInput
+  buyRequestOffers?: Prisma.BuyRequestOfferUpdateManyWithoutSellerNestedInput
+  buyerOrders?: Prisma.OrderUpdateManyWithoutBuyerNestedInput
+  sellerOrders?: Prisma.OrderUpdateManyWithoutSellerNestedInput
+  reviewsGiven?: Prisma.OrderReviewUpdateManyWithoutBuyerNestedInput
+  reviewsReceived?: Prisma.OrderReviewUpdateManyWithoutSellerNestedInput
+  depositRequests?: Prisma.DepositRequestUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminNestedInput
+  adminNotesReceived?: Prisma.AdminUserNoteUpdateManyWithoutUserNestedInput
+  adminNotesAuthored?: Prisma.AdminUserNoteUpdateManyWithoutAdminNestedInput
+  adminGameNotes?: Prisma.AdminGameNoteUpdateManyWithoutAdminNestedInput
+  slaIncidentNotes?: Prisma.AdminSlaIncidentNoteUpdateManyWithoutAdminNestedInput
+  reportsMade?: Prisma.TrustReportUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.TrustReportUpdateManyWithoutTargetUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  emailVerificationLoginTokens?: Prisma.EmailVerificationLoginTokenUpdateManyWithoutUserNestedInput
+  adminInviteTokens?: Prisma.AdminInviteTokenUpdateManyWithoutUserNestedInput
+  adminInvitesCreated?: Prisma.AdminInviteTokenUpdateManyWithoutCreatedByNestedInput
+  buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
+  sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSupportInquiriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  listings?: Prisma.ListingUncheckedUpdateManyWithoutSellerNestedInput
+  buyRequests?: Prisma.BuyRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  buyRequestOffers?: Prisma.BuyRequestOfferUncheckedUpdateManyWithoutSellerNestedInput
+  buyerOrders?: Prisma.OrderUncheckedUpdateManyWithoutBuyerNestedInput
+  sellerOrders?: Prisma.OrderUncheckedUpdateManyWithoutSellerNestedInput
+  reviewsGiven?: Prisma.OrderReviewUncheckedUpdateManyWithoutBuyerNestedInput
+  reviewsReceived?: Prisma.OrderReviewUncheckedUpdateManyWithoutSellerNestedInput
+  depositRequests?: Prisma.DepositRequestUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminNestedInput
   adminNotesReceived?: Prisma.AdminUserNoteUncheckedUpdateManyWithoutUserNestedInput
   adminNotesAuthored?: Prisma.AdminUserNoteUncheckedUpdateManyWithoutAdminNestedInput
   adminGameNotes?: Prisma.AdminGameNoteUncheckedUpdateManyWithoutAdminNestedInput
@@ -4394,6 +4669,7 @@ export type UserCreateWithoutSlaIncidentNotesInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSlaIncidentNotesInput = {
@@ -4432,6 +4708,7 @@ export type UserUncheckedCreateWithoutSlaIncidentNotesInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSlaIncidentNotesInput = {
@@ -4486,6 +4763,7 @@ export type UserUpdateWithoutSlaIncidentNotesInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSlaIncidentNotesInput = {
@@ -4524,6 +4802,7 @@ export type UserUncheckedUpdateWithoutSlaIncidentNotesInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReportsMadeInput = {
@@ -4562,6 +4841,7 @@ export type UserCreateWithoutReportsMadeInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsMadeInput = {
@@ -4600,6 +4880,7 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsMadeInput = {
@@ -4643,6 +4924,7 @@ export type UserCreateWithoutReportsReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsReceivedInput = {
@@ -4681,6 +4963,7 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsReceivedInput = {
@@ -4735,6 +5018,7 @@ export type UserUpdateWithoutReportsMadeInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsMadeInput = {
@@ -4773,6 +5057,7 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReportsReceivedInput = {
@@ -4822,6 +5107,7 @@ export type UserUpdateWithoutReportsReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsReceivedInput = {
@@ -4860,6 +5146,7 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAdminNotesReceivedInput = {
@@ -4898,6 +5185,7 @@ export type UserCreateWithoutAdminNotesReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminNotesReceivedInput = {
@@ -4936,6 +5224,7 @@ export type UserUncheckedCreateWithoutAdminNotesReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminNotesReceivedInput = {
@@ -4979,6 +5268,7 @@ export type UserCreateWithoutAdminNotesAuthoredInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminNotesAuthoredInput = {
@@ -5017,6 +5307,7 @@ export type UserUncheckedCreateWithoutAdminNotesAuthoredInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminNotesAuthoredInput = {
@@ -5071,6 +5362,7 @@ export type UserUpdateWithoutAdminNotesReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminNotesReceivedInput = {
@@ -5109,6 +5401,7 @@ export type UserUncheckedUpdateWithoutAdminNotesReceivedInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutAdminNotesAuthoredInput = {
@@ -5158,6 +5451,7 @@ export type UserUpdateWithoutAdminNotesAuthoredInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminNotesAuthoredInput = {
@@ -5196,6 +5490,7 @@ export type UserUncheckedUpdateWithoutAdminNotesAuthoredInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAdminGameNotesInput = {
@@ -5234,6 +5529,7 @@ export type UserCreateWithoutAdminGameNotesInput = {
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminGameNotesInput = {
@@ -5272,6 +5568,7 @@ export type UserUncheckedCreateWithoutAdminGameNotesInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminGameNotesInput = {
@@ -5326,6 +5623,7 @@ export type UserUpdateWithoutAdminGameNotesInput = {
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminGameNotesInput = {
@@ -5364,6 +5662,7 @@ export type UserUncheckedUpdateWithoutAdminGameNotesInput = {
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -5402,6 +5701,7 @@ export type UserCreateWithoutNotificationsInput = {
   buyerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutBuyerInput
   sellerChatRooms?: Prisma.ChatRoomCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  supportInquiries?: Prisma.SupportInquiryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -5440,6 +5740,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   buyerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutBuyerInput
   sellerChatRooms?: Prisma.ChatRoomUncheckedCreateNestedManyWithoutSellerInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -5494,6 +5795,7 @@ export type UserUpdateWithoutNotificationsInput = {
   buyerChatRooms?: Prisma.ChatRoomUpdateManyWithoutBuyerNestedInput
   sellerChatRooms?: Prisma.ChatRoomUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  supportInquiries?: Prisma.SupportInquiryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -5532,6 +5834,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   buyerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutBuyerNestedInput
   sellerChatRooms?: Prisma.ChatRoomUncheckedUpdateManyWithoutSellerNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportInquiries?: Prisma.SupportInquiryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -5566,6 +5869,7 @@ export type UserCountOutputType = {
   sellerChatRooms: number
   sentChatMessages: number
   notifications: number
+  supportInquiries: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5595,6 +5899,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   sellerChatRooms?: boolean | UserCountOutputTypeCountSellerChatRoomsArgs
   sentChatMessages?: boolean | UserCountOutputTypeCountSentChatMessagesArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
+  supportInquiries?: boolean | UserCountOutputTypeCountSupportInquiriesArgs
 }
 
 /**
@@ -5789,6 +6094,13 @@ export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.NotificationWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSupportInquiriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportInquiryWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -5827,6 +6139,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   sellerChatRooms?: boolean | Prisma.User$sellerChatRoomsArgs<ExtArgs>
   sentChatMessages?: boolean | Prisma.User$sentChatMessagesArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
+  supportInquiries?: boolean | Prisma.User$supportInquiriesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -5895,6 +6208,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sellerChatRooms?: boolean | Prisma.User$sellerChatRoomsArgs<ExtArgs>
   sentChatMessages?: boolean | Prisma.User$sentChatMessagesArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
+  supportInquiries?: boolean | Prisma.User$supportInquiriesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -5930,6 +6244,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     sellerChatRooms: Prisma.$ChatRoomPayload<ExtArgs>[]
     sentChatMessages: Prisma.$ChatMessagePayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
+    supportInquiries: Prisma.$SupportInquiryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -6362,6 +6677,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   sellerChatRooms<T extends Prisma.User$sellerChatRoomsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sellerChatRoomsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatRoomPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentChatMessages<T extends Prisma.User$sentChatMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentChatMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportInquiries<T extends Prisma.User$supportInquiriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportInquiriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportInquiryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7433,6 +7749,30 @@ export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * User.supportInquiries
+ */
+export type User$supportInquiriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportInquiry
+   */
+  select?: Prisma.SupportInquirySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportInquiry
+   */
+  omit?: Prisma.SupportInquiryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportInquiryInclude<ExtArgs> | null
+  where?: Prisma.SupportInquiryWhereInput
+  orderBy?: Prisma.SupportInquiryOrderByWithRelationInput | Prisma.SupportInquiryOrderByWithRelationInput[]
+  cursor?: Prisma.SupportInquiryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportInquiryScalarFieldEnum | Prisma.SupportInquiryScalarFieldEnum[]
 }
 
 /**

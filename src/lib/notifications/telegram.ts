@@ -15,7 +15,7 @@ export async function sendAdminTelegramAlert(input: TelegramAlertInput) {
 
   const text = buildTelegramText(input);
 
-  await Promise.allSettled(
+  const results = await Promise.allSettled(
     chatIds.map(async (chatId) => {
       const response = await fetch(`${TELEGRAM_API_BASE}/bot${token}/sendMessage`, {
         method: "POST",
@@ -33,9 +33,15 @@ export async function sendAdminTelegramAlert(input: TelegramAlertInput) {
         throw new Error(`Telegram send failed: ${response.status}`);
       }
     }),
-  ).catch((error) => {
-    console.warn("[telegram] admin alert failed", error);
-  });
+  );
+
+  const failed = results.filter((result) => result.status === "rejected");
+  if (failed.length > 0) {
+    console.warn("[telegram] admin alert failed", {
+      failedCount: failed.length,
+      totalCount: results.length,
+    });
+  }
 }
 
 function getTelegramChatIds() {
@@ -54,5 +60,10 @@ function getTelegramChatIds() {
 
 function buildTelegramText(input: TelegramAlertInput) {
   const lines = input.lines?.filter(Boolean) ?? [];
-  return [`[GGtem] ${input.title}`, ...lines].join("\n").slice(0, 3800);
+  const now = new Date().toLocaleString("ko-KR", {
+    hour12: false,
+    timeZone: "Asia/Seoul",
+  });
+
+  return [`[GGtem] ${input.title}`, `시간: ${now}`, ...lines].join("\n").slice(0, 3800);
 }

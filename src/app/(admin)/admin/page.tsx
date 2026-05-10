@@ -20,6 +20,7 @@ const quickActions = [
   { href: "/admin/disputes", label: "분쟁 처리" },
   { href: "/admin/risk", label: "신고 확인" },
   { href: "/admin/order-chats?risk=1&refresh=1", label: "위험 채팅" },
+  { href: "/admin/support-inquiries", label: "1:1 문의" },
   { href: "/admin/sla-incidents", label: "SLA 확인" },
 ];
 

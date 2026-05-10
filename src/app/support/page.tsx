@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import UserMarketHeader from "@/app/user-market-header";
+import { getCurrentSessionUser } from "@/lib/auth/session";
+import { sendAdminTelegramAlert } from "@/lib/notifications/telegram";
+import { getPrismaClient } from "@/lib/prisma";
 import {
   getCustomerCenterDocuments,
-  getCustomerCenterTypes,
   type CustomerCenterType,
 } from "@/lib/support/customer-center";
 
@@ -15,6 +18,15 @@ const tabs = [
   { key: "game-request", label: "신규 게임 / 서버 신청", type: "GAME_SERVER_REQUEST" },
 ] satisfies Array<{ key: string; label: string; type: CustomerCenterType | null }>;
 
+const inquiryCategories = [
+  { value: "WALLET", label: "충전/출금" },
+  { value: "ORDER", label: "주문/거래" },
+  { value: "DISPUTE", label: "분쟁/신고" },
+  { value: "ACCOUNT", label: "계정" },
+  { value: "GAME_SERVER", label: "게임/서버" },
+  { value: "OTHER", label: "기타" },
+] as const;
+
 export default async function CustomerCenterPage({
   searchParams,
 }: {
@@ -24,7 +36,18 @@ export default async function CustomerCenterPage({
   const selectedTab = typeof params.tab === "string" ? params.tab : "notice";
   const query = typeof params.q === "string" ? params.q.trim() : "";
   const selected = tabs.find((tab) => tab.key === selectedTab) ?? tabs[0];
-  const documents = await getCustomerCenterDocuments();
+  const currentUser = await getCurrentSessionUser();
+  const prisma = getPrismaClient();
+  const [documents, myInquiries] = await Promise.all([
+    getCustomerCenterDocuments(),
+    selectedTab === "inquiry" && currentUser
+      ? prisma.supportInquiry.findMany({
+          where: { userId: currentUser.userId },
+          orderBy: { createdAt: "desc" },
+          take: 8,
+        })
+      : [],
+  ]);
   const visibleDocuments = selected.type
     ? documents.filter((document) => document.type === selected.type)
     : [];
@@ -68,7 +91,18 @@ export default async function CustomerCenterPage({
           ) : null}
 
           {selected.key === "inquiry" ? (
-            <InquiryPanel />
+            <InquiryPanel
+              isSignedIn={Boolean(currentUser)}
+              submitted={params.submitted === "1"}
+              inquiries={myInquiries.map((inquiry) => ({
+                id: inquiry.id,
+                category: inquiry.category,
+                title: inquiry.title,
+                status: inquiry.status,
+                adminNote: inquiry.adminNote,
+                createdAt: formatSupportDate(inquiry.createdAt),
+              }))}
+            />
           ) : selected.key === "game-request" ? (
             <GameRequestPanel documents={searchedDocuments} />
           ) : (
@@ -161,26 +195,86 @@ function DocumentList({
   );
 }
 
-function InquiryPanel() {
+function InquiryPanel({
+  isSignedIn,
+  submitted,
+  inquiries,
+}: {
+  isSignedIn: boolean;
+  submitted: boolean;
+  inquiries: Array<{
+    id: string;
+    category: string;
+    title: string;
+    status: string;
+    adminNote: string | null;
+    createdAt: string;
+  }>;
+}) {
   return (
     <section className="grid gap-5">
       <div className="rounded-lg border border-[var(--gg-border)] bg-white p-6">
         <h2 className="text-xl font-black">1:1 문의</h2>
         <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
-          돈이 이동하는 충전, 출금, 분쟁, 계정 거래 문의는 관련 주문이나 지갑 내역과 함께 접수되어야 합니다.
-          현재는 채팅/주문 화면을 통해 문의를 남기면 운영자가 확인합니다.
+          충전, 출금, 분쟁, 계정 거래처럼 운영자 확인이 필요한 내용을 접수하세요.
+          접수 즉시 운영자 텔레그램과 어드민 문의함에 표시됩니다.
         </p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          <Link href="/my/orders" prefetch={false} className="rounded-lg border border-[var(--gg-border)] px-4 py-3 text-sm font-black">
-            주문 문의
-          </Link>
-          <Link href="/my/wallet" prefetch={false} className="rounded-lg border border-[var(--gg-border)] px-4 py-3 text-sm font-black">
-            지갑 문의
-          </Link>
-          <Link href="/my/chat" prefetch={false} className="rounded-lg bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-white">
-            채팅 문의
-          </Link>
-        </div>
+        {submitted ? (
+          <div className="mt-5 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm font-black text-cyan-800">
+            문의가 접수되었습니다. 운영자가 확인 후 답변 메모를 남깁니다.
+          </div>
+        ) : null}
+        {isSignedIn ? (
+          <form action={createSupportInquiryAction} className="mt-5 grid gap-4">
+            <label className="grid gap-2 text-sm font-black">
+              문의 종류
+              <select name="category" className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold">
+                {inquiryCategories.map((category) => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="grid gap-2 text-sm font-black">
+              제목
+              <input
+                name="title"
+                required
+                minLength={2}
+                maxLength={100}
+                placeholder="문의 제목을 입력해 주세요."
+                className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold"
+              />
+            </label>
+            <label className="grid gap-2 text-sm font-black">
+              내용
+              <textarea
+                name="body"
+                required
+                minLength={10}
+                maxLength={2000}
+                rows={6}
+                placeholder="주문번호, 지갑 요청번호, 상황 설명을 함께 적어 주세요."
+                className="rounded-lg border border-[var(--gg-border)] px-4 py-3 text-sm font-bold leading-6"
+              />
+            </label>
+            <button type="submit" className="h-12 rounded-lg bg-[var(--gg-accent)] px-4 text-sm font-black text-white">
+              문의 접수
+            </button>
+          </form>
+        ) : (
+          <div className="mt-5 rounded-lg border border-[var(--gg-border)] bg-slate-50 p-4">
+            <p className="text-sm font-bold text-slate-600">1:1 문의 접수는 로그인 후 이용할 수 있습니다.</p>
+            <Link
+              href="/sign-in?next=/support?tab=inquiry"
+              prefetch={false}
+              className="mt-3 inline-flex rounded-lg bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-white"
+            >
+              로그인하고 문의하기
+            </Link>
+          </div>
+        )}
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
         {["입금자명과 회원명이 달라요", "출금 처리가 되지 않아요", "마일리지 충전이 되지 않아요"].map((title, index) => (
@@ -192,6 +286,36 @@ function InquiryPanel() {
           </div>
         ))}
       </div>
+      {isSignedIn ? (
+        <section className="rounded-lg border border-[var(--gg-border)] bg-white">
+          <div className="border-b border-[var(--gg-border)] px-5 py-4">
+            <h3 className="text-lg font-black">내 문의 내역</h3>
+          </div>
+          <div className="divide-y divide-[var(--gg-border)]">
+            {inquiries.length ? (
+              inquiries.map((inquiry) => (
+                <div key={inquiry.id} className="grid gap-2 px-5 py-4 text-sm sm:grid-cols-[110px_1fr_100px]">
+                  <span className="font-black text-[var(--gg-accent)]">{inquiryCategoryLabel(inquiry.category)}</span>
+                  <div>
+                    <p className="font-black text-slate-950">{inquiry.title}</p>
+                    {inquiry.adminNote ? (
+                      <p className="mt-2 rounded-lg bg-slate-50 p-3 text-sm font-semibold leading-6 text-slate-600">
+                        운영자 답변: {inquiry.adminNote}
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="text-right">
+                    <p className="font-black text-slate-700">{supportInquiryStatusLabel(inquiry.status)}</p>
+                    <p className="mt-1 text-xs font-bold text-slate-500">{inquiry.createdAt}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="px-5 py-8 text-sm font-bold text-slate-500">아직 접수한 문의가 없습니다.</p>
+            )}
+          </div>
+        </section>
+      ) : null}
     </section>
   );
 }
@@ -223,4 +347,71 @@ function GameRequestPanel({
       <DocumentList title="신청 안내" documents={documents} />
     </section>
   );
+}
+
+async function createSupportInquiryAction(formData: FormData) {
+  "use server";
+
+  const currentUser = await getCurrentSessionUser();
+  if (!currentUser) {
+    redirect("/sign-in?next=/support?tab=inquiry");
+  }
+
+  const category = String(formData.get("category") ?? "OTHER").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+  const safeCategory = inquiryCategories.some((item) => item.value === category)
+    ? category
+    : "OTHER";
+
+  if (title.length < 2 || body.length < 10) {
+    redirect("/support?tab=inquiry&error=invalid");
+  }
+
+  const prisma = getPrismaClient();
+  const inquiry = await prisma.supportInquiry.create({
+    data: {
+      userId: currentUser.userId,
+      category: safeCategory,
+      title: title.slice(0, 100),
+      body: body.slice(0, 2000),
+    },
+  });
+
+  await sendAdminTelegramAlert({
+    title: "1:1 문의 접수",
+    lines: [
+      `문의 ID: ${inquiry.id}`,
+      `종류: ${inquiryCategoryLabel(safeCategory)}`,
+      `회원: ${currentUser.displayName} / ${currentUser.email}`,
+      `제목: ${title.slice(0, 100)}`,
+      `어드민: ${(process.env.ADMIN_BASE_URL ?? process.env.NEXT_PUBLIC_ADMIN_BASE_URL ?? "").replace(/\/$/, "")}/admin/support-inquiries`,
+    ],
+  });
+
+  redirect("/support?tab=inquiry&submitted=1");
+}
+
+function inquiryCategoryLabel(category: string) {
+  return inquiryCategories.find((item) => item.value === category)?.label ?? "기타";
+}
+
+function supportInquiryStatusLabel(status: string) {
+  const labels: Record<string, string> = {
+    OPEN: "접수",
+    IN_PROGRESS: "확인중",
+    ANSWERED: "답변완료",
+    CLOSED: "종료",
+  };
+
+  return labels[status] ?? status;
+}
+
+function formatSupportDate(date: Date) {
+  return date.toLocaleDateString("ko-KR", {
+    year: "2-digit",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Seoul",
+  });
 }

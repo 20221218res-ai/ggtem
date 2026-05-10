@@ -162,6 +162,7 @@ model User {
   sellerChatRooms    ChatRoom[]          @relation("SellerChatRooms")
   sentChatMessages   ChatMessage[]       @relation("SenderChatMessages")
   notifications      Notification[]
+  supportInquiries   SupportInquiry[]
 }
 
 model Session {
@@ -703,6 +704,23 @@ model CmsDocumentVersion {
   @@unique([documentId, locale, version])
   @@index([documentId, status, createdAt])
   @@index([locale, status])
+}
+
+model SupportInquiry {
+  id        String   @id @default(cuid())
+  userId    String?
+  category  String
+  title     String
+  body      String
+  status    String   @default("OPEN")
+  adminNote String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+  @@index([category, createdAt])
 }
 
 model AdminSlaIncident {

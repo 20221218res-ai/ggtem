@@ -414,6 +414,7 @@ export const ModelName = {
   AdminAuditLog: 'AdminAuditLog',
   CmsDocument: 'CmsDocument',
   CmsDocumentVersion: 'CmsDocumentVersion',
+  SupportInquiry: 'SupportInquiry',
   AdminSlaIncident: 'AdminSlaIncident',
   AdminSlaIncidentNote: 'AdminSlaIncidentNote',
   AdminFinanceCloseReport: 'AdminFinanceCloseReport',
@@ -436,7 +437,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "loginAttempt" | "passwordResetToken" | "emailVerificationToken" | "emailVerificationLoginToken" | "adminInviteToken" | "wallet" | "walletLedgerEntry" | "game" | "gameServer" | "listing" | "listingImage" | "listingInventory" | "buyRequest" | "buyRequestOffer" | "order" | "orderAccountCredential" | "chatRoom" | "chatMessage" | "orderEvent" | "orderReview" | "orderReviewModeration" | "depositRequest" | "depositWalletAddress" | "withdrawalRequest" | "withdrawalLog" | "adminAuditLog" | "cmsDocument" | "cmsDocumentVersion" | "adminSlaIncident" | "adminSlaIncidentNote" | "adminFinanceCloseReport" | "trustReport" | "adminUserNote" | "adminGameNote" | "notification"
+    modelProps: "user" | "session" | "loginAttempt" | "passwordResetToken" | "emailVerificationToken" | "emailVerificationLoginToken" | "adminInviteToken" | "wallet" | "walletLedgerEntry" | "game" | "gameServer" | "listing" | "listingImage" | "listingInventory" | "buyRequest" | "buyRequestOffer" | "order" | "orderAccountCredential" | "chatRoom" | "chatMessage" | "orderEvent" | "orderReview" | "orderReviewModeration" | "depositRequest" | "depositWalletAddress" | "withdrawalRequest" | "withdrawalLog" | "adminAuditLog" | "cmsDocument" | "cmsDocumentVersion" | "supportInquiry" | "adminSlaIncident" | "adminSlaIncidentNote" | "adminFinanceCloseReport" | "trustReport" | "adminUserNote" | "adminGameNote" | "notification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2660,6 +2661,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SupportInquiry: {
+      payload: Prisma.$SupportInquiryPayload<ExtArgs>
+      fields: Prisma.SupportInquiryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SupportInquiryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInquiryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SupportInquiryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInquiryPayload>
+        }
+        findFirst: {
+          args: Prisma.SupportInquiryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInquiryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SupportInquiryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInquiryPayload>
+        }
+        findMany: {
+          args: Prisma.SupportInquiryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInquiryPayload>[]
+        }
+        create: {
+          args: Prisma.SupportInquiryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInquiryPayload>
+        }
+        createMany: {
+          args: Prisma.SupportInquiryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SupportInquiryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInquiryPayload>[]
+        }
+        delete: {
+          args: Prisma.SupportInquiryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInquiryPayload>
+        }
+        update: {
+          args: Prisma.SupportInquiryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInquiryPayload>
+        }
+        deleteMany: {
+          args: Prisma.SupportInquiryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SupportInquiryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SupportInquiryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInquiryPayload>[]
+        }
+        upsert: {
+          args: Prisma.SupportInquiryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInquiryPayload>
+        }
+        aggregate: {
+          args: Prisma.SupportInquiryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSupportInquiry>
+        }
+        groupBy: {
+          args: Prisma.SupportInquiryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportInquiryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SupportInquiryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportInquiryCountAggregateOutputType> | number
+        }
+      }
+    }
     AdminSlaIncident: {
       payload: Prisma.$AdminSlaIncidentPayload<ExtArgs>
       fields: Prisma.AdminSlaIncidentFieldRefs
@@ -3711,6 +3786,21 @@ export const CmsDocumentVersionScalarFieldEnum = {
 export type CmsDocumentVersionScalarFieldEnum = (typeof CmsDocumentVersionScalarFieldEnum)[keyof typeof CmsDocumentVersionScalarFieldEnum]
 
 
+export const SupportInquiryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  category: 'category',
+  title: 'title',
+  body: 'body',
+  status: 'status',
+  adminNote: 'adminNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupportInquiryScalarFieldEnum = (typeof SupportInquiryScalarFieldEnum)[keyof typeof SupportInquiryScalarFieldEnum]
+
+
 export const AdminSlaIncidentScalarFieldEnum = {
   id: 'id',
   queueKey: 'queueKey',
@@ -4290,6 +4380,7 @@ export type GlobalOmitConfig = {
   adminAuditLog?: Prisma.AdminAuditLogOmit
   cmsDocument?: Prisma.CmsDocumentOmit
   cmsDocumentVersion?: Prisma.CmsDocumentVersionOmit
+  supportInquiry?: Prisma.SupportInquiryOmit
   adminSlaIncident?: Prisma.AdminSlaIncidentOmit
   adminSlaIncidentNote?: Prisma.AdminSlaIncidentNoteOmit
   adminFinanceCloseReport?: Prisma.AdminFinanceCloseReportOmit
