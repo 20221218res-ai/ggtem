@@ -241,12 +241,17 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     forbiddenPath: "/admin/sign-in",
   });
   const requiredRoles = getRequiredAdminRoles(pathname);
+  const showDemoTools = isDemoToolEnabled();
+  const normalizedPathname = normalizeAdminPathname(pathname);
 
   if (requiredRoles && !roleHasAccess(currentUser.role, requiredRoles)) {
     redirect("/admin");
   }
 
-  const showDemoTools = isDemoToolEnabled();
+  if (!showDemoTools && demoToolLinks.has(normalizedPathname)) {
+    redirect("/admin");
+  }
+
   const visibleLinks = adminLinks.filter((link) =>
     roleHasAccess(currentUser.role, link.roles) &&
     (showDemoTools || !demoToolLinks.has(link.href)),
