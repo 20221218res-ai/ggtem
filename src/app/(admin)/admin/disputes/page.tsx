@@ -95,6 +95,7 @@ export default function AdminDisputesPage() {
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isResolving, setIsResolving] = useState(false);
+  const [resolvingAction, setResolvingAction] = useState<"REFUND_BUYER" | "RELEASE_TO_SELLER" | null>(null);
 
   const summary = useMemo(() => getDisputeListSummary(state.disputes), [state.disputes]);
   const selectedAction = state.detail ? getDisputeNextAction(state.detail.status) : null;
@@ -163,6 +164,7 @@ export default function AdminDisputesPage() {
 
     setError("");
     setIsResolving(true);
+    setResolvingAction(action);
 
     try {
       const response = await fetch("/api/admin/orders", {
@@ -189,6 +191,7 @@ export default function AdminDisputesPage() {
       setError(resolveError instanceof Error ? cleanEventMessage(resolveError.message) : "분쟁 처리를 완료하지 못했습니다.");
     } finally {
       setIsResolving(false);
+      setResolvingAction(null);
     }
   }
 
@@ -229,11 +232,12 @@ export default function AdminDisputesPage() {
                     setIsLoading(true);
                     void loadDisputes(undefined, tab.value, searchQuery);
                   }}
+                  disabled={isLoading || isResolving}
                   className={`rounded-md border px-4 py-2 text-sm font-black ${
                     viewFilter === tab.value
                       ? "border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_12%,white)] text-slate-950"
                       : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
+                  } disabled:cursor-not-allowed disabled:opacity-60`}
                 >
                   {tab.label}
                 </button>
@@ -254,10 +258,11 @@ export default function AdminDisputesPage() {
                 className="min-w-[280px] rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--gg-accent)]"
               />
               <button
-                className="rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-slate-950 hover:brightness-105"
+                className="rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-slate-950 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
                 type="submit"
+                disabled={isLoading || isResolving}
               >
-                검색
+                {isLoading ? "검색 중..." : "검색"}
               </button>
             </form>
           </div>
@@ -290,12 +295,13 @@ export default function AdminDisputesPage() {
                     <button
                       key={dispute.orderId}
                       type="button"
+                      disabled={isLoading || isResolving}
                       onClick={() => void loadDisputes(dispute.orderId, viewFilter, searchQuery)}
                       className={`rounded-lg border p-4 text-left transition ${
                         selectedOrderId === dispute.orderId
                           ? "border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_10%,white)]"
                           : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-                      }`}
+                      } disabled:cursor-not-allowed disabled:opacity-60`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
@@ -394,17 +400,17 @@ export default function AdminDisputesPage() {
                       type="button"
                       disabled={isResolving}
                       onClick={() => void resolveDispute("REFUND_BUYER")}
-                      className="rounded-md border border-red-200 bg-red-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
+                      className="rounded-md border border-red-200 bg-red-600 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      구매자 환불로 종료
+                      {resolvingAction === "REFUND_BUYER" ? "구매자 환불 처리 중..." : "구매자 환불로 종료"}
                     </button>
                     <button
                       type="button"
                       disabled={isResolving}
                       onClick={() => void resolveDispute("RELEASE_TO_SELLER")}
-                      className="rounded-md border border-[var(--color-primary)] bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-slate-950 hover:brightness-105 disabled:opacity-60"
+                      className="rounded-md border border-[var(--color-primary)] bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-slate-950 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      판매자 정산으로 종료
+                      {resolvingAction === "RELEASE_TO_SELLER" ? "판매자 정산 처리 중..." : "판매자 정산으로 종료"}
                     </button>
                   </div>
                 ) : (

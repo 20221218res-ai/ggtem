@@ -36,6 +36,7 @@ export default function FinanceActions({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeAction, setActiveAction] = useState<FinanceAction | null>(null);
   const [confirmationText, setConfirmationText] = useState("");
   const [evidenceTxId, setEvidenceTxId] = useState("");
   const [evidenceMemo, setEvidenceMemo] = useState("");
@@ -75,6 +76,7 @@ export default function FinanceActions({
     setError("");
     setSuccess("");
     setIsSubmitting(true);
+    setActiveAction(action);
 
     try {
       const response = await fetch("/api/admin/finance", {
@@ -112,6 +114,7 @@ export default function FinanceActions({
       );
     } finally {
       setIsSubmitting(false);
+      setActiveAction(null);
     }
   }
 
@@ -172,7 +175,7 @@ export default function FinanceActions({
           disabled={isSubmitting || !canSubmitPrimary}
           className="rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-slate-950 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {primaryLabel}
+          {activeAction === primaryAction ? `${primaryLabel} 처리 중...` : primaryLabel}
         </button>
         <button
           type="button"
@@ -180,7 +183,7 @@ export default function FinanceActions({
           disabled={isSubmitting}
           className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm font-black text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {secondaryLabel}
+          {activeAction === secondaryAction ? `${secondaryLabel} 처리 중...` : secondaryLabel}
         </button>
       </div>
 
