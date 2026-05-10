@@ -104,7 +104,11 @@ export default async function CustomerCenterPage({
               }))}
             />
           ) : selected.key === "game-request" ? (
-            <GameRequestPanel documents={searchedDocuments} />
+            <GameRequestPanel
+              documents={searchedDocuments}
+              isSignedIn={Boolean(currentUser)}
+              submitted={params.submitted === "1"}
+            />
           ) : (
             <DocumentList title={selected.label} documents={searchedDocuments} />
           )}
@@ -322,27 +326,94 @@ function InquiryPanel({
 
 function GameRequestPanel({
   documents,
+  isSignedIn,
+  submitted,
 }: {
   documents: Array<{ slug: string; typeLabel: string; title: string; body: string; updatedAt: string }>;
+  isSignedIn: boolean;
+  submitted: boolean;
 }) {
   return (
     <section className="grid gap-5">
       <div className="rounded-lg border border-[var(--gg-border)] bg-white p-6">
         <h2 className="text-xl font-black">게임 / 서버 신청</h2>
-        <form className="mt-6 grid gap-4 sm:grid-cols-[180px_1fr]">
-          <label className="text-sm font-black" htmlFor="request-kind">신청 종류</label>
-          <select id="request-kind" className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold">
-            <option>선택</option>
-            <option>신규 게임 신청</option>
-            <option>신규 서버 신청</option>
-            <option>게임 정보 수정</option>
-          </select>
-          <label className="text-sm font-black" htmlFor="request-title">신청 내용</label>
-          <input id="request-title" className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold" placeholder="게임명, 서버명, 참고 링크를 입력해 주세요." />
-        </form>
-        <p className="mt-4 text-xs font-bold leading-6 text-slate-500">
-          신청 저장 기능은 다음 묶음에서 로그인 계정 기반 접수함으로 연결할 예정입니다.
+        <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
+          원하는 게임이나 서버가 목록에 없으면 이곳에서 신청하세요. 접수 즉시 운영자 문의함과 텔레그램에 표시됩니다.
         </p>
+        {submitted ? (
+          <div className="mt-5 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm font-black text-cyan-800">
+            게임/서버 신청이 접수되었습니다. 운영자가 검토 후 반영 여부를 답변합니다.
+          </div>
+        ) : null}
+        {isSignedIn ? (
+          <form action={createGameServerRequestAction} className="mt-6 grid gap-4">
+            <label className="grid gap-2 text-sm font-black">
+              신청 종류
+              <select name="requestKind" className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold">
+                <option value="신규 게임 신청">신규 게임 신청</option>
+                <option value="신규 서버 신청">신규 서버 신청</option>
+                <option value="게임 정보 수정">게임 정보 수정</option>
+              </select>
+            </label>
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="grid gap-2 text-sm font-black">
+                게임명
+                <input
+                  name="gameName"
+                  required
+                  minLength={2}
+                  maxLength={80}
+                  className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold"
+                  placeholder="예: 리니지 클래식"
+                />
+              </label>
+              <label className="grid gap-2 text-sm font-black">
+                서버명
+                <input
+                  name="serverName"
+                  maxLength={80}
+                  className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold"
+                  placeholder="신규 서버 신청일 때 입력"
+                />
+              </label>
+            </div>
+            <label className="grid gap-2 text-sm font-black">
+              참고 링크
+              <input
+                name="referenceUrl"
+                maxLength={300}
+                className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold"
+                placeholder="공식 홈페이지나 서버 공지 링크"
+              />
+            </label>
+            <label className="grid gap-2 text-sm font-black">
+              요청 사유
+              <textarea
+                name="body"
+                required
+                minLength={10}
+                maxLength={2000}
+                rows={5}
+                className="rounded-lg border border-[var(--gg-border)] px-4 py-3 text-sm font-bold leading-6"
+                placeholder="거래 수요, 서버명, 필요한 카테고리 등을 적어 주세요."
+              />
+            </label>
+            <button type="submit" className="h-12 rounded-lg bg-[var(--gg-accent)] px-4 text-sm font-black text-white">
+              신청 접수
+            </button>
+          </form>
+        ) : (
+          <div className="mt-5 rounded-lg border border-[var(--gg-border)] bg-slate-50 p-4">
+            <p className="text-sm font-bold text-slate-600">게임/서버 신청은 로그인 후 접수할 수 있습니다.</p>
+            <Link
+              href="/sign-in?next=/support?tab=game-request"
+              prefetch={false}
+              className="mt-3 inline-flex rounded-lg bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-white"
+            >
+              로그인하고 신청하기
+            </Link>
+          </div>
+        )}
       </div>
       <DocumentList title="신청 안내" documents={documents} />
     </section>
@@ -390,6 +461,59 @@ async function createSupportInquiryAction(formData: FormData) {
   });
 
   redirect("/support?tab=inquiry&submitted=1");
+}
+
+async function createGameServerRequestAction(formData: FormData) {
+  "use server";
+
+  const currentUser = await getCurrentSessionUser();
+  if (!currentUser) {
+    redirect("/sign-in?next=/support?tab=game-request");
+  }
+
+  const requestKind = String(formData.get("requestKind") ?? "신규 게임 신청").trim();
+  const gameName = String(formData.get("gameName") ?? "").trim();
+  const serverName = String(formData.get("serverName") ?? "").trim();
+  const referenceUrl = String(formData.get("referenceUrl") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+
+  if (gameName.length < 2 || body.length < 10) {
+    redirect("/support?tab=game-request&error=invalid");
+  }
+
+  const title = `[${requestKind.slice(0, 30)}] ${gameName}${serverName ? ` / ${serverName}` : ""}`;
+  const detailLines = [
+    `신청 종류: ${requestKind}`,
+    `게임명: ${gameName}`,
+    serverName ? `서버명: ${serverName}` : null,
+    referenceUrl ? `참고 링크: ${referenceUrl}` : null,
+    "",
+    body,
+  ].filter(Boolean);
+
+  const prisma = getPrismaClient();
+  const inquiry = await prisma.supportInquiry.create({
+    data: {
+      userId: currentUser.userId,
+      category: "GAME_SERVER",
+      title: title.slice(0, 100),
+      body: detailLines.join("\n").slice(0, 2000),
+    },
+  });
+
+  await sendAdminTelegramAlert({
+    title: "게임/서버 신청 접수",
+    lines: [
+      `문의 ID: ${inquiry.id}`,
+      `신청 종류: ${requestKind}`,
+      `게임명: ${gameName}`,
+      serverName ? `서버명: ${serverName}` : null,
+      `회원: ${currentUser.displayName} / ${currentUser.email}`,
+      `어드민: ${(process.env.ADMIN_BASE_URL ?? process.env.NEXT_PUBLIC_ADMIN_BASE_URL ?? "").replace(/\/$/, "")}/admin/support-inquiries`,
+    ],
+  });
+
+  redirect("/support?tab=game-request&submitted=1");
 }
 
 function inquiryCategoryLabel(category: string) {
