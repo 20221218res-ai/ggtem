@@ -30,7 +30,7 @@ export function validateServerDetail(
 
   const options = getServerDetailOptionsForGameCode(gameCode);
   if (options.length === 0 || !options.includes(normalized)) {
-    throw new Error("선택한 서버 상세 번호가 해당 게임에 맞지 않습니다.");
+    throw new Error("선택한 서버 상세 번호가 해당 게임과 맞지 않습니다.");
   }
 
   return normalized;
