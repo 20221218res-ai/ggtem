@@ -92,6 +92,19 @@ export type AdminDashboardState = {
     lastDetectedAt: string;
     resolvedAt: string | null;
   }>;
+  offPlatformChatAlerts: Array<{
+    reportId: string;
+    orderId: string | null;
+    orderNumber: string | null;
+    listingTitle: string | null;
+    severity: string;
+    status: string;
+    description: string;
+    reporterName: string;
+    targetName: string;
+    targetEmail: string;
+    createdAt: string;
+  }>;
 };
 
 export async function getAdminDashboardState(): Promise<AdminDashboardState> {
@@ -115,6 +128,7 @@ export async function getAdminDashboardState(): Promise<AdminDashboardState> {
     pendingWithdrawals,
     openTrustReports,
     highTrustReports,
+    offPlatformChatAlerts,
     sellerRiskCandidates,
     recentAutoNotes,
     oldestDispute,
@@ -282,6 +296,34 @@ export async function getAdminDashboardState(): Promise<AdminDashboardState> {
           in: ["HIGH", "CRITICAL"],
         },
       },
+    }),
+    prisma.trustReport.findMany({
+      where: {
+        status: {
+          in: ["OPEN", "UNDER_REVIEW"],
+        },
+        OR: [
+          {
+            category: "OFF_PLATFORM_PAYMENT",
+          },
+          {
+            sourceType: "OFF_PLATFORM_CONTACT",
+          },
+        ],
+      },
+      include: {
+        reporter: true,
+        targetUser: true,
+        order: {
+          include: {
+            listing: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5,
     }),
     countSellerRiskCandidates(prisma),
     prisma.adminUserNote.count({
@@ -500,6 +542,19 @@ export async function getAdminDashboardState(): Promise<AdminDashboardState> {
       resolvedAt: incident.resolvedAt
         ? formatKoreanDate(incident.resolvedAt)
         : null,
+    })),
+    offPlatformChatAlerts: offPlatformChatAlerts.map((report) => ({
+      reportId: report.id,
+      orderId: report.orderId,
+      orderNumber: report.order?.orderNumber ?? null,
+      listingTitle: report.order?.listing.title ?? null,
+      severity: report.severity,
+      status: report.status,
+      description: report.description,
+      reporterName: report.reporter.displayName,
+      targetName: report.targetUser.displayName,
+      targetEmail: report.targetUser.email,
+      createdAt: formatKoreanDate(report.createdAt),
     })),
   };
 }

@@ -19,6 +19,7 @@ const quickActions = [
   { href: "/admin/withdrawals", label: "출금 처리" },
   { href: "/admin/disputes", label: "분쟁 처리" },
   { href: "/admin/risk", label: "신고 확인" },
+  { href: "/admin/order-chats?risk=1&refresh=1", label: "위험 채팅" },
   { href: "/admin/sla-incidents", label: "SLA 확인" },
 ];
 
@@ -112,6 +113,8 @@ export default async function AdminDashboardPage() {
           <MetricCard label="에스크로" value={`${state.metrics.buyerEscrow} USDT`} href="/admin/finance/ledger" tone="cyan" />
           <MetricCard label="출금 가능액" value={`${state.metrics.sellerAvailable} USDT`} href="/admin/finance/ledger?bucket=WITHDRAWABLE" tone="green" />
         </section>
+
+        <OffPlatformAlertPanel alerts={state.offPlatformChatAlerts} />
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -216,6 +219,83 @@ function QueueCard({
         {item.previewLabel}
       </p>
     </Link>
+  );
+}
+
+function OffPlatformAlertPanel({
+  alerts,
+}: {
+  alerts: DashboardState["offPlatformChatAlerts"];
+}) {
+  const alertCount = alerts.length;
+
+  return (
+    <section className="rounded-2xl border border-red-200 bg-white p-5 shadow-sm">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <p className="text-sm font-black text-red-600">OFF-PLATFORM CHAT WATCH</p>
+          <h2 className="mt-1 text-xl font-black text-slate-950">
+            외부거래 의심 채팅 {alertCount.toLocaleString("ko-KR")}건
+          </h2>
+          <p className="mt-1 text-sm font-semibold text-slate-500">
+            연락처, SNS, 외부 링크, 개인 지갑주소 교환이 감지된 주문 채팅입니다.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/admin/order-chats?risk=1&refresh=1"
+            className="rounded-full bg-red-600 px-4 py-2 text-sm font-black text-white shadow-sm hover:bg-red-700"
+          >
+            위험 채팅 실시간 보기
+          </Link>
+          <Link
+            href="/admin/risk?status=ALL&query=OFF_PLATFORM"
+            className="rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-black text-red-700 hover:bg-red-50"
+          >
+            신고 목록 보기
+          </Link>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-5">
+        {alerts.map((alert) => (
+          <Link
+            key={alert.reportId}
+            href={
+              alert.orderId
+                ? `/admin/order-chats?orderId=${alert.orderId}&risk=1&refresh=1`
+                : `/admin/risk?query=${alert.reportId}`
+            }
+            className="rounded-xl border border-red-100 bg-red-50 p-4 transition hover:-translate-y-0.5 hover:border-red-300 hover:bg-red-100"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="rounded-full bg-red-600 px-2 py-1 text-xs font-black text-white">
+                {alert.severity}
+              </span>
+              <span className="text-xs font-black text-red-700">{alert.status}</span>
+            </div>
+            <p className="mt-3 line-clamp-2 text-sm font-black text-slate-950">
+              {alert.listingTitle ?? alert.orderNumber ?? "주문 정보 없음"}
+            </p>
+            <p className="mt-2 line-clamp-2 text-xs font-semibold text-red-700">
+              {cleanPreview(alert.description, "외부거래 의심 채팅")}
+            </p>
+            <p className="mt-3 text-xs font-semibold text-slate-500">
+              대상: {alert.targetName} / {alert.targetEmail}
+            </p>
+            <p className="mt-1 text-xs font-semibold text-slate-500">
+              {alert.createdAt}
+            </p>
+          </Link>
+        ))}
+
+        {alerts.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm font-bold text-slate-500 lg:col-span-5">
+            현재 열려 있는 외부거래 의심 채팅 신고가 없습니다.
+          </div>
+        ) : null}
+      </div>
+    </section>
   );
 }
 
