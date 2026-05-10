@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/guards";
+import { DEFAULT_DEPOSIT_WALLET_ADDRESSES } from "@/lib/wallet/deposit-address-defaults";
 import { getAdminDepositWalletAddressState } from "@/lib/wallet/deposit-addresses";
 import {
   AdminMockPage,
@@ -16,19 +17,6 @@ type DepositAddressesPageProps = {
     notice?: string;
   }>;
 };
-
-const chainDefaults = {
-  TRC20: {
-    label: "USDT TRC20",
-    networkName: "TRON",
-    minimumAmount: "10",
-  },
-  BEP20: {
-    label: "USDT BEP20",
-    networkName: "BNB Smart Chain",
-    minimumAmount: "10",
-  },
-} as const;
 
 export default async function AdminDepositAddressesPage({
   searchParams,
@@ -101,13 +89,13 @@ export default async function AdminDepositAddressesPage({
       <section className="grid gap-5 xl:grid-cols-2">
         {(["TRC20", "BEP20"] as const).map((chain) => {
           const current = state.addresses.find((address) => address.chain === chain);
-          const defaults = chainDefaults[chain];
+          const defaults = DEFAULT_DEPOSIT_WALLET_ADDRESSES[chain];
 
           return (
             <Panel key={chain} title={`${chain} 주소 변경`}>
               <form action={updateDepositWalletAddressAction} className="grid gap-4">
                 <input type="hidden" name="chain" value={chain} />
-                <input type="hidden" name="asset" value="USDT" />
+                <input type="hidden" name="asset" value={defaults.asset} />
 
                 <Field label="표시 이름" name="label" defaultValue={current?.label ?? defaults.label} />
                 <Field
@@ -118,7 +106,7 @@ export default async function AdminDepositAddressesPage({
                 <Field
                   label="입금 주소"
                   name="address"
-                  defaultValue={current?.address ?? ""}
+                  defaultValue={current?.address ?? defaults.address}
                   placeholder={chain === "TRC20" ? "T로 시작하는 TRC20 주소" : "0x로 시작하는 BEP20 주소"}
                   monospace
                 />
@@ -141,14 +129,14 @@ export default async function AdminDepositAddressesPage({
                   label="변경 사유"
                   name="reason"
                   defaultValue=""
-                  placeholder="예: 운영 지갑 교체 또는 보안 주소 변경"
+                  placeholder="예: 운영 지갑 주소 교체 또는 보안 주소 변경"
                 />
                 <Field
                   label="최고관리자 비밀번호"
                   name="adminPassword"
                   defaultValue=""
                   type="password"
-                  placeholder="주소 변경 전 비밀번호 재확인"
+                  placeholder="주소 변경을 위해 비밀번호 재확인"
                 />
                 <button
                   type="submit"

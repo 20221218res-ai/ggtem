@@ -6,6 +6,7 @@ import { Prisma, type WithdrawalChain } from "@/generated/prisma/client";
 import { requirePageRole } from "@/lib/auth/guards";
 import { verifyCurrentUserPassword } from "@/lib/auth/session";
 import { getPrismaClient } from "@/lib/prisma";
+import { DEFAULT_DEPOSIT_WALLET_ADDRESSES } from "@/lib/wallet/deposit-address-defaults";
 
 export async function updateDepositWalletAddressAction(formData: FormData) {
   const admin = await requirePageRole(["SUPER"], {
@@ -13,11 +14,12 @@ export async function updateDepositWalletAddressAction(formData: FormData) {
     forbiddenPath: "/admin",
   });
   const chain = parseChain(getText(formData, "chain"));
-  const label = getText(formData, "label");
-  const asset = getText(formData, "asset") || "USDT";
-  const networkName = getText(formData, "networkName");
-  const address = getText(formData, "address");
-  const minimumAmount = getText(formData, "minimumAmount") || "10";
+  const defaults = chain ? DEFAULT_DEPOSIT_WALLET_ADDRESSES[chain] : null;
+  const label = getText(formData, "label") || defaults?.label || "";
+  const asset = getText(formData, "asset") || defaults?.asset || "USDT";
+  const networkName = getText(formData, "networkName") || defaults?.networkName || "";
+  const address = getText(formData, "address") || defaults?.address || "";
+  const minimumAmount = getText(formData, "minimumAmount") || defaults?.minimumAmount || "10";
   const reason = getText(formData, "reason");
   const adminPassword = getText(formData, "adminPassword");
   const isActive = formData.get("isActive") === "on";
@@ -68,7 +70,7 @@ export async function updateDepositWalletAddressAction(formData: FormData) {
         address,
         minimumAmount,
         isActive,
-        sortOrder: chain === "TRC20" ? 10 : 20,
+        sortOrder: defaults?.sortOrder ?? (chain === "TRC20" ? 10 : 20),
         updatedByAdminId: admin.userId,
       },
       update: {
