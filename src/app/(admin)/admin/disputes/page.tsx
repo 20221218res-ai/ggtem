@@ -92,6 +92,7 @@ export default function AdminDisputesPage() {
   const [viewFilter, setViewFilter] = useState("OPEN");
   const [resolutionNote, setResolutionNote] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isResolving, setIsResolving] = useState(false);
 
@@ -102,6 +103,7 @@ export default function AdminDisputesPage() {
 
   async function loadDisputes(orderId?: string, nextView?: string, nextQuery?: string) {
     setError("");
+    setSuccess("");
 
     try {
       const params = new URLSearchParams();
@@ -181,6 +183,7 @@ export default function AdminDisputesPage() {
       }
 
       await loadDisputes(state.detail.orderId, viewFilter, searchQuery);
+      setSuccess(result.message ?? "분쟁 처리가 완료되었습니다.");
       setResolutionNote("");
     } catch (resolveError) {
       setError(resolveError instanceof Error ? cleanEventMessage(resolveError.message) : "분쟁 처리를 완료하지 못했습니다.");
@@ -263,6 +266,11 @@ export default function AdminDisputesPage() {
         {error ? (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
             {error}
+          </div>
+        ) : null}
+        {success ? (
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
+            {success} 주문 이벤트, 원장, 감사 로그를 다시 확인하세요.
           </div>
         ) : null}
 

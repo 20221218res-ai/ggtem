@@ -34,6 +34,7 @@ export default function FinanceActions({
 }: FinanceActionsProps) {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmationText, setConfirmationText] = useState("");
   const [evidenceTxId, setEvidenceTxId] = useState("");
@@ -72,6 +73,7 @@ export default function FinanceActions({
     if (!confirmed) return;
 
     setError("");
+    setSuccess("");
     setIsSubmitting(true);
 
     try {
@@ -97,6 +99,10 @@ export default function FinanceActions({
         throw new Error(result.message ?? "요청을 처리하지 못했습니다.");
       }
 
+      setSuccess(result.message ?? "요청 처리가 완료되었습니다.");
+      setConfirmationText("");
+      setEvidenceTxId("");
+      setEvidenceMemo("");
       router.refresh();
     } catch (submitError) {
       setError(
@@ -181,6 +187,11 @@ export default function FinanceActions({
       {error ? (
         <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-bold text-red-700">
           {error}
+        </p>
+      ) : null}
+      {success ? (
+        <p className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700">
+          {success} 목록과 감사 로그를 새로 반영했습니다.
         </p>
       ) : null}
     </div>
