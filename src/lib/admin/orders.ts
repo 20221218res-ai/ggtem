@@ -3,6 +3,7 @@ import {
   releasePurchaseQuantity,
 } from "@/lib/inventory/purchase-lock";
 import { createUserNotification } from "@/lib/notifications/notifications";
+import { sendAdminTelegramAlert } from "@/lib/notifications/telegram";
 import { getPrismaClient } from "@/lib/prisma";
 import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit";
 
@@ -207,7 +208,7 @@ export async function resolveAdminDispute(input: {
   const prisma = getPrismaClient();
   const trimmedNote = input.note?.trim();
 
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
       where: {
         id: input.orderId,
@@ -579,6 +580,18 @@ export async function resolveAdminDispute(input: {
 
     return { orderId: order.id, status: "COMPLETED", message: "판매자 정산 승인으로 분쟁이 종료되었습니다." };
   });
+
+  await sendAdminTelegramAlert({
+    title: "분쟁 처리 완료",
+    lines: [
+      `주문 ID: ${result.orderId}`,
+      `상태: ${result.status}`,
+      `처리: ${input.action}`,
+      trimmedNote ? `메모: ${trimmedNote}` : null,
+    ],
+  });
+
+  return result;
 }
 
 export async function getAdminDisputesState(

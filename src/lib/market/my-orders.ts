@@ -3,6 +3,7 @@
   releasePurchaseQuantity,
 } from "@/lib/inventory/purchase-lock";
 import { createUserNotification } from "@/lib/notifications/notifications";
+import { sendAdminTelegramAlert } from "@/lib/notifications/telegram";
 import { getPrismaClient } from "@/lib/prisma";
 import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit";
 import { getCurrentUserEmailForRole } from "@/lib/auth/session";
@@ -273,7 +274,7 @@ export async function updateMarketplaceBuyerOrderStatus(input: {
     throw new Error("\uad6c\ub9e4\uc790 \uacc4\uc815\uc744 \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.");
   }
 
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const order = await tx.order.findFirst({
       where: {
         id: input.orderId,
@@ -782,6 +783,19 @@ export async function updateMarketplaceBuyerOrderStatus(input: {
       message: "인수확정이 완료되었습니다. 판매자 정산이 반영되었습니다.",
     };
   });
+
+  if (result.status === "DISPUTED") {
+    await sendAdminTelegramAlert({
+      title: "분쟁 접수",
+      lines: [
+        `주문 ID: ${result.orderId}`,
+        `상태: ${result.status}`,
+        input.reason?.trim() ? `사유: ${input.reason.trim()}` : "사유: 미입력",
+      ],
+    });
+  }
+
+  return result;
 }
 
 function formatKoreanDate(date: Date) {

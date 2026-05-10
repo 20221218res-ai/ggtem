@@ -1,6 +1,7 @@
 ﻿import type { LedgerDirection, WalletBucket } from "@/generated/prisma/client";
 import { getCurrentUserEmailForRole } from "@/lib/auth/session";
 import { ensureUserWallet } from "@/lib/market/wallets";
+import { sendAdminTelegramAlert } from "@/lib/notifications/telegram";
 import { getPrismaClient } from "@/lib/prisma";
 import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit";
 import {
@@ -373,7 +374,7 @@ export async function createMarketplaceWalletRequest(input: {
     throw new Error("금액은 0보다 커야 합니다.");
   }
 
-  return prisma.$transaction(async (tx) => {
+  const result: MarketplaceWalletActionResult = await prisma.$transaction(async (tx) => {
     if (input.kind === "DEPOSIT") {
       const request = await tx.depositRequest.create({
         data: {
@@ -589,6 +590,19 @@ export async function createMarketplaceWalletRequest(input: {
       message: "출금 요청이 접수되었습니다.",
     };
   });
+
+  await sendAdminTelegramAlert({
+    title: result.kind === "DEPOSIT" ? "충전 요청 접수" : "출금 요청 접수",
+    lines: [
+      `상태: ${result.status}`,
+      `요청 ID: ${result.requestId}`,
+      `회원: ${buyer.displayName} / ${buyer.email}`,
+      `금액: ${formatFixedAmount(amount)} ${wallet.currency}`,
+      input.kind === "WITHDRAWAL" && input.chain ? `체인: ${input.chain}` : null,
+    ],
+  });
+
+  return result;
 }
 
 export async function cancelMarketplaceWalletRequest(input: {

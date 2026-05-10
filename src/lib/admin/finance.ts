@@ -4,6 +4,7 @@
   WalletBucket,
 } from "@/generated/prisma/client";
 import { createUserNotification } from "@/lib/notifications/notifications";
+import { sendAdminTelegramAlert } from "@/lib/notifications/telegram";
 import { getPrismaClient } from "@/lib/prisma";
 import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit";
 
@@ -824,7 +825,7 @@ export async function processAdminFinanceAction(input: {
 }): Promise<AdminFinanceActionResult> {
   const prisma = getPrismaClient();
 
-  return prisma.$transaction(async (tx) => {
+  const result: AdminFinanceActionResult = await prisma.$transaction(async (tx) => {
     if (!input.adminId) {
       throw new Error("관리자 인증 정보가 필요합니다.");
     }
@@ -1381,6 +1382,18 @@ export async function processAdminFinanceAction(input: {
       message: "출금 요청이 완료되었습니다.",
     };
   });
+
+  await sendAdminTelegramAlert({
+    title: result.kind === "DEPOSIT" ? "충전 처리 완료" : "출금 처리 완료",
+    lines: [
+      `요청 ID: ${result.requestId}`,
+      `종류: ${result.kind}`,
+      `상태: ${result.status}`,
+      `처리: ${input.action}`,
+    ],
+  });
+
+  return result;
 }
 
 type CryptoDepositEvidence = {
