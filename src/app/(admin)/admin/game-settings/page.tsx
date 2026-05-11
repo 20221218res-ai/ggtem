@@ -84,7 +84,7 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
             </p>
             <h1 className="mt-2 text-3xl font-black tracking-tight">게임 / 서버 설정</h1>
             <p className="mt-2 text-sm font-semibold text-slate-600">
-              게임, 서버, 게임 이미지를 관리합니다. 이미지는 유저 페이지의 게임 카드와 탐색 화면에 사용됩니다.
+              게임, 서버, 게임 이미지와 게임머니 단위를 관리합니다. 이미지는 유저 페이지의 게임 카드와 검색 화면에 사용됩니다.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -143,13 +143,13 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
             <form action={createGameAction} className="grid gap-3 sm:grid-cols-4" encType="multipart/form-data">
               <Field name="name" label="게임명" placeholder="Lineage W" />
               <Field name="code" label="게임 코드" placeholder="lineage-w" />
-              <Field name="moneyUnitName" label="게임머니 단위" placeholder="아데나" />
+              <Field name="moneyUnitName" label="게임머니 단위명" placeholder="아데나" />
               <Field name="sortOrder" label="노출 순서" placeholder="1" />
               <Field name="nameKo" label="한국어 게임명" placeholder="리니지W" />
               <Field name="nameCn" label="중국어 게임명" placeholder="天堂W" />
               <Field name="nameVn" label="베트남어 게임명" placeholder="Lineage W" />
               <Field name="namePh" label="필리핀/영어 게임명" placeholder="Lineage W" />
-              <Field name="nameTh" label="태국어 게임명" placeholder="ไลน์เอจ W" />
+              <Field name="nameTh" label="태국어 게임명" placeholder="Lineage W" />
               <Field name="imageAlt" label="이미지 설명" placeholder="Lineage W 대표 이미지" />
               <FileField name="image" label="게임 이미지" />
               <FormSubmitButton className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
@@ -289,7 +289,7 @@ function GameCard({ game }: { game: GameRow }) {
             <input type="hidden" name="gameId" value={game.id} />
             <Field name="name" label="게임명" defaultValue={game.name} />
             <Field name="code" label="게임 코드" defaultValue={game.code} />
-            <Field name="moneyUnitName" label="게임머니 단위" defaultValue={game.moneyUnitName} />
+            <Field name="moneyUnitName" label="게임머니 단위명" defaultValue={game.moneyUnitName} />
             <Field name="sortOrder" label="노출 순서" defaultValue={String(game.sortOrder)} />
             <Field name="nameKo" label="한국어 게임명" defaultValue={game.nameKo || ""} />
             <Field name="nameCn" label="중국어 게임명" defaultValue={game.nameCn || ""} />
@@ -525,7 +525,7 @@ function Pill({ tone, children }: { tone: "green" | "slate" | "cyan"; children: 
 }
 
 function getNoticeMessage(kind: string, details: { game?: string; count?: string; servers?: string }) {
-  const base = noticeMessages[kind] ?? "작업을 완료했습니다.";
+  const base = noticeMessages[kind] ?? "작업이 완료되었습니다.";
   if (kind !== "created-servers") return base;
   const suffix = [details.game, details.count ? `${details.count}개` : null, details.servers]
     .filter(Boolean)

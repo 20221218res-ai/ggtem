@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { requirePageRole, ROLE_GROUPS } from "@/lib/auth/guards";
+import { ROLE_GROUPS, requirePageRole } from "@/lib/auth/guards";
 import { getPrismaClient } from "@/lib/prisma";
 import {
   AdminMockPage,
@@ -14,7 +14,7 @@ import { FormSubmitButton } from "../form-submit-button";
 
 const inquiryStatusOptions = [
   { value: "OPEN", label: "접수" },
-  { value: "IN_PROGRESS", label: "확인중" },
+  { value: "IN_PROGRESS", label: "확인 중" },
   { value: "ANSWERED", label: "답변 완료" },
   { value: "CLOSED", label: "종료" },
 ] as const;
@@ -60,19 +60,21 @@ export default async function AdminSupportInquiriesPage({
     <AdminMockPage
       icon="문의"
       title="1:1 문의"
-      subtitle="유저 고객센터에서 접수된 문의와 신규 게임/서버 요청을 확인하고 답변을 남깁니다."
+      subtitle="유저 고객센터에서 접수한 문의와 신규 게임/서버 신청을 확인하고 답변합니다."
     >
       <MetricGrid
         items={[
           { label: "전체 문의", value: String(inquiries.length), hint: "최근 80건", tone: "blue" },
           { label: "접수", value: String(statusCounts.get("OPEN") ?? 0), hint: "확인 필요", tone: "amber" },
-          { label: "확인중", value: String(statusCounts.get("IN_PROGRESS") ?? 0), hint: "처리 중", tone: "cyan" },
+          { label: "확인 중", value: String(statusCounts.get("IN_PROGRESS") ?? 0), hint: "처리 중", tone: "cyan" },
           { label: "답변 완료", value: String(statusCounts.get("ANSWERED") ?? 0), hint: "유저 화면 노출", tone: "green" },
         ]}
       />
 
       {params.notice === "updated" ? (
-        <InlineBanner tone="success">문의 답변과 상태를 저장했습니다. 유저 고객센터 화면에 반영됩니다.</InlineBanner>
+        <InlineBanner tone="success">
+          문의 답변과 상태를 저장했습니다. 유저 고객센터 화면에 반영됩니다.
+        </InlineBanner>
       ) : null}
       {params.error ? <InlineBanner tone="error">{params.error}</InlineBanner> : null}
 
@@ -141,7 +143,10 @@ async function updateSupportInquiryAction(formData: FormData) {
   const safeStatus = inquiryStatusOptions.some((item) => item.value === status) ? status : "OPEN";
 
   if (!inquiryId) {
-    redirect("/admin/support-inquiries?error=" + encodeURIComponent("문의 ID를 찾을 수 없습니다. 새로고침 후 다시 시도해 주세요."));
+    redirect(
+      "/admin/support-inquiries?error=" +
+        encodeURIComponent("문의 ID를 찾을 수 없습니다. 새로고침 후 다시 시도해 주세요."),
+    );
   }
 
   if ((safeStatus === "ANSWERED" || safeStatus === "CLOSED") && adminNote.length < 5) {
