@@ -40,15 +40,19 @@ export default function FinanceActions({
   const [confirmationText, setConfirmationText] = useState("");
   const [evidenceTxId, setEvidenceTxId] = useState("");
   const [evidenceMemo, setEvidenceMemo] = useState("");
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const effectiveCompletionPhrase =
     completionPhrase ?? (primaryAction === "COMPLETE_WITHDRAWAL" ? "출금완료" : undefined);
   const needsWithdrawalEvidence = primaryAction === "COMPLETE_WITHDRAWAL";
   const needsCompletionPhrase = Boolean(effectiveCompletionPhrase);
   const hasWithdrawalEvidence = !needsWithdrawalEvidence || Boolean(evidenceTxId.trim());
+  const needsRejectionReason = secondaryAction === "REJECT_DEPOSIT" || secondaryAction === "REJECT_WITHDRAWAL";
+  const hasRejectionReason = !needsRejectionReason || rejectionReason.trim().length >= 5;
   const canSubmitPrimary =
     hasWithdrawalEvidence &&
     (!needsCompletionPhrase || confirmationText.trim() === effectiveCompletionPhrase);
+  const canSubmitSecondary = hasRejectionReason;
 
   async function submit(action: FinanceAction) {
     const confirmed = window.confirm(
@@ -61,6 +65,9 @@ export default function FinanceActions({
               txId: evidenceTxId,
               memo: evidenceMemo,
             })}`
+          : null,
+        action === "REJECT_DEPOSIT" || action === "REJECT_WITHDRAWAL"
+          ? `반려 사유: ${rejectionReason.trim() || "미입력"}`
           : null,
         `${kind === "DEPOSIT" ? "입금" : "출금"} 요청 ${requestId}을 처리할까요?`,
       ]
@@ -84,10 +91,15 @@ export default function FinanceActions({
           requestId,
           action,
           adminEvidence:
-            action === "COMPLETE_WITHDRAWAL" || action === "REJECT_WITHDRAWAL"
+            action === "COMPLETE_WITHDRAWAL" ||
+            action === "REJECT_WITHDRAWAL" ||
+            action === "REJECT_DEPOSIT"
               ? {
                   txId: evidenceTxId.trim(),
-                  memo: evidenceMemo.trim(),
+                  memo:
+                    action === "REJECT_DEPOSIT" || action === "REJECT_WITHDRAWAL"
+                      ? rejectionReason.trim()
+                      : evidenceMemo.trim(),
                 }
               : undefined,
         }),
@@ -102,6 +114,7 @@ export default function FinanceActions({
       setConfirmationText("");
       setEvidenceTxId("");
       setEvidenceMemo("");
+      setRejectionReason("");
       router.refresh();
     } catch (submitError) {
       setError(
@@ -163,6 +176,29 @@ export default function FinanceActions({
         </div>
       ) : null}
 
+      {needsRejectionReason ? (
+        <label className="grid gap-2 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+          <span className="font-black">반려 사유</span>
+          <span className="text-xs font-bold leading-5">
+            유저 알림과 감사 로그에 남길 사유를 입력하세요. 최소 5자 이상 입력해야 반려할 수 있습니다.
+          </span>
+          <input
+            value={rejectionReason}
+            onChange={(event) => setRejectionReason(event.target.value)}
+            className="rounded-md border border-red-200 bg-white px-3 py-2 text-slate-900 outline-none placeholder:text-slate-400 focus:border-red-400"
+            placeholder={kind === "DEPOSIT" ? "예: TXID 미확인 또는 금액 불일치" : "예: 주소 오입력 또는 위험 심사 반려"}
+          />
+        </label>
+      ) : null}
+
+      {!canSubmitPrimary ? (
+        <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-800">
+          {primaryAction === "COMPLETE_WITHDRAWAL"
+            ? "출금 완료는 송금 TXID와 확인 문구를 모두 입력해야 가능합니다."
+            : "최종 확인 조건을 입력해야 처리할 수 있습니다."}
+        </p>
+      ) : null}
+
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
@@ -175,7 +211,7 @@ export default function FinanceActions({
         <button
           type="button"
           onClick={() => void submit(secondaryAction)}
-          disabled={isSubmitting}
+          disabled={isSubmitting || !canSubmitSecondary}
           className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm font-black text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {activeAction === secondaryAction ? `${secondaryLabel} 처리 중...` : secondaryLabel}

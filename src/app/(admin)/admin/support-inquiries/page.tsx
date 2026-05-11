@@ -144,6 +144,13 @@ async function updateSupportInquiryAction(formData: FormData) {
     redirect("/admin/support-inquiries?error=" + encodeURIComponent("문의 ID를 찾을 수 없습니다. 새로고침 후 다시 시도해 주세요."));
   }
 
+  if ((safeStatus === "ANSWERED" || safeStatus === "CLOSED") && adminNote.length < 5) {
+    redirect(
+      "/admin/support-inquiries?error=" +
+        encodeURIComponent("답변 완료 또는 종료 처리에는 유저에게 보여줄 답변을 5자 이상 입력해야 합니다."),
+    );
+  }
+
   const prisma = getPrismaClient();
   await prisma.supportInquiry.update({
     where: { id: inquiryId },

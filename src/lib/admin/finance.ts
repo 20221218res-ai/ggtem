@@ -896,6 +896,8 @@ export async function processAdminFinanceAction(input: {
       }
 
       if (input.action === "REJECT_DEPOSIT") {
+        const rejectReason = input.adminEvidence?.memo?.trim() || request.memo || "관리자 수동 입금 반려";
+
         const statusUpdate = await tx.depositRequest.updateMany({
           where: {
             id: request.id,
@@ -917,7 +919,7 @@ export async function processAdminFinanceAction(input: {
             action: "DEPOSIT_REJECTED",
             targetType: "DEPOSIT_REQUEST",
             targetId: request.id,
-            reason: request.memo ?? "관리자 수동 입금 반려",
+            reason: rejectReason,
             before: {
               status: request.status,
               amount: request.amount.toString(),
@@ -933,7 +935,7 @@ export async function processAdminFinanceAction(input: {
           userId: request.userId,
           type: "WALLET_UPDATE",
           title: "입금 요청이 반려되었습니다.",
-          body: `${request.amount.toString()} ${request.currency} 입금 요청이 반려되었습니다.`, 
+          body: `${request.amount.toString()} ${request.currency} 입금 요청이 반려되었습니다. 사유: ${rejectReason}`, 
           href: `/my/wallet/deposits/${request.id}`,
           metadata: {
             requestId: request.id,

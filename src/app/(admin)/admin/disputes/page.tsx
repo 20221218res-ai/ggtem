@@ -101,6 +101,7 @@ export default function AdminDisputesPage() {
   const selectedAction = state.detail ? getDisputeNextAction(state.detail.status) : null;
   const noteLength = resolutionNote.trim().length;
   const noteIsShort = noteLength > 0 && noteLength < 20;
+  const canResolveDispute = noteLength >= 20;
 
   async function loadDisputes(orderId?: string, nextView?: string, nextQuery?: string) {
     setError("");
@@ -143,6 +144,11 @@ export default function AdminDisputesPage() {
 
   async function resolveDispute(action: "REFUND_BUYER" | "RELEASE_TO_SELLER") {
     if (!state.detail) return;
+
+    if (resolutionNote.trim().length < 20) {
+      setError("분쟁 종료 전 처리 메모를 20자 이상 입력해 주세요. 나중에 감사 로그와 분쟁 근거로 남습니다.");
+      return;
+    }
 
     const confirmed = window.confirm(
       action === "REFUND_BUYER"
@@ -373,9 +379,9 @@ export default function AdminDisputesPage() {
                   </div>
                   <div className="text-sm text-slate-500">
                     메모 {noteLength}자{" "}
-                    {noteIsShort ? (
+                    {noteIsShort || noteLength === 0 ? (
                       <span className="font-semibold text-amber-600">
-                        / 판단 근거를 조금 더 구체적으로 남겨주세요.
+                        / 종료 처리 전 판단 근거를 20자 이상 남겨주세요.
                       </span>
                     ) : null}
                   </div>
@@ -398,7 +404,7 @@ export default function AdminDisputesPage() {
                   <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                     <button
                       type="button"
-                      disabled={isResolving}
+                      disabled={isResolving || !canResolveDispute}
                       onClick={() => void resolveDispute("REFUND_BUYER")}
                       className="rounded-md border border-red-200 bg-red-600 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
                     >
@@ -406,7 +412,7 @@ export default function AdminDisputesPage() {
                     </button>
                     <button
                       type="button"
-                      disabled={isResolving}
+                      disabled={isResolving || !canResolveDispute}
                       onClick={() => void resolveDispute("RELEASE_TO_SELLER")}
                       className="rounded-md border border-[var(--color-primary)] bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-slate-950 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
                     >
