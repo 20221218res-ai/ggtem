@@ -234,10 +234,22 @@ export async function getMarketplaceBuyRequestFormView(): Promise<MarketplaceBuy
           },
         },
       },
-      include: {
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        nameKo: true,
+        nameCn: true,
+        nameVn: true,
+        namePh: true,
+        nameTh: true,
         servers: {
           where: {
             isActive: true,
+          },
+          select: {
+            id: true,
+            name: true,
           },
           orderBy: {
             code: "asc",
@@ -296,10 +308,24 @@ export async function getMarketplaceBuyRequests(
     where: {
       isActive: true,
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      imageUrl: true,
+      moneyUnitName: true,
+      nameKo: true,
+      nameCn: true,
+      nameVn: true,
+      namePh: true,
+      nameTh: true,
       servers: {
         where: {
           isActive: true,
+        },
+        select: {
+          id: true,
+          name: true,
         },
         orderBy: {
           code: "asc",
@@ -377,7 +403,11 @@ export async function getMarketplaceBuyRequests(
         : {}),
     },
     include: {
-      buyer: true,
+      buyer: {
+        select: {
+          displayName: true,
+        },
+      },
       _count: {
         select: {
           offers: true,
@@ -413,6 +443,9 @@ export async function getMarketplaceBuyRequests(
             ? activeServerIds
             : ["__missing_server__"],
       },
+    },
+    select: {
+      category: true,
     },
     take: 100,
   });
@@ -467,7 +500,11 @@ export async function getMarketplaceMyBuyRequests(): Promise<MarketplaceMyBuyReq
         buyerId: sessionUser.userId,
       },
       include: {
-        buyer: true,
+        buyer: {
+          select: {
+            displayName: true,
+          },
+        },
         offers: {
           include: {
             seller: {
@@ -499,8 +536,23 @@ export async function getMarketplaceMyBuyRequests(): Promise<MarketplaceMyBuyReq
       take: 100,
     }),
     prisma.game.findMany({
-      include: {
-        servers: true,
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        imageUrl: true,
+        moneyUnitName: true,
+        nameKo: true,
+        nameCn: true,
+        nameVn: true,
+        namePh: true,
+        nameTh: true,
+        servers: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     }),
