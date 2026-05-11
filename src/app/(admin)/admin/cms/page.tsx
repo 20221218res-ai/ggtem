@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requirePageRole, ROLE_GROUPS } from "@/lib/auth/guards";
 import { getPrismaClient } from "@/lib/prisma";
 import {
@@ -17,12 +18,17 @@ import {
   getAdminCmsState,
 } from "@/lib/admin/cms";
 
-export default async function AdminCmsPage() {
+export default async function AdminCmsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ notice?: string; error?: string }>;
+}) {
   await requirePageRole(ROLE_GROUPS.PLATFORM_ADMINS, {
     signInPath: "/admin/sign-in",
     forbiddenPath: "/admin",
   });
 
+  const params = searchParams ? await searchParams : {};
   const state = await getAdminCmsState();
 
   return (
@@ -36,11 +42,14 @@ export default async function AdminCmsPage() {
           { label: "전체 문서", value: String(state.summary.totalDocuments), hint: "CMS 문서", tone: "blue" },
           { label: "게시중", value: String(state.summary.publishedDocuments), hint: "유저에게 노출", tone: "green" },
           { label: "초안", value: String(state.summary.draftDocuments), hint: "작성 중", tone: "amber" },
-          { label: "검토 요청", value: String(state.summary.reviewRequestedDocuments), hint: "승인 필요", tone: "cyan" },
+          { label: "검토요청", value: String(state.summary.reviewRequestedDocuments), hint: "승인 필요", tone: "cyan" },
           { label: "보관", value: String(state.summary.archivedDocuments), hint: "미노출", tone: "slate" },
           { label: "버전", value: String(state.summary.totalVersions), hint: "전체 버전", tone: "blue" },
         ]}
       />
+
+      {params.notice === "saved" ? <SoftNotice tone="green">콘텐츠가 저장되었습니다. 유저 고객센터에 반영됩니다.</SoftNotice> : null}
+      {params.error ? <SoftNotice tone="red">{params.error}</SoftNotice> : null}
 
       <section className="grid gap-5 xl:grid-cols-[420px_1fr]">
         <Panel title="고객센터 문서 작성">
@@ -72,7 +81,7 @@ export default async function AdminCmsPage() {
               <input
                 name="title"
                 required
-                placeholder="고객센터에 표시될 제목"
+                placeholder="고객센터에 표시할 제목"
                 className="h-11 rounded-md border border-slate-200 px-3 font-bold"
               />
             </label>
@@ -82,7 +91,7 @@ export default async function AdminCmsPage() {
                 name="body"
                 required
                 rows={8}
-                placeholder="운영자가 유저에게 안내할 내용을 입력하세요."
+                placeholder="유저에게 안내할 내용을 입력하세요."
                 className="rounded-md border border-slate-200 px-3 py-3 font-bold leading-6"
               />
             </label>
@@ -91,7 +100,7 @@ export default async function AdminCmsPage() {
               <select name="status" defaultValue="PUBLISHED" className="h-11 rounded-md border border-slate-200 px-3 font-bold">
                 <option value="PUBLISHED">게시중</option>
                 <option value="DRAFT">초안</option>
-                <option value="REVIEW_REQUESTED">검토 요청</option>
+                <option value="REVIEW_REQUESTED">검토요청</option>
                 <option value="ARCHIVED">보관</option>
               </select>
             </label>
@@ -189,7 +198,7 @@ async function saveCmsDocumentAction(formData: FormData) {
   const changeNote = String(formData.get("changeNote") ?? "").trim() || "어드민 CMS 수정";
 
   if (!slug || !title || !body) {
-    return;
+    redirect("/admin/cms?error=" + encodeURIComponent("슬러그, 제목, 본문을 모두 입력해 주세요."));
   }
 
   const version = `v${Date.now()}`;
@@ -233,4 +242,5 @@ async function saveCmsDocumentAction(formData: FormData) {
 
   revalidatePath("/admin/cms");
   revalidatePath("/support");
+  redirect("/admin/cms?notice=saved");
 }

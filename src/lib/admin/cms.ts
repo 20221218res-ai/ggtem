@@ -153,7 +153,7 @@ export function cmsTypeLabel(type: string) {
 export function cmsStatusLabel(status: string) {
   const labels: Record<string, string> = {
     DRAFT: "초안",
-    REVIEW_REQUESTED: "검토 요청",
+    REVIEW_REQUESTED: "검토요청",
     PUBLISHED: "게시중",
     ARCHIVED: "보관",
   };

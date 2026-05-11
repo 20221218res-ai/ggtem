@@ -26,6 +26,23 @@ const inquiryCategories = [
   { value: "OTHER", label: "기타" },
 ] as const;
 
+type InquirySummary = {
+  id: string;
+  category: string;
+  title: string;
+  status: string;
+  adminNote: string | null;
+  createdAt: string;
+};
+
+type DocumentSummary = {
+  slug: string;
+  typeLabel: string;
+  title: string;
+  body: string;
+  updatedAt: string;
+};
+
 export default async function CustomerCenterPage({
   searchParams,
 }: {
@@ -134,15 +151,15 @@ function CustomerSidebar() {
         <p className="text-sm font-black text-slate-500">고객지원센터</p>
         <p className="mt-2 text-2xl font-black text-slate-950">온라인 문의</p>
         <p className="mt-3 text-sm font-bold leading-6 text-slate-600">
-          충전, 출금, 분쟁, 계정 거래 문의는 로그인 후 1:1 문의로 접수하면 운영자가 확인합니다.
+          충전, 출금, 분쟁, 계정 거래 문의는 로그인 후 1:1 문의로 접수해 주세요. 운영자가 답변을 남기면 내 문의 내역에서 확인할 수 있습니다.
         </p>
       </div>
       <Link
-        href="/my/chat"
+        href="/support?tab=inquiry"
         prefetch={false}
         className="block rounded-lg bg-[var(--gg-accent)] px-4 py-3 text-center text-sm font-black text-white"
       >
-        채팅 문의 보기
+        1:1 문의하기
       </Link>
     </aside>
   );
@@ -169,7 +186,7 @@ function DocumentList({
   documents,
 }: {
   title: string;
-  documents: Array<{ slug: string; typeLabel: string; title: string; body: string; updatedAt: string }>;
+  documents: DocumentSummary[];
 }) {
   return (
     <section className="rounded-lg border border-[var(--gg-border)] bg-white">
@@ -207,14 +224,7 @@ function InquiryPanel({
   isSignedIn: boolean;
   submitted: boolean;
   error: boolean;
-  inquiries: Array<{
-    id: string;
-    category: string;
-    title: string;
-    status: string;
-    adminNote: string | null;
-    createdAt: string;
-  }>;
+  inquiries: InquirySummary[];
 }) {
   return (
     <section className="grid gap-5">
@@ -279,7 +289,7 @@ function GameRequestPanel({
   submitted,
   error,
 }: {
-  documents: Array<{ slug: string; typeLabel: string; title: string; body: string; updatedAt: string }>;
+  documents: DocumentSummary[];
   isSignedIn: boolean;
   submitted: boolean;
   error: boolean;
@@ -291,7 +301,7 @@ function GameRequestPanel({
         <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
           원하는 게임이나 서버가 목록에 없으면 아래 폼으로 요청하세요. 접수 내용은 어드민 1:1 문의 화면에서 검토됩니다.
         </p>
-        <SupportNotice submitted={submitted} error={error} successText="게임/서버 신청이 접수되었습니다. 운영자가 검토 후 반영 여부를 답변합니다." />
+        <SupportNotice submitted={submitted} error={error} successText="게임/서버 요청이 접수되었습니다. 운영자가 검토 후 반영 여부를 답변합니다." />
         {isSignedIn ? (
           <form action={createGameServerRequestAction} className="mt-6 grid gap-4">
             <label className="grid gap-2 text-sm font-black">
@@ -346,7 +356,7 @@ function GameRequestPanel({
               />
             </label>
             <button type="submit" className="h-12 rounded-lg bg-[var(--gg-accent)] px-4 text-sm font-black text-white">
-              신청 접수
+              요청 접수
             </button>
           </form>
         ) : (
@@ -381,7 +391,7 @@ function SupportNotice({ submitted, error, successText }: { submitted: boolean; 
 function SignInPrompt({ next, label }: { next: string; label: string }) {
   return (
     <div className="mt-5 rounded-lg border border-[var(--gg-border)] bg-slate-50 p-4">
-      <p className="text-sm font-bold text-slate-600">로그인 후 접수할 수 있습니다.</p>
+      <p className="text-sm font-bold text-slate-600">로그인해야 접수할 수 있습니다.</p>
       <Link
         href={`/sign-in?next=${encodeURIComponent(next)}`}
         prefetch={false}
@@ -397,9 +407,9 @@ function TopQuestions() {
   const questions = [
     "입금자명과 회원명이 달라요",
     "출금 처리가 되지 않아요",
-    "마일리지 충전이 되지 않아요",
-    "계정 거래 정보는 어디에 입력하나요",
-    "분쟁은 어떻게 접수하나요",
+    "충전이 반영되지 않아요",
+    "계정 거래 정보는 어디에 입력하나요?",
+    "분쟁은 어떻게 접수하나요?",
   ];
 
   return (
@@ -416,18 +426,7 @@ function TopQuestions() {
   );
 }
 
-function InquiryHistory({
-  inquiries,
-}: {
-  inquiries: Array<{
-    id: string;
-    category: string;
-    title: string;
-    status: string;
-    adminNote: string | null;
-    createdAt: string;
-  }>;
-}) {
+function InquiryHistory({ inquiries }: { inquiries: InquirySummary[] }) {
   return (
     <section className="rounded-lg border border-[var(--gg-border)] bg-white">
       <div className="border-b border-[var(--gg-border)] px-5 py-4">
