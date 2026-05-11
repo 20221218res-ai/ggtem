@@ -42,16 +42,13 @@ export default function FinanceActions({
   const [evidenceMemo, setEvidenceMemo] = useState("");
 
   const effectiveCompletionPhrase =
-    completionPhrase ??
-    (primaryAction === "COMPLETE_WITHDRAWAL" ? "출금완료" : undefined);
+    completionPhrase ?? (primaryAction === "COMPLETE_WITHDRAWAL" ? "출금완료" : undefined);
   const needsWithdrawalEvidence = primaryAction === "COMPLETE_WITHDRAWAL";
   const needsCompletionPhrase = Boolean(effectiveCompletionPhrase);
-  const hasWithdrawalEvidence =
-    !needsWithdrawalEvidence || Boolean(evidenceTxId.trim());
+  const hasWithdrawalEvidence = !needsWithdrawalEvidence || Boolean(evidenceTxId.trim());
   const canSubmitPrimary =
     hasWithdrawalEvidence &&
-    (!needsCompletionPhrase ||
-      confirmationText.trim() === effectiveCompletionPhrase);
+    (!needsCompletionPhrase || confirmationText.trim() === effectiveCompletionPhrase);
 
   async function submit(action: FinanceAction) {
     const confirmed = window.confirm(
@@ -108,9 +105,7 @@ export default function FinanceActions({
       router.refresh();
     } catch (submitError) {
       setError(
-        submitError instanceof Error
-          ? submitError.message
-          : "요청을 처리하지 못했습니다.",
+        submitError instanceof Error ? submitError.message : "요청을 처리하지 못했습니다.",
       );
     } finally {
       setIsSubmitting(false);

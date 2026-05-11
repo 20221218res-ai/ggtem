@@ -38,7 +38,7 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("saving");
-    setMessage("저장 중입니다...");
+    setMessage("입금 주소를 저장하는 중입니다...");
 
     try {
       const response = await fetch("/api/admin/deposit-addresses", {

@@ -100,7 +100,7 @@ function WithdrawalReviewCard({ item }: { item: PendingWithdrawal }) {
         <InfoPanel title="2. 송금 정보">
           <InfoRow label="체인" value={item.chain ?? "TRC20"} />
           <InfoRow label="받을 주소" value={item.destination} breakAll />
-          <InfoRow label="실지급" value={`${item.netAmount} ${item.currency}`} />
+          <InfoRow label="실수령" value={`${item.netAmount} ${item.currency}`} />
           <InfoRow label="요청 시각" value={item.requestedAt} />
         </InfoPanel>
 
@@ -146,7 +146,7 @@ function WithdrawalReviewCard({ item }: { item: PendingWithdrawal }) {
         secondaryLabel="출금 거절"
         completionPhrase="출금완료"
         completionPhraseLabel="출금 완료 확인 문구"
-        confirmationSummary={`금액: ${item.amount} ${item.currency}\n수수료: ${item.fee} ${item.currency}\n실지급: ${item.netAmount} ${item.currency}\n유저: ${item.userName} <${item.userEmail}>\n받을 주소: ${item.destination}\n메모: ${item.memo ?? "없음"}`}
+        confirmationSummary={`금액: ${item.amount} ${item.currency}\n수수료: ${item.fee} ${item.currency}\n실수령: ${item.netAmount} ${item.currency}\n유저: ${item.userName} <${item.userEmail}>\n받을 주소: ${item.destination}\n메모: ${item.memo ?? "없음"}`}
       />
     </article>
   );
@@ -266,8 +266,8 @@ function withdrawalRiskFlagLabel(flag: string) {
   const labels: Record<string, string> = {
     SAME_IP_MULTI_ACCOUNT_WITHDRAWAL: "동일 IP 다계정 출금",
     SAME_IP_WITHDRAWAL_REVIEW: "동일 IP 검토",
-    SAME_DEVICE_MULTI_ACCOUNT_WITHDRAWAL: "동일 디바이스 다계정 출금",
-    SAME_DEVICE_WITHDRAWAL_REVIEW: "동일 디바이스 검토",
+    SAME_DEVICE_MULTI_ACCOUNT_WITHDRAWAL: "동일 기기 다계정 출금",
+    SAME_DEVICE_WITHDRAWAL_REVIEW: "동일 기기 검토",
     SHORT_INTERVAL_WITHDRAWAL_ATTEMPT: "짧은 간격 반복 요청",
   };
   return labels[flag] ?? flag;

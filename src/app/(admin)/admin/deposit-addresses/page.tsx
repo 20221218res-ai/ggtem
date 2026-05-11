@@ -33,7 +33,7 @@ export default async function AdminDepositAddressesPage({
     <AdminMockPage
       icon=""
       title="입금 주소 설정"
-      subtitle="유저에게 노출되는 USDT 입금 주소를 최고관리자만 변경합니다."
+      subtitle="유저에게 노출되는 USDT 입금 주소는 최고관리자만 변경할 수 있습니다."
       actions={null}
     >
       <MetricGrid

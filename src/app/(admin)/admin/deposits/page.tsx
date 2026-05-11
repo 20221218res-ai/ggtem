@@ -105,7 +105,7 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
           <InfoRow label="입금 주소" value={item.evidence.depositAddress ?? "미입력"} breakAll />
           <InfoRow
             label="TXID"
-            value={item.evidence.txHash ?? "아직 제출되지 않음"}
+            value={item.evidence.txHash ?? "아직 제출하지 않음"}
             breakAll
             tone={item.evidence.isTxHashPending ? "text-amber-700" : "text-emerald-700"}
           />
@@ -124,10 +124,7 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
           { label: "코인 정보 확인", done: Boolean(item.evidence.asset) },
           { label: "네트워크 확인", done: Boolean(item.evidence.network) },
           { label: "입금 주소 확인", done: Boolean(item.evidence.depositAddress) },
-          {
-            label: "TXID 제출 확인",
-            done: hasValidTxId,
-          },
+          { label: "TXID 제출 확인", done: hasValidTxId },
         ]}
       />
 

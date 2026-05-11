@@ -60,7 +60,7 @@ export default async function AdminSupportInquiriesPage({
     <AdminMockPage
       icon="문의"
       title="1:1 문의"
-      subtitle="유저 고객센터에서 접수된 문의와 신규 게임/서버 신청을 확인하고 답변을 남깁니다."
+      subtitle="유저 고객센터에서 접수된 문의와 신규 게임/서버 요청을 확인하고 답변을 남깁니다."
     >
       <MetricGrid
         items={[
