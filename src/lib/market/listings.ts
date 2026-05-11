@@ -217,12 +217,54 @@ export async function getMarketplaceListings(
   const [listings, allActiveListings, activeGames] = await Promise.all([
     prisma.listing.findMany({
       where,
-      include: {
-        seller: true,
-        inventory: true,
-        game: true,
-        server: true,
+      select: {
+        id: true,
+        sellerId: true,
+        title: true,
+        category: true,
+        accountTransferType: true,
+        serverDetail: true,
+        unitPrice: true,
+        currency: true,
+        premiumEndsAt: true,
+        premiumDurationHours: true,
+        premiumFeeAmount: true,
+        createdAt: true,
+        seller: {
+          select: {
+            displayName: true,
+          },
+        },
+        inventory: {
+          select: {
+            minimumQuantity: true,
+            availableQuantity: true,
+            lockedQuantity: true,
+            soldQuantity: true,
+          },
+        },
+        game: {
+          select: {
+            name: true,
+            code: true,
+            imageUrl: true,
+            moneyUnitName: true,
+            nameKo: true,
+            nameCn: true,
+            nameVn: true,
+            namePh: true,
+            nameTh: true,
+          },
+        },
+        server: {
+          select: {
+            name: true,
+          },
+        },
         images: {
+          select: {
+            imageUrl: true,
+          },
           orderBy: {
             sortOrder: "asc",
           },
@@ -253,18 +295,6 @@ export async function getMarketplaceListings(
       },
       select: {
         category: true,
-        game: {
-          select: {
-            name: true,
-            code: true,
-            imageUrl: true,
-            nameKo: true,
-            nameCn: true,
-            nameVn: true,
-            namePh: true,
-            nameTh: true,
-          },
-        },
       },
       orderBy: {
         createdAt: "desc",
@@ -474,12 +504,61 @@ export async function getMarketplaceListingDetail(
   const prisma = getPrismaClient();
   const listing = await prisma.listing.findUnique({
     where: { id: listingId },
-    include: {
-      seller: true,
-      inventory: true,
-      game: true,
-      server: true,
+    select: {
+      id: true,
+      sellerId: true,
+      gameId: true,
+      title: true,
+      description: true,
+      status: true,
+      category: true,
+      accountTransferType: true,
+      serverDetail: true,
+      unitPrice: true,
+      currency: true,
+      premiumEndsAt: true,
+      premiumDurationHours: true,
+      premiumFeeAmount: true,
+      createdAt: true,
+      seller: {
+        select: {
+          displayName: true,
+        },
+      },
+      inventory: {
+        select: {
+          totalQuantity: true,
+          minimumQuantity: true,
+          availableQuantity: true,
+          lockedQuantity: true,
+          soldQuantity: true,
+        },
+      },
+      game: {
+        select: {
+          name: true,
+          code: true,
+          imageUrl: true,
+          moneyUnitName: true,
+          isActive: true,
+          nameKo: true,
+          nameCn: true,
+          nameVn: true,
+          namePh: true,
+          nameTh: true,
+        },
+      },
+      server: {
+        select: {
+          name: true,
+          isActive: true,
+        },
+      },
       images: {
+        select: {
+          imageUrl: true,
+          altText: true,
+        },
         orderBy: {
           sortOrder: "asc",
         },
@@ -522,12 +601,54 @@ export async function getMarketplaceListingDetail(
       gameId: listing.gameId,
       category: listing.category,
     },
-    include: {
-      seller: true,
-      inventory: true,
-      game: true,
-      server: true,
+    select: {
+      id: true,
+      sellerId: true,
+      title: true,
+      category: true,
+      accountTransferType: true,
+      serverDetail: true,
+      unitPrice: true,
+      currency: true,
+      premiumEndsAt: true,
+      premiumDurationHours: true,
+      premiumFeeAmount: true,
+      createdAt: true,
+      seller: {
+        select: {
+          displayName: true,
+        },
+      },
+      inventory: {
+        select: {
+          minimumQuantity: true,
+          availableQuantity: true,
+          lockedQuantity: true,
+          soldQuantity: true,
+        },
+      },
+      game: {
+        select: {
+          name: true,
+          code: true,
+          imageUrl: true,
+          moneyUnitName: true,
+          nameKo: true,
+          nameCn: true,
+          nameVn: true,
+          namePh: true,
+          nameTh: true,
+        },
+      },
+      server: {
+        select: {
+          name: true,
+        },
+      },
       images: {
+        select: {
+          imageUrl: true,
+        },
         orderBy: {
           sortOrder: "asc",
         },
@@ -562,8 +683,16 @@ export async function getMarketplaceListingDetail(
       ],
     },
     include: {
-      buyer: true,
-      order: true,
+      buyer: {
+        select: {
+          displayName: true,
+        },
+      },
+      order: {
+        select: {
+          orderNumber: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
