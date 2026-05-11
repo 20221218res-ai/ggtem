@@ -14,10 +14,9 @@ type NotificationItem = {
 };
 
 type NotificationsResponse = {
-  notifications?: NotificationItem[];
+  notification?: NotificationItem | null;
 };
 
-const PRIORITY_TYPES = new Set(["CHAT_MESSAGE", "ORDER_STATUS"]);
 const DISMISSED_STORAGE_KEY = "ggtem-dismissed-priority-notification";
 
 export default function PriorityNotificationModal() {
@@ -47,7 +46,10 @@ export default function PriorityNotificationModal() {
 
     async function loadPriorityNotification() {
       try {
-        const response = await fetch("/api/notifications", {
+        const params = dismissedId
+          ? `?dismissedId=${encodeURIComponent(dismissedId)}`
+          : "";
+        const response = await fetch(`/api/user/priority-notification${params}`, {
           cache: "no-store",
         });
 
@@ -56,16 +58,9 @@ export default function PriorityNotificationModal() {
         }
 
         const data = (await response.json()) as NotificationsResponse;
-        const nextNotification =
-          data.notifications?.find(
-            (item) =>
-              !item.isRead &&
-              PRIORITY_TYPES.has(item.type) &&
-              item.notificationId !== dismissedId,
-          ) ?? null;
 
         if (isActive) {
-          setNotification(nextNotification);
+          setNotification(data.notification ?? null);
         }
       } catch {
         // The modal is opportunistic; failed polling should not block the page.
@@ -123,10 +118,10 @@ export default function PriorityNotificationModal() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-black uppercase text-[var(--gg-accent)]">
-              Priority alert
+              우선 알림
             </p>
             <h2 className="mt-2 text-2xl font-black text-[var(--gg-text)]">
-              먼저 확인할 거래 알림이 있습니다
+              먼저 확인해야 할 거래 알림이 있습니다
             </h2>
           </div>
           <button

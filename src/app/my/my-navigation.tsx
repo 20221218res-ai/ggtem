@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import BrandLogo from "@/components/brand-logo";
 import CountrySelector from "../country-selector";
 import CountryText from "../country-text";
@@ -16,6 +17,11 @@ export type MyNavigationLink = {
   descriptionKey: TranslationKey;
   groupKey: TranslationKey;
   badgeCount?: number;
+};
+
+type NavigationCounts = {
+  unreadChatCount: number;
+  unreadNotificationCount: number;
 };
 
 const categoryLinks: Array<{ href: string; labelKey: TranslationKey }> = [
@@ -33,9 +39,43 @@ export default function MyNavigation({
   displayName: string;
 }) {
   const pathname = usePathname();
-  const unreadChatCount = links.find((link) => link.href === "/my/chat")?.badgeCount ?? 0;
-  const unreadNoticeCount =
-    links.find((link) => link.href === "/my/notifications")?.badgeCount ?? 0;
+  const [counts, setCounts] = useState<NavigationCounts>({
+    unreadChatCount: 0,
+    unreadNotificationCount: 0,
+  });
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadNavigationCounts() {
+      try {
+        const response = await fetch("/api/user/header-counts", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = (await response.json()) as NavigationCounts;
+
+        if (isActive) {
+          setCounts({
+            unreadChatCount: data.unreadChatCount ?? 0,
+            unreadNotificationCount: data.unreadNotificationCount ?? 0,
+          });
+        }
+      } catch {
+        // Navigation badges should never block the my-page shell.
+      }
+    }
+
+    void loadNavigationCounts();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 overflow-x-clip border-b border-[var(--gg-border-soft)] bg-white/95 shadow-sm shadow-[var(--gg-shadow)] backdrop-blur">
@@ -141,18 +181,18 @@ export default function MyNavigation({
           <NavIconLink
             href="/my/chat"
             active={isActivePath(pathname, "/my/chat")}
-            badgeCount={unreadChatCount}
+            badgeCount={counts.unreadChatCount}
           >
             <CountryText id="common.chat" />
           </NavIconLink>
           <NavIconLink href="/my" active={pathname === "/my"}>
             <CountryText id="common.my" />
           </NavIconLink>
-          {unreadNoticeCount > 0 ? (
+          {counts.unreadNotificationCount > 0 ? (
             <NavIconLink
               href="/my/notifications"
               active={isActivePath(pathname, "/my/notifications")}
-              badgeCount={unreadNoticeCount}
+              badgeCount={counts.unreadNotificationCount}
             >
               <CountryText id="common.notifications" />
             </NavIconLink>

@@ -37,6 +37,8 @@ export type MyNotificationsView = {
   }>;
 };
 
+export type PriorityNotificationItem = MyNotificationsView["notifications"][number];
+
 export async function createUserNotification(input: UserNotificationInput) {
   const prisma = getPrismaClient();
   await prisma.notification.create({
@@ -109,6 +111,60 @@ export async function getMyNotificationsView(): Promise<MyNotificationsView | nu
       isRead: item.isRead,
       createdAt: formatKoreanDate(item.createdAt),
     })),
+  };
+}
+
+export async function getPriorityNotification(
+  dismissedId?: string | null,
+): Promise<PriorityNotificationItem | null> {
+  const prisma = getPrismaClient();
+  const sessionUser = await getCurrentSessionUser();
+
+  if (!sessionUser) {
+    return null;
+  }
+
+  const notification = await prisma.notification.findFirst({
+    where: {
+      userId: sessionUser.userId,
+      isRead: false,
+      type: {
+        in: ["CHAT_MESSAGE", "ORDER_STATUS"],
+      },
+      ...(dismissedId
+        ? {
+            id: {
+              not: dismissedId,
+            },
+          }
+        : {}),
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      type: true,
+      title: true,
+      body: true,
+      href: true,
+      isRead: true,
+      createdAt: true,
+    },
+  });
+
+  if (!notification) {
+    return null;
+  }
+
+  return {
+    notificationId: notification.id,
+    type: notification.type,
+    title: notification.title,
+    body: notification.body,
+    href: notification.href,
+    isRead: notification.isRead,
+    createdAt: formatKoreanDate(notification.createdAt),
   };
 }
 

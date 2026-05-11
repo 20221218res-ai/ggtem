@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import BrandLogo from "@/components/brand-logo";
 import CountrySelector from "./country-selector";
 import MarketplaceAccountMenu from "./marketplace-account-menu";
@@ -21,16 +22,59 @@ type UserMarketHeaderClientProps = {
     displayName: string;
     email: string;
   } | null;
+};
+
+type HeaderCounts = {
   unreadChatCount: number;
   unreadNotificationCount: number;
 };
 
 export default function UserMarketHeaderClient({
   currentUser,
-  unreadChatCount,
-  unreadNotificationCount,
 }: UserMarketHeaderClientProps) {
   const { t } = useCountryTranslation();
+  const [counts, setCounts] = useState<HeaderCounts>({
+    unreadChatCount: 0,
+    unreadNotificationCount: 0,
+  });
+
+  useEffect(() => {
+    if (!currentUser) {
+      setCounts({ unreadChatCount: 0, unreadNotificationCount: 0 });
+      return;
+    }
+
+    let isActive = true;
+
+    async function loadHeaderCounts() {
+      try {
+        const response = await fetch("/api/user/header-counts", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = (await response.json()) as HeaderCounts;
+
+        if (isActive) {
+          setCounts({
+            unreadChatCount: data.unreadChatCount ?? 0,
+            unreadNotificationCount: data.unreadNotificationCount ?? 0,
+          });
+        }
+      } catch {
+        // Counts are non-critical; the header should never block page navigation.
+      }
+    }
+
+    void loadHeaderCounts();
+
+    return () => {
+      isActive = false;
+    };
+  }, [currentUser]);
 
   return (
     <header className="sticky top-0 z-30 overflow-x-clip border-b border-[var(--gg-border-soft)] bg-white/95 shadow-sm shadow-[var(--gg-shadow)] backdrop-blur">
@@ -83,8 +127,8 @@ export default function UserMarketHeaderClient({
               <MarketplaceAccountMenu
                 displayName={currentUser.displayName}
                 email={currentUser.email}
-                unreadChatCount={unreadChatCount}
-                unreadNotificationCount={unreadNotificationCount}
+                unreadChatCount={counts.unreadChatCount}
+                unreadNotificationCount={counts.unreadNotificationCount}
               />
             </>
           ) : null}
@@ -144,8 +188,8 @@ export default function UserMarketHeaderClient({
           {currentUser ? (
             <>
               <TextIconLink href="/my/wallet" label={t("common.wallet")} />
-              <TextIconLink href="/my/chat" label={t("common.chat")} badge={unreadChatCount} />
-              <TextIconLink href="/my" label={t("common.my")} badge={unreadNotificationCount} />
+              <TextIconLink href="/my/chat" label={t("common.chat")} badge={counts.unreadChatCount} />
+              <TextIconLink href="/my" label={t("common.my")} badge={counts.unreadNotificationCount} />
             </>
           ) : (
             <>

@@ -5,7 +5,6 @@ import {
   roleHasAccess,
   type AllowedRole,
 } from "@/lib/auth/guards";
-import { getPrismaClient } from "@/lib/prisma";
 import type { TranslationKey } from "../i18n";
 import MyNavigation, { type MyNavigationLink } from "./my-navigation";
 
@@ -90,33 +89,10 @@ const myLinks = [
 
 export default async function MyLayout({ children }: { children: ReactNode }) {
   const currentUser = await requirePageRole(ROLE_GROUPS.MARKET_USERS);
-  const prisma = getPrismaClient();
-  const [unreadChatCount, unreadNotificationCount] = await Promise.all([
-    prisma.chatMessage.count({
-      where: {
-        senderId: { not: currentUser.userId },
-        readAt: null,
-        room: {
-          OR: [{ buyerId: currentUser.userId }, { sellerId: currentUser.userId }],
-        },
-      },
-    }),
-    prisma.notification.count({
-      where: {
-        userId: currentUser.userId,
-        isRead: false,
-      },
-    }),
-  ]);
-  const badgeByHref: Record<string, number> = {
-    "/my/chat": unreadChatCount,
-    "/my/notifications": unreadNotificationCount,
-  };
   const visibleLinks = myLinks
     .filter((link) => roleHasAccess(currentUser.role, link.roles))
     .map((link) => ({
       ...link,
-      badgeCount: badgeByHref[link.href] ?? 0,
     })) satisfies MyNavigationLink[];
 
   return (

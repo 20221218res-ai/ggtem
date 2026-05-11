@@ -11,6 +11,7 @@ import LocalizedInput from "./localized-input";
 import UserContentText, { SourceCountryFlag } from "./user-content-text";
 import UserMarketHeader from "./user-market-header";
 import GameNameText from "./game-name-text";
+import OptimizedGameImage from "@/components/optimized-game-image";
 import type { GameCatalogOption } from "@/lib/market/game-localization";
 
 type MarketplaceHomeProps = MarketplaceListingsView;
@@ -320,9 +321,12 @@ function GameIndex({
             className="flex items-center justify-between gap-3 rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 hover:border-[var(--gg-accent)]"
           >
             <div className="flex items-center gap-3">
-              <img
+              <OptimizedGameImage
                 src={game.imageUrl ?? `/api/game-card/${game.code}`}
                 alt={game.name}
+                width={48}
+                height={48}
+                sizes="48px"
                 className="h-12 w-12 rounded-lg border border-[var(--gg-border)] object-cover"
               />
               <div>

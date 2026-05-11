@@ -1,4 +1,5 @@
 import Link from "next/link";
+import OptimizedGameImage from "@/components/optimized-game-image";
 import type { MarketplaceListingSummary } from "@/lib/market/listings";
 import { getMarketplaceListings } from "@/lib/market/listings";
 import { MarketplaceHeader } from "../marketplace-home";
@@ -110,29 +111,16 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
         });
   const canonicalSelectedGame = view.appliedFilters.game || selectedGame;
 
-  const categorySeedView = selectedGame
-    ? selectedMode === "buy"
-      ? await getMarketplaceBuyRequests({ category: buyRequestCategoryFilter })
-      : await getMarketplaceListings({ category: selectedCategory })
-    : view;
   const viewItems = getMarketItems(view);
-  const categorySeedItems = getMarketItems(categorySeedView);
-  const gameSeedView =
-    selectedGame && categorySeedItems.length === 0
-      ? selectedMode === "buy"
-        ? await getMarketplaceBuyRequests()
-        : await getMarketplaceListings()
-      : categorySeedView;
-  const gameSeedItems = getMarketItems(gameSeedView);
-  const gameCards = buildGameCards(
-    gameSeedItems,
-    gameSeedView.filterOptions.gameOptions ?? [],
-    gameSearch,
-  );
-  const itemsForSelectedGame =
-    selectedGame && viewItems.length === 0 ? gameSeedItems : viewItems;
+  const gameCards = shouldShowResults
+    ? []
+    : buildGameCards(
+        viewItems,
+        view.filterOptions.gameOptions ?? [],
+        gameSearch,
+      );
   const visibleItems = filterMarketItemsByServerAndPrice(
-    itemsForSelectedGame,
+    viewItems,
     selectedServer,
     selectedServerDetail,
     minPrice,
@@ -616,9 +604,12 @@ function GameCardSelector({
             href={`/listings?category=${selectedCategory}&mode=${selectedMode}&game=${encodeURIComponent(game.name)}`}
             className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)]"
           >
-            <img
+            <OptimizedGameImage
               src={game.imageUrl ?? `/api/game-card/${game.code}`}
               alt={game.name}
+              width={320}
+              height={160}
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
               className="h-24 w-full rounded-xl border border-[var(--gg-border)] object-cover"
             />
             <h3 className="mt-4 text-base font-black">

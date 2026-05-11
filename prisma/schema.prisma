@@ -350,6 +350,8 @@ model Listing {
   @@index([category, accountTransferType])
   @@index([status, createdAt])
   @@index([status, unitPrice])
+  @@index([status, category, createdAt], map: "Listing_status_category_created_idx")
+  @@index([status, gameId, serverId, category, createdAt], map: "Listing_active_filter_created_idx")
   @@index([premiumEndsAt])
 }
 
@@ -413,6 +415,8 @@ model BuyRequest {
   @@index([category, accountTransferType])
   @@index([status, createdAt])
   @@index([status, unitPrice])
+  @@index([status, category, createdAt], map: "BuyRequest_status_category_created_idx")
+  @@index([status, gameId, serverId, category, createdAt], map: "BuyRequest_active_filter_created_idx")
   @@index([premiumEndsAt])
 }
 
@@ -469,6 +473,8 @@ model Order {
   @@index([buyerId, status])
   @@index([sellerId, status])
   @@index([listingId, status])
+  @@index([buyerId, updatedAt], map: "Order_buyer_updated_idx")
+  @@index([sellerId, updatedAt], map: "Order_seller_updated_idx")
 }
 
 model OrderAccountCredential {
@@ -519,6 +525,7 @@ model ChatMessage {
 
   @@index([roomId, createdAt])
   @@index([senderId, createdAt])
+  @@index([roomId, readAt, senderId], map: "ChatMessage_room_read_sender_idx")
 }
 
 model OrderEvent {
@@ -847,4 +854,5 @@ model Notification {
   user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead, createdAt])
+  @@index([userId, isRead, type, createdAt], map: "Notification_user_read_type_created_idx")
 }
