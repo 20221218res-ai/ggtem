@@ -293,7 +293,7 @@ export async function resolveAdminRiskReport(input: {
       data: {
         userId: report.reporterId,
         type: "SYSTEM",
-        title: "접수된 신고 상태가 변경되었습니다.",
+        title: "접수한 신고 상태가 변경되었습니다.",
         body: `신고 상태가 ${reportStatusLabel(updatedReport.status)} 상태로 변경되었습니다.`,
         href: report.orderId ? `/my/orders/${report.orderId}` : "/",
         metadata: {
@@ -377,7 +377,7 @@ export async function applySellerRiskRestriction(input: {
     });
 
     if (!targetUser) {
-      throw new Error("판매자 후보를 찾을 수 없습니다.");
+      throw new Error("판매자 정보를 찾을 수 없습니다.");
     }
 
     if (["SUSPENDED", "BANNED"].includes(targetUser.status)) {
@@ -475,7 +475,7 @@ export async function restoreSellerSellingAccess(input: {
     });
 
     if (!targetUser) {
-      throw new Error("판매자 후보를 찾을 수 없습니다.");
+      throw new Error("판매자 정보를 찾을 수 없습니다.");
     }
 
     if (targetUser.status !== "SELLING_RESTRICTED") {
