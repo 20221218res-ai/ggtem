@@ -163,10 +163,29 @@ export async function getAdminOrdersState(
           }
         : {}),
     },
-    include: {
-      buyer: true,
-      seller: true,
-      listing: true,
+    select: {
+      id: true,
+      orderNumber: true,
+      status: true,
+      quantity: true,
+      grossAmount: true,
+      currency: true,
+      createdAt: true,
+      buyer: {
+        select: {
+          displayName: true,
+        },
+      },
+      seller: {
+        select: {
+          displayName: true,
+        },
+      },
+      listing: {
+        select: {
+          title: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",

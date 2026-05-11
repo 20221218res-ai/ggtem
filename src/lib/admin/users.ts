@@ -265,8 +265,20 @@ export async function getAdminUsersState(filters?: {
   ] = await Promise.all([
     prisma.user.findMany({
       where,
-      include: {
-        wallet: true,
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        wallet: {
+          select: {
+            availableBalance: true,
+            currency: true,
+          },
+        },
         _count: {
           select: {
             buyerOrders: true,

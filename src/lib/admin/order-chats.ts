@@ -126,21 +126,45 @@ export async function getAdminOrderChatsState(input: {
   const [rooms, totalRooms] = await Promise.all([
     prisma.chatRoom.findMany({
       where,
-      include: {
-        buyer: true,
-        seller: true,
+      select: {
+        id: true,
+        orderId: true,
+        buyerId: true,
+        sellerId: true,
+        lastMessageAt: true,
+        updatedAt: true,
+        buyer: {
+          select: {
+            displayName: true,
+            email: true,
+          },
+        },
+        seller: {
+          select: {
+            displayName: true,
+            email: true,
+          },
+        },
         order: {
-          include: {
+          select: {
+            orderNumber: true,
+            status: true,
             listing: {
-              include: {
-                game: true,
+              select: {
+                title: true,
+                game: {
+                  select: {
+                    name: true,
+                  },
+                },
               },
             },
           },
         },
         messages: {
-          include: {
-            sender: true,
+          select: {
+            body: true,
+            createdAt: true,
           },
           orderBy: {
             createdAt: "desc",
@@ -227,21 +251,54 @@ async function getAdminOrderChatDetail(
     where: {
       orderId,
     },
-    include: {
-      buyer: true,
-      seller: true,
+    select: {
+      id: true,
+      orderId: true,
+      buyerId: true,
+      sellerId: true,
+      buyer: {
+        select: {
+          displayName: true,
+          email: true,
+        },
+      },
+      seller: {
+        select: {
+          displayName: true,
+          email: true,
+        },
+      },
       order: {
-        include: {
+        select: {
+          orderNumber: true,
+          status: true,
+          grossAmount: true,
+          currency: true,
           listing: {
-            include: {
-              game: true,
+            select: {
+              title: true,
+              game: {
+                select: {
+                  name: true,
+                },
+              },
             },
           },
         },
       },
       messages: {
-        include: {
-          sender: true,
+        select: {
+          id: true,
+          senderId: true,
+          body: true,
+          createdAt: true,
+          readAt: true,
+          sender: {
+            select: {
+              displayName: true,
+              email: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "asc",
