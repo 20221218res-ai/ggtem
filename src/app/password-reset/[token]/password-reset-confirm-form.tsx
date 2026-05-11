@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { Alert, Button, CardHeading, Field, TextInput } from "@/components/ui";
+import { Alert, Button, CardHeading, Field } from "@/components/ui";
+import PasswordVisibilityInput from "@/components/password-visibility-input";
 import CountryText from "../../country-text";
 import useCountryTranslation from "../../use-country-translation";
 
 export default function PasswordResetConfirmForm({ token }: { token: string }) {
   const { t } = useCountryTranslation();
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,6 +19,12 @@ export default function PasswordResetConfirmForm({ token }: { token: string }) {
     event.preventDefault();
     setMessage("");
     setError("");
+
+    if (password !== passwordConfirm) {
+      setError("비밀번호가 서로 일치하지 않습니다.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -35,6 +43,7 @@ export default function PasswordResetConfirmForm({ token }: { token: string }) {
 
       setMessage(result.message ?? t("auth.passwordChanged"));
       setPassword("");
+      setPasswordConfirm("");
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : t("auth.passwordChangeFailed"));
     } finally {
@@ -54,13 +63,21 @@ export default function PasswordResetConfirmForm({ token }: { token: string }) {
       />
       <div className="mt-5">
         <Field label={<CountryText id="auth.newPassword" />}>
-          <TextInput
-            type="password"
+          <PasswordVisibilityInput
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             autoComplete="new-password"
           />
         </Field>
+        <div className="mt-4">
+          <Field label="새 비밀번호 확인">
+            <PasswordVisibilityInput
+              value={passwordConfirm}
+              onChange={(event) => setPasswordConfirm(event.target.value)}
+              autoComplete="new-password"
+            />
+          </Field>
+        </div>
       </div>
       <Button type="submit" disabled={isSubmitting} className="mt-5">
         {isSubmitting ? <CountryText id="auth.passwordChanging" /> : <CountryText id="auth.passwordChange" />}

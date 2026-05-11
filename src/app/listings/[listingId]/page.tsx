@@ -241,6 +241,7 @@ export default async function ListingDetailPage({
           <aside className="flex flex-col gap-4 xl:sticky xl:top-28 xl:self-start">
             <PurchasePreviewPanel
               listingId={listing.listingId}
+              category={listing.category}
               unitPrice={listing.unitPrice}
               currency={listing.currency}
               availableQuantity={listing.availableQuantity}

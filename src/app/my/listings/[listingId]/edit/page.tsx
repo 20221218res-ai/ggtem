@@ -83,6 +83,7 @@ export default async function EditListingPage({
           currency={listing.currency}
           initialTitle={listing.title}
           initialDescription={listing.description ?? ""}
+          initialCategory={listing.category}
           initialUnitPrice={listing.unitPrice}
           initialTotalQuantity={listing.totalQuantity}
           initialImageUrl={listing.primaryImageUrl}

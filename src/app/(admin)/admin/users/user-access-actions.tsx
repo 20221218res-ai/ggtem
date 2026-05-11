@@ -15,10 +15,12 @@ const operatorRoles = ["CS", "MODERATOR", "FINANCE", "ADMIN", "SUPER"];
 
 export default function UserAccessActions({
   userId,
+  userEmail,
   currentRole,
   currentStatus,
 }: {
   userId: string;
+  userEmail: string;
   currentRole: string;
   currentStatus: string;
 }) {
@@ -26,8 +28,14 @@ export default function UserAccessActions({
   const [role, setRole] = useState(currentRole);
   const [status, setStatus] = useState(currentStatus);
   const [reason, setReason] = useState("운영상 계정 상태 점검");
+  const [passwordResetReason, setPasswordResetReason] = useState(
+    "유저 요청으로 비밀번호 재설정 지원",
+  );
   const [error, setError] = useState("");
+  const [passwordResetMessage, setPasswordResetMessage] = useState("");
+  const [passwordResetError, setPasswordResetError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPasswordResetting, setIsPasswordResetting] = useState(false);
   const roleChanged = role !== currentRole;
   const statusChanged = status !== currentStatus;
   const isOperatorRoleChange =
@@ -93,6 +101,64 @@ export default function UserAccessActions({
       );
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function requestUserPasswordReset() {
+    const trimmedReason = passwordResetReason.trim();
+
+    if (trimmedReason.length < 10) {
+      setPasswordResetError("비밀번호 초기화 사유를 10자 이상 입력해 주세요.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      [
+        "이 유저에게 비밀번호 재설정 메일을 발송할까요?",
+        "",
+        `대상: ${userEmail}`,
+        `사유: ${trimmedReason}`,
+        "",
+        "기존 비밀번호는 운영자가 볼 수 없으며, 유저가 메일 링크에서 직접 새 비밀번호를 설정합니다.",
+      ].join("\n"),
+    );
+
+    if (!confirmed) return;
+
+    setPasswordResetMessage("");
+    setPasswordResetError("");
+    setIsPasswordResetting(true);
+
+    try {
+      const response = await fetch("/api/admin/users/password-reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          reason: trimmedReason,
+        }),
+      });
+      const result = (await response.json()) as {
+        message?: string;
+        resetUrl?: string | null;
+      };
+
+      if (!response.ok) {
+        throw new Error(result.message ?? "비밀번호 재설정 메일을 발송하지 못했습니다.");
+      }
+
+      setPasswordResetMessage(result.message ?? "비밀번호 재설정 메일을 발송했습니다.");
+      router.refresh();
+    } catch (resetError) {
+      setPasswordResetError(
+        resetError instanceof Error
+          ? resetError.message
+          : "비밀번호 재설정 메일을 발송하지 못했습니다.",
+      );
+    } finally {
+      setIsPasswordResetting(false);
     }
   }
 
@@ -166,6 +232,43 @@ export default function UserAccessActions({
           {error}
         </p>
       ) : null}
+
+      <div className="rounded-md border border-slate-200 bg-white p-3">
+        <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
+          <label className="flex flex-col gap-1 text-xs font-black text-slate-600">
+            비밀번호 초기화 사유
+            <input
+              value={passwordResetReason}
+              onChange={(event) => setPasswordResetReason(event.target.value)}
+              className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-emerald-500"
+              placeholder="유저 요청, 본인 확인 기록, 상담 번호"
+            />
+          </label>
+          <div className="flex items-end">
+            <button
+              type="button"
+              onClick={() => void requestUserPasswordReset()}
+              disabled={isPasswordResetting || passwordResetReason.trim().length < 10}
+              className="w-full rounded-md border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-black text-amber-900 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isPasswordResetting ? "발송 중..." : "비밀번호 초기화 메일 발송"}
+            </button>
+          </div>
+        </div>
+        <p className="mt-2 text-xs font-bold text-slate-500">
+          운영자는 유저 비밀번호를 직접 확인하지 않습니다. 메일 링크로 유저가 직접 재설정합니다.
+        </p>
+        {passwordResetMessage ? (
+          <p className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700">
+            {passwordResetMessage}
+          </p>
+        ) : null}
+        {passwordResetError ? (
+          <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-bold text-red-700">
+            {passwordResetError}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

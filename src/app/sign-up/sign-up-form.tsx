@@ -12,6 +12,7 @@ import {
   Field,
   TextInput,
 } from "@/components/ui";
+import PasswordVisibilityInput from "@/components/password-visibility-input";
 import CountryText from "../country-text";
 import useCountryTranslation from "../use-country-translation";
 
@@ -21,6 +22,7 @@ export default function SignUpForm() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [message, setMessage] = useState("");
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState("");
@@ -123,6 +125,12 @@ export default function SignUpForm() {
     setError("");
     setMessage("");
     setVerificationUrl(null);
+
+    if (password !== passwordConfirm) {
+      setError("비밀번호가 서로 일치하지 않습니다.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -148,7 +156,9 @@ export default function SignUpForm() {
 
       setMessage(result.message ?? "가입이 완료되었습니다. 이메일 인증을 진행해 주세요.");
       setVerificationUrl(result.verificationUrl ?? null);
+      setPendingVerificationEmail(email);
       setPassword("");
+      setPasswordConfirm("");
     } catch (submitError) {
       setError(
         submitError instanceof Error ? submitError.message : t("auth.signUpFailed"),
@@ -189,10 +199,17 @@ export default function SignUpForm() {
           </Field>
 
           <Field label={<CountryText id="auth.password" />}>
-            <TextInput
-              type="password"
+            <PasswordVisibilityInput
               value={password}
               onChange={(event) => setPassword(event.target.value)}
+              autoComplete="new-password"
+            />
+          </Field>
+
+          <Field label="비밀번호 확인">
+            <PasswordVisibilityInput
+              value={passwordConfirm}
+              onChange={(event) => setPasswordConfirm(event.target.value)}
               autoComplete="new-password"
             />
           </Field>

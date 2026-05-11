@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { ChangeEvent, FormEvent } from "react";
 import { useMemo, useState } from "react";
+import { isGameMoneyQuantityUnit } from "@/lib/market/trade-unit";
 
 const LISTING_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const LISTING_IMAGE_ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
@@ -13,6 +14,7 @@ export default function EditListingForm({
   currency,
   initialTitle,
   initialDescription,
+  initialCategory,
   initialUnitPrice,
   initialTotalQuantity,
   initialImageUrl,
@@ -22,6 +24,7 @@ export default function EditListingForm({
   currency: string;
   initialTitle: string;
   initialDescription: string;
+  initialCategory: string;
   initialUnitPrice: string;
   initialTotalQuantity: string;
   initialImageUrl: string | null;
@@ -42,6 +45,7 @@ export default function EditListingForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isRemovingImage, setIsRemovingImage] = useState(false);
+  const isGameMoneyListing = initialCategory === "GAME_MONEY";
 
   const changedFields = [
     title !== initialTitle ? "제목" : null,
@@ -71,6 +75,10 @@ export default function EditListingForm({
 
       if (Number(totalQuantity) <= 0) {
         throw new Error("총 수량은 0보다 커야 합니다.");
+      }
+
+      if (isGameMoneyListing && !isGameMoneyQuantityUnit(totalQuantity)) {
+        throw new Error("게임머니 총 수량은 10,000 단위로만 입력할 수 있습니다.");
       }
 
       const response = await fetch("/api/market/seller-listings", {
@@ -249,9 +257,15 @@ export default function EditListingForm({
             <input
               value={totalQuantity}
               onChange={(event) => setTotalQuantity(event.target.value)}
-              inputMode="decimal"
+              inputMode={isGameMoneyListing ? "numeric" : "decimal"}
+              step={isGameMoneyListing ? 10000 : undefined}
               className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-3 text-[var(--gg-text)] outline-none focus:border-[var(--gg-accent)]"
             />
+            {isGameMoneyListing ? (
+              <span className="text-xs font-bold text-[var(--gg-muted)]">
+                게임머니 총 수량은 10,000 단위로만 입력할 수 있습니다.
+              </span>
+            ) : null}
           </label>
 
           <label className="flex flex-col gap-2 text-sm font-black md:col-span-2">

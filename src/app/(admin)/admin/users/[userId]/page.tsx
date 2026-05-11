@@ -223,6 +223,7 @@ export default async function AdminUserDetailPage({
 
           <UserAccessActions
             userId={detail.user.userId}
+            userEmail={detail.user.email}
             currentRole={detail.user.role}
             currentStatus={detail.user.status}
           />

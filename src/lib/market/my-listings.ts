@@ -16,6 +16,7 @@ import {
   mapGameLocalizedNames,
 } from "@/lib/market/game-localization";
 import { validateServerDetail } from "@/lib/market/server-detail-options";
+import { assertGameMoneyQuantityUnit } from "@/lib/market/trade-unit";
 import { copyFile, mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -483,6 +484,9 @@ export async function createMarketplaceSellerListing(input: {
     throw new Error("최소 구매 수량은 0보다 커야 합니다.");
   }
 
+  assertGameMoneyQuantityUnit(input.category, quantity, "판매 수량");
+  assertGameMoneyQuantityUnit(input.category, minimumQuantity, "최소 구매 수량");
+
   if (minimumQuantity > quantity) {
     throw new Error("최소 구매 수량은 총 판매 수량보다 클 수 없습니다.");
   }
@@ -723,6 +727,8 @@ export async function updateMarketplaceSellerListing(input: {
     if (!listing?.inventory) {
       throw new Error("판매글을 찾을 수 없습니다.");
     }
+
+    assertGameMoneyQuantityUnit(listing.category, nextTotalQuantity, "총 수량");
 
     const lockedQuantity = parseFixedAmount(
       listing.inventory.lockedQuantity.toString(),

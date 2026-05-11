@@ -248,6 +248,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
 
               <UserAccessActions
                 userId={user.userId}
+                userEmail={user.email}
                 currentRole={user.role}
                 currentStatus={user.status}
               />

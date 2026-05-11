@@ -11,6 +11,7 @@ import {
   Field,
   TextInput,
 } from "@/components/ui";
+import PasswordVisibilityInput from "@/components/password-visibility-input";
 import CountryText from "../country-text";
 import useCountryTranslation from "../use-country-translation";
 
@@ -230,8 +231,7 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
           </Field>
 
           <Field label={<CountryText id="auth.password" />}>
-            <TextInput
-              type="password"
+            <PasswordVisibilityInput
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="current-password"
@@ -243,12 +243,14 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? <CountryText id="auth.signingIn" /> : <CountryText id="common.signIn" />}
           </Button>
-          <Link
-            href="/password-reset"
-            className="text-sm font-semibold text-[var(--gg-accent)] hover:opacity-80"
-          >
-            <CountryText id="auth.forgotPassword" />
-          </Link>
+          <div className="flex flex-wrap gap-3 text-sm font-semibold text-[var(--gg-accent)]">
+            <Link href="/password-reset" className="hover:opacity-80">
+              <CountryText id="auth.forgotPassword" />
+            </Link>
+            <Link href="/email-recovery" className="hover:opacity-80">
+              이메일 찾기
+            </Link>
+          </div>
         </div>
 
         {error ? (

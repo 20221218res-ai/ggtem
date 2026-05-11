@@ -12,6 +12,7 @@ import { getLocalizedGameName } from "@/app/game-name-text";
 import type { LocalizedGameNames } from "@/lib/market/game-localization";
 import { accountTransferTypeOptions } from "@/lib/market/account-transfer-types";
 import { getServerDetailOptionsForGameCode } from "@/lib/market/server-detail-options";
+import { isGameMoneyQuantityUnit } from "@/lib/market/trade-unit";
 
 type ListingCategory = "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
 type TFunction = (key: TranslationKey) => string;
@@ -53,7 +54,7 @@ export default function CreateListingForm({
   const [accountTransferType, setAccountTransferType] = useState("GOOGLE");
   const [unitPrice, setUnitPrice] = useState("0.0005");
   const [quantity, setQuantity] = useState("100000");
-  const [minimumQuantity, setMinimumQuantity] = useState("1000");
+  const [minimumQuantity, setMinimumQuantity] = useState("10000");
   const [premiumDurationHours, setPremiumDurationHours] = useState("0");
   const [imageAlt, setImageAlt] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -165,7 +166,7 @@ export default function CreateListingForm({
     }
 
     setQuantity("100000");
-    setMinimumQuantity("1000");
+    setMinimumQuantity("10000");
     setUnitPrice("0.0005");
   }
 
@@ -196,6 +197,12 @@ export default function CreateListingForm({
     }
 
     if (!isPositiveNumber(saleMinimumQuantity)) return t("listingForm.minimumQuantityInvalid");
+    if (category === "GAME_MONEY" && !isGameMoneyQuantityUnit(saleQuantity)) {
+      return "게임머니 판매 수량은 10,000 단위로만 입력할 수 있습니다.";
+    }
+    if (category === "GAME_MONEY" && !isGameMoneyQuantityUnit(saleMinimumQuantity)) {
+      return "게임머니 최소 구매 수량은 10,000 단위로만 입력할 수 있습니다.";
+    }
     if (Number(saleMinimumQuantity) > Number(saleQuantity)) {
       return t("listingForm.minimumOverQuantity");
     }
@@ -399,7 +406,8 @@ export default function CreateListingForm({
                   value={saleQuantity}
                   onChange={(event) => setQuantity(event.target.value)}
                   disabled={isAccountListing}
-                  inputMode="decimal"
+                  inputMode={category === "GAME_MONEY" ? "numeric" : "decimal"}
+                  step={category === "GAME_MONEY" ? 10000 : undefined}
                   className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)] disabled:bg-[var(--gg-control-bg)]"
                 />
               </FieldLabel>
@@ -408,11 +416,17 @@ export default function CreateListingForm({
                   value={saleMinimumQuantity}
                   onChange={(event) => setMinimumQuantity(event.target.value)}
                   disabled={isAccountListing}
-                  inputMode="decimal"
+                  inputMode={category === "GAME_MONEY" ? "numeric" : "decimal"}
+                  step={category === "GAME_MONEY" ? 10000 : undefined}
                   className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)] disabled:bg-[var(--gg-control-bg)]"
                 />
               </FieldLabel>
             </div>
+            {category === "GAME_MONEY" ? (
+              <p className="text-xs font-bold text-[var(--gg-muted)]">
+                게임머니 수량과 최소 구매 수량은 10,000 단위로만 입력할 수 있습니다.
+              </p>
+            ) : null}
             <FieldLabel label={t("listingForm.tradeContent")}>
               <textarea
                 value={description}

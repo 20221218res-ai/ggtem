@@ -5,7 +5,10 @@ import {
 import { getPrismaClient } from "@/lib/prisma";
 import { ensureUserWallet } from "@/lib/market/wallets";
 import { calculateMarketplaceOrderFees } from "@/lib/market/order-fees";
-import { getGameMoneyUnitName } from "@/lib/market/trade-unit";
+import {
+  assertGameMoneyQuantityUnit,
+  getGameMoneyUnitName,
+} from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
 import { assertNoOffPlatformContact } from "@/lib/risk/off-platform-contact";
 import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit";
@@ -595,6 +598,8 @@ export async function createMarketplaceBuyRequest(input: {
     throw new Error("수량은 0보다 커야 합니다.");
   }
 
+  assertGameMoneyQuantityUnit(input.category, quantity, "구매 수량");
+
   if (unitPrice <= 0n) {
     throw new Error("단가는 0보다 커야 합니다.");
   }
@@ -980,6 +985,8 @@ export async function createMarketplaceBuyRequestOffer(input: {
   if (!buyRequest || buyRequest.status !== "ACTIVE") {
     throw new Error("모집 중인 구매요청에만 판매 제안을 보낼 수 있습니다.");
   }
+
+  assertGameMoneyQuantityUnit(buyRequest.category, quantity, "판매 제안 수량");
 
   if (buyRequest.buyerId === sessionUser.userId) {
     throw new Error("본인이 등록한 구매요청에는 판매할 수 없습니다.");

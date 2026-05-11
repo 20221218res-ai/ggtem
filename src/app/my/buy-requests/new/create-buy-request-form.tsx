@@ -11,6 +11,7 @@ import { getLocalizedGameName } from "@/app/game-name-text";
 import type { LocalizedGameNames } from "@/lib/market/game-localization";
 import { accountTransferTypeOptions } from "@/lib/market/account-transfer-types";
 import { getServerDetailOptionsForGameCode } from "@/lib/market/server-detail-options";
+import { isGameMoneyQuantityUnit } from "@/lib/market/trade-unit";
 
 type ListingCategory = "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
 type TFunction = (key: TranslationKey) => string;
@@ -43,7 +44,7 @@ export default function CreateBuyRequestForm({
   const [serverId, setServerId] = useState(games[0]?.servers[0]?.serverId ?? "");
   const [serverDetail, setServerDetail] = useState("");
   const [category, setCategory] = useState<ListingCategory>("GAME_MONEY");
-  const [quantity, setQuantity] = useState("1");
+  const [quantity, setQuantity] = useState("10000");
   const [unitPrice, setUnitPrice] = useState("0.0005");
   const [expiresInDays, setExpiresInDays] = useState("7");
   const [title, setTitle] = useState("");
@@ -120,7 +121,7 @@ export default function CreateBuyRequestForm({
 
   function handleCategoryChange(nextCategory: ListingCategory) {
     setCategory(nextCategory);
-    setQuantity("1");
+    setQuantity(nextCategory === "GAME_MONEY" ? "10000" : "1");
     setError("");
     setSuccess("");
     setCreatedBuyRequestId(null);
@@ -161,6 +162,9 @@ export default function CreateBuyRequestForm({
       return isAccountRequest
         ? t("listingForm.accountBuyQuantityFixed")
         : t("listingForm.buyQuantityInvalid");
+    }
+    if (category === "GAME_MONEY" && !isGameMoneyQuantityUnit(requestQuantity)) {
+      return "게임머니 구매 수량은 10,000 단위로만 입력할 수 있습니다.";
     }
 
     if (!isPositiveNumber(unitPrice)) {
@@ -377,7 +381,8 @@ export default function CreateBuyRequestForm({
                     <input
                       value={quantity}
                       onChange={(event) => setQuantity(event.target.value)}
-                      inputMode="decimal"
+                      inputMode={category === "GAME_MONEY" ? "numeric" : "decimal"}
+                      step={category === "GAME_MONEY" ? 10000 : undefined}
                       className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
                     />
                   </FieldLabel>
@@ -390,6 +395,11 @@ export default function CreateBuyRequestForm({
                     />
                   </FieldLabel>
                 </div>
+                {category === "GAME_MONEY" ? (
+                  <p className="text-xs font-bold text-[var(--gg-muted)]">
+                    게임머니 구매 수량은 10,000 단위로만 입력할 수 있습니다.
+                  </p>
+                ) : null}
                 <FieldLabel label={t("listingForm.buyCondition")}>
                   <textarea
                     value={description}

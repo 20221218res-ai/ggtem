@@ -3,6 +3,7 @@ import "./globals.css";
 import AuthStatus from "./auth-status";
 import ConditionalAuthStatus from "./conditional-auth-status";
 import CountryScript from "./country-script";
+import PriorityNotificationModal from "./priority-notification-modal";
 import UserLocaleDomTranslator from "./user-locale-dom-translator";
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function RootLayout({
           <AuthStatus />
         </ConditionalAuthStatus>
         {children}
+        <PriorityNotificationModal />
         <UserLocaleDomTranslator />
       </body>
     </html>

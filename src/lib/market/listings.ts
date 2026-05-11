@@ -5,7 +5,10 @@ import { lockPurchaseQuantity } from "@/lib/inventory/purchase-lock";
 import { calculateMarketplacePurchaseAmount } from "@/lib/market/purchase-calculation";
 import { calculateMarketplaceOrderFees } from "@/lib/market/order-fees";
 import { getCurrentUserEmailForRole } from "@/lib/auth/session";
-import { getGameMoneyUnitName } from "@/lib/market/trade-unit";
+import {
+  assertGameMoneyQuantityUnit,
+  getGameMoneyUnitName,
+} from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
 import { isPremiumActive } from "@/lib/market/premium-promotion";
 import {
@@ -705,6 +708,8 @@ export async function purchaseMarketplaceListing(input: {
     const availableQuantity = parseFixedAmount(
       listing.inventory.availableQuantity.toString(),
     );
+
+    assertGameMoneyQuantityUnit(listing.category, purchaseQuantity, "구매 수량");
 
     if (purchaseQuantity < minimumQuantity) {
       throw new Error("구매 수량이 매물의 최소 수량보다 적습니다.");
