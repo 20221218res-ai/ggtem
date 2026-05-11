@@ -176,19 +176,51 @@ export async function getMarketplaceMyListings(): Promise<MarketplaceMyListingsV
     where: {
       email: sellerEmail,
     },
-    include: {
-      wallet: true,
+    select: {
+      displayName: true,
+      wallet: {
+        select: {
+          availableBalance: true,
+          currency: true,
+        },
+      },
       listings: {
         where: {
           status: {
             in: ["ACTIVE", "PAUSED", "SOLD_OUT", "HIDDEN"],
           },
         },
-        include: {
-          inventory: true,
-          game: true,
-          server: true,
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          category: true,
+          accountTransferType: true,
+          unitPrice: true,
+          currency: true,
+          createdAt: true,
+          inventory: {
+            select: {
+              minimumQuantity: true,
+              availableQuantity: true,
+              lockedQuantity: true,
+              soldQuantity: true,
+            },
+          },
+          game: {
+            select: {
+              name: true,
+            },
+          },
+          server: {
+            select: {
+              name: true,
+            },
+          },
           images: {
+            select: {
+              imageUrl: true,
+            },
             orderBy: {
               sortOrder: "asc",
             },
@@ -201,9 +233,25 @@ export async function getMarketplaceMyListings(): Promise<MarketplaceMyListingsV
         take: 30,
       },
       sellerOrders: {
-        include: {
-          buyer: true,
-          listing: true,
+        select: {
+          id: true,
+          orderNumber: true,
+          listingId: true,
+          status: true,
+          quantity: true,
+          grossAmount: true,
+          currency: true,
+          createdAt: true,
+          buyer: {
+            select: {
+              displayName: true,
+            },
+          },
+          listing: {
+            select: {
+              title: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",

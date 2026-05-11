@@ -99,18 +99,54 @@ export async function getMarketplaceMyOrders(): Promise<MarketplaceMyOrdersView>
     where: {
       email: buyerEmail,
     },
-    include: {
-      wallet: true,
+    select: {
+      displayName: true,
+      wallet: {
+        select: {
+          availableBalance: true,
+          escrowLockedBalance: true,
+          currency: true,
+        },
+      },
       buyerOrders: {
-        include: {
+        select: {
+          id: true,
+          orderNumber: true,
+          status: true,
+          listingId: true,
+          quantity: true,
+          grossAmount: true,
+          currency: true,
+          createdAt: true,
           listing: {
-            include: {
-              game: true,
-              server: true,
+            select: {
+              title: true,
+              category: true,
+              accountTransferType: true,
+              game: {
+                select: {
+                  name: true,
+                  moneyUnitName: true,
+                },
+              },
+              server: {
+                select: {
+                  name: true,
+                },
+              },
             },
           },
-          seller: true,
+          seller: {
+            select: {
+              displayName: true,
+            },
+          },
           events: {
+            select: {
+              status: true,
+              message: true,
+              createdAt: true,
+            },
             orderBy: {
               createdAt: "desc",
             },
@@ -195,20 +231,59 @@ export async function getMarketplaceMyOrderDetail(
       id: orderId,
       buyerId: buyer.id,
     },
-    include: {
+    select: {
+      id: true,
+      orderNumber: true,
+      status: true,
+      listingId: true,
+      quantity: true,
+      grossAmount: true,
+      sellerReceivableAmount: true,
+      currency: true,
+      createdAt: true,
+      completedAt: true,
+      canceledAt: true,
       listing: {
-        include: {
-          game: true,
-          server: true,
+        select: {
+          title: true,
+          category: true,
+          accountTransferType: true,
+          game: {
+            select: {
+              name: true,
+              moneyUnitName: true,
+            },
+          },
+          server: {
+            select: {
+              name: true,
+            },
+          },
         },
       },
-      seller: true,
+      seller: {
+        select: {
+          displayName: true,
+        },
+      },
       events: {
+        select: {
+          id: true,
+          status: true,
+          message: true,
+          createdAt: true,
+        },
         orderBy: {
           createdAt: "desc",
         },
       },
-      review: true,
+      review: {
+        select: {
+          rating: true,
+          comment: true,
+          createdAt: true,
+        },
+      },
     },
   });
 

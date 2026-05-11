@@ -168,20 +168,37 @@ export async function getOrderChatInbox(): Promise<OrderChatInboxView | null> {
         },
       ],
     },
-    include: {
-      buyer: true,
-      seller: true,
+    select: {
+      id: true,
+      buyerId: true,
+      sellerId: true,
+      orderNumber: true,
+      status: true,
+      grossAmount: true,
+      currency: true,
+      buyer: {
+        select: {
+          displayName: true,
+        },
+      },
+      seller: {
+        select: {
+          displayName: true,
+        },
+      },
       listing: {
-        include: {
-          game: true,
-          server: true,
+        select: {
+          title: true,
         },
       },
       chatRoom: {
-        include: {
+        select: {
+          id: true,
+          createdAt: true,
           messages: {
-            include: {
-              sender: true,
+            select: {
+              body: true,
+              createdAt: true,
             },
             orderBy: {
               createdAt: "desc",
@@ -197,7 +214,11 @@ export async function getOrderChatInbox(): Promise<OrderChatInboxView | null> {
     take: 30,
   });
 
-  const rooms: OrderChatInboxView["rooms"] = [];
+  const roomRows: Array<{
+    order: (typeof orders)[number];
+    room: { id: string; createdAt: Date };
+    latestMessage: { body: string; createdAt: Date } | null;
+  }> = [];
 
   for (const order of orders) {
     const room = order.chatRoom ?? (await ensureOrderChatRoom(order.id));
@@ -208,22 +229,43 @@ export async function getOrderChatInbox(): Promise<OrderChatInboxView | null> {
             where: {
               roomId: room.id,
             },
-            include: {
-              sender: true,
+            select: {
+              body: true,
+              createdAt: true,
             },
             orderBy: {
               createdAt: "desc",
             },
           });
-    const unreadCount = await prisma.chatMessage.count({
-      where: {
-        roomId: room.id,
-        senderId: {
-          not: sessionUser.userId,
+
+    roomRows.push({ order, room, latestMessage });
+  }
+
+  const unreadGroups = roomRows.length
+    ? await prisma.chatMessage.groupBy({
+        by: ["roomId"],
+        where: {
+          roomId: {
+            in: roomRows.map((row) => row.room.id),
+          },
+          senderId: {
+            not: sessionUser.userId,
+          },
+          readAt: null,
         },
-        readAt: null,
-      },
-    });
+        _count: {
+          _all: true,
+        },
+      })
+    : [];
+  const unreadCountByRoomId = new Map(
+    unreadGroups.map((group) => [group.roomId, group._count._all]),
+  );
+
+  const rooms: OrderChatInboxView["rooms"] = [];
+
+  for (const { order, room, latestMessage } of roomRows) {
+    const unreadCount = unreadCountByRoomId.get(room.id) ?? 0;
 
     rooms.push({
       roomId: room.id,
@@ -283,25 +325,43 @@ export async function getOrderChatView(input: {
       sessionUser.userId,
       input.perspective,
     ),
-    include: {
-      buyer: true,
-      seller: true,
-      listing: {
-        include: {
-          game: true,
-          server: true,
+    select: {
+      id: true,
+      listingId: true,
+      buyerId: true,
+      sellerId: true,
+      orderNumber: true,
+      status: true,
+      grossAmount: true,
+      sellerReceivableAmount: true,
+      currency: true,
+      quantity: true,
+      unitPrice: true,
+      buyer: {
+        select: {
+          displayName: true,
         },
       },
-      chatRoom: {
-        include: {
-          messages: {
-            include: {
-              sender: true,
+      seller: {
+        select: {
+          displayName: true,
+        },
+      },
+      listing: {
+        select: {
+          title: true,
+          category: true,
+          accountTransferType: true,
+          game: {
+            select: {
+              name: true,
+              moneyUnitName: true,
             },
-            orderBy: {
-              createdAt: "asc",
+          },
+          server: {
+            select: {
+              name: true,
             },
-            take: 100,
           },
         },
       },
@@ -330,10 +390,21 @@ export async function getOrderChatView(input: {
     where: {
       id: room.id,
     },
-    include: {
+    select: {
+      id: true,
       messages: {
-        include: {
-          sender: true,
+        select: {
+          id: true,
+          senderId: true,
+          body: true,
+          createdAt: true,
+          readAt: true,
+          sender: {
+            select: {
+              displayName: true,
+              role: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "asc",
