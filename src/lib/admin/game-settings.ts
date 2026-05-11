@@ -11,7 +11,7 @@ export async function getAdminGameSettingsState() {
         orderBy: [{ isActive: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
         include: {
           servers: {
-            orderBy: [{ isActive: "desc" }, { name: "asc" }],
+            orderBy: [{ isActive: "desc" }, { code: "asc" }, { name: "asc" }],
             include: { _count: { select: { listings: true } } },
           },
           _count: { select: { listings: true } },
@@ -30,7 +30,23 @@ export async function getAdminGameSettingsState() {
         _count: true,
       }),
       prisma.adminAuditLog.findMany({
-        where: { targetType: { in: ["GAME", "GAME_SERVER"] } },
+        where: {
+          targetType: { in: ["GAME", "GAME_SERVER"] },
+          action: {
+            in: [
+              "GAME_CREATED",
+              "GAME_UPDATED",
+              "GAME_ACTIVATED",
+              "GAME_DEACTIVATED",
+              "GAME_SERVER_CREATED",
+              "GAME_SERVER_UPDATED",
+              "GAME_SERVER_ACTIVATED",
+              "GAME_SERVER_DEACTIVATED",
+              "GAME_SERVERS_BULK_CREATED",
+              "GAME_NOTE_CREATED",
+            ],
+          },
+        },
         orderBy: { createdAt: "desc" },
         take: 8,
         include: { admin: { select: { displayName: true, email: true } } },
