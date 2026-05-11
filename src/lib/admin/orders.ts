@@ -82,7 +82,10 @@ export type AdminOrdersState = {
 
 export type AdminDisputeActionResult = {
   orderId: string;
+  orderNumber: string;
   status: string;
+  grossAmount: string;
+  currency: string;
   message: string;
 };
 
@@ -207,6 +210,10 @@ export async function resolveAdminDispute(input: {
 }): Promise<AdminDisputeActionResult> {
   const prisma = getPrismaClient();
   const trimmedNote = input.note?.trim();
+
+  if (!trimmedNote || trimmedNote.length < 20) {
+    throw new Error("분쟁 종료 전 처리 메모를 20자 이상 입력해야 합니다.");
+  }
 
   const result = await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
@@ -398,7 +405,14 @@ export async function resolveAdminDispute(input: {
         },
       });
 
-      return { orderId: order.id, status: "REFUNDED", message: "구매자 환불로 분쟁이 종료되었습니다." };
+      return {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        status: "REFUNDED",
+        grossAmount: order.grossAmount.toString(),
+        currency: order.currency,
+        message: "구매자 환불로 분쟁이 종료되었습니다.",
+      };
     }
 
     const buyerEscrow = parseFixedAmount(buyerWallet.escrowLockedBalance.toString());
@@ -578,16 +592,25 @@ export async function resolveAdminDispute(input: {
       },
     });
 
-    return { orderId: order.id, status: "COMPLETED", message: "판매자 정산 승인으로 분쟁이 종료되었습니다." };
+    return {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      status: "COMPLETED",
+      grossAmount: order.grossAmount.toString(),
+      currency: order.currency,
+      message: "판매자 정산 승인으로 분쟁이 종료되었습니다.",
+    };
   });
 
   await sendAdminTelegramAlert({
     title: "분쟁 처리 완료",
     lines: [
+      `주문 번호: ${result.orderNumber}`,
       `주문 ID: ${result.orderId}`,
+      `금액: ${result.grossAmount} ${result.currency}`,
       `상태: ${result.status}`,
       `처리: ${input.action}`,
-      trimmedNote ? `메모: ${trimmedNote}` : null,
+      `메모: ${trimmedNote}`,
     ],
   });
 

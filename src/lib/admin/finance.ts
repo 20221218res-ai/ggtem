@@ -842,6 +842,13 @@ export async function processAdminFinanceAction(input: {
       throw new Error("출금 요청에는 출금 완료 또는 출금 거절만 사용할 수 있습니다.");
     }
 
+    if (
+      (input.action === "REJECT_DEPOSIT" || input.action === "REJECT_WITHDRAWAL") &&
+      (input.adminEvidence?.memo?.trim().length ?? 0) < 5
+    ) {
+      throw new Error("반려 처리에는 관리자 사유를 5자 이상 입력해야 합니다.");
+    }
+
     if (input.kind === "DEPOSIT") {
       const request = await tx.depositRequest.findUnique({
         where: {
