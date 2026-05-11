@@ -291,9 +291,141 @@ async function main() {
       );
 
       const gameId = gameResult.rows[0].id;
-      const serverCodes = game.servers.map((serverName) => toServerCode(serverName));
+      const serverCodes = game.servers.map((serverName, index) =>
+        toOrderedServerCode(serverName, index),
+      );
 
-      for (const serverName of game.servers) {
+      for (const [index, serverName] of game.servers.entries()) {
+        const serverCode = toOrderedServerCode(serverName, index);
+
+        const targetByCode = await client.query(
+          `
+            SELECT "id"
+            FROM "GameServer"
+            WHERE "gameId" = $1 AND "code" = $2
+            LIMIT 1
+          `,
+          [gameId, serverCode],
+        );
+
+        if (targetByCode.rows.length > 0) {
+          const targetId = targetByCode.rows[0].id;
+          const duplicateByName = await client.query(
+            `
+              SELECT "id"
+              FROM "GameServer"
+              WHERE "gameId" = $1 AND "name" = $2 AND "id" <> $3
+            `,
+            [gameId, serverName, targetId],
+          );
+          const duplicateIds = duplicateByName.rows.map((row) => row.id);
+
+          if (duplicateIds.length > 0) {
+            await client.query(
+              `
+                UPDATE "Listing"
+                SET "serverId" = $1
+                WHERE "serverId" = ANY($2::text[])
+              `,
+              [targetId, duplicateIds],
+            );
+
+            await client.query(
+              `
+                UPDATE "BuyRequest"
+                SET "serverId" = $1
+                WHERE "serverId" = ANY($2::text[])
+              `,
+              [targetId, duplicateIds],
+            );
+
+            await client.query(
+              `
+                UPDATE "GameServer"
+                SET "isActive" = false
+                WHERE "id" = ANY($1::text[])
+              `,
+              [duplicateIds],
+            );
+          }
+
+          await client.query(
+            `
+              UPDATE "GameServer"
+              SET "name" = $2,
+                  "isActive" = true
+              WHERE "id" = $1
+            `,
+            [targetId, serverName],
+          );
+          continue;
+        }
+
+        const existingServer = await client.query(
+          `
+            SELECT "id"
+            FROM "GameServer"
+            WHERE "gameId" = $1 AND "name" = $2
+            ORDER BY "isActive" DESC, "id" ASC
+            LIMIT 1
+          `,
+          [gameId, serverName],
+        );
+
+        if (existingServer.rows.length > 0) {
+          const targetId = existingServer.rows[0].id;
+          const duplicateByName = await client.query(
+            `
+              SELECT "id"
+              FROM "GameServer"
+              WHERE "gameId" = $1 AND "name" = $2 AND "id" <> $3
+            `,
+            [gameId, serverName, targetId],
+          );
+          const duplicateIds = duplicateByName.rows.map((row) => row.id);
+
+          if (duplicateIds.length > 0) {
+            await client.query(
+              `
+                UPDATE "Listing"
+                SET "serverId" = $1
+                WHERE "serverId" = ANY($2::text[])
+              `,
+              [targetId, duplicateIds],
+            );
+
+            await client.query(
+              `
+                UPDATE "BuyRequest"
+                SET "serverId" = $1
+                WHERE "serverId" = ANY($2::text[])
+              `,
+              [targetId, duplicateIds],
+            );
+
+            await client.query(
+              `
+                UPDATE "GameServer"
+                SET "isActive" = false
+                WHERE "id" = ANY($1::text[])
+              `,
+              [duplicateIds],
+            );
+          }
+
+          await client.query(
+            `
+              UPDATE "GameServer"
+              SET "code" = $3,
+                  "name" = $2,
+                  "isActive" = true
+              WHERE "id" = $1
+            `,
+            [targetId, serverName, serverCode],
+          );
+          continue;
+        }
+
         await client.query(
           `
             INSERT INTO "GameServer" ("id", "gameId", "name", "code", "isActive")
@@ -302,7 +434,7 @@ async function main() {
               "name" = EXCLUDED."name",
               "isActive" = true
           `,
-          [crypto.randomUUID(), gameId, serverName, toServerCode(serverName)],
+          [crypto.randomUUID(), gameId, serverName, serverCode],
         );
       }
 
@@ -333,6 +465,10 @@ async function main() {
   } finally {
     await client.end();
   }
+}
+
+function toOrderedServerCode(value, index) {
+  return `${String(index + 1).padStart(3, "0")}-${toServerCode(value)}`;
 }
 
 function toServerCode(value) {
