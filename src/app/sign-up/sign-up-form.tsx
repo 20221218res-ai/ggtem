@@ -56,6 +56,7 @@ export default function SignUpForm() {
 
         if (result.status === "verified") {
           setMessage("이메일 인증이 완료되었습니다. 로그인 중입니다.");
+          setPendingVerificationEmail("");
           router.replace(result.redirectPath ?? "/my");
           router.refresh();
         } else if (result.status === "blocked") {
@@ -124,6 +125,8 @@ export default function SignUpForm() {
     event.preventDefault();
     setError("");
     setMessage("");
+    setResendMessage("");
+    setResendError("");
     setVerificationUrl(null);
 
     if (password !== passwordConfirm) {
@@ -247,7 +250,7 @@ export default function SignUpForm() {
             </h2>
             <p className="mt-3 text-sm leading-6 text-[var(--gg-muted)]">
               {pendingVerificationEmail} 주소로 인증 링크를 발송했습니다. 휴대폰에서
-              링크를 눌러도 이 PC 화면에서 자동으로 로그인 완료를 확인합니다.
+              링크를 눌러도 이 PC 화면에서 자동으로 인증 완료를 확인하고 로그인합니다.
             </p>
             <div className="mt-5 rounded-xl bg-[var(--gg-card-soft-bg)] p-4 text-sm font-semibold text-[var(--gg-text)]">
               인증 완료 여부를 확인하는 중입니다...

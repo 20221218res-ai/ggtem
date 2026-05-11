@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
     if (!body.email) {
       return NextResponse.json(
-        { message: "Please enter an email." },
+        { message: "이메일을 입력해 주세요." },
         { status: 400 },
       );
     }
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        message: error instanceof Error ? error.message : "Could not create an email verification link.",
+        message: error instanceof Error ? error.message : "이메일 인증 링크를 생성하지 못했습니다.",
       },
       { status: 400 },
     );

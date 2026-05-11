@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     if (!body.email || !body.password) {
       return NextResponse.json(
-        { message: "Please enter email and password." },
+        { message: "이메일과 비밀번호를 입력해 주세요." },
         { status: 400 },
       );
     }
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: "Signed in.",
+      message: "로그인되었습니다.",
       role: user.role,
       redirectPath: getSignedInRedirectPath(user),
     });
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: error instanceof Error ? error.message : "Sign in failed.",
+        message: error instanceof Error ? error.message : "로그인에 실패했습니다.",
       },
       { status: 400 },
     );
@@ -69,11 +69,11 @@ function getAllowedRolesForSurface(surface?: "market" | "admin") {
 
 function getForbiddenMessageForSurface(surface?: "market" | "admin") {
   if (surface === "market") {
-    return "Admin accounts cannot sign in from the user sign-in page. Use the admin sign-in page.";
+    return "관리자 계정은 유저 로그인 페이지에서 로그인할 수 없습니다. 관리자 페이지를 이용해 주세요.";
   }
 
   if (surface === "admin") {
-    return "User accounts cannot sign in from the admin sign-in page. Use the user sign-in page.";
+    return "유저 계정은 관리자 로그인 페이지에서 로그인할 수 없습니다. 일반 로그인 페이지를 이용해 주세요.";
   }
 
   return undefined;

@@ -60,6 +60,8 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
         }
 
         if (result.status === "verified") {
+          setResendMessage("이메일 인증이 완료되었습니다. 로그인 중입니다.");
+          setVerificationNotice(null);
           router.replace(result.redirectPath ?? "/my");
           router.refresh();
         } else if (result.status === "blocked") {
@@ -170,6 +172,8 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setResendMessage("");
+    setResendError("");
     setVerificationNotice(null);
     setIsSubmitting(true);
 
@@ -195,6 +199,8 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
     setEmail(account.email);
     setPassword(account.password);
     setError("");
+    setResendMessage("");
+    setResendError("");
     setVerificationNotice(null);
     setIsSubmitting(true);
 
@@ -256,6 +262,11 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
         {error ? (
           <div className="mt-4">
             <Alert tone="danger">{error}</Alert>
+          </div>
+        ) : null}
+        {resendMessage && !verificationNotice ? (
+          <div className="mt-4">
+            <Alert tone="success">{resendMessage}</Alert>
           </div>
         ) : null}
       </form>
