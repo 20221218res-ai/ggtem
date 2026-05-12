@@ -45,7 +45,10 @@ export async function getMarketplaceSellerProfile(
     where: {
       id: sellerId,
     },
-    include: {
+    select: {
+      id: true,
+      displayName: true,
+      createdAt: true,
       listings: {
         where: {
           status: "ACTIVE",
@@ -57,9 +60,25 @@ export async function getMarketplaceSellerProfile(
             },
           },
         },
-        include: {
-          inventory: true,
-          game: true,
+        select: {
+          id: true,
+          title: true,
+          category: true,
+          unitPrice: true,
+          currency: true,
+          createdAt: true,
+          inventory: {
+            select: {
+              availableQuantity: true,
+              lockedQuantity: true,
+              soldQuantity: true,
+            },
+          },
+          game: {
+            select: {
+              name: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",
@@ -121,9 +140,21 @@ export async function getMarketplaceSellerProfile(
           },
         ],
       },
-      include: {
-        buyer: true,
-        order: true,
+      select: {
+        id: true,
+        rating: true,
+        comment: true,
+        createdAt: true,
+        buyer: {
+          select: {
+            displayName: true,
+          },
+        },
+        order: {
+          select: {
+            orderNumber: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
