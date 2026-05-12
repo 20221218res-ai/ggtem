@@ -58,7 +58,7 @@ const starterDocuments: CustomerCenterDocument[] = [
     typeLabel: typeLabels.FAQ,
     title: "충전과 출금은 어떻게 처리되나요?",
     body:
-      "충전과 출금은 현재 수동 관리자 승인 방식입니다.\n\n충전은 USDT TRC20 또는 BEP20 입금 후 TXID를 제출하면 관리자가 확인합니다. 출금은 신청 후 운영 확인을 거치며, 처리 완료까지 시간이 걸릴 수 있습니다.",
+      "충전과 출금은 현재 수동 관리자 승인 방식입니다.\n\n충전은 USDT TRC20 또는 BEP20 입금 후 TXID를 제출하면 관리자가 확인합니다. 출금은 요청 후 운영 검토를 거치며 처리 완료까지 시간이 걸릴 수 있습니다.",
     updatedAt: dateFormatter.format(new Date()),
   },
   {
@@ -68,7 +68,7 @@ const starterDocuments: CustomerCenterDocument[] = [
     typeLabel: typeLabels.POLICY,
     title: "1인 1계정 및 외부거래 제한 안내",
     body:
-      "GGtem은 1인 1계정 원칙을 기준으로 운영됩니다.\n\n동일 지갑 주소, 출금 주소, IP, 기기 정보, 외부거래 정황이 반복되면 운영 검토 대상이 될 수 있습니다.",
+      "GGtem은 1인 1계정 원칙을 기준으로 운영합니다.\n\n동일 지갑 주소, 출금 주소, IP, 기기 정보, 외부거래 정황이 반복되면 운영 검토 대상이 될 수 있습니다.",
     updatedAt: dateFormatter.format(new Date()),
   },
   {
@@ -78,7 +78,7 @@ const starterDocuments: CustomerCenterDocument[] = [
     typeLabel: typeLabels.PAID_SERVICE,
     title: "프리미엄 글 노출 안내",
     body:
-      "프리미엄 글은 선택한 시간 동안 일반 글보다 상단에 노출됩니다.\n\n거래가 완료되거나 노출 시간이 종료되면 프리미엄 상태는 자동 해제됩니다. 결제된 프리미엄 비용은 운영 정책에 따라 처리됩니다.",
+      "프리미엄 글은 선택한 시간 동안 일반 글보다 상단에 노출됩니다.\n\n거래가 완료되거나 노출 시간이 종료되면 프리미엄 상태가 자동 해제됩니다. 결제된 프리미엄 비용은 운영 정책에 따라 처리됩니다.",
     updatedAt: dateFormatter.format(new Date()),
   },
   {

@@ -56,7 +56,7 @@ export default async function CustomerCenterPage({
   const prisma = getPrismaClient();
   const [documents, myInquiries] = await Promise.all([
     getCustomerCenterDocuments(),
-    selectedTab === "inquiry" && currentUser
+    selected.key === "inquiry" && currentUser
       ? prisma.supportInquiry.findMany({
           where: { userId: currentUser.userId },
           select: {
@@ -67,8 +67,11 @@ export default async function CustomerCenterPage({
             adminNote: true,
             createdAt: true,
           },
-          orderBy: { createdAt: "desc" },
-          take: 8,
+          orderBy: [
+            { status: "asc" },
+            { createdAt: "desc" },
+          ],
+          take: 12,
         })
       : [],
   ]);
@@ -159,7 +162,7 @@ function CustomerSidebar() {
         <p className="text-sm font-black text-slate-500">고객지원센터</p>
         <p className="mt-2 text-2xl font-black text-slate-950">온라인 문의</p>
         <p className="mt-3 text-sm font-bold leading-6 text-slate-600">
-          충전, 출금, 분쟁, 계정 거래 문의는 로그인 후 1:1 문의로 접수해 주세요. 운영자가 답변을 남기면 내 문의 내역에서 확인할 수 있습니다.
+          충전, 출금, 분쟁, 계정 거래 문의는 로그인 후 1:1 문의로 접수해 주세요. 답변은 내 문의 내역에서 바로 확인할 수 있습니다.
         </p>
       </div>
       <Link
@@ -177,7 +180,9 @@ function FaqSearch({ query }: { query: string }) {
   return (
     <form action="/support" className="rounded-lg border border-[var(--gg-border)] bg-white p-4">
       <input type="hidden" name="tab" value="faq" />
-      <label className="sr-only" htmlFor="support-search">FAQ 검색</label>
+      <label className="sr-only" htmlFor="support-search">
+        FAQ 검색
+      </label>
       <input
         id="support-search"
         name="q"
@@ -234,13 +239,24 @@ function InquiryPanel({
   error: boolean;
   inquiries: InquirySummary[];
 }) {
+  const answeredCount = inquiries.filter((inquiry) => inquiry.status === "ANSWERED").length;
+
   return (
     <section className="grid gap-5">
       <div className="rounded-lg border border-[var(--gg-border)] bg-white p-6">
-        <h2 className="text-xl font-black">1:1 문의</h2>
-        <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
-          충전, 출금, 분쟁, 계정 거래처럼 운영자 확인이 필요한 내용을 접수하세요. 답변은 내 문의 내역에 표시됩니다.
-        </p>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-xl font-black">1:1 문의</h2>
+            <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
+              충전, 출금, 분쟁, 계정 거래처럼 운영자 확인이 필요한 내용을 접수하세요. 답변은 내 문의 내역과 알림에 표시됩니다.
+            </p>
+          </div>
+          {isSignedIn ? (
+            <div className="rounded-lg bg-slate-50 px-4 py-3 text-sm font-black text-slate-700">
+              답변 완료 {answeredCount}건
+            </div>
+          ) : null}
+        </div>
         <SupportNotice submitted={submitted} error={error} successText="문의가 접수되었습니다. 운영자가 확인 후 답변을 남깁니다." />
         {isSignedIn ? (
           <form action={createSupportInquiryAction} className="mt-5 grid gap-4">
@@ -348,7 +364,7 @@ function GameRequestPanel({
                 name="referenceUrl"
                 maxLength={300}
                 className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold"
-                placeholder="공식 홈페이지나 서버 공지 링크"
+                placeholder="공식 홈페이지 또는 서버 공지 링크"
               />
             </label>
             <label className="grid gap-2 text-sm font-black">
@@ -416,8 +432,8 @@ function TopQuestions() {
     "입금자명과 회원명이 달라요",
     "출금 처리가 되지 않아요",
     "충전이 반영되지 않아요",
-    "계정 거래 정보는 어디에 입력하나요?",
-    "분쟁은 어떻게 접수하나요?",
+    "계정 거래 정보는 어디에 입력하나요",
+    "분쟁은 어떻게 접수하나요",
   ];
 
   return (
@@ -443,19 +459,25 @@ function InquiryHistory({ inquiries }: { inquiries: InquirySummary[] }) {
       <div className="divide-y divide-[var(--gg-border)]">
         {inquiries.length ? (
           inquiries.map((inquiry) => (
-            <div key={inquiry.id} className="grid gap-2 px-5 py-4 text-sm sm:grid-cols-[110px_1fr_100px]">
+            <div key={inquiry.id} className="grid gap-3 px-5 py-4 text-sm lg:grid-cols-[110px_1fr_120px]">
               <span className="font-black text-[var(--gg-accent)]">{inquiryCategoryLabel(inquiry.category)}</span>
               <div>
                 <p className="font-black text-slate-950">{inquiry.title}</p>
                 {inquiry.adminNote ? (
-                  <p className="mt-2 whitespace-pre-line rounded-lg bg-slate-50 p-3 text-sm font-semibold leading-6 text-slate-600">
+                  <p className="mt-2 whitespace-pre-line rounded-lg border border-cyan-100 bg-cyan-50 p-3 text-sm font-semibold leading-6 text-cyan-900">
                     운영자 답변: {inquiry.adminNote}
                   </p>
-                ) : null}
+                ) : (
+                  <p className="mt-2 rounded-lg bg-slate-50 p-3 text-sm font-semibold leading-6 text-slate-500">
+                    운영자가 확인 중입니다. 답변이 등록되면 알림으로 안내됩니다.
+                  </p>
+                )}
               </div>
-              <div className="text-right">
-                <p className="font-black text-slate-700">{supportInquiryStatusLabel(inquiry.status)}</p>
-                <p className="mt-1 text-xs font-bold text-slate-500">{inquiry.createdAt}</p>
+              <div className="lg:text-right">
+                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${supportInquiryStatusClass(inquiry.status)}`}>
+                  {supportInquiryStatusLabel(inquiry.status)}
+                </span>
+                <p className="mt-2 text-xs font-bold text-slate-500">{inquiry.createdAt}</p>
               </div>
             </div>
           ))
@@ -547,12 +569,19 @@ function inquiryCategoryLabel(category: string) {
 function supportInquiryStatusLabel(status: string) {
   const labels: Record<string, string> = {
     OPEN: "접수",
-    IN_PROGRESS: "확인중",
+    IN_PROGRESS: "확인 중",
     ANSWERED: "답변 완료",
     CLOSED: "종료",
   };
 
   return labels[status] ?? status;
+}
+
+function supportInquiryStatusClass(status: string) {
+  if (status === "ANSWERED") return "bg-emerald-50 text-emerald-700";
+  if (status === "IN_PROGRESS") return "bg-cyan-50 text-cyan-700";
+  if (status === "CLOSED") return "bg-slate-100 text-slate-600";
+  return "bg-amber-50 text-amber-700";
 }
 
 function formatSupportDate(date: Date) {
