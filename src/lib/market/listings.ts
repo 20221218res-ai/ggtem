@@ -296,10 +296,7 @@ export async function getMarketplaceListings(
       select: {
         category: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 100,
+      distinct: ["category"],
     }),
     prisma.game.findMany({
       where: {

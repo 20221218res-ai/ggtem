@@ -221,8 +221,9 @@ export async function getMarketplaceBuyRequestFormView(): Promise<MarketplaceBuy
       where: {
         email: buyerEmail,
       },
-      include: {
-        wallet: true,
+      select: {
+        id: true,
+        displayName: true,
       },
     }),
     prisma.game.findMany({
@@ -402,7 +403,28 @@ export async function getMarketplaceBuyRequests(
           }
         : {}),
     },
-    include: {
+    select: {
+      id: true,
+      buyerId: true,
+      gameId: true,
+      serverId: true,
+      serverDetail: true,
+      category: true,
+      title: true,
+      description: true,
+      accountTransferType: true,
+      accountRank: true,
+      quantity: true,
+      unitPrice: true,
+      totalAmount: true,
+      lockAmount: true,
+      currency: true,
+      status: true,
+      expiresAt: true,
+      premiumEndsAt: true,
+      premiumDurationHours: true,
+      premiumFeeAmount: true,
+      createdAt: true,
       buyer: {
         select: {
           displayName: true,
@@ -447,7 +469,7 @@ export async function getMarketplaceBuyRequests(
     select: {
       category: true,
     },
-    take: 100,
+    distinct: ["category"],
   });
 
   return {
@@ -499,14 +521,43 @@ export async function getMarketplaceMyBuyRequests(): Promise<MarketplaceMyBuyReq
       where: {
         buyerId: sessionUser.userId,
       },
-      include: {
+      select: {
+        id: true,
+        buyerId: true,
+        gameId: true,
+        serverId: true,
+        serverDetail: true,
+        category: true,
+        title: true,
+        description: true,
+        accountTransferType: true,
+        accountRank: true,
+        quantity: true,
+        unitPrice: true,
+        totalAmount: true,
+        lockAmount: true,
+        currency: true,
+        status: true,
+        expiresAt: true,
+        premiumEndsAt: true,
+        premiumDurationHours: true,
+        premiumFeeAmount: true,
+        createdAt: true,
         buyer: {
           select: {
             displayName: true,
           },
         },
         offers: {
-          include: {
+          select: {
+            id: true,
+            quantity: true,
+            unitPrice: true,
+            totalAmount: true,
+            currency: true,
+            message: true,
+            status: true,
+            createdAt: true,
             seller: {
               select: {
                 displayName: true,
