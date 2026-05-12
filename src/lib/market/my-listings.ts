@@ -1247,10 +1247,37 @@ export async function getMarketplaceSellerOrderDetail(
       id: orderId,
       sellerId: seller.id,
     },
-    include: {
-      buyer: true,
-      listing: true,
+    select: {
+      id: true,
+      orderNumber: true,
+      status: true,
+      listingId: true,
+      quantity: true,
+      grossAmount: true,
+      sellerReceivableAmount: true,
+      currency: true,
+      createdAt: true,
+      completedAt: true,
+      canceledAt: true,
+      buyer: {
+        select: {
+          displayName: true,
+        },
+      },
+      listing: {
+        select: {
+          title: true,
+          category: true,
+          accountTransferType: true,
+        },
+      },
       events: {
+        select: {
+          id: true,
+          status: true,
+          message: true,
+          createdAt: true,
+        },
         orderBy: {
           createdAt: "desc",
         },
