@@ -109,7 +109,7 @@ export async function getOrderChatLiveSignature(input: {
   }
 
   const room = await ensureOrderChatRoom(order.id);
-  const [latestMessage, totalMessages, unreadCount] = await Promise.all([
+  const [latestMessage, unreadCount] = await Promise.all([
     prisma.chatMessage.findFirst({
       where: {
         roomId: room.id,
@@ -126,11 +126,6 @@ export async function getOrderChatLiveSignature(input: {
     prisma.chatMessage.count({
       where: {
         roomId: room.id,
-      },
-    }),
-    prisma.chatMessage.count({
-      where: {
-        roomId: room.id,
         senderId: {
           not: sessionUser.userId,
         },
@@ -141,7 +136,6 @@ export async function getOrderChatLiveSignature(input: {
 
   return JSON.stringify({
     roomId: room.id,
-    totalMessages,
     unreadCount,
     latestMessageId: latestMessage?.id ?? null,
     latestMessageAt: latestMessage?.createdAt.toISOString() ?? null,
@@ -554,6 +548,13 @@ async function ensureOrderChatRoom(orderId: string) {
     where: {
       orderId,
     },
+    select: {
+      id: true,
+      orderId: true,
+      buyerId: true,
+      sellerId: true,
+      createdAt: true,
+    },
   });
 
   if (existingRoom) {
@@ -580,6 +581,13 @@ async function ensureOrderChatRoom(orderId: string) {
       orderId: order.id,
       buyerId: order.buyerId,
       sellerId: order.sellerId,
+    },
+    select: {
+      id: true,
+      orderId: true,
+      buyerId: true,
+      sellerId: true,
+      createdAt: true,
     },
   });
 }
