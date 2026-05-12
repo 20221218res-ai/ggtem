@@ -655,7 +655,7 @@ export async function getMarketplaceListingDetail(
     orderBy: {
       createdAt: "desc",
     },
-    take: 4,
+    take: 3,
   });
   const sellerReviewSummaries = await getSellerReviewSummaries(prisma, [
     listing.sellerId,
@@ -679,7 +679,11 @@ export async function getMarketplaceListingDetail(
         },
       ],
     },
-    include: {
+    select: {
+      id: true,
+      rating: true,
+      comment: true,
+      createdAt: true,
       buyer: {
         select: {
           displayName: true,
@@ -694,7 +698,7 @@ export async function getMarketplaceListingDetail(
     orderBy: {
       createdAt: "desc",
     },
-    take: 5,
+    take: 2,
   });
 
   return {
