@@ -216,8 +216,22 @@ export async function getAdminFinanceState(): Promise<AdminFinanceState> {
           where: {
             status: "PENDING",
           },
-          include: {
-            user: true,
+          select: {
+            id: true,
+            userId: true,
+            amount: true,
+            currency: true,
+            provider: true,
+            status: true,
+            requestedAt: true,
+            confirmedAt: true,
+            memo: true,
+            user: {
+              select: {
+                displayName: true,
+                email: true,
+              },
+            },
           },
           orderBy: {
             requestedAt: "asc",
@@ -230,9 +244,31 @@ export async function getAdminFinanceState(): Promise<AdminFinanceState> {
               in: ["REQUESTED", "UNDER_REVIEW", "APPROVED", "SENT"],
             },
           },
-          include: {
-            user: true,
+          select: {
+            id: true,
+            userId: true,
+            amount: true,
+            fee: true,
+            netAmount: true,
+            chain: true,
+            currency: true,
+            provider: true,
+            destination: true,
+            status: true,
+            riskFlags: true,
+            requestedAt: true,
+            completedAt: true,
+            memo: true,
+            user: {
+              select: {
+                displayName: true,
+                email: true,
+              },
+            },
             logs: {
+              select: {
+                message: true,
+              },
               orderBy: {
                 createdAt: "desc",
               },
@@ -250,8 +286,22 @@ export async function getAdminFinanceState(): Promise<AdminFinanceState> {
               in: ["CONFIRMED", "REJECTED"],
             },
           },
-          include: {
-            user: true,
+          select: {
+            id: true,
+            userId: true,
+            amount: true,
+            currency: true,
+            provider: true,
+            status: true,
+            requestedAt: true,
+            confirmedAt: true,
+            memo: true,
+            user: {
+              select: {
+                displayName: true,
+                email: true,
+              },
+            },
           },
           orderBy: {
             requestedAt: "desc",
@@ -264,8 +314,23 @@ export async function getAdminFinanceState(): Promise<AdminFinanceState> {
               in: ["COMPLETED", "REJECTED"],
             },
           },
-          include: {
-            user: true,
+          select: {
+            id: true,
+            userId: true,
+            amount: true,
+            currency: true,
+            provider: true,
+            destination: true,
+            status: true,
+            requestedAt: true,
+            completedAt: true,
+            memo: true,
+            user: {
+              select: {
+                displayName: true,
+                email: true,
+              },
+            },
           },
           orderBy: {
             requestedAt: "desc",
@@ -393,10 +458,26 @@ export async function getAdminFinanceLedgerState(filters?: {
       ...(direction ? { direction } : {}),
       ...(bucket ? { bucket } : {}),
     },
-    include: {
+    select: {
+      id: true,
+      userId: true,
+      type: true,
+      direction: true,
+      bucket: true,
+      amount: true,
+      currency: true,
+      referenceType: true,
+      referenceId: true,
+      memo: true,
+      createdAt: true,
       wallet: {
-        include: {
-          user: true,
+        select: {
+          user: {
+            select: {
+              displayName: true,
+              email: true,
+            },
+          },
         },
       },
     },
@@ -451,10 +532,29 @@ export async function getAdminFinanceLedgerState(filters?: {
               in: orderIds,
             },
           },
-          include: {
-            buyer: true,
-            seller: true,
-            listing: true,
+          select: {
+            id: true,
+            orderNumber: true,
+            status: true,
+            grossAmount: true,
+            platformFeeAmount: true,
+            sellerReceivableAmount: true,
+            currency: true,
+            buyer: {
+              select: {
+                displayName: true,
+              },
+            },
+            seller: {
+              select: {
+                displayName: true,
+              },
+            },
+            listing: {
+              select: {
+                title: true,
+              },
+            },
           },
         })
       : [];
@@ -553,10 +653,26 @@ export async function getAdminFinanceReconciliationState(filters?: {
         lte: to,
       },
     },
-    include: {
+    select: {
+      id: true,
+      userId: true,
+      type: true,
+      direction: true,
+      bucket: true,
+      amount: true,
+      currency: true,
+      referenceType: true,
+      referenceId: true,
+      memo: true,
+      createdAt: true,
       wallet: {
-        include: {
-          user: true,
+        select: {
+          user: {
+            select: {
+              displayName: true,
+              email: true,
+            },
+          },
         },
       },
     },
