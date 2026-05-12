@@ -71,18 +71,73 @@ export type OrderChatInboxView = {
 };
 
 export async function getOrderChatInboxLiveSignature(): Promise<string | null> {
-  const view = await getOrderChatInbox();
+  const prisma = getPrismaClient();
+  const sessionUser = await getCurrentSessionUser();
 
-  if (!view) {
+  if (!sessionUser || !["CUSTOMER", "SELLER"].includes(sessionUser.role)) {
     return null;
   }
 
+  const roomRows = await prisma.chatRoom.findMany({
+    where: {
+      OR: [{ buyerId: sessionUser.userId }, { sellerId: sessionUser.userId }],
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+    take: 30,
+    select: {
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+      lastMessageAt: true,
+      messages: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
+        select: {
+          body: true,
+          createdAt: true,
+        },
+      },
+    },
+  });
+
+  const roomIds = roomRows.map((room) => room.id);
+  const unreadRows = roomIds.length
+    ? await prisma.chatMessage.groupBy({
+        by: ["roomId"],
+        where: {
+          roomId: {
+            in: roomIds,
+          },
+          senderId: {
+            not: sessionUser.userId,
+          },
+          readAt: null,
+        },
+        _count: {
+          _all: true,
+        },
+      })
+    : [];
+
+  const unreadCountByRoomId = new Map(
+    unreadRows.map((row) => [row.roomId, row._count._all]),
+  );
+
   return JSON.stringify(
-    view.rooms.map((room) => ({
-      roomId: room.roomId,
-      lastMessageAt: room.lastMessageAt,
-      preview: room.lastMessagePreview,
-      unreadCount: room.unreadCount,
+    roomRows.map((room) => ({
+      roomId: room.id,
+      lastMessageAt: (
+        room.messages[0]?.createdAt ??
+        room.lastMessageAt ??
+        room.updatedAt ??
+        room.createdAt
+      ).toISOString(),
+      preview: room.messages[0]?.body ?? "",
+      unreadCount: unreadCountByRoomId.get(room.id) ?? 0,
     })),
   );
 }
