@@ -54,16 +54,21 @@ export async function createUserNotification(input: UserNotificationInput) {
 }
 
 export async function getUnreadNotificationCount() {
-  const prisma = getPrismaClient();
   const sessionUser = await getCurrentSessionUser();
 
   if (!sessionUser) {
     return 0;
   }
 
+  return getUnreadNotificationCountForUser(sessionUser.userId);
+}
+
+export async function getUnreadNotificationCountForUser(userId: string) {
+  const prisma = getPrismaClient();
+
   return prisma.notification.count({
     where: {
-      userId: sessionUser.userId,
+      userId,
       isRead: false,
     },
   });
@@ -77,20 +82,40 @@ export async function getMyNotificationsView(): Promise<MyNotificationsView | nu
     return null;
   }
 
-  const notifications = await prisma.notification.findMany({
-    where: {
-      userId: sessionUser.userId,
-    },
-    orderBy: [
-      {
-        isRead: "asc",
+  const [notifications, statusGroups] = await Promise.all([
+    prisma.notification.findMany({
+      where: {
+        userId: sessionUser.userId,
       },
-      {
-        createdAt: "desc",
+      orderBy: [
+        {
+          isRead: "asc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
+      take: 50,
+      select: {
+        id: true,
+        type: true,
+        title: true,
+        body: true,
+        href: true,
+        isRead: true,
+        createdAt: true,
       },
-    ],
-    take: 50,
-  });
+    }),
+    prisma.notification.groupBy({
+      by: ["isRead"],
+      where: {
+        userId: sessionUser.userId,
+      },
+      _count: { _all: true },
+    }),
+  ]);
+  const totalCount = statusGroups.reduce((sum, group) => sum + group._count._all, 0);
+  const unreadCount = statusGroups.find((group) => !group.isRead)?._count._all ?? 0;
 
   return {
     currentUser: {
@@ -99,8 +124,8 @@ export async function getMyNotificationsView(): Promise<MyNotificationsView | nu
       role: sessionUser.role,
     },
     summary: {
-      unreadCount: notifications.filter((item) => !item.isRead).length,
-      totalCount: notifications.length,
+      unreadCount,
+      totalCount,
     },
     notifications: notifications.map((item) => ({
       notificationId: item.id,
@@ -176,7 +201,7 @@ export async function getNotificationsLiveSignature(): Promise<string | null> {
     return null;
   }
 
-  const [latestNotification, unreadCount, totalCount] = await Promise.all([
+  const [latestNotification, statusGroups] = await Promise.all([
     prisma.notification.findFirst({
       where: {
         userId: sessionUser.userId,
@@ -191,18 +216,16 @@ export async function getNotificationsLiveSignature(): Promise<string | null> {
         readAt: true,
       },
     }),
-    prisma.notification.count({
-      where: {
-        userId: sessionUser.userId,
-        isRead: false,
-      },
-    }),
-    prisma.notification.count({
+    prisma.notification.groupBy({
+      by: ["isRead"],
       where: {
         userId: sessionUser.userId,
       },
+      _count: { _all: true },
     }),
   ]);
+  const totalCount = statusGroups.reduce((sum, group) => sum + group._count._all, 0);
+  const unreadCount = statusGroups.find((group) => !group.isRead)?._count._all ?? 0;
 
   return JSON.stringify({
     latestNotificationId: latestNotification?.id ?? null,

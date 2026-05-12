@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getCurrentSessionUser } from "@/lib/auth/session";
 import { getPrismaClient } from "@/lib/prisma";
-import { getUnreadNotificationCount } from "@/lib/notifications/notifications";
+import { getUnreadNotificationCountForUser } from "@/lib/notifications/notifications";
 import CountryText from "./country-text";
 import SignOutButton from "./sign-out-button";
 
@@ -44,7 +44,7 @@ export default async function AuthStatus() {
 
   const prisma = getPrismaClient();
   const [unreadNotificationCount, unreadChatCount] = await Promise.all([
-    getUnreadNotificationCount(),
+    getUnreadNotificationCountForUser(user.userId),
     prisma.chatMessage.count({
       where: {
         senderId: {
