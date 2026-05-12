@@ -38,7 +38,14 @@ export default async function AdminSupportInquiriesPage({
   const prisma = getPrismaClient();
   const [inquiries, statusGroups] = await Promise.all([
     prisma.supportInquiry.findMany({
-      include: {
+      select: {
+        id: true,
+        category: true,
+        title: true,
+        body: true,
+        status: true,
+        adminNote: true,
+        createdAt: true,
         user: {
           select: {
             email: true,

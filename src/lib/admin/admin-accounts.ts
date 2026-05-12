@@ -99,12 +99,23 @@ export async function getAdminAccountsState(): Promise<AdminAccountsState> {
           in: [...ADMIN_ROLES],
         },
       },
-      include: {
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+        role: true,
+        status: true,
+        passwordHash: true,
+        updatedAt: true,
         sessions: {
           where: {
             expiresAt: {
               gt: new Date(),
             },
+          },
+          select: {
+            id: true,
+            lastSeenAt: true,
           },
           orderBy: {
             lastSeenAt: "desc",
@@ -128,8 +139,19 @@ export async function getAdminAccountsState(): Promise<AdminAccountsState> {
       ],
     }),
     prisma.adminAuditLog.findMany({
-      include: {
-        admin: true,
+      select: {
+        id: true,
+        adminId: true,
+        action: true,
+        targetType: true,
+        targetId: true,
+        reason: true,
+        createdAt: true,
+        admin: {
+          select: {
+            displayName: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -137,9 +159,25 @@ export async function getAdminAccountsState(): Promise<AdminAccountsState> {
       take: 80,
     }),
     prisma.adminInviteToken.findMany({
-      include: {
-        user: true,
-        createdBy: true,
+      select: {
+        id: true,
+        usedAt: true,
+        revokedAt: true,
+        createdAt: true,
+        expiresAt: true,
+        userId: true,
+        user: {
+          select: {
+            email: true,
+            displayName: true,
+            role: true,
+          },
+        },
+        createdBy: {
+          select: {
+            displayName: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",

@@ -9,16 +9,41 @@ export async function getAdminGameSettingsState() {
     await Promise.all([
       prisma.game.findMany({
         orderBy: [{ isActive: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
-        include: {
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          nameKo: true,
+          nameCn: true,
+          nameVn: true,
+          namePh: true,
+          nameTh: true,
+          moneyUnitName: true,
+          imageUrl: true,
+          imageStoragePath: true,
+          imageAlt: true,
+          sortOrder: true,
+          isActive: true,
           servers: {
             orderBy: [{ isActive: "desc" }, { code: "asc" }, { name: "asc" }],
-            include: { _count: { select: { listings: true } } },
+            select: {
+              id: true,
+              name: true,
+              code: true,
+              isActive: true,
+              _count: { select: { listings: true } },
+            },
           },
           _count: { select: { listings: true } },
           adminNotes: {
             orderBy: { updatedAt: "desc" },
             take: 3,
-            include: { admin: { select: { displayName: true, email: true } } },
+            select: {
+              id: true,
+              body: true,
+              updatedAt: true,
+              admin: { select: { displayName: true, email: true } },
+            },
           },
         },
       }),
@@ -49,7 +74,15 @@ export async function getAdminGameSettingsState() {
         },
         orderBy: { createdAt: "desc" },
         take: 8,
-        include: { admin: { select: { displayName: true, email: true } } },
+        select: {
+          id: true,
+          action: true,
+          targetType: true,
+          targetId: true,
+          reason: true,
+          createdAt: true,
+          admin: { select: { displayName: true, email: true } },
+        },
       }),
     ]);
 
