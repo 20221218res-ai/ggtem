@@ -59,6 +59,14 @@ export default async function CustomerCenterPage({
     selectedTab === "inquiry" && currentUser
       ? prisma.supportInquiry.findMany({
           where: { userId: currentUser.userId },
+          select: {
+            id: true,
+            category: true,
+            title: true,
+            status: true,
+            adminNote: true,
+            createdAt: true,
+          },
           orderBy: { createdAt: "desc" },
           take: 8,
         })
@@ -330,7 +338,7 @@ function GameRequestPanel({
                   name="serverName"
                   maxLength={80}
                   className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold"
-                  placeholder="신규 서버 신청 시 입력"
+                  placeholder="신규 서버 요청 시 입력"
                 />
               </label>
             </div>
