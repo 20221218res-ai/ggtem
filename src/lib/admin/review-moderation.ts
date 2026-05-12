@@ -70,15 +70,40 @@ export async function getAdminReviewModerationState(): Promise<AdminReviewModera
     reportCategoryGroups,
   ] = await Promise.all([
     prisma.orderReview.findMany({
-      include: {
-        buyer: true,
-        seller: true,
-        order: {
-          include: {
-            listing: true,
+      select: {
+        id: true,
+        orderId: true,
+        buyerId: true,
+        sellerId: true,
+        rating: true,
+        comment: true,
+        createdAt: true,
+        buyer: {
+          select: {
+            displayName: true,
           },
         },
-        moderation: true,
+        seller: {
+          select: {
+            displayName: true,
+          },
+        },
+        order: {
+          select: {
+            orderNumber: true,
+            listing: {
+              select: {
+                title: true,
+              },
+            },
+          },
+        },
+        moderation: {
+          select: {
+            status: true,
+            reason: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -86,12 +111,34 @@ export async function getAdminReviewModerationState(): Promise<AdminReviewModera
       take: 40,
     }),
     prisma.trustReport.findMany({
-      include: {
-        reporter: true,
-        targetUser: true,
+      select: {
+        id: true,
+        category: true,
+        status: true,
+        severity: true,
+        description: true,
+        resolutionNote: true,
+        createdAt: true,
+        targetUserId: true,
+        orderId: true,
+        reporter: {
+          select: {
+            displayName: true,
+          },
+        },
+        targetUser: {
+          select: {
+            displayName: true,
+          },
+        },
         order: {
-          include: {
-            listing: true,
+          select: {
+            orderNumber: true,
+            listing: {
+              select: {
+                title: true,
+              },
+            },
           },
         },
       },

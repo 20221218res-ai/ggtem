@@ -134,12 +134,41 @@ export async function getAdminRiskState(filters?: {
     await Promise.all([
       prisma.trustReport.findMany({
         where,
-        include: {
-          reporter: true,
-          targetUser: true,
+        select: {
+          id: true,
+          category: true,
+          status: true,
+          severity: true,
+          sourceType: true,
+          sourceId: true,
+          description: true,
+          resolutionNote: true,
+          createdAt: true,
+          updatedAt: true,
+          resolvedAt: true,
+          orderId: true,
+          reporter: {
+            select: {
+              displayName: true,
+              email: true,
+            },
+          },
+          targetUser: {
+            select: {
+              id: true,
+              displayName: true,
+              email: true,
+              status: true,
+            },
+          },
           order: {
-            include: {
-              listing: true,
+            select: {
+              orderNumber: true,
+              listing: {
+                select: {
+                  title: true,
+                },
+              },
             },
           },
         },
