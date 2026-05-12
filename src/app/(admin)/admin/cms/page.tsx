@@ -18,6 +18,17 @@ import {
   getAdminCmsState,
 } from "@/lib/admin/cms";
 
+const cmsTemplateHints: Record<string, string> = {
+  NOTICE: "예: GGtem 안전거래 이용 안내",
+  FAQ: "예: 충전과 출금은 어떻게 처리되나요?",
+  POLICY: "예: 1인 1계정 및 외부거래 제한 안내",
+  PAID_SERVICE: "예: 프리미엄 글 노출 안내",
+  GAME_SERVER_REQUEST: "예: 신규 게임/서버 신청 방법",
+  TERMS: "예: 이용약관 개정 안내",
+  PRIVACY: "예: 개인정보 처리방침 안내",
+  GUIDE: "예: 계정 거래 진행 가이드",
+};
+
 export default async function AdminCmsPage({
   searchParams,
 }: {
@@ -85,6 +96,13 @@ export default async function AdminCmsPage({
                 className="h-11 rounded-md border border-slate-200 px-3 font-bold"
               />
             </label>
+            <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs font-bold leading-6 text-slate-600">
+              {CMS_TYPES.map((type) => (
+                <p key={type}>
+                  {cmsTypeLabel(type)}: {cmsTemplateHints[type]}
+                </p>
+              ))}
+            </div>
             <label className="grid gap-2 text-sm font-black">
               본문
               <textarea
@@ -175,6 +193,11 @@ export default async function AdminCmsPage({
               </button>
             </form>
           ))}
+          {state.documents.length === 0 ? (
+            <p className="rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm font-bold text-slate-600">
+              아직 등록된 CMS 문서가 없습니다. 왼쪽 작성 폼으로 첫 공지나 FAQ를 등록하세요.
+            </p>
+          ) : null}
         </div>
       </Panel>
     </AdminMockPage>
