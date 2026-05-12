@@ -18,6 +18,8 @@ type NotificationsResponse = {
 };
 
 const DISMISSED_STORAGE_KEY = "ggtem-dismissed-priority-notification";
+const ACTIVE_CHECK_INTERVAL_MS = 45_000;
+const DISMISSED_CHECK_INTERVAL_MS = 90_000;
 
 export default function PriorityNotificationModal() {
   const router = useRouter();
@@ -43,8 +45,22 @@ export default function PriorityNotificationModal() {
     }
 
     let isActive = true;
+    let timer: number | null = null;
+
+    function scheduleNextCheck(delay: number) {
+      if (!isActive) {
+        return;
+      }
+
+      timer = window.setTimeout(() => void loadPriorityNotification(), delay);
+    }
 
     async function loadPriorityNotification() {
+      if (document.visibilityState === "hidden") {
+        scheduleNextCheck(ACTIVE_CHECK_INTERVAL_MS);
+        return;
+      }
+
       try {
         const params = dismissedId
           ? `?dismissedId=${encodeURIComponent(dismissedId)}`
@@ -54,25 +70,34 @@ export default function PriorityNotificationModal() {
         });
 
         if (!response.ok) {
+          scheduleNextCheck(ACTIVE_CHECK_INTERVAL_MS);
           return;
         }
 
         const data = (await response.json()) as NotificationsResponse;
 
         if (isActive) {
-          setNotification(data.notification ?? null);
+          const nextNotification = data.notification ?? null;
+          setNotification(nextNotification);
+          scheduleNextCheck(
+            nextNotification || !dismissedId
+              ? ACTIVE_CHECK_INTERVAL_MS
+              : DISMISSED_CHECK_INTERVAL_MS,
+          );
         }
       } catch {
         // The modal is opportunistic; failed polling should not block the page.
+        scheduleNextCheck(ACTIVE_CHECK_INTERVAL_MS);
       }
     }
 
     void loadPriorityNotification();
-    const timer = window.setInterval(() => void loadPriorityNotification(), 15000);
 
     return () => {
       isActive = false;
-      window.clearInterval(timer);
+      if (timer) {
+        window.clearTimeout(timer);
+      }
     };
   }, [dismissedId, shouldCheck]);
 
