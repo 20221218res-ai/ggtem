@@ -145,8 +145,22 @@ export async function getAdminAuditState(filters?: AdminAuditFilters): Promise<A
   const [logs, totalLogs, actionGroups, targetGroups, adminOptions] = await Promise.all([
     prisma.adminAuditLog.findMany({
       where: effectiveWhere,
-      include: {
-        admin: true,
+      select: {
+        id: true,
+        action: true,
+        targetType: true,
+        targetId: true,
+        reason: true,
+        before: true,
+        after: true,
+        ipAddress: true,
+        createdAt: true,
+        admin: {
+          select: {
+            displayName: true,
+            email: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -212,8 +226,17 @@ export async function getAdminAuditState(filters?: AdminAuditFilters): Promise<A
         in: logs.map((log) => log.id),
       },
     },
-    include: {
-      admin: true,
+    select: {
+      id: true,
+      targetId: true,
+      reason: true,
+      createdAt: true,
+      admin: {
+        select: {
+          displayName: true,
+          email: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",

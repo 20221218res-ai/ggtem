@@ -53,8 +53,25 @@ export async function getAdminCmsState(): Promise<AdminCmsState> {
   const prisma = getPrismaClient();
   const [documents, statusGroups, typeGroups, totalVersions] = await Promise.all([
     prisma.cmsDocument.findMany({
-      include: {
+      select: {
+        id: true,
+        slug: true,
+        type: true,
+        title: true,
+        status: true,
+        currentVersionId: true,
+        updatedAt: true,
         versions: {
+          select: {
+            id: true,
+            title: true,
+            version: true,
+            locale: true,
+            status: true,
+            changeNote: true,
+            body: true,
+            updatedAt: true,
+          },
           orderBy: {
             updatedAt: "desc",
           },

@@ -238,10 +238,28 @@ export async function getAdminDashboardState(): Promise<AdminDashboardState> {
       },
     }),
     prisma.order.findMany({
-      include: {
-        buyer: true,
-        seller: true,
-        listing: true,
+      select: {
+        id: true,
+        orderNumber: true,
+        status: true,
+        grossAmount: true,
+        currency: true,
+        createdAt: true,
+        buyer: {
+          select: {
+            displayName: true,
+          },
+        },
+        seller: {
+          select: {
+            displayName: true,
+          },
+        },
+        listing: {
+          select: {
+            title: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -252,11 +270,31 @@ export async function getAdminDashboardState(): Promise<AdminDashboardState> {
       where: {
         status: "DISPUTED",
       },
-      include: {
-        buyer: true,
-        seller: true,
-        listing: true,
+      select: {
+        id: true,
+        orderNumber: true,
+        updatedAt: true,
+        buyer: {
+          select: {
+            displayName: true,
+          },
+        },
+        seller: {
+          select: {
+            displayName: true,
+          },
+        },
+        listing: {
+          select: {
+            title: true,
+          },
+        },
         events: {
+          select: {
+            status: true,
+            message: true,
+            createdAt: true,
+          },
           orderBy: {
             createdAt: "desc",
           },
@@ -311,12 +349,32 @@ export async function getAdminDashboardState(): Promise<AdminDashboardState> {
           },
         ],
       },
-      include: {
-        reporter: true,
-        targetUser: true,
+      select: {
+        id: true,
+        orderId: true,
+        severity: true,
+        status: true,
+        description: true,
+        createdAt: true,
+        reporter: {
+          select: {
+            displayName: true,
+          },
+        },
+        targetUser: {
+          select: {
+            displayName: true,
+            email: true,
+          },
+        },
         order: {
-          include: {
-            listing: true,
+          select: {
+            orderNumber: true,
+            listing: {
+              select: {
+                title: true,
+              },
+            },
           },
         },
       },
