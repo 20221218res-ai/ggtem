@@ -3,6 +3,7 @@ import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
 import { getPrismaClient } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+const BADGE_COUNT_LIMIT = 100;
 
 export async function GET() {
   const auth = await requireApiRole(ROLE_GROUPS.MARKET_USERS);
@@ -12,8 +13,8 @@ export async function GET() {
   }
 
   const prisma = getPrismaClient();
-  const [unreadChatCount, unreadNotificationCount] = await Promise.all([
-    prisma.chatMessage.count({
+  const [unreadChatRows, unreadNotificationRows] = await Promise.all([
+    prisma.chatMessage.findMany({
       where: {
         senderId: { not: auth.user.userId },
         readAt: null,
@@ -24,17 +25,25 @@ export async function GET() {
           ],
         },
       },
+      take: BADGE_COUNT_LIMIT,
+      select: {
+        id: true,
+      },
     }),
-    prisma.notification.count({
+    prisma.notification.findMany({
       where: {
         userId: auth.user.userId,
         isRead: false,
+      },
+      take: BADGE_COUNT_LIMIT,
+      select: {
+        id: true,
       },
     }),
   ]);
 
   return NextResponse.json({
-    unreadChatCount,
-    unreadNotificationCount,
+    unreadChatCount: unreadChatRows.length,
+    unreadNotificationCount: unreadNotificationRows.length,
   });
 }
