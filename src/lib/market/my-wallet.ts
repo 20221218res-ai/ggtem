@@ -139,15 +139,49 @@ export async function getMarketplaceWalletView(): Promise<MarketplaceWalletView>
     where: {
       email: buyerEmail,
     },
-    include: {
-      wallet: true,
+    select: {
+      id: true,
+      displayName: true,
+      wallet: {
+        select: {
+          availableBalance: true,
+          escrowLockedBalance: true,
+          buyRequestLocked: true,
+          withdrawableBalance: true,
+          withdrawalLocked: true,
+          currency: true,
+        },
+      },
       depositRequests: {
+        select: {
+          id: true,
+          amount: true,
+          currency: true,
+          status: true,
+          provider: true,
+          requestedAt: true,
+          confirmedAt: true,
+          memo: true,
+        },
         orderBy: {
           requestedAt: "desc",
         },
         take: 10,
       },
       withdrawalRequests: {
+        select: {
+          id: true,
+          amount: true,
+          fee: true,
+          netAmount: true,
+          chain: true,
+          currency: true,
+          status: true,
+          destination: true,
+          requestedAt: true,
+          completedAt: true,
+          memo: true,
+        },
         orderBy: {
           requestedAt: "desc",
         },
@@ -229,8 +263,19 @@ export async function getMarketplaceWalletLedgerView(filters?: {
     where: {
       email: buyerEmail,
     },
-    include: {
-      wallet: true,
+    select: {
+      id: true,
+      displayName: true,
+      wallet: {
+        select: {
+          availableBalance: true,
+          escrowLockedBalance: true,
+          buyRequestLocked: true,
+          withdrawableBalance: true,
+          withdrawalLocked: true,
+          currency: true,
+        },
+      },
     },
   });
 
@@ -261,6 +306,18 @@ export async function getMarketplaceWalletLedgerView(filters?: {
       userId: buyer.id,
       ...(direction ? { direction } : {}),
       ...(bucket ? { bucket } : {}),
+    },
+    select: {
+      id: true,
+      type: true,
+      direction: true,
+      bucket: true,
+      amount: true,
+      currency: true,
+      referenceType: true,
+      referenceId: true,
+      memo: true,
+      createdAt: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -847,6 +904,16 @@ export async function getMarketplaceDepositRequestDetail(
       id: requestId,
       userId: buyer.id,
     },
+    select: {
+      id: true,
+      amount: true,
+      currency: true,
+      status: true,
+      provider: true,
+      memo: true,
+      requestedAt: true,
+      confirmedAt: true,
+    },
   });
 
   if (!request) {
@@ -893,8 +960,29 @@ export async function getMarketplaceWithdrawalRequestDetail(
       id: requestId,
       userId: buyer.id,
     },
-    include: {
+    select: {
+      id: true,
+      amount: true,
+      fee: true,
+      netAmount: true,
+      chain: true,
+      currency: true,
+      status: true,
+      provider: true,
+      destination: true,
+      memo: true,
+      requestedAt: true,
+      completedAt: true,
+      processedAt: true,
+      failureReason: true,
       logs: {
+        select: {
+          action: true,
+          statusFrom: true,
+          statusTo: true,
+          message: true,
+          createdAt: true,
+        },
         orderBy: {
           createdAt: "asc",
         },
