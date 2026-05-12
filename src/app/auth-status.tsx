@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { getCurrentSessionUser } from "@/lib/auth/session";
 import { getPrismaClient } from "@/lib/prisma";
-import { getUnreadNotificationCountForUser } from "@/lib/notifications/notifications";
 import CountryText from "./country-text";
 import SignOutButton from "./sign-out-button";
+
+const BADGE_COUNT_LIMIT = 100;
 
 const userLinks = [
   { href: "/", labelId: "common.home" },
@@ -43,9 +44,18 @@ export default async function AuthStatus() {
   }
 
   const prisma = getPrismaClient();
-  const [unreadNotificationCount, unreadChatCount] = await Promise.all([
-    getUnreadNotificationCountForUser(user.userId),
-    prisma.chatMessage.count({
+  const [unreadNotificationRows, unreadChatRows] = await Promise.all([
+    prisma.notification.findMany({
+      where: {
+        userId: user.userId,
+        isRead: false,
+      },
+      take: BADGE_COUNT_LIMIT,
+      select: {
+        id: true,
+      },
+    }),
+    prisma.chatMessage.findMany({
       where: {
         senderId: {
           not: user.userId,
@@ -55,8 +65,14 @@ export default async function AuthStatus() {
           OR: [{ buyerId: user.userId }, { sellerId: user.userId }],
         },
       },
+      take: BADGE_COUNT_LIMIT,
+      select: {
+        id: true,
+      },
     }),
   ]);
+  const unreadNotificationCount = unreadNotificationRows.length;
+  const unreadChatCount = unreadChatRows.length;
 
   return (
     <div className="border-b border-white/10 bg-slate-950/95">

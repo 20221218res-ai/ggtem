@@ -182,7 +182,7 @@ export default function UserMarketHeaderClient({
           prefetch={false}
           className="shrink-0 rounded-full px-3 py-2 text-sm font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)] hover:text-[var(--gg-accent)]"
         >
-          고객센터
+          {t("common.customerCenter")}
         </Link>
         <div className="flex shrink-0 items-center gap-2 sm:ml-auto">
           {currentUser ? (
