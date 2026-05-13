@@ -1,3 +1,4 @@
+import { getGameMoneyPriceUnitLabel, getGameMoneyUnitName } from "@/lib/market/trade-unit";
 import { getPrismaClient } from "@/lib/prisma";
 
 export type AdminPremiumItem = {
@@ -12,6 +13,8 @@ export type AdminPremiumItem = {
   status: string;
   unitPrice: string;
   currency: string;
+  tradeModeLabel: string | null;
+  minimumQuantityLabel: string | null;
   premiumStartedAt: string;
   premiumEndsAt: string;
   remainingLabel: string;
@@ -63,6 +66,7 @@ export async function getAdminPremiumState(): Promise<AdminPremiumState> {
         seller: true,
         game: true,
         server: true,
+        inventory: true,
       },
       orderBy: {
         premiumEndsAt: "asc",
@@ -79,6 +83,7 @@ export async function getAdminPremiumState(): Promise<AdminPremiumState> {
         seller: true,
         game: true,
         server: true,
+        inventory: true,
       },
       orderBy: {
         premiumEndsAt: "desc",
@@ -163,6 +168,7 @@ export async function getAdminPremiumState(): Promise<AdminPremiumState> {
           select: {
             id: true,
             name: true,
+            moneyUnitName: true,
           },
         })
       : [],
@@ -180,23 +186,19 @@ export async function getAdminPremiumState(): Promise<AdminPremiumState> {
         })
       : [],
   ]);
-  const gameNameById = new Map(games.map((game) => [game.id, game.name]));
+  const gameById = new Map(games.map((game) => [game.id, game]));
   const serverNameById = new Map(servers.map((server) => [server.id, server.name]));
 
   const activeItems = [
-    ...activeListings.map((listing) =>
-      mapListingPremiumItem(listing, now),
-    ),
+    ...activeListings.map((listing) => mapListingPremiumItem(listing, now)),
     ...activeBuyRequests.map((request) =>
-      mapBuyRequestPremiumItem(request, now, gameNameById, serverNameById),
+      mapBuyRequestPremiumItem(request, now, gameById, serverNameById),
     ),
   ].sort((left, right) => comparePremiumEnd(left, right));
   const expiredItems = [
-    ...expiredListings.map((listing) =>
-      mapListingPremiumItem(listing, now),
-    ),
+    ...expiredListings.map((listing) => mapListingPremiumItem(listing, now)),
     ...expiredBuyRequests.map((request) =>
-      mapBuyRequestPremiumItem(request, now, gameNameById, serverNameById),
+      mapBuyRequestPremiumItem(request, now, gameById, serverNameById),
     ),
   ].sort((left, right) => comparePremiumEnd(right, left));
 
@@ -230,6 +232,8 @@ function mapListingPremiumItem(
     title: string;
     category: string;
     status: string;
+    tradeMode: string;
+    priceUnitQuantity: unknown;
     unitPrice: unknown;
     currency: string;
     premiumStartedAt: Date | null;
@@ -237,11 +241,15 @@ function mapListingPremiumItem(
     premiumDurationHours: number | null;
     premiumFeeAmount: unknown | null;
     seller: { displayName: string };
-    game: { name: string };
+    game: { name: string; moneyUnitName: string | null };
     server: { name: string } | null;
+    inventory: { minimumQuantity: unknown } | null;
   },
   now: Date,
 ): AdminPremiumItem {
+  const isGameMoney = listing.category === "GAME_MONEY";
+  const moneyUnitName = getGameMoneyUnitName(listing.game.moneyUnitName, listing.game.name);
+
   return {
     id: listing.id,
     type: "LISTING",
@@ -252,14 +260,21 @@ function mapListingPremiumItem(
     serverName: listing.server?.name ?? "전체 서버",
     category: categoryLabel(listing.category),
     status: listing.status,
-    unitPrice: formatDecimal(String(listing.unitPrice)),
+    unitPrice: formatPriceLabel({
+      category: listing.category,
+      unitPrice: listing.unitPrice,
+      priceUnitQuantity: listing.priceUnitQuantity,
+      currency: listing.currency,
+      moneyUnitName,
+    }),
     currency: listing.currency,
-    premiumStartedAt: listing.premiumStartedAt
-      ? formatKoreanDate(listing.premiumStartedAt)
-      : "-",
-    premiumEndsAt: listing.premiumEndsAt
-      ? listing.premiumEndsAt.toISOString()
-      : now.toISOString(),
+    tradeModeLabel: isGameMoney ? tradeModeLabel(listing.tradeMode, "sell") : null,
+    minimumQuantityLabel:
+      isGameMoney && listing.inventory
+        ? `${formatDecimal(String(listing.inventory.minimumQuantity))} ${moneyUnitName}`
+        : null,
+    premiumStartedAt: listing.premiumStartedAt ? formatKoreanDate(listing.premiumStartedAt) : "-",
+    premiumEndsAt: listing.premiumEndsAt ? listing.premiumEndsAt.toISOString() : now.toISOString(),
     remainingLabel: formatRemaining(listing.premiumEndsAt, now),
     durationHours: listing.premiumDurationHours ?? 0,
     feeAmount: formatDecimal(String(listing.premiumFeeAmount ?? "0")),
@@ -273,6 +288,9 @@ function mapBuyRequestPremiumItem(
     title: string | null;
     category: string;
     status: string;
+    tradeMode: string;
+    priceUnitQuantity: unknown;
+    minimumQuantity: unknown;
     unitPrice: unknown;
     currency: string;
     gameId: string;
@@ -284,36 +302,88 @@ function mapBuyRequestPremiumItem(
     buyer: { displayName: string };
   },
   now: Date,
-  gameNameById: Map<string, string>,
+  gameById: Map<string, { id: string; name: string; moneyUnitName: string | null }>,
   serverNameById: Map<string, string>,
 ): AdminPremiumItem {
+  const game = gameById.get(request.gameId);
+  const gameName = game?.name ?? "알 수 없는 게임";
+  const isGameMoney = request.category === "GAME_MONEY";
+  const moneyUnitName = getGameMoneyUnitName(game?.moneyUnitName, gameName);
+
   return {
     id: request.id,
     type: "BUY_REQUEST",
     modeLabel: "구매글",
     title: request.title ?? "제목 없는 구매글",
     ownerName: request.buyer.displayName,
-    gameName: gameNameById.get(request.gameId) ?? "알 수 없는 게임",
-    serverName: request.serverId
-      ? serverNameById.get(request.serverId) ?? "알 수 없는 서버"
-      : "전체 서버",
+    gameName,
+    serverName: request.serverId ? serverNameById.get(request.serverId) ?? "알 수 없는 서버" : "전체 서버",
     category: categoryLabel(request.category),
     status: request.status,
-    unitPrice: formatDecimal(String(request.unitPrice)),
+    unitPrice: formatPriceLabel({
+      category: request.category,
+      unitPrice: request.unitPrice,
+      priceUnitQuantity: request.priceUnitQuantity,
+      currency: request.currency,
+      moneyUnitName,
+    }),
     currency: request.currency,
-    premiumStartedAt: request.premiumStartedAt
-      ? formatKoreanDate(request.premiumStartedAt)
-      : "-",
-    premiumEndsAt: request.premiumEndsAt
-      ? request.premiumEndsAt.toISOString()
-      : now.toISOString(),
+    tradeModeLabel: isGameMoney ? tradeModeLabel(request.tradeMode, "buy") : null,
+    minimumQuantityLabel: isGameMoney
+      ? `${formatDecimal(String(request.minimumQuantity))} ${moneyUnitName}`
+      : null,
+    premiumStartedAt: request.premiumStartedAt ? formatKoreanDate(request.premiumStartedAt) : "-",
+    premiumEndsAt: request.premiumEndsAt ? request.premiumEndsAt.toISOString() : now.toISOString(),
     remainingLabel: formatRemaining(request.premiumEndsAt, now),
     durationHours: request.premiumDurationHours ?? 0,
     feeAmount: formatDecimal(String(request.premiumFeeAmount ?? "0")),
-    href: `/listings?mode=buy&category=${request.category}&game=${encodeURIComponent(
-      gameNameById.get(request.gameId) ?? "",
-    )}`,
+    href: `/listings?mode=buy&category=${request.category}&game=${encodeURIComponent(gameName)}`,
   };
+}
+
+function formatPriceLabel({
+  category,
+  unitPrice,
+  priceUnitQuantity,
+  currency,
+  moneyUnitName,
+}: {
+  category: string;
+  unitPrice: unknown;
+  priceUnitQuantity: unknown;
+  currency: string;
+  moneyUnitName: string;
+}) {
+  if (category !== "GAME_MONEY") {
+    return `${formatDecimal(String(unitPrice))} ${currency}`;
+  }
+
+  const unitQuantity = Number(priceUnitQuantity);
+  const basePrice = Number(unitPrice);
+  const displayAmount =
+    Number.isFinite(unitQuantity) && Number.isFinite(basePrice)
+      ? basePrice * unitQuantity
+      : basePrice;
+  const unitLabel = getGameMoneyPriceUnitLabel(formatUnitQuantity(priceUnitQuantity), moneyUnitName);
+
+  return `${formatDecimal(String(displayAmount))} ${currency} / ${unitLabel}`;
+}
+
+function tradeModeLabel(value: string, side: "sell" | "buy") {
+  if (value === "BULK") {
+    return side === "sell" ? "일괄 판매" : "일괄 구매";
+  }
+
+  return side === "sell" ? "분할 판매" : "분할 구매";
+}
+
+function formatUnitQuantity(value: unknown) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return String(value);
+  }
+
+  return String(Math.trunc(numeric));
 }
 
 function comparePremiumEnd(left: AdminPremiumItem, right: AdminPremiumItem) {
@@ -327,10 +397,7 @@ function formatRemaining(date: Date | null, now: Date) {
   const absMinutes = Math.max(Math.ceil(Math.abs(diffMs) / 60_000), 0);
   const hours = Math.floor(absMinutes / 60);
   const minutes = absMinutes % 60;
-  const label =
-    hours > 0
-      ? `${hours}시간 ${minutes}분`
-      : `${minutes}분`;
+  const label = hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
 
   return diffMs > 0 ? `${label} 남음` : `${label} 전 만료`;
 }

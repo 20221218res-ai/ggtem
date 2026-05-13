@@ -7,7 +7,11 @@ import { MarketplaceHeader } from "../../marketplace-home";
 import CountryText from "../../country-text";
 import UserContentText, { SourceCountryFlag } from "../../user-content-text";
 import { PurchasePreviewPanel } from "./purchase-preview-panel";
-import { getTradeUnitLabel } from "@/lib/market/trade-unit";
+import {
+  getGameMoneyPriceUnitLabel,
+  getTradeUnitLabel,
+  normalizeGameMoneyPriceUnit,
+} from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
 
 export const dynamic = "force-dynamic";
@@ -39,6 +43,12 @@ export default async function ListingDetailPage({
     listing.moneyUnitName,
     listing.gameName,
   );
+  const priceDisplay = getListingPriceDisplay({
+    category: listing.category,
+    unitPrice: listing.unitPrice,
+    priceUnitQuantity: listing.priceUnitQuantity,
+    moneyUnitName: listing.moneyUnitName,
+  });
   const accountTransferTypeLabel =
     listing.category === "GAME_ACCOUNT"
       ? normalizeAccountTransferType(listing.accountTransferType)
@@ -112,16 +122,8 @@ export default async function ListingDetailPage({
                   <div className="mt-6 grid gap-3 md:grid-cols-3">
                     <Metric
                       label={<CountryText id="listingDetail.unitPrice" />}
-                      value={`${listing.unitPrice} ${listing.currency}`}
-                      hint={
-                        moneyUnit ? (
-                          <>
-                            {moneyUnit} <CountryText id="listingDetail.unitBasisSuffix" />
-                          </>
-                        ) : (
-                          <CountryText id="listingDetail.eachBasis" />
-                        )
-                      }
+                      value={`${priceDisplay.price} ${listing.currency}`}
+                      hint={`${priceDisplay.unitLabel} 기준`}
                       strong
                     />
                     <Metric label={<CountryText id="listingDetail.minimumQuantity" />} value={formatTradeQuantity(listing.minimumQuantity, moneyUnit)} />
@@ -242,11 +244,15 @@ export default async function ListingDetailPage({
             <PurchasePreviewPanel
               listingId={listing.listingId}
               category={listing.category}
+              tradeMode={listing.tradeMode}
               unitPrice={listing.unitPrice}
+              displayUnitPrice={priceDisplay.price}
+              priceUnitLabel={priceDisplay.unitLabel}
               currency={listing.currency}
               availableQuantity={listing.availableQuantity}
               minimumQuantity={listing.minimumQuantity}
               tradeUnitLabel={moneyUnit}
+              serverLabel={serverLabel ?? "전체 서버"}
             />
 
             <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5">
@@ -271,6 +277,44 @@ export default async function ListingDetailPage({
       </section>
     </main>
   );
+}
+
+function getListingPriceDisplay({
+  category,
+  unitPrice,
+  priceUnitQuantity,
+  moneyUnitName,
+}: {
+  category: string;
+  unitPrice: string;
+  priceUnitQuantity: string;
+  moneyUnitName: string;
+}) {
+  if (category !== "GAME_MONEY") {
+    return {
+      price: formatDisplayNumber(Number(unitPrice)),
+      unitLabel: "1개",
+    };
+  }
+
+  const normalizedPriceUnitQuantity = normalizeGameMoneyPriceUnit(priceUnitQuantity);
+  const quantity = Number(normalizedPriceUnitQuantity);
+  const price = Number(unitPrice) * quantity;
+
+  return {
+    price: formatDisplayNumber(price),
+    unitLabel: getGameMoneyPriceUnitLabel(normalizedPriceUnitQuantity, moneyUnitName),
+  };
+}
+
+function formatDisplayNumber(value: number) {
+  if (!Number.isFinite(value)) {
+    return "0";
+  }
+
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: 6,
+  });
 }
 
 function Metric({

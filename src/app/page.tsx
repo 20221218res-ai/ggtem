@@ -18,6 +18,8 @@ export default async function Home({ searchParams }: HomePageProps) {
     category: resolvedSearchParams?.category,
     sort: resolvedSearchParams?.sort,
     limit: 12,
+    includeCategories: false,
+    includeSellerReviewSummaries: false,
   });
 
   return <MarketplaceHome {...view} />;

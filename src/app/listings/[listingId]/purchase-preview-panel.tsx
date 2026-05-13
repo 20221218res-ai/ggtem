@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
-import { ActionConfirmDialog } from "@/components/action-confirm-dialog";
+import { useEffect, useMemo, useState } from "react";
+import { TradeSafetyConfirmDialog } from "@/components/trade-safety-confirm-dialog";
 import { calculateMarketplacePurchaseAmount } from "@/lib/market/purchase-calculation";
 import { isGameMoneyQuantityUnit } from "@/lib/market/trade-unit";
 import { parseFixedAmount } from "@/lib/wallet/manual-deposit";
@@ -14,11 +14,15 @@ import type { TranslationKey } from "@/app/i18n";
 type PurchasePreviewPanelProps = {
   listingId: string;
   category: string;
+  tradeMode: string;
   unitPrice: string;
+  displayUnitPrice: string;
+  priceUnitLabel: string;
   currency: string;
   availableQuantity: string;
   minimumQuantity: string;
   tradeUnitLabel: string;
+  serverLabel?: string;
 };
 
 type PurchaseResult = {
@@ -42,11 +46,15 @@ type PurchaseResult = {
 export function PurchasePreviewPanel({
   listingId,
   category,
+  tradeMode,
   unitPrice,
+  displayUnitPrice,
+  priceUnitLabel,
   currency,
   availableQuantity,
   minimumQuantity,
   tradeUnitLabel,
+  serverLabel,
 }: PurchasePreviewPanelProps) {
   const router = useRouter();
   const { t } = useCountryTranslation();
@@ -56,6 +64,13 @@ export function PurchasePreviewPanel({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const isGameMoneyListing = category === "GAME_MONEY";
+  const isBulkMode = tradeMode === "BULK";
+
+  useEffect(() => {
+    if (isBulkMode) {
+      setQuantity(availableQuantity);
+    }
+  }, [availableQuantity, isBulkMode]);
 
   const quantityStatus = useMemo(() => {
     try {
@@ -65,6 +80,13 @@ export function PurchasePreviewPanel({
 
       if (normalizedQuantity <= 0n) {
         return { isValid: false, message: t("purchase.quantityPositive") };
+      }
+
+      if (isBulkMode && normalizedQuantity !== normalizedAvailable) {
+        return {
+          isValid: false,
+          message: "일괄판매 매물은 전체 수량만 즉시구매할 수 있습니다.",
+        };
       }
 
       if (normalizedQuantity < normalizedMinimum) {
@@ -95,7 +117,7 @@ export function PurchasePreviewPanel({
     } catch {
       return { isValid: false, message: t("purchase.numberOnly") };
     }
-  }, [availableQuantity, isGameMoneyListing, minimumQuantity, quantity, t]);
+  }, [availableQuantity, isBulkMode, isGameMoneyListing, minimumQuantity, quantity, t]);
 
   const expectedAmount = useMemo(() => {
     try {
@@ -109,13 +131,17 @@ export function PurchasePreviewPanel({
     }
   }, [quantity, quantityStatus.isValid, unitPrice]);
 
-  const quickQuantities = Array.from(
-    new Set(
-      [
+  const quickQuantitySeeds = isBulkMode
+    ? [availableQuantity]
+    : [
         minimumQuantity,
         ...(isGameMoneyListing ? ["10000", "50000", "100000"] : ["10", "100", "1000"]),
         availableQuantity,
-      ].filter(Boolean),
+      ];
+
+  const quickQuantities = Array.from(
+    new Set(
+      quickQuantitySeeds.filter(Boolean),
     ),
   ).filter((option) => {
     try {
@@ -147,7 +173,7 @@ export function PurchasePreviewPanel({
     setIsConfirmOpen(true);
   }
 
-  async function handlePurchase() {
+  async function handlePurchase(input: { password: string; characterName: string }) {
     setError("");
 
     setIsSubmitting(true);
@@ -162,6 +188,8 @@ export function PurchasePreviewPanel({
           listingId,
           quantity,
           amount: expectedAmount,
+          password: input.password,
+          characterName: input.characterName,
         }),
       });
       const responseBody = (await response.json()) as
@@ -204,9 +232,15 @@ export function PurchasePreviewPanel({
           onChange={(event) => setQuantity(event.target.value)}
           inputMode={isGameMoneyListing ? "numeric" : "decimal"}
           step={isGameMoneyListing ? 10000 : undefined}
-          className="mt-2 h-12 w-full rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-4 text-sm font-black outline-none focus:border-[var(--gg-accent)]"
+          disabled={isBulkMode}
+          className="mt-2 h-12 w-full rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-4 text-sm font-black outline-none focus:border-[var(--gg-accent)] disabled:cursor-not-allowed disabled:opacity-70"
         />
       </label>
+      {isBulkMode ? (
+        <p className="mt-2 text-xs font-bold text-[var(--gg-muted)]">
+          일괄판매 매물은 등록된 전체 수량만 한 번에 즉시구매할 수 있습니다.
+        </p>
+      ) : null}
       <p
         className={
           quantityStatus.isValid
@@ -235,7 +269,7 @@ export function PurchasePreviewPanel({
       </div>
 
       <div className="mt-5 grid gap-3">
-        <PreviewRow label={t("purchase.unitPrice")} value={`${unitPrice} ${currency}`} />
+        <PreviewRow label={t("purchase.unitPrice")} value={`${displayUnitPrice} ${currency} / ${priceUnitLabel}`} />
         <PreviewRow label={t("purchase.minimumQuantity")} value={formatTradeQuantity(minimumQuantity, tradeUnitLabel)} />
         <PreviewRow label={t("purchase.availableStock")} value={formatTradeQuantity(availableQuantity, tradeUnitLabel)} />
         <PreviewRow
@@ -304,33 +338,25 @@ export function PurchasePreviewPanel({
         </div>
       ) : null}
 
-      <ActionConfirmDialog
+      <TradeSafetyConfirmDialog
         isOpen={isConfirmOpen}
-        eyebrow={t("purchase.escrowLocked")}
-        title={t("purchase.confirmTitle")}
-        body={t("purchase.confirmBody")}
-        confirmLabel={t("purchase.confirmLabel")}
+        eyebrow="SAFE ESCROW"
+        title="안전 거래 결제확인"
+        body="구매 금액이 에스크로로 잠기고 주문 채팅이 생성됩니다. 서버와 거래 정보를 마지막으로 확인해 주세요."
+        confirmLabel="결제"
         cancelLabel={t("common.cancel")}
         isSubmitting={isSubmitting}
+        serverLabel={serverLabel}
+        requireCharacterName
+        summaryRows={[
+          { label: String(t("purchase.quantity")), value: formatTradeQuantity(quantity, tradeUnitLabel) },
+          { label: String(t("purchase.unitPrice")), value: `${displayUnitPrice} ${currency} / ${priceUnitLabel}` },
+          { label: String(t("purchase.expectedPayment")), value: `${expectedAmount} ${currency}` },
+        ]}
         onCancel={() => setIsConfirmOpen(false)}
         onConfirm={handlePurchase}
-      >
-        <div className="space-y-2 text-sm font-bold text-[var(--gg-muted)]">
-          <PreviewModalRow label={t("purchase.quantity")} value={formatTradeQuantity(quantity, tradeUnitLabel)} />
-          <PreviewModalRow label={t("purchase.unitPrice")} value={`${unitPrice} ${currency}`} />
-          <PreviewModalRow label={t("purchase.expectedPayment")} value={`${expectedAmount} ${currency}`} />
-        </div>
-      </ActionConfirmDialog>
+      />
     </section>
-  );
-}
-
-function PreviewModalRow({ label, value }: { label: ReactNode; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <span>{label}</span>
-      <span className="font-black text-[var(--gg-text)]">{value}</span>
-    </div>
   );
 }
 

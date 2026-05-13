@@ -13,8 +13,8 @@ export async function GET() {
   }
 
   const prisma = getPrismaClient();
-  const [unreadChatRows, unreadNotificationRows] = await Promise.all([
-    prisma.chatMessage.findMany({
+  const [unreadChatCount, unreadNotificationCount, wallet] = await Promise.all([
+    prisma.chatMessage.count({
       where: {
         senderId: { not: auth.user.userId },
         readAt: null,
@@ -25,25 +25,26 @@ export async function GET() {
           ],
         },
       },
-      take: BADGE_COUNT_LIMIT,
-      select: {
-        id: true,
-      },
     }),
-    prisma.notification.findMany({
+    prisma.notification.count({
       where: {
         userId: auth.user.userId,
         isRead: false,
       },
-      take: BADGE_COUNT_LIMIT,
+    }),
+    prisma.wallet.findUnique({
+      where: { userId: auth.user.userId },
       select: {
-        id: true,
+        availableBalance: true,
+        currency: true,
       },
     }),
   ]);
 
   return NextResponse.json({
-    unreadChatCount: unreadChatRows.length,
-    unreadNotificationCount: unreadNotificationRows.length,
+    unreadChatCount: Math.min(unreadChatCount, BADGE_COUNT_LIMIT),
+    unreadNotificationCount: Math.min(unreadNotificationCount, BADGE_COUNT_LIMIT),
+    walletAvailableBalance: wallet?.availableBalance.toString() ?? "0",
+    walletCurrency: wallet?.currency ?? "USDT",
   });
 }

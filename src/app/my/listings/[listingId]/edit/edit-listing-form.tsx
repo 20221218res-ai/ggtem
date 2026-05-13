@@ -2,12 +2,19 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import type { ChangeEvent, FormEvent } from "react";
-import { useMemo, useState } from "react";
-import { isGameMoneyQuantityUnit } from "@/lib/market/trade-unit";
+import type { ChangeEvent, FormEvent, ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  GAME_MONEY_PRICE_UNIT_OPTIONS,
+  getGameMoneyPriceUnitLabel,
+  isGameMoneyQuantityUnit,
+  normalizeGameMoneyPriceUnit,
+} from "@/lib/market/trade-unit";
 
 const LISTING_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const LISTING_IMAGE_ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
+
+type TradeMode = "BULK" | "SPLIT";
 
 export default function EditListingForm({
   listingId,
@@ -16,7 +23,11 @@ export default function EditListingForm({
   initialDescription,
   initialCategory,
   initialUnitPrice,
+  initialPriceUnitQuantity,
+  initialTradeMode,
+  moneyUnitName,
   initialTotalQuantity,
+  initialMinimumQuantity,
   initialImageUrl,
   initialImageAlt,
 }: {
@@ -26,15 +37,36 @@ export default function EditListingForm({
   initialDescription: string;
   initialCategory: string;
   initialUnitPrice: string;
+  initialPriceUnitQuantity: string;
+  initialTradeMode: string;
+  moneyUnitName: string | null;
   initialTotalQuantity: string;
+  initialMinimumQuantity: string;
   initialImageUrl: string | null;
   initialImageAlt: string;
 }) {
   const router = useRouter();
+  const isGameMoneyListing = initialCategory === "GAME_MONEY";
+  const normalizedInitialPriceUnitQuantity = isGameMoneyListing
+    ? normalizeGameMoneyPriceUnit(initialPriceUnitQuantity)
+    : "1";
+  const initialDisplayUnitPrice = isGameMoneyListing
+    ? formatDisplayNumber(
+        Number(initialUnitPrice) * Number(normalizedInitialPriceUnitQuantity),
+      )
+    : initialUnitPrice;
+  const initialNormalizedTradeMode: TradeMode =
+    initialTradeMode === "BULK" ? "BULK" : "SPLIT";
+
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
-  const [unitPrice, setUnitPrice] = useState(initialUnitPrice);
+  const [unitPrice, setUnitPrice] = useState(initialDisplayUnitPrice);
+  const [priceUnitQuantity, setPriceUnitQuantity] = useState(
+    normalizedInitialPriceUnitQuantity,
+  );
+  const [tradeMode, setTradeMode] = useState<TradeMode>(initialNormalizedTradeMode);
   const [totalQuantity, setTotalQuantity] = useState(initialTotalQuantity);
+  const [minimumQuantity, setMinimumQuantity] = useState(initialMinimumQuantity);
   const [imageAlt, setImageAlt] = useState(initialImageAlt);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState(initialImageUrl);
@@ -45,18 +77,42 @@ export default function EditListingForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isRemovingImage, setIsRemovingImage] = useState(false);
-  const isGameMoneyListing = initialCategory === "GAME_MONEY";
+
+  const effectiveMinimumQuantity =
+    isGameMoneyListing && tradeMode === "BULK" ? totalQuantity : minimumQuantity;
+  const priceUnitLabel = getGameMoneyPriceUnitLabel(
+    priceUnitQuantity,
+    moneyUnitName,
+  );
+
+  useEffect(() => {
+    if (isGameMoneyListing && tradeMode === "BULK") {
+      setMinimumQuantity(totalQuantity);
+    }
+  }, [isGameMoneyListing, totalQuantity, tradeMode]);
 
   const changedFields = [
     title !== initialTitle ? "제목" : null,
     description !== initialDescription ? "내용" : null,
-    unitPrice !== initialUnitPrice ? "판매 단가" : null,
+    unitPrice !== initialDisplayUnitPrice ? "단위당 금액" : null,
+    priceUnitQuantity !== normalizedInitialPriceUnitQuantity ? "가격 단위" : null,
+    tradeMode !== initialNormalizedTradeMode ? "거래 방식" : null,
     totalQuantity !== initialTotalQuantity ? "총 수량" : null,
+    effectiveMinimumQuantity !== initialMinimumQuantity ? "최소 거래 수량" : null,
   ].filter(Boolean);
+
   const imagePreviewUrl = useMemo(() => {
     if (!selectedImage) return null;
     return URL.createObjectURL(selectedImage);
   }, [selectedImage]);
+
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -70,15 +126,29 @@ export default function EditListingForm({
       }
 
       if (Number(unitPrice) <= 0) {
-        throw new Error("판매 단가는 0보다 커야 합니다.");
+        throw new Error("단위당 금액은 0보다 커야 합니다.");
       }
 
       if (Number(totalQuantity) <= 0) {
         throw new Error("총 수량은 0보다 커야 합니다.");
       }
 
-      if (isGameMoneyListing && !isGameMoneyQuantityUnit(totalQuantity)) {
-        throw new Error("게임머니 총 수량은 10,000 단위로만 입력할 수 있습니다.");
+      if (Number(effectiveMinimumQuantity) <= 0) {
+        throw new Error("최소 거래 수량은 0보다 커야 합니다.");
+      }
+
+      if (Number(effectiveMinimumQuantity) > Number(totalQuantity)) {
+        throw new Error("최소 거래 수량은 총 수량보다 클 수 없습니다.");
+      }
+
+      if (isGameMoneyListing) {
+        if (!isGameMoneyQuantityUnit(totalQuantity)) {
+          throw new Error("게임머니 총 수량은 10,000 단위로만 입력할 수 있습니다.");
+        }
+
+        if (!isGameMoneyQuantityUnit(effectiveMinimumQuantity)) {
+          throw new Error("게임머니 최소 거래 수량은 10,000 단위로만 입력할 수 있습니다.");
+        }
       }
 
       const response = await fetch("/api/market/seller-listings", {
@@ -92,6 +162,10 @@ export default function EditListingForm({
           title,
           description,
           unitPrice,
+          pricePerUnit: isGameMoneyListing ? unitPrice : undefined,
+          priceUnitQuantity: isGameMoneyListing ? priceUnitQuantity : undefined,
+          tradeMode: isGameMoneyListing ? tradeMode : undefined,
+          minimumQuantity: isGameMoneyListing ? effectiveMinimumQuantity : undefined,
           totalQuantity,
         }),
       });
@@ -101,7 +175,7 @@ export default function EditListingForm({
         throw new Error(result.message ?? "판매글 수정에 실패했습니다.");
       }
 
-      setSuccess(result.message ?? "판매글이 수정되었습니다.");
+      setSuccess(result.message ?? "판매글을 수정했습니다.");
       router.refresh();
     } catch (submitError) {
       setError(
@@ -242,14 +316,43 @@ export default function EditListingForm({
             />
           </label>
 
+          {isGameMoneyListing ? (
+            <div className="md:col-span-2">
+              <p className="text-sm font-black">거래 방식</p>
+              <SegmentedTradeMode value={tradeMode} onChange={setTradeMode} />
+            </div>
+          ) : null}
+
+          {isGameMoneyListing ? (
+            <label className="flex flex-col gap-2 text-sm font-black">
+              가격 단위
+              <select
+                value={priceUnitQuantity}
+                onChange={(event) => setPriceUnitQuantity(event.target.value)}
+                className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-3 text-[var(--gg-text)] outline-none focus:border-[var(--gg-accent)]"
+              >
+                {GAME_MONEY_PRICE_UNIT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {getGameMoneyPriceUnitLabel(option.value, moneyUnitName)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
           <label className="flex flex-col gap-2 text-sm font-black">
-            판매 단가 ({currency})
+            단위당 금액 ({currency})
             <input
               value={unitPrice}
               onChange={(event) => setUnitPrice(event.target.value)}
               inputMode="decimal"
               className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-3 text-[var(--gg-text)] outline-none focus:border-[var(--gg-accent)]"
             />
+            {isGameMoneyListing ? (
+              <span className="text-xs font-bold text-[var(--gg-muted)]">
+                선택한 {priceUnitLabel}당 금액을 입력합니다.
+              </span>
+            ) : null}
           </label>
 
           <label className="flex flex-col gap-2 text-sm font-black">
@@ -267,6 +370,25 @@ export default function EditListingForm({
               </span>
             ) : null}
           </label>
+
+          {isGameMoneyListing ? (
+            <label className="flex flex-col gap-2 text-sm font-black">
+              최소 거래 수량
+              <input
+                value={effectiveMinimumQuantity}
+                onChange={(event) => setMinimumQuantity(event.target.value)}
+                inputMode="numeric"
+                step={10000}
+                disabled={tradeMode === "BULK"}
+                className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-3 text-[var(--gg-text)] outline-none focus:border-[var(--gg-accent)] disabled:cursor-not-allowed disabled:opacity-70"
+              />
+              <span className="text-xs font-bold text-[var(--gg-muted)]">
+                {tradeMode === "BULK"
+                  ? "일괄판매는 등록된 전체 수량만 거래할 수 있습니다."
+                  : "분할판매는 구매자가 최소 거래 수량 이상으로 구매할 수 있습니다."}
+              </span>
+            </label>
+          ) : null}
 
           <label className="flex flex-col gap-2 text-sm font-black md:col-span-2">
             내용
@@ -288,17 +410,34 @@ export default function EditListingForm({
               </span>
             </p>
             <p>
-              현재 단가{" "}
+              현재 금액{" "}
               <span className="font-bold text-[var(--gg-accent)]">
                 {unitPrice || "0"} {currency}
+                {isGameMoneyListing ? ` / ${priceUnitLabel}` : ""}
               </span>
             </p>
+            {isGameMoneyListing ? (
+              <p>
+                거래 방식{" "}
+                <span className="font-bold text-[var(--gg-text)]">
+                  {tradeMode === "BULK" ? "일괄 판매" : "분할 판매"}
+                </span>
+              </p>
+            ) : null}
             <p>
               총 수량{" "}
               <span className="font-bold text-[var(--gg-text)]">
                 {totalQuantity || "0"}
               </span>
             </p>
+            {isGameMoneyListing ? (
+              <p>
+                최소 거래 수량{" "}
+                <span className="font-bold text-[var(--gg-text)]">
+                  {effectiveMinimumQuantity || "0"}
+                </span>
+              </p>
+            ) : null}
           </div>
         </div>
 
@@ -401,7 +540,67 @@ export default function EditListingForm({
   );
 }
 
-function Notice({ tone, children }: { tone: "error" | "success"; children: React.ReactNode }) {
+function SegmentedTradeMode({
+  value,
+  onChange,
+}: {
+  value: TradeMode;
+  onChange: (value: TradeMode) => void;
+}) {
+  return (
+    <div className="mt-2 grid gap-2 sm:grid-cols-2">
+      <TradeModeButton
+        active={value === "BULK"}
+        title="일괄 판매"
+        description="등록한 전체 수량을 한 번에 판매합니다."
+        onClick={() => onChange("BULK")}
+      />
+      <TradeModeButton
+        active={value === "SPLIT"}
+        title="분할 판매"
+        description="구매자가 최소 거래 수량 이상으로 나누어 구매합니다."
+        onClick={() => onChange("SPLIT")}
+      />
+    </div>
+  );
+}
+
+function TradeModeButton({
+  active,
+  title,
+  description,
+  onClick,
+}: {
+  active: boolean;
+  title: string;
+  description: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={
+        active
+          ? "rounded-2xl border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_12%,white)] p-4 text-left shadow-sm shadow-[var(--gg-shadow)]"
+          : "rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] p-4 text-left hover:border-[var(--gg-accent)]"
+      }
+    >
+      <span className="block text-sm font-black text-[var(--gg-text)]">{title}</span>
+      <span className="mt-1 block text-xs font-bold text-[var(--gg-muted)]">
+        {description}
+      </span>
+    </button>
+  );
+}
+
+function Notice({
+  tone,
+  children,
+}: {
+  tone: "error" | "success";
+  children: ReactNode;
+}) {
   return (
     <p
       className={
@@ -413,4 +612,14 @@ function Notice({ tone, children }: { tone: "error" | "success"; children: React
       {children}
     </p>
   );
+}
+
+function formatDisplayNumber(value: number) {
+  if (!Number.isFinite(value)) {
+    return "";
+  }
+
+  return Number.isInteger(value)
+    ? String(value)
+    : String(value).replace(/0+$/, "").replace(/\.$/, "");
 }

@@ -85,7 +85,8 @@ export default async function BuyerOrderChatPage({
               <InfoRow label={<CountryText id="orderManage.gameServer" />} value={gameMeta || <CountryText id="orderManage.gameInfoMissing" />} />
               {accountType ? <InfoRow label={<CountryText id="listingForm.accountType" />} value={accountType} /> : null}
               <InfoRow label={<CountryText id="orderManage.quantity" />} value={<QuantityValue quantity={view.quantity} category={view.category} moneyUnitName={view.moneyUnitName} />} />
-              <InfoRow label={<CountryText id="manage.unitPrice" />} value={`${view.unitPrice} ${view.currency}`} />
+              {view.tradeCharacterName ? <InfoRow label="거래 캐릭터명" value={view.tradeCharacterName} /> : null}
+              <InfoRow label={<CountryText id="manage.unitPrice" />} value={<UnitPriceValue view={view} />} />
               <InfoRow label={<CountryText id="orderManage.amount" />} value={`${view.grossAmount} ${view.currency}`} />
               <InfoRow label={<CountryText id="orderManage.expectedSettlement" />} value={`${view.sellerReceivableAmount} ${view.currency}`} />
             </div>
@@ -158,6 +159,21 @@ function QuantityValue({ quantity, category, moneyUnitName }: { quantity: string
   return (
     <>
       {quantity} {category === "GAME_MONEY" && moneyUnit ? moneyUnit : <CountryText id={getCategoryKey(category)} />}
+    </>
+  );
+}
+
+function UnitPriceValue({
+  view,
+}: {
+  view: Pick<NonNullable<Awaited<ReturnType<typeof getOrderChatView>>>, "category" | "currency" | "moneyUnitName" | "unitPrice">;
+}) {
+  const moneyUnit = view.moneyUnitName?.trim();
+
+  return (
+    <>
+      {view.unitPrice} {view.currency}
+      {view.category === "GAME_MONEY" && moneyUnit ? ` / 1 ${moneyUnit}` : ""}
     </>
   );
 }

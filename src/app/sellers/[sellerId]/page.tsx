@@ -5,6 +5,7 @@ import type { TranslationKey } from "@/app/i18n";
 import { MarketplaceHeader } from "@/app/marketplace-home";
 import UserContentText, { SourceCountryFlag } from "@/app/user-content-text";
 import { getMarketplaceSellerProfile } from "@/lib/market/sellers";
+import { getGameMoneyPriceUnitLabel } from "@/lib/market/trade-unit";
 
 type SellerProfilePageProps = {
   params: Promise<{
@@ -22,6 +23,11 @@ type SellerTrustGuide = {
   badgeKey: TranslationKey;
   descriptionKey: TranslationKey;
 };
+
+type SellerProfile = NonNullable<
+  Awaited<ReturnType<typeof getMarketplaceSellerProfile>>
+>;
+type SellerListing = SellerProfile["listings"][number];
 
 export default async function SellerProfilePage({ params }: SellerProfilePageProps) {
   const { sellerId } = await params;
@@ -221,40 +227,7 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
 
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             {seller.listings.map((listing) => (
-              <Link
-                key={listing.listingId}
-                href={`/listings/${listing.listingId}`}
-                className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-5 transition hover:border-[var(--gg-accent)] hover:bg-[var(--gg-control-bg)]"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="line-clamp-2 text-base font-black">
-                      <UserContentText text={listing.title} />
-                    </p>
-                    <p className="mt-2 text-sm font-bold text-[var(--gg-muted)]">
-                      {listing.gameName} / <CategoryName category={listing.category} />
-                    </p>
-                  </div>
-                  <div className="shrink-0 text-right">
-                    <p className="text-xl font-black text-[var(--gg-accent)]">
-                      {listing.unitPrice}
-                    </p>
-                    <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">
-                      {listing.currency}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-[var(--gg-muted)]">
-                  <InfoBadge><CountryText id="seller.buyAvailable" /> {listing.availableQuantity}</InfoBadge>
-                  <InfoBadge><CountryText id="seller.lockedQuantity" /> {listing.lockedQuantity}</InfoBadge>
-                  <InfoBadge><CountryText id="seller.soldQuantity" /> {listing.soldQuantity}</InfoBadge>
-                </div>
-
-                <p className="mt-4 text-xs font-bold text-[var(--gg-subtle)]">
-                  <CountryText id="manage.registeredAt" /> {listing.createdAt}
-                </p>
-              </Link>
+              <SellerListingCard key={listing.listingId} listing={listing} />
             ))}
 
             {seller.listings.length === 0 ? (
@@ -284,6 +257,52 @@ function SummaryCard({
   );
 }
 
+function SellerListingCard({ listing }: { listing: SellerListing }) {
+  const price = getSellerListingDisplayPrice(listing);
+
+  return (
+    <Link
+      href={`/listings/${listing.listingId}`}
+      className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-5 transition hover:border-[var(--gg-accent)] hover:bg-[var(--gg-control-bg)]"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="line-clamp-2 text-base font-black">
+            <UserContentText text={listing.title} />
+          </p>
+          <p className="mt-2 text-sm font-bold text-[var(--gg-muted)]">
+            {listing.gameName} / <CategoryName category={listing.category} />
+          </p>
+          {listing.category === "GAME_MONEY" ? (
+            <p className="mt-2 text-xs font-black text-[var(--gg-accent)]">
+              {listing.tradeMode === "BULK" ? "일괄 판매" : "분할 판매"}
+            </p>
+          ) : null}
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="text-xl font-black text-[var(--gg-accent)]">
+            {price.amount}
+          </p>
+          <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">
+            {listing.currency}
+            {price.unitLabel ? ` / ${price.unitLabel}` : ""}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-[var(--gg-muted)]">
+        <InfoBadge><CountryText id="seller.buyAvailable" /> {listing.availableQuantity}</InfoBadge>
+        <InfoBadge><CountryText id="seller.lockedQuantity" /> {listing.lockedQuantity}</InfoBadge>
+        <InfoBadge><CountryText id="seller.soldQuantity" /> {listing.soldQuantity}</InfoBadge>
+      </div>
+
+      <p className="mt-4 text-xs font-bold text-[var(--gg-subtle)]">
+        <CountryText id="manage.registeredAt" /> {listing.createdAt}
+      </p>
+    </Link>
+  );
+}
+
 function TrustSignal({ label, value }: { label: React.ReactNode; value: number }) {
   return (
     <div className="rounded-xl bg-white/55 px-3 py-2 text-center text-[var(--gg-text)]">
@@ -307,6 +326,40 @@ function InfoBadge({ children }: { children: React.ReactNode }) {
       {children}
     </span>
   );
+}
+
+function getSellerListingDisplayPrice(listing: SellerListing) {
+  if (listing.category !== "GAME_MONEY") {
+    return {
+      amount: listing.unitPrice,
+      unitLabel: null,
+    };
+  }
+
+  const unitQuantity = Number(listing.priceUnitQuantity || "1");
+  const unitPrice = Number(listing.unitPrice || "0");
+
+  return {
+    amount: formatDisplayNumber(unitPrice * unitQuantity),
+    unitLabel: getGameMoneyPriceUnitLabel(
+      listing.priceUnitQuantity,
+      listing.moneyUnitName,
+    ),
+  };
+}
+
+function formatDisplayNumber(value: number) {
+  if (!Number.isFinite(value)) {
+    return "0";
+  }
+
+  if (Number.isInteger(value)) {
+    return value.toLocaleString("en-US");
+  }
+
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: 6,
+  });
 }
 
 function ReviewLabel({

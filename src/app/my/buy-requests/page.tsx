@@ -5,6 +5,7 @@ import type { TranslationKey } from "@/app/i18n";
 import LocalizedInput from "@/app/localized-input";
 import UserContentText from "@/app/user-content-text";
 import { getMarketplaceMyBuyRequests } from "@/lib/market/buy-requests";
+import { getGameMoneyPriceUnitLabel } from "@/lib/market/trade-unit";
 import BuyRequestActions from "./buy-request-actions";
 import OfferActions from "./offer-actions";
 
@@ -179,6 +180,7 @@ export default async function MyBuyRequestsPage({ searchParams }: MyBuyRequestsP
 function BuyRequestRow({ request }: { request: MyBuyRequest }) {
   const pendingOffers = request.offers?.filter((offer) => offer.status === "PENDING") ?? [];
   const moneyUnit = request.category === "GAME_MONEY" ? request.moneyUnitName : "";
+  const price = getBuyRequestDisplayPrice(request);
   const accountTransferTypeLabel =
     request.category === "GAME_ACCOUNT" ? getAccountTransferTypeLabelNode(request.accountTransferType) : null;
 
@@ -215,7 +217,13 @@ function BuyRequestRow({ request }: { request: MyBuyRequest }) {
           </p>
           <div className="mt-3 flex flex-wrap gap-2 text-xs font-black text-[var(--gg-muted)]">
             <InfoChip label={<CountryText id="manage.buyQuantity" />} value={formatQuantity(request.quantity, moneyUnit)} />
-            <InfoChip label={<CountryText id="manage.unitPrice" />} value={`${request.unitPrice} ${request.currency}`} />
+            <InfoChip label={<CountryText id="manage.unitPrice" />} value={`${price.amount} ${request.currency}${price.unitLabel ? ` / ${price.unitLabel}` : ""}`} />
+            {request.category === "GAME_MONEY" ? (
+              <>
+                <InfoChip label="거래 방식" value={request.tradeMode === "BULK" ? "일괄 구매" : "분할 구매"} />
+                <InfoChip label={<CountryText id="manage.minimumQuantity" />} value={formatQuantity(request.minimumQuantity, moneyUnit)} />
+              </>
+            ) : null}
             <InfoChip label={<CountryText id="manage.reserveAmount" />} value={`${request.lockAmount} ${request.currency}`} />
           </div>
         </div>
@@ -439,4 +447,38 @@ function getAccountTransferTypeLabelNode(value: string | null) {
 
 function formatQuantity(quantity: string, unit: string | null) {
   return unit ? `${quantity} ${unit}` : quantity;
+}
+
+function getBuyRequestDisplayPrice(request: MyBuyRequest) {
+  if (request.category !== "GAME_MONEY") {
+    return {
+      amount: request.unitPrice,
+      unitLabel: null,
+    };
+  }
+
+  const unitQuantity = Number(request.priceUnitQuantity || "1");
+  const unitPrice = Number(request.unitPrice || "0");
+
+  return {
+    amount: formatDisplayNumber(unitPrice * unitQuantity),
+    unitLabel: getGameMoneyPriceUnitLabel(
+      request.priceUnitQuantity,
+      request.moneyUnitName,
+    ),
+  };
+}
+
+function formatDisplayNumber(value: number) {
+  if (!Number.isFinite(value)) {
+    return "0";
+  }
+
+  if (Number.isInteger(value)) {
+    return value.toLocaleString("en-US");
+  }
+
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: 6,
+  });
 }

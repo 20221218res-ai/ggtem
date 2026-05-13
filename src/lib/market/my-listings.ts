@@ -16,7 +16,11 @@ import {
   mapGameLocalizedNames,
 } from "@/lib/market/game-localization";
 import { validateServerDetail } from "@/lib/market/server-detail-options";
-import { assertGameMoneyQuantityUnit } from "@/lib/market/trade-unit";
+import {
+  assertGameMoneyQuantityUnit,
+  normalizeGameMoneyPriceUnit,
+  normalizeGameMoneyTradeMode,
+} from "@/lib/market/trade-unit";
 import { copyFile, mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -46,6 +50,9 @@ export type MarketplaceMyListingsView = {
     category: string;
     accountTransferType: string | null;
     unitPrice: string;
+    priceUnitQuantity: string;
+    tradeMode: string;
+    moneyUnitName: string | null;
     currency: string;
     minimumQuantity: string;
     availableQuantity: string;
@@ -76,6 +83,7 @@ export type MarketplaceSellerOrderDetail = {
   listingTitle: string;
   category: string;
   accountTransferType: string | null;
+  tradeCharacterName: string | null;
   buyerName: string;
   quantity: string;
   grossAmount: string;
@@ -114,6 +122,7 @@ export type MarketplaceSellerListingFormView = {
     gameId: string;
     code: string;
     name: string;
+    moneyUnitName: string | null;
     localizedNames: LocalizedGameNames;
     servers: Array<{
       serverId: string;
@@ -141,6 +150,9 @@ export type MarketplaceSellerListingEditorView = {
   category: string;
   accountTransferType: string | null;
   unitPrice: string;
+  priceUnitQuantity: string;
+  tradeMode: string;
+  moneyUnitName: string | null;
   currency: string;
   totalQuantity: string;
   minimumQuantity: string;
@@ -197,6 +209,8 @@ export async function getMarketplaceMyListings(): Promise<MarketplaceMyListingsV
           category: true,
           accountTransferType: true,
           unitPrice: true,
+          priceUnitQuantity: true,
+          tradeMode: true,
           currency: true,
           createdAt: true,
           inventory: {
@@ -210,6 +224,7 @@ export async function getMarketplaceMyListings(): Promise<MarketplaceMyListingsV
           game: {
             select: {
               name: true,
+              moneyUnitName: true,
             },
           },
           server: {
@@ -325,6 +340,9 @@ export async function getMarketplaceMyListings(): Promise<MarketplaceMyListingsV
       category: listing.category,
       accountTransferType: listing.accountTransferType ?? null,
       unitPrice: listing.unitPrice.toString(),
+      priceUnitQuantity: listing.priceUnitQuantity?.toString() ?? "1",
+      tradeMode: listing.tradeMode ?? "SPLIT",
+      moneyUnitName: listing.game.moneyUnitName,
       currency: listing.currency,
       minimumQuantity: listing.inventory?.minimumQuantity?.toString() ?? "1",
       availableQuantity: listing.inventory?.availableQuantity.toString() ?? "0",
@@ -403,6 +421,9 @@ export async function getMarketplaceSellerListingEditorView(
     category: listing.category,
     accountTransferType: listing.accountTransferType ?? null,
     unitPrice: listing.unitPrice.toString(),
+    priceUnitQuantity: listing.priceUnitQuantity?.toString() ?? "1",
+    tradeMode: listing.tradeMode ?? "SPLIT",
+    moneyUnitName: listing.game.moneyUnitName,
     currency: listing.currency,
     totalQuantity: listing.inventory.totalQuantity.toString(),
     minimumQuantity: listing.inventory.minimumQuantity?.toString() ?? "1",
@@ -458,9 +479,10 @@ export async function getMarketplaceSellerListingFormView(): Promise<Marketplace
       { value: "GAME_ACCOUNT", label: "계정" },
     ],
     games: games.map((game) => ({
-    gameId: game.id,
-    code: game.code,
-    name: game.name,
+      gameId: game.id,
+      code: game.code,
+      name: game.name,
+      moneyUnitName: game.moneyUnitName,
       localizedNames: mapGameLocalizedNames(game),
       servers: game.servers.map((server) => ({
         serverId: server.id,
@@ -479,6 +501,9 @@ export async function createMarketplaceSellerListing(input: {
   title: string;
   description?: string;
   unitPrice: string;
+  pricePerUnit?: string;
+  priceUnitQuantity?: string;
+  tradeMode?: "BULK" | "SPLIT";
   quantity: string;
   minimumQuantity?: string;
   premiumDurationHours?: number;
@@ -508,9 +533,22 @@ export async function createMarketplaceSellerListing(input: {
   const normalizedAccountTransferType = normalizeAccountTransferType(
     input.accountTransferType,
   );
-  const unitPrice = parseFixedAmount(input.unitPrice);
+  const priceUnitQuantityValue =
+    input.category === "GAME_MONEY"
+      ? normalizeGameMoneyPriceUnit(input.priceUnitQuantity)
+      : "1";
+  const priceUnitQuantity = parseFixedAmount(priceUnitQuantityValue);
+  const unitPrice =
+    input.category === "GAME_MONEY" && input.pricePerUnit
+      ? (parseFixedAmount(input.pricePerUnit) * 1_000_000n) / priceUnitQuantity
+      : parseFixedAmount(input.unitPrice);
+  const tradeMode =
+    input.category === "GAME_MONEY"
+      ? normalizeGameMoneyTradeMode(input.tradeMode)
+      : "SPLIT";
   const quantity = parseFixedAmount(input.quantity);
-  const minimumQuantity = parseFixedAmount(input.minimumQuantity || "1");
+  const minimumQuantity =
+    tradeMode === "BULK" ? quantity : parseFixedAmount(input.minimumQuantity || "1");
   const premiumDurationHours = normalizePremiumDurationHours(
     input.premiumDurationHours,
   );
@@ -606,6 +644,8 @@ export async function createMarketplaceSellerListing(input: {
           input.category === "GAME_ACCOUNT" ? normalizedAccountTransferType : null,
         title: trimmedTitle,
         description: trimmedDescription || null,
+        tradeMode,
+        priceUnitQuantity: formatFixedAmount(priceUnitQuantity),
         unitPrice: formatFixedAmount(unitPrice),
         currency: sellerWallet.currency,
         status: "ACTIVE",
@@ -714,6 +754,10 @@ export async function updateMarketplaceSellerListing(input: {
   title: string;
   description?: string;
   unitPrice: string;
+  pricePerUnit?: string;
+  priceUnitQuantity?: string;
+  tradeMode?: "BULK" | "SPLIT";
+  minimumQuantity?: string;
   totalQuantity: string;
 }): Promise<MarketplaceSellerListingMutationResult> {
   const prisma = getPrismaClient();
@@ -736,15 +780,10 @@ export async function updateMarketplaceSellerListing(input: {
 
   const trimmedTitle = input.title.trim();
   const trimmedDescription = input.description?.trim() ?? "";
-  const nextUnitPrice = parseFixedAmount(input.unitPrice);
   const nextTotalQuantity = parseFixedAmount(input.totalQuantity);
 
   if (!trimmedTitle) {
     throw new Error("판매글 제목을 입력해 주세요.");
-  }
-
-  if (nextUnitPrice <= 0n) {
-    throw new Error("단가는 0보다 커야 합니다.");
   }
 
   if (nextTotalQuantity <= 0n) {
@@ -776,7 +815,48 @@ export async function updateMarketplaceSellerListing(input: {
       throw new Error("판매글을 찾을 수 없습니다.");
     }
 
+    const priceUnitQuantityValue =
+      listing.category === "GAME_MONEY"
+        ? normalizeGameMoneyPriceUnit(input.priceUnitQuantity)
+        : "1";
+    const priceUnitQuantity = parseFixedAmount(priceUnitQuantityValue);
+    const nextUnitPrice =
+      listing.category === "GAME_MONEY" && input.pricePerUnit
+        ? (parseFixedAmount(input.pricePerUnit) * 1_000_000n) / priceUnitQuantity
+        : parseFixedAmount(input.unitPrice);
+    const tradeMode =
+      listing.category === "GAME_MONEY"
+        ? normalizeGameMoneyTradeMode(input.tradeMode)
+        : listing.tradeMode;
+
+    if (nextUnitPrice <= 0n) {
+      throw new Error("단가는 0보다 커야 합니다.");
+    }
+
     assertGameMoneyQuantityUnit(listing.category, nextTotalQuantity, "총 수량");
+
+    const nextMinimumQuantity =
+      listing.category === "GAME_MONEY"
+        ? tradeMode === "BULK"
+          ? nextTotalQuantity
+          : parseFixedAmount(input.minimumQuantity || "1")
+        : parseFixedAmount(
+            listing.inventory.minimumQuantity?.toString() ?? "1",
+          );
+
+    if (nextMinimumQuantity <= 0n) {
+      throw new Error("최소 거래 수량은 0보다 커야 합니다.");
+    }
+
+    assertGameMoneyQuantityUnit(
+      listing.category,
+      nextMinimumQuantity,
+      "최소 거래 수량",
+    );
+
+    if (nextMinimumQuantity > nextTotalQuantity) {
+      throw new Error("최소 거래 수량은 총 수량보다 클 수 없습니다.");
+    }
 
     const lockedQuantity = parseFixedAmount(
       listing.inventory.lockedQuantity.toString(),
@@ -800,6 +880,8 @@ export async function updateMarketplaceSellerListing(input: {
       data: {
         title: trimmedTitle,
         description: trimmedDescription || null,
+        tradeMode,
+        priceUnitQuantity: formatFixedAmount(priceUnitQuantity),
         unitPrice: formatFixedAmount(nextUnitPrice),
       },
     });
@@ -810,6 +892,7 @@ export async function updateMarketplaceSellerListing(input: {
       },
       data: {
         totalQuantity: formatFixedAmount(nextTotalQuantity),
+        minimumQuantity: formatFixedAmount(nextMinimumQuantity),
         availableQuantity: formatFixedAmount(nextAvailableQuantity),
         version: {
           increment: 1,
@@ -1256,6 +1339,7 @@ export async function getMarketplaceSellerOrderDetail(
       grossAmount: true,
       sellerReceivableAmount: true,
       currency: true,
+      tradeCharacterName: true,
       createdAt: true,
       completedAt: true,
       canceledAt: true,
@@ -1302,6 +1386,7 @@ export async function getMarketplaceSellerOrderDetail(
     grossAmount: order.grossAmount.toString(),
     sellerReceivableAmount: order.sellerReceivableAmount.toString(),
     currency: order.currency,
+    tradeCharacterName: order.tradeCharacterName,
     createdAt: formatKoreanDate(order.createdAt),
     completedAt: order.completedAt ? formatKoreanDate(order.completedAt) : null,
     canceledAt: order.canceledAt ? formatKoreanDate(order.canceledAt) : null,

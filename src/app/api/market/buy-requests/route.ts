@@ -25,6 +25,10 @@ export async function POST(request: NextRequest) {
       accountRank?: string;
       quantity?: string;
       unitPrice?: string;
+      pricePerUnit?: string;
+      priceUnitQuantity?: string;
+      tradeMode?: "BULK" | "SPLIT";
+      minimumQuantity?: string;
       expiresInDays?: number;
       premiumDurationHours?: number;
     };
@@ -68,6 +72,10 @@ export async function POST(request: NextRequest) {
       accountRank: body.accountRank,
       quantity: body.quantity,
       unitPrice: body.unitPrice,
+      pricePerUnit: body.pricePerUnit,
+      priceUnitQuantity: body.priceUnitQuantity,
+      tradeMode: body.tradeMode,
+      minimumQuantity: body.minimumQuantity,
       expiresInDays: body.expiresInDays,
       premiumDurationHours: body.premiumDurationHours,
     });

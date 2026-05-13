@@ -54,6 +54,7 @@ export default async function SellerOrderDetailPage({ params }: SellerOrderDetai
             <Metric label={<CountryText id="orderManage.buyer" />} value={order.buyerName} />
             <Metric label={<CountryText id="orderManage.quantity" />} value={order.quantity} />
             <Metric label={<CountryText id="orderManage.orderAmount" />} value={`${order.grossAmount} ${order.currency}`} />
+            {order.tradeCharacterName ? <Metric label="거래 캐릭터명" value={order.tradeCharacterName} /> : null}
           </section>
 
           <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)]">

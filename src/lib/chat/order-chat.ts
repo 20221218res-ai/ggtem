@@ -12,6 +12,7 @@ export type OrderChatView = {
   grossAmount: string;
   sellerReceivableAmount: string;
   currency: string;
+  tradeCharacterName: string | null;
   listingTitle: string;
   category: string;
   gameName: string;
@@ -384,6 +385,7 @@ export async function getOrderChatView(input: {
       grossAmount: true,
       sellerReceivableAmount: true,
       currency: true,
+      tradeCharacterName: true,
       quantity: true,
       unitPrice: true,
       buyer: {
@@ -476,6 +478,7 @@ export async function getOrderChatView(input: {
     grossAmount: order.grossAmount.toString(),
     sellerReceivableAmount: order.sellerReceivableAmount.toString(),
     currency: order.currency,
+    tradeCharacterName: order.tradeCharacterName,
     listingTitle: order.listing.title,
     category: order.listing.category,
     gameName: order.listing.game.name,

@@ -21,6 +21,7 @@ import { ensureUserWallet } from "@/lib/market/wallets";
 const SESSION_COOKIE_NAME = "ggitem_session";
 const SESSION_DURATION_DAYS = 7;
 const SESSION_IDLE_TIMEOUT_HOURS = 24;
+const SESSION_TOUCH_INTERVAL_MINUTES = 10;
 const PASSWORD_KEY_LENGTH = 64;
 const LOGIN_FAILURE_LIMIT = 5;
 const LOGIN_LOCK_MINUTES = 15;
@@ -441,7 +442,9 @@ export async function signOutCurrentSession() {
   });
 }
 
-export async function getCurrentSessionUser(): Promise<AppSessionUser | null> {
+export async function getCurrentSessionUser(input?: {
+  touch?: boolean;
+}): Promise<AppSessionUser | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
@@ -496,18 +499,25 @@ export async function getCurrentSessionUser(): Promise<AppSessionUser | null> {
     return null;
   }
 
-  const touchedSession = await prisma.session.updateMany({
-    where: {
-      token,
-      userId: session.userId,
-    },
-    data: {
-      lastSeenAt: new Date(),
-    },
-  });
+  const shouldTouchSession =
+    input?.touch !== false &&
+    session.lastSeenAt.getTime() <=
+      Date.now() - SESSION_TOUCH_INTERVAL_MINUTES * 60 * 1000;
 
-  if (touchedSession.count === 0) {
-    return null;
+  if (shouldTouchSession) {
+    const touchedSession = await prisma.session.updateMany({
+      where: {
+        token,
+        userId: session.userId,
+      },
+      data: {
+        lastSeenAt: new Date(),
+      },
+    });
+
+    if (touchedSession.count === 0) {
+      return null;
+    }
   }
 
   return {

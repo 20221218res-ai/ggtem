@@ -43,9 +43,9 @@ export default async function AdminPremiumPage() {
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-black">현재 프리미엄글</h2>
+              <h2 className="text-lg font-black">현재 프리미엄 글</h2>
               <p className="mt-1 text-sm font-semibold text-slate-500">
-                만료 시간이 가까운 순서로 표시됩니다.
+                만료 시간이 가까운 순서로 표시합니다.
               </p>
             </div>
             <span className="rounded-full bg-[color-mix(in_srgb,var(--color-primary)_12%,white)] px-3 py-1 text-xs font-black text-[var(--color-primary)]">
@@ -58,21 +58,21 @@ export default async function AdminPremiumPage() {
                 <PremiumItemRow key={`${item.type}-${item.id}`} item={item} />
               ))
             ) : (
-              <EmptyState label="현재 노출 중인 프리미엄글이 없습니다." />
+              <EmptyState label="현재 노출 중인 프리미엄 글이 없습니다." />
             )}
           </div>
         </section>
 
         <section className="grid gap-5 lg:grid-cols-[1fr_0.8fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-lg font-black">최근 만료된 프리미엄글</h2>
+            <h2 className="text-lg font-black">최근 만료된 프리미엄 글</h2>
             <div className="mt-4 space-y-3">
               {state.expiredItems.length > 0 ? (
                 state.expiredItems.slice(0, 10).map((item) => (
                   <PremiumItemRow key={`${item.type}-${item.id}`} item={item} muted />
                 ))
               ) : (
-                <EmptyState label="최근 만료된 프리미엄글이 없습니다." />
+                <EmptyState label="최근 만료된 프리미엄 글이 없습니다." />
               )}
             </div>
           </section>
@@ -161,6 +161,11 @@ function PremiumItemRow({
             <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-700">
               {item.category}
             </span>
+            {item.tradeModeLabel ? (
+              <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-black text-white">
+                {item.tradeModeLabel}
+              </span>
+            ) : null}
             <span className="text-xs font-bold text-slate-500">{item.status}</span>
           </div>
           <p className="mt-3 truncate text-base font-black">{item.title}</p>
@@ -169,11 +174,14 @@ function PremiumItemRow({
           </p>
         </div>
 
-        <div className="grid gap-2 text-sm font-bold text-slate-600 sm:grid-cols-2 lg:min-w-[420px]">
-          <Info label="단가" value={`${item.unitPrice} ${item.currency}`} />
+        <div className="grid gap-2 text-sm font-bold text-slate-600 sm:grid-cols-2 lg:min-w-[460px]">
+          <Info label="단가" value={item.unitPrice} />
           <Info label="이용료" value={`${item.feeAmount} ${item.currency}`} />
           <Info label="기간" value={`${item.durationHours}시간`} />
           <Info label="남은 시간" value={item.remainingLabel} strong />
+          {item.minimumQuantityLabel ? (
+            <Info label="최소 수량" value={item.minimumQuantityLabel} />
+          ) : null}
         </div>
       </div>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/70 pt-3">

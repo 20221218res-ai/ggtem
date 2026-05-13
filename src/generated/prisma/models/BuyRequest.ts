@@ -27,7 +27,10 @@ export type AggregateBuyRequest = {
 }
 
 export type BuyRequestAvgAggregateOutputType = {
+  priceUnitQuantity: runtime.Decimal | null
   quantity: runtime.Decimal | null
+  minimumQuantity: runtime.Decimal | null
+  remainingQuantity: runtime.Decimal | null
   unitPrice: runtime.Decimal | null
   totalAmount: runtime.Decimal | null
   lockAmount: runtime.Decimal | null
@@ -36,7 +39,10 @@ export type BuyRequestAvgAggregateOutputType = {
 }
 
 export type BuyRequestSumAggregateOutputType = {
+  priceUnitQuantity: runtime.Decimal | null
   quantity: runtime.Decimal | null
+  minimumQuantity: runtime.Decimal | null
+  remainingQuantity: runtime.Decimal | null
   unitPrice: runtime.Decimal | null
   totalAmount: runtime.Decimal | null
   lockAmount: runtime.Decimal | null
@@ -55,7 +61,11 @@ export type BuyRequestMinAggregateOutputType = {
   description: string | null
   accountTransferType: string | null
   accountRank: string | null
+  tradeMode: string | null
+  priceUnitQuantity: runtime.Decimal | null
   quantity: runtime.Decimal | null
+  minimumQuantity: runtime.Decimal | null
+  remainingQuantity: runtime.Decimal | null
   unitPrice: runtime.Decimal | null
   totalAmount: runtime.Decimal | null
   lockAmount: runtime.Decimal | null
@@ -81,7 +91,11 @@ export type BuyRequestMaxAggregateOutputType = {
   description: string | null
   accountTransferType: string | null
   accountRank: string | null
+  tradeMode: string | null
+  priceUnitQuantity: runtime.Decimal | null
   quantity: runtime.Decimal | null
+  minimumQuantity: runtime.Decimal | null
+  remainingQuantity: runtime.Decimal | null
   unitPrice: runtime.Decimal | null
   totalAmount: runtime.Decimal | null
   lockAmount: runtime.Decimal | null
@@ -107,7 +121,11 @@ export type BuyRequestCountAggregateOutputType = {
   description: number
   accountTransferType: number
   accountRank: number
+  tradeMode: number
+  priceUnitQuantity: number
   quantity: number
+  minimumQuantity: number
+  remainingQuantity: number
   unitPrice: number
   totalAmount: number
   lockAmount: number
@@ -125,7 +143,10 @@ export type BuyRequestCountAggregateOutputType = {
 
 
 export type BuyRequestAvgAggregateInputType = {
+  priceUnitQuantity?: true
   quantity?: true
+  minimumQuantity?: true
+  remainingQuantity?: true
   unitPrice?: true
   totalAmount?: true
   lockAmount?: true
@@ -134,7 +155,10 @@ export type BuyRequestAvgAggregateInputType = {
 }
 
 export type BuyRequestSumAggregateInputType = {
+  priceUnitQuantity?: true
   quantity?: true
+  minimumQuantity?: true
+  remainingQuantity?: true
   unitPrice?: true
   totalAmount?: true
   lockAmount?: true
@@ -153,7 +177,11 @@ export type BuyRequestMinAggregateInputType = {
   description?: true
   accountTransferType?: true
   accountRank?: true
+  tradeMode?: true
+  priceUnitQuantity?: true
   quantity?: true
+  minimumQuantity?: true
+  remainingQuantity?: true
   unitPrice?: true
   totalAmount?: true
   lockAmount?: true
@@ -179,7 +207,11 @@ export type BuyRequestMaxAggregateInputType = {
   description?: true
   accountTransferType?: true
   accountRank?: true
+  tradeMode?: true
+  priceUnitQuantity?: true
   quantity?: true
+  minimumQuantity?: true
+  remainingQuantity?: true
   unitPrice?: true
   totalAmount?: true
   lockAmount?: true
@@ -205,7 +237,11 @@ export type BuyRequestCountAggregateInputType = {
   description?: true
   accountTransferType?: true
   accountRank?: true
+  tradeMode?: true
+  priceUnitQuantity?: true
   quantity?: true
+  minimumQuantity?: true
+  remainingQuantity?: true
   unitPrice?: true
   totalAmount?: true
   lockAmount?: true
@@ -318,7 +354,11 @@ export type BuyRequestGroupByOutputType = {
   description: string | null
   accountTransferType: string | null
   accountRank: string | null
+  tradeMode: string
+  priceUnitQuantity: runtime.Decimal
   quantity: runtime.Decimal
+  minimumQuantity: runtime.Decimal
+  remainingQuantity: runtime.Decimal
   unitPrice: runtime.Decimal
   totalAmount: runtime.Decimal
   lockAmount: runtime.Decimal
@@ -367,7 +407,11 @@ export type BuyRequestWhereInput = {
   description?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountTransferType?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountRank?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
+  tradeMode?: Prisma.StringFilter<"BuyRequest"> | string
+  priceUnitQuantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -395,7 +439,11 @@ export type BuyRequestOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   accountTransferType?: Prisma.SortOrderInput | Prisma.SortOrder
   accountRank?: Prisma.SortOrderInput | Prisma.SortOrder
+  tradeMode?: Prisma.SortOrder
+  priceUnitQuantity?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  minimumQuantity?: Prisma.SortOrder
+  remainingQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   lockAmount?: Prisma.SortOrder
@@ -426,7 +474,11 @@ export type BuyRequestWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountTransferType?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountRank?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
+  tradeMode?: Prisma.StringFilter<"BuyRequest"> | string
+  priceUnitQuantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -454,7 +506,11 @@ export type BuyRequestOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   accountTransferType?: Prisma.SortOrderInput | Prisma.SortOrder
   accountRank?: Prisma.SortOrderInput | Prisma.SortOrder
+  tradeMode?: Prisma.SortOrder
+  priceUnitQuantity?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  minimumQuantity?: Prisma.SortOrder
+  remainingQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   lockAmount?: Prisma.SortOrder
@@ -488,7 +544,11 @@ export type BuyRequestScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"BuyRequest"> | string | null
   accountTransferType?: Prisma.StringNullableWithAggregatesFilter<"BuyRequest"> | string | null
   accountRank?: Prisma.StringNullableWithAggregatesFilter<"BuyRequest"> | string | null
+  tradeMode?: Prisma.StringWithAggregatesFilter<"BuyRequest"> | string
+  priceUnitQuantity?: Prisma.DecimalWithAggregatesFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalWithAggregatesFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalWithAggregatesFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalWithAggregatesFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalWithAggregatesFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalWithAggregatesFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalWithAggregatesFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -513,7 +573,11 @@ export type BuyRequestCreateInput = {
   description?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -541,7 +605,11 @@ export type BuyRequestUncheckedCreateInput = {
   description?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -567,7 +635,11 @@ export type BuyRequestUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -595,7 +667,11 @@ export type BuyRequestUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -622,7 +698,11 @@ export type BuyRequestCreateManyInput = {
   description?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -647,7 +727,11 @@ export type BuyRequestUpdateManyMutationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -673,7 +757,11 @@ export type BuyRequestUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -709,7 +797,11 @@ export type BuyRequestCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   accountTransferType?: Prisma.SortOrder
   accountRank?: Prisma.SortOrder
+  tradeMode?: Prisma.SortOrder
+  priceUnitQuantity?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  minimumQuantity?: Prisma.SortOrder
+  remainingQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   lockAmount?: Prisma.SortOrder
@@ -725,7 +817,10 @@ export type BuyRequestCountOrderByAggregateInput = {
 }
 
 export type BuyRequestAvgOrderByAggregateInput = {
+  priceUnitQuantity?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  minimumQuantity?: Prisma.SortOrder
+  remainingQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   lockAmount?: Prisma.SortOrder
@@ -744,7 +839,11 @@ export type BuyRequestMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   accountTransferType?: Prisma.SortOrder
   accountRank?: Prisma.SortOrder
+  tradeMode?: Prisma.SortOrder
+  priceUnitQuantity?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  minimumQuantity?: Prisma.SortOrder
+  remainingQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   lockAmount?: Prisma.SortOrder
@@ -770,7 +869,11 @@ export type BuyRequestMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   accountTransferType?: Prisma.SortOrder
   accountRank?: Prisma.SortOrder
+  tradeMode?: Prisma.SortOrder
+  priceUnitQuantity?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  minimumQuantity?: Prisma.SortOrder
+  remainingQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   lockAmount?: Prisma.SortOrder
@@ -786,7 +889,10 @@ export type BuyRequestMinOrderByAggregateInput = {
 }
 
 export type BuyRequestSumOrderByAggregateInput = {
+  priceUnitQuantity?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  minimumQuantity?: Prisma.SortOrder
+  remainingQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   lockAmount?: Prisma.SortOrder
@@ -869,7 +975,11 @@ export type BuyRequestCreateWithoutBuyerInput = {
   description?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -895,7 +1005,11 @@ export type BuyRequestUncheckedCreateWithoutBuyerInput = {
   description?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -951,7 +1065,11 @@ export type BuyRequestScalarWhereInput = {
   description?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountTransferType?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountRank?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
+  tradeMode?: Prisma.StringFilter<"BuyRequest"> | string
+  priceUnitQuantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFilter<"BuyRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -976,7 +1094,11 @@ export type BuyRequestCreateWithoutOffersInput = {
   description?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1003,7 +1125,11 @@ export type BuyRequestUncheckedCreateWithoutOffersInput = {
   description?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1044,7 +1170,11 @@ export type BuyRequestUpdateWithoutOffersInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1071,7 +1201,11 @@ export type BuyRequestUncheckedUpdateWithoutOffersInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1096,7 +1230,11 @@ export type BuyRequestCreateManyBuyerInput = {
   description?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1121,7 +1259,11 @@ export type BuyRequestUpdateWithoutBuyerInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1147,7 +1289,11 @@ export type BuyRequestUncheckedUpdateWithoutBuyerInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1173,7 +1319,11 @@ export type BuyRequestUncheckedUpdateManyWithoutBuyerInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1230,7 +1380,11 @@ export type BuyRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   description?: boolean
   accountTransferType?: boolean
   accountRank?: boolean
+  tradeMode?: boolean
+  priceUnitQuantity?: boolean
   quantity?: boolean
+  minimumQuantity?: boolean
+  remainingQuantity?: boolean
   unitPrice?: boolean
   totalAmount?: boolean
   lockAmount?: boolean
@@ -1259,7 +1413,11 @@ export type BuyRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   description?: boolean
   accountTransferType?: boolean
   accountRank?: boolean
+  tradeMode?: boolean
+  priceUnitQuantity?: boolean
   quantity?: boolean
+  minimumQuantity?: boolean
+  remainingQuantity?: boolean
   unitPrice?: boolean
   totalAmount?: boolean
   lockAmount?: boolean
@@ -1286,7 +1444,11 @@ export type BuyRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   description?: boolean
   accountTransferType?: boolean
   accountRank?: boolean
+  tradeMode?: boolean
+  priceUnitQuantity?: boolean
   quantity?: boolean
+  minimumQuantity?: boolean
+  remainingQuantity?: boolean
   unitPrice?: boolean
   totalAmount?: boolean
   lockAmount?: boolean
@@ -1313,7 +1475,11 @@ export type BuyRequestSelectScalar = {
   description?: boolean
   accountTransferType?: boolean
   accountRank?: boolean
+  tradeMode?: boolean
+  priceUnitQuantity?: boolean
   quantity?: boolean
+  minimumQuantity?: boolean
+  remainingQuantity?: boolean
   unitPrice?: boolean
   totalAmount?: boolean
   lockAmount?: boolean
@@ -1328,7 +1494,7 @@ export type BuyRequestSelectScalar = {
   updatedAt?: boolean
 }
 
-export type BuyRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "buyerId" | "gameId" | "serverId" | "serverDetail" | "category" | "title" | "description" | "accountTransferType" | "accountRank" | "quantity" | "unitPrice" | "totalAmount" | "lockAmount" | "currency" | "status" | "expiresAt" | "premiumStartedAt" | "premiumEndsAt" | "premiumDurationHours" | "premiumFeeAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["buyRequest"]>
+export type BuyRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "buyerId" | "gameId" | "serverId" | "serverDetail" | "category" | "title" | "description" | "accountTransferType" | "accountRank" | "tradeMode" | "priceUnitQuantity" | "quantity" | "minimumQuantity" | "remainingQuantity" | "unitPrice" | "totalAmount" | "lockAmount" | "currency" | "status" | "expiresAt" | "premiumStartedAt" | "premiumEndsAt" | "premiumDurationHours" | "premiumFeeAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["buyRequest"]>
 export type BuyRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   offers?: boolean | Prisma.BuyRequest$offersArgs<ExtArgs>
@@ -1358,7 +1524,11 @@ export type $BuyRequestPayload<ExtArgs extends runtime.Types.Extensions.Internal
     description: string | null
     accountTransferType: string | null
     accountRank: string | null
+    tradeMode: string
+    priceUnitQuantity: runtime.Decimal
     quantity: runtime.Decimal
+    minimumQuantity: runtime.Decimal
+    remainingQuantity: runtime.Decimal
     unitPrice: runtime.Decimal
     totalAmount: runtime.Decimal
     lockAmount: runtime.Decimal
@@ -1806,7 +1976,11 @@ export interface BuyRequestFieldRefs {
   readonly description: Prisma.FieldRef<"BuyRequest", 'String'>
   readonly accountTransferType: Prisma.FieldRef<"BuyRequest", 'String'>
   readonly accountRank: Prisma.FieldRef<"BuyRequest", 'String'>
+  readonly tradeMode: Prisma.FieldRef<"BuyRequest", 'String'>
+  readonly priceUnitQuantity: Prisma.FieldRef<"BuyRequest", 'Decimal'>
   readonly quantity: Prisma.FieldRef<"BuyRequest", 'Decimal'>
+  readonly minimumQuantity: Prisma.FieldRef<"BuyRequest", 'Decimal'>
+  readonly remainingQuantity: Prisma.FieldRef<"BuyRequest", 'Decimal'>
   readonly unitPrice: Prisma.FieldRef<"BuyRequest", 'Decimal'>
   readonly totalAmount: Prisma.FieldRef<"BuyRequest", 'Decimal'>
   readonly lockAmount: Prisma.FieldRef<"BuyRequest", 'Decimal'>

@@ -11,7 +11,11 @@ import { getLocalizedGameName } from "@/app/game-name-text";
 import type { LocalizedGameNames } from "@/lib/market/game-localization";
 import { accountTransferTypeOptions } from "@/lib/market/account-transfer-types";
 import { getServerDetailOptionsForGameCode } from "@/lib/market/server-detail-options";
-import { isGameMoneyQuantityUnit } from "@/lib/market/trade-unit";
+import {
+  GAME_MONEY_PRICE_UNIT_OPTIONS,
+  getGameMoneyPriceUnitLabel,
+  isGameMoneyQuantityUnit,
+} from "@/lib/market/trade-unit";
 
 type ListingCategory = "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
 type TFunction = (key: TranslationKey) => string;
@@ -34,6 +38,7 @@ export default function CreateBuyRequestForm({
     gameId: string;
     code: string;
     name: string;
+    moneyUnitName?: string | null;
     localizedNames: LocalizedGameNames;
     servers: Array<{ serverId: string; name: string }>;
   }>;
@@ -44,8 +49,11 @@ export default function CreateBuyRequestForm({
   const [serverId, setServerId] = useState(games[0]?.servers[0]?.serverId ?? "");
   const [serverDetail, setServerDetail] = useState("");
   const [category, setCategory] = useState<ListingCategory>("GAME_MONEY");
-  const [quantity, setQuantity] = useState("10000");
-  const [unitPrice, setUnitPrice] = useState("0.0005");
+  const [quantity, setQuantity] = useState("100000");
+  const [minimumQuantity, setMinimumQuantity] = useState("10000");
+  const [unitPrice, setUnitPrice] = useState("5");
+  const [priceUnitQuantity, setPriceUnitQuantity] = useState("10000");
+  const [tradeMode, setTradeMode] = useState<"BULK" | "SPLIT">("BULK");
   const [expiresInDays, setExpiresInDays] = useState("7");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -78,9 +86,11 @@ export default function CreateBuyRequestForm({
   const estimatedReserveAmount = useMemo(() => {
     const nextQuantity = Number(requestQuantity);
     const nextUnitPrice = Number(unitPrice);
+    const nextPriceUnit = category === "GAME_MONEY" ? Number(priceUnitQuantity) : 1;
     if (!Number.isFinite(nextQuantity) || !Number.isFinite(nextUnitPrice)) return 0;
-    return Math.max(nextQuantity * nextUnitPrice, 0);
-  }, [requestQuantity, unitPrice]);
+    if (!Number.isFinite(nextPriceUnit) || nextPriceUnit <= 0) return 0;
+    return Math.max((nextQuantity / nextPriceUnit) * nextUnitPrice, 0);
+  }, [category, priceUnitQuantity, requestQuantity, unitPrice]);
   const totalAmount = estimatedReserveAmount.toLocaleString("en-US", {
     maximumFractionDigits: 6,
   });
@@ -121,7 +131,8 @@ export default function CreateBuyRequestForm({
 
   function handleCategoryChange(nextCategory: ListingCategory) {
     setCategory(nextCategory);
-    setQuantity(nextCategory === "GAME_MONEY" ? "10000" : "1");
+    setQuantity(nextCategory === "GAME_MONEY" ? "100000" : "1");
+    setMinimumQuantity(nextCategory === "GAME_MONEY" ? "10000" : "1");
     setError("");
     setSuccess("");
     setCreatedBuyRequestId(null);
@@ -129,15 +140,19 @@ export default function CreateBuyRequestForm({
     if (nextCategory === "GAME_ACCOUNT") {
       setAccountTransferType("GOOGLE");
       setUnitPrice("10");
+      setTradeMode("BULK");
       return;
     }
 
     if (nextCategory === "GAME_ITEM") {
       setUnitPrice("1");
+      setTradeMode("BULK");
       return;
     }
 
-    setUnitPrice("0.0005");
+    setPriceUnitQuantity("10000");
+    setTradeMode("BULK");
+    setUnitPrice("5");
   }
 
   function fillSampleBuyRequest() {
@@ -165,6 +180,21 @@ export default function CreateBuyRequestForm({
     }
     if (category === "GAME_MONEY" && !isGameMoneyQuantityUnit(requestQuantity)) {
       return "게임머니 구매 수량은 10,000 단위로만 입력할 수 있습니다.";
+    }
+
+    if (
+      category === "GAME_MONEY" &&
+      tradeMode === "SPLIT" &&
+      (!isPositiveNumber(minimumQuantity) || !isGameMoneyQuantityUnit(minimumQuantity))
+    ) {
+      return "분할 구매의 최소 판매 수량은 10,000 단위로 입력해 주세요.";
+    }
+    if (
+      category === "GAME_MONEY" &&
+      tradeMode === "SPLIT" &&
+      Number(minimumQuantity) > Number(requestQuantity)
+    ) {
+      return "최소 판매 수량은 총 구매 수량보다 클 수 없습니다.";
     }
 
     if (!isPositiveNumber(unitPrice)) {
@@ -225,6 +255,15 @@ export default function CreateBuyRequestForm({
           accountRank: isAccountRequest ? accountRank.trim() : undefined,
           quantity: requestQuantity,
           unitPrice,
+          pricePerUnit: category === "GAME_MONEY" ? unitPrice : undefined,
+          priceUnitQuantity: category === "GAME_MONEY" ? priceUnitQuantity : undefined,
+          tradeMode: category === "GAME_MONEY" ? tradeMode : undefined,
+          minimumQuantity:
+            category === "GAME_MONEY"
+              ? tradeMode === "BULK"
+                ? requestQuantity
+                : minimumQuantity
+              : requestQuantity,
           expiresInDays: Number(expiresInDays),
           premiumDurationHours: Number(premiumDurationHours),
         }),
@@ -250,6 +289,10 @@ export default function CreateBuyRequestForm({
   return (
     <form onSubmit={handleSubmit} className="grid gap-5 lg:grid-cols-[1fr_340px]">
       <section className="space-y-5">
+        <RegistrationFlowGuide
+          steps={["카테고리", "게임/서버", "구매 방식", "수량/단위/가격", "내용/프리미엄"]}
+        />
+
         <Panel title={t("listingForm.itemType")}>
           <div className="grid gap-3 md:grid-cols-3">
             {categoryOptions.map((option) => {
@@ -376,6 +419,26 @@ export default function CreateBuyRequestForm({
               </div>
             ) : (
               <div className="grid gap-3">
+                {category === "GAME_MONEY" ? (
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <FieldLabel label="구매 방식">
+                      <SegmentedTradeMode value={tradeMode} onChange={setTradeMode} labels={["일괄구매", "분할구매"]} />
+                    </FieldLabel>
+                    <FieldLabel label="가격 기준 단위">
+                      <select
+                        value={priceUnitQuantity}
+                        onChange={(event) => setPriceUnitQuantity(event.target.value)}
+                        className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                      >
+                        {GAME_MONEY_PRICE_UNIT_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {getGameMoneyPriceUnitLabel(option.value, selectedGame?.moneyUnitName)}
+                          </option>
+                        ))}
+                      </select>
+                    </FieldLabel>
+                  </div>
+                ) : null}
                 <div className="grid gap-3 md:grid-cols-2">
                   <FieldLabel label={t("listingForm.buyQuantity")}>
                     <input
@@ -386,7 +449,7 @@ export default function CreateBuyRequestForm({
                       className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
                     />
                   </FieldLabel>
-                  <FieldLabel label={`${t("listingForm.unitPrice")} (${currency})`}>
+                  <FieldLabel label={category === "GAME_MONEY" ? `선택 단위당 구매가 (${currency})` : `${t("listingForm.unitPrice")} (${currency})`}>
                     <input
                       value={unitPrice}
                       onChange={(event) => setUnitPrice(event.target.value)}
@@ -395,6 +458,18 @@ export default function CreateBuyRequestForm({
                     />
                   </FieldLabel>
                 </div>
+                {category === "GAME_MONEY" ? (
+                  <FieldLabel label="최소 판매 수량">
+                    <input
+                      value={tradeMode === "BULK" ? requestQuantity : minimumQuantity}
+                      onChange={(event) => setMinimumQuantity(event.target.value)}
+                      inputMode="numeric"
+                      step={10000}
+                      disabled={tradeMode === "BULK"}
+                      className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)] disabled:bg-[var(--gg-control-bg)] disabled:text-[var(--gg-muted)]"
+                    />
+                  </FieldLabel>
+                ) : null}
                 {category === "GAME_MONEY" ? (
                   <p className="text-xs font-bold text-[var(--gg-muted)]">
                     게임머니 구매 수량은 10,000 단위로만 입력할 수 있습니다.
@@ -526,6 +601,26 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
+function RegistrationFlowGuide({ steps }: { steps: string[] }) {
+  return (
+    <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 shadow-sm shadow-[var(--gg-shadow)]">
+      <div className="flex flex-wrap items-center gap-2">
+        {steps.map((step, index) => (
+          <div key={step} className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--gg-accent)] text-xs font-black text-[var(--gg-inverse-text)]">
+              {index + 1}
+            </span>
+            <span className="text-sm font-black text-[var(--gg-text)]">{step}</span>
+            {index < steps.length - 1 ? (
+              <span className="hidden text-sm font-black text-[var(--gg-muted)] sm:inline">→</span>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function FieldLabel({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="grid gap-2 text-sm font-black">
@@ -540,6 +635,44 @@ function MiniSummary({ label, value }: { label: string; value: string }) {
     <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4">
       <p className="text-xs font-black text-[var(--gg-muted)]">{label}</p>
       <p className="mt-1 text-lg font-black">{value}</p>
+    </div>
+  );
+}
+
+function SegmentedTradeMode({
+  value,
+  onChange,
+  labels,
+}: {
+  value: "BULK" | "SPLIT";
+  onChange: (value: "BULK" | "SPLIT") => void;
+  labels: [string, string];
+}) {
+  const options = [
+    { value: "BULK" as const, label: labels[0] },
+    { value: "SPLIT" as const, label: labels[1] },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {options.map((option) => {
+        const active = value === option.value;
+
+        return (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => onChange(option.value)}
+            className={
+              active
+                ? "rounded-xl border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_14%,white)] px-4 py-3 text-sm font-black text-[var(--gg-text)]"
+                : "rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-4 py-3 text-sm font-black text-[var(--gg-muted)] hover:border-[var(--gg-accent)]"
+            }
+          >
+            {option.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

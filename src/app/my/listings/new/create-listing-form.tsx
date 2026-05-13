@@ -12,7 +12,11 @@ import { getLocalizedGameName } from "@/app/game-name-text";
 import type { LocalizedGameNames } from "@/lib/market/game-localization";
 import { accountTransferTypeOptions } from "@/lib/market/account-transfer-types";
 import { getServerDetailOptionsForGameCode } from "@/lib/market/server-detail-options";
-import { isGameMoneyQuantityUnit } from "@/lib/market/trade-unit";
+import {
+  GAME_MONEY_PRICE_UNIT_OPTIONS,
+  getGameMoneyPriceUnitLabel,
+  isGameMoneyQuantityUnit,
+} from "@/lib/market/trade-unit";
 
 type ListingCategory = "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
 type TFunction = (key: TranslationKey) => string;
@@ -39,6 +43,7 @@ export default function CreateListingForm({
     gameId: string;
     code: string;
     name: string;
+    moneyUnitName?: string | null;
     localizedNames: LocalizedGameNames;
     servers: Array<{ serverId: string; name: string }>;
   }>;
@@ -52,7 +57,9 @@ export default function CreateListingForm({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState(t(defaultDescriptionKey.GAME_MONEY));
   const [accountTransferType, setAccountTransferType] = useState("GOOGLE");
-  const [unitPrice, setUnitPrice] = useState("0.0005");
+  const [unitPrice, setUnitPrice] = useState("5");
+  const [priceUnitQuantity, setPriceUnitQuantity] = useState("10000");
+  const [tradeMode, setTradeMode] = useState<"BULK" | "SPLIT">("SPLIT");
   const [quantity, setQuantity] = useState("100000");
   const [minimumQuantity, setMinimumQuantity] = useState("10000");
   const [premiumDurationHours, setPremiumDurationHours] = useState("0");
@@ -94,11 +101,12 @@ export default function CreateListingForm({
   const estimatedFullAmount = useMemo(() => {
     const nextQuantity = Number(saleQuantity);
     const nextUnitPrice = Number(unitPrice);
-    if (!Number.isFinite(nextQuantity) || !Number.isFinite(nextUnitPrice)) return "0";
-    return Math.max(nextQuantity * nextUnitPrice, 0).toLocaleString("en-US", {
+    const nextPriceUnit = category === "GAME_MONEY" ? Number(priceUnitQuantity) : 1;
+    if (!Number.isFinite(nextQuantity) || !Number.isFinite(nextUnitPrice) || !Number.isFinite(nextPriceUnit) || nextPriceUnit <= 0) return "0";
+    return Math.max((nextQuantity / nextPriceUnit) * nextUnitPrice, 0).toLocaleString("en-US", {
       maximumFractionDigits: 6,
     });
-  }, [saleQuantity, unitPrice]);
+  }, [category, priceUnitQuantity, saleQuantity, unitPrice]);
 
   useEffect(() => {
     if (serverDetail && !serverDetailOptions.includes(serverDetail)) {
@@ -154,6 +162,7 @@ export default function CreateListingForm({
       setAccountTransferType("GOOGLE");
       setQuantity("1");
       setMinimumQuantity("1");
+      setTradeMode("BULK");
       setUnitPrice("10");
       return;
     }
@@ -161,13 +170,16 @@ export default function CreateListingForm({
     if (nextCategory === "GAME_ITEM") {
       setQuantity("1");
       setMinimumQuantity("1");
+      setTradeMode("SPLIT");
       setUnitPrice("1");
       return;
     }
 
     setQuantity("100000");
     setMinimumQuantity("10000");
-    setUnitPrice("0.0005");
+    setPriceUnitQuantity("10000");
+    setTradeMode("SPLIT");
+    setUnitPrice("5");
   }
 
   function fillSampleListing() {
@@ -184,6 +196,11 @@ export default function CreateListingForm({
   }
 
   function validateForm() {
+    const effectiveMinimumQuantity =
+      category === "GAME_MONEY" && tradeMode === "BULK"
+        ? saleQuantity
+        : saleMinimumQuantity;
+
     if (!gameId || games.length === 0) return t("listingForm.noGame");
     if (!serverId) return t("listingForm.selectServer");
     if (title.trim().length < 4) return t("listingForm.titleTooShort");
@@ -196,14 +213,14 @@ export default function CreateListingForm({
         : t("listingForm.sellQuantityInvalid");
     }
 
-    if (!isPositiveNumber(saleMinimumQuantity)) return t("listingForm.minimumQuantityInvalid");
+    if (!isPositiveNumber(effectiveMinimumQuantity)) return t("listingForm.minimumQuantityInvalid");
     if (category === "GAME_MONEY" && !isGameMoneyQuantityUnit(saleQuantity)) {
       return "게임머니 판매 수량은 10,000 단위로만 입력할 수 있습니다.";
     }
-    if (category === "GAME_MONEY" && !isGameMoneyQuantityUnit(saleMinimumQuantity)) {
+    if (category === "GAME_MONEY" && !isGameMoneyQuantityUnit(effectiveMinimumQuantity)) {
       return "게임머니 최소 구매 수량은 10,000 단위로만 입력할 수 있습니다.";
     }
-    if (Number(saleMinimumQuantity) > Number(saleQuantity)) {
+    if (Number(effectiveMinimumQuantity) > Number(saleQuantity)) {
       return t("listingForm.minimumOverQuantity");
     }
     if (isAccountListing && !accountTransferType) return t("listingForm.accountTypeRequired");
@@ -241,8 +258,11 @@ export default function CreateListingForm({
           title: title.trim(),
           description: description.trim(),
           unitPrice,
+          pricePerUnit: category === "GAME_MONEY" ? unitPrice : undefined,
+          priceUnitQuantity: category === "GAME_MONEY" ? priceUnitQuantity : undefined,
+          tradeMode: category === "GAME_MONEY" ? tradeMode : undefined,
           quantity: saleQuantity,
-          minimumQuantity: saleMinimumQuantity,
+          minimumQuantity: tradeMode === "BULK" ? saleQuantity : saleMinimumQuantity,
           premiumDurationHours: Number(premiumDurationHours),
         }),
       });
@@ -291,6 +311,10 @@ export default function CreateListingForm({
   return (
     <form onSubmit={handleSubmit} className="grid gap-5 lg:grid-cols-[1fr_340px]">
       <section className="space-y-5">
+        <RegistrationFlowGuide
+          steps={["카테고리", "게임/서버", "판매 방식", "수량/단위/가격", "내용/프리미엄"]}
+        />
+
         <Panel title={t("listingForm.itemType")}>
           <div className="grid gap-3 md:grid-cols-3">
             {categoryOptions.map((option) => {
@@ -393,7 +417,27 @@ export default function CreateListingForm({
               />
             </FieldLabel>
             <div className="grid gap-3 md:grid-cols-3">
-              <FieldLabel label={`${t("listingForm.unitPrice")} (${currency})`}>
+              {category === "GAME_MONEY" ? (
+                <FieldLabel label="판매 방식">
+                  <SegmentedTradeMode value={tradeMode} onChange={setTradeMode} labels={["일괄판매", "분할판매"]} />
+                </FieldLabel>
+              ) : null}
+              {category === "GAME_MONEY" ? (
+                <FieldLabel label="가격 기준 단위">
+                  <select
+                    value={priceUnitQuantity}
+                    onChange={(event) => setPriceUnitQuantity(event.target.value)}
+                    className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                  >
+                    {GAME_MONEY_PRICE_UNIT_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {getGameMoneyPriceUnitLabel(option.value, selectedGame?.moneyUnitName)}
+                      </option>
+                    ))}
+                  </select>
+                </FieldLabel>
+              ) : null}
+              <FieldLabel label={category === "GAME_MONEY" ? `선택 단위당 판매가 (${currency})` : `${t("listingForm.unitPrice")} (${currency})`}>
                 <input
                   value={unitPrice}
                   onChange={(event) => setUnitPrice(event.target.value)}
@@ -413,9 +457,9 @@ export default function CreateListingForm({
               </FieldLabel>
               <FieldLabel label={t("listingForm.minimumQuantity")}>
                 <input
-                  value={saleMinimumQuantity}
+                  value={category === "GAME_MONEY" && tradeMode === "BULK" ? saleQuantity : saleMinimumQuantity}
                   onChange={(event) => setMinimumQuantity(event.target.value)}
-                  disabled={isAccountListing}
+                  disabled={isAccountListing || (category === "GAME_MONEY" && tradeMode === "BULK")}
                   inputMode={category === "GAME_MONEY" ? "numeric" : "decimal"}
                   step={category === "GAME_MONEY" ? 10000 : undefined}
                   className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)] disabled:bg-[var(--gg-control-bg)]"
@@ -424,7 +468,7 @@ export default function CreateListingForm({
             </div>
             {category === "GAME_MONEY" ? (
               <p className="text-xs font-bold text-[var(--gg-muted)]">
-                게임머니 수량과 최소 구매 수량은 10,000 단위로만 입력할 수 있습니다.
+                게임머니 수량과 최소 구매 수량은 10,000 단위로만 입력할 수 있습니다. 일괄판매는 최소 구매 수량이 총 판매 수량과 같게 저장됩니다.
               </p>
             ) : null}
             <FieldLabel label={t("listingForm.tradeContent")}>
@@ -563,12 +607,61 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
+function RegistrationFlowGuide({ steps }: { steps: string[] }) {
+  return (
+    <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 shadow-sm shadow-[var(--gg-shadow)]">
+      <div className="flex flex-wrap items-center gap-2">
+        {steps.map((step, index) => (
+          <div key={step} className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--gg-accent)] text-xs font-black text-[var(--gg-inverse-text)]">
+              {index + 1}
+            </span>
+            <span className="text-sm font-black text-[var(--gg-text)]">{step}</span>
+            {index < steps.length - 1 ? (
+              <span className="hidden text-sm font-black text-[var(--gg-muted)] sm:inline">→</span>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function FieldLabel({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="grid gap-2 text-sm font-black">
       {label}
       {children}
     </label>
+  );
+}
+
+function SegmentedTradeMode({
+  value,
+  onChange,
+  labels,
+}: {
+  value: "BULK" | "SPLIT";
+  onChange: (value: "BULK" | "SPLIT") => void;
+  labels: [string, string];
+}) {
+  return (
+    <div className="grid grid-cols-2 rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] p-1">
+      {(["BULK", "SPLIT"] as const).map((mode, index) => (
+        <button
+          key={mode}
+          type="button"
+          onClick={() => onChange(mode)}
+          className={
+            value === mode
+              ? "rounded-lg bg-[var(--gg-accent)] px-3 py-2 text-xs font-black text-[var(--gg-inverse-text)]"
+              : "rounded-lg px-3 py-2 text-xs font-black text-[var(--gg-muted)]"
+          }
+        >
+          {labels[index]}
+        </button>
+      ))}
+    </div>
   );
 }
 

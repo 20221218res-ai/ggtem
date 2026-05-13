@@ -7,6 +7,7 @@ import type {
   WithdrawalStatus,
 } from "@/generated/prisma/enums";
 import { SENSITIVE_AUDIT_ACTIONS } from "@/lib/admin/audit";
+import { getGameMoneyPriceUnitLabel, getGameMoneyUnitName } from "@/lib/market/trade-unit";
 import { getPrismaClient } from "@/lib/prisma";
 import type { XlsxSheet } from "@/lib/xlsx";
 
@@ -396,7 +397,7 @@ export async function getAdminReportsState(filters?: AdminReportFilters) {
     game: listing.game.name,
     server: listing.server?.name ?? "-",
     category: categoryLabel(listing.category),
-    price: `${listing.unitPrice.toString()} ${listing.currency}`,
+    price: formatListingPriceForReport(listing),
     quantity: listing.inventory?.availableQuantity.toString() ?? "-",
     createdAt: formatDateTime(listing.createdAt),
     createdDate: toDateInputValue(listing.createdAt),
@@ -863,6 +864,37 @@ function formatDateTime(date: Date) {
 
 function toDateInputValue(date: Date) {
   return date.toISOString().slice(0, 10);
+}
+
+function formatListingPriceForReport(listing: {
+  category: string;
+  unitPrice: { toString(): string };
+  priceUnitQuantity: { toString(): string };
+  currency: string;
+  game: { name: string; moneyUnitName: string | null };
+}) {
+  if (listing.category !== "GAME_MONEY") {
+    return `${listing.unitPrice.toString()} ${listing.currency}`;
+  }
+
+  const unitQuantity = Number(listing.priceUnitQuantity);
+  const basePrice = Number(listing.unitPrice);
+  const displayPrice =
+    Number.isFinite(unitQuantity) && Number.isFinite(basePrice)
+      ? unitQuantity * basePrice
+      : basePrice;
+  const moneyUnitName = getGameMoneyUnitName(
+    listing.game.moneyUnitName,
+    listing.game.name,
+  );
+  const unitLabel = getGameMoneyPriceUnitLabel(
+    Number.isFinite(unitQuantity)
+      ? String(Math.trunc(unitQuantity))
+      : listing.priceUnitQuantity.toString(),
+    moneyUnitName,
+  );
+
+  return `${formatAmount(displayPrice)} ${listing.currency} / ${unitLabel}`;
 }
 
 function formatAmount(value: number) {

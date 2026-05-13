@@ -5,6 +5,7 @@ import CountryText from "@/app/country-text";
 import type { TranslationKey } from "@/app/i18n";
 import LocalizedInput from "@/app/localized-input";
 import UserContentText from "@/app/user-content-text";
+import { getGameMoneyPriceUnitLabel } from "@/lib/market/trade-unit";
 import { getMarketplaceMyListings } from "@/lib/market/my-listings";
 import SellerListingActions from "./seller-listing-actions";
 
@@ -167,6 +168,14 @@ function ListingRow({ listing }: { listing: MyListing }) {
   const soldOut = isSoldOutListing(listing);
   const publicHref = `/listings/${listing.listingId}`;
   const editHref = `/my/listings/${listing.listingId}/edit`;
+  const priceUnitLabel =
+    listing.category === "GAME_MONEY"
+      ? getGameMoneyPriceUnitLabel(listing.priceUnitQuantity, listing.moneyUnitName)
+      : null;
+  const displayUnitPrice =
+    listing.category === "GAME_MONEY"
+      ? formatDisplayNumber(Number(listing.unitPrice) * Number(listing.priceUnitQuantity || "1"))
+      : listing.unitPrice;
   const accountTransferTypeLabel =
     listing.category === "GAME_ACCOUNT" ? getAccountTransferTypeLabelNode(listing.accountTransferType) : null;
 
@@ -218,15 +227,24 @@ function ListingRow({ listing }: { listing: MyListing }) {
           <InfoChip label={<CountryText id="manage.availableToSell" />} value={listing.availableQuantity} />
           <InfoChip label={<CountryText id="manage.minimumQuantity" />} value={listing.minimumQuantity} />
           <InfoChip label={<CountryText id="manage.soldQuantity" />} value={listing.soldQuantity} />
+          {listing.category === "GAME_MONEY" ? (
+            <InfoChip
+              label="거래 방식"
+              value={listing.tradeMode === "BULK" ? "일괄 판매" : "분할 판매"}
+            />
+          ) : null}
         </div>
       </div>
 
       <div className="flex flex-col gap-3 lg:items-end">
         <div className="lg:text-right">
           <p className="text-2xl font-black text-[var(--gg-accent)]">
-            {listing.unitPrice} {listing.currency}
+            {displayUnitPrice} {listing.currency}
           </p>
-          <p className="text-xs font-bold text-[var(--gg-muted)]"><CountryText id="manage.unitPrice" /></p>
+          <p className="text-xs font-bold text-[var(--gg-muted)]">
+            <CountryText id="manage.unitPrice" />
+            {priceUnitLabel ? ` / ${priceUnitLabel}` : ""}
+          </p>
         </div>
         <SellerListingActions
           listingId={listing.listingId}
@@ -460,4 +478,14 @@ function buildHref({ inventory, game }: { inventory: string; game: string }) {
   if (game !== "ALL") params.set("game", game);
   const query = params.toString();
   return query ? `/my/listings?${query}` : "/my/listings";
+}
+
+function formatDisplayNumber(value: number) {
+  if (!Number.isFinite(value)) {
+    return "0";
+  }
+
+  return Number.isInteger(value)
+    ? String(value)
+    : String(value).replace(/0+$/, "").replace(/\.$/, "");
 }

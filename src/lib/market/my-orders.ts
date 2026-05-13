@@ -62,6 +62,7 @@ export type MarketplaceMyOrderDetail = {
   serverName: string | null;
   moneyUnitName: string;
   accountTransferType: string | null;
+  tradeCharacterName: string | null;
   sellerName: string;
   quantity: string;
   grossAmount: string;
@@ -240,6 +241,7 @@ export async function getMarketplaceMyOrderDetail(
       grossAmount: true,
       sellerReceivableAmount: true,
       currency: true,
+      tradeCharacterName: true,
       createdAt: true,
       completedAt: true,
       canceledAt: true,
@@ -307,6 +309,7 @@ export async function getMarketplaceMyOrderDetail(
     grossAmount: order.grossAmount.toString(),
     sellerReceivableAmount: order.sellerReceivableAmount.toString(),
     currency: order.currency,
+    tradeCharacterName: order.tradeCharacterName,
     createdAt: formatKoreanDate(order.createdAt),
     completedAt: order.completedAt ? formatKoreanDate(order.completedAt) : null,
     canceledAt: order.canceledAt ? formatKoreanDate(order.canceledAt) : null,

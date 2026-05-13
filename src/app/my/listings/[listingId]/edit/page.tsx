@@ -51,7 +51,7 @@ export default async function EditListingPage({
           label="게임 / 서버"
           value={`${listing.gameName} / ${listing.serverName ?? "서버 없음"}`}
         />
-        <SummaryCard label="품목" value={formatCategory(listing.category)} />
+        <SummaryCard label="카테고리" value={formatCategory(listing.category)} />
         <SummaryCard
           label="재고"
           value={`${listing.availableQuantity} / ${listing.lockedQuantity} / ${listing.soldQuantity}`}
@@ -85,7 +85,11 @@ export default async function EditListingPage({
           initialDescription={listing.description ?? ""}
           initialCategory={listing.category}
           initialUnitPrice={listing.unitPrice}
+          initialPriceUnitQuantity={listing.priceUnitQuantity}
+          initialTradeMode={listing.tradeMode}
+          moneyUnitName={listing.moneyUnitName}
           initialTotalQuantity={listing.totalQuantity}
+          initialMinimumQuantity={listing.minimumQuantity}
           initialImageUrl={listing.primaryImageUrl}
           initialImageAlt={listing.primaryImageAlt ?? ""}
         />
@@ -115,7 +119,7 @@ function getStatusGuide(status: string, availableQuantity: string) {
   if (status === "ACTIVE" && Number(availableQuantity) <= 0) {
     return {
       eyebrow: "재고 없음",
-      title: "판매 가능 수량이 없어 목록에서 숨겨집니다.",
+      title: "판매 가능한 수량이 없어 목록에서 숨겨집니다.",
       className: "border-sky-200 bg-sky-50 text-sky-800",
     };
   }

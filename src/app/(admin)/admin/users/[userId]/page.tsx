@@ -286,8 +286,16 @@ export default async function AdminUserDetailPage({
             items={detail.listings.map((listing) => ({
               key: listing.listingId,
               title: listing.title,
-              subtitle: statusLabel(listing.status),
-              meta: `${listing.unitPrice} ${listing.currency} / ${listing.createdAt}`,
+              subtitle: [
+                statusLabel(listing.status),
+                listing.tradeModeLabel,
+                listing.minimumQuantityLabel
+                  ? `최소 ${listing.minimumQuantityLabel}`
+                  : null,
+              ]
+                .filter(Boolean)
+                .join(" / "),
+              meta: `${listing.unitPrice} / ${listing.createdAt}`,
               href: `/listings/${listing.listingId}`,
             }))}
           />

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useCountryTranslation from "@/app/use-country-translation";
 import { ActionConfirmDialog } from "@/components/action-confirm-dialog";
+import { TradeSafetyConfirmDialog } from "@/components/trade-safety-confirm-dialog";
 
 type BuyerOrderActionsProps = {
   orderId: string;
@@ -69,7 +70,7 @@ export function BuyerOrderActions({ orderId, status }: BuyerOrderActionsProps) {
     setPendingAction(action);
   }
 
-  async function runPendingAction() {
+  async function runPendingAction(input?: { password: string; characterName: string }) {
     if (!pendingAction) return;
 
     const action = pendingAction;
@@ -97,6 +98,7 @@ export function BuyerOrderActions({ orderId, status }: BuyerOrderActionsProps) {
           orderId,
           action,
           reason: disputeReason,
+          password: input?.password,
         }),
       });
       const result = (await response.json()) as BuyerOrderActionResponse | { message?: string };
@@ -200,7 +202,24 @@ export function BuyerOrderActions({ orderId, status }: BuyerOrderActionsProps) {
         </p>
       ) : null}
 
-      {dialog ? (
+      {dialog && pendingAction === "CONFIRM_DELIVERY" ? (
+        <TradeSafetyConfirmDialog
+          isOpen
+          eyebrow={dialog.eyebrow}
+          title="결제 비밀번호 확인"
+          body="인수확정을 누르면 거래가 완료되고 에스크로 금액이 판매자에게 정산됩니다. 물품을 받은 뒤에만 진행해 주세요."
+          confirmLabel={dialog.confirmLabel}
+          tone={dialog.tone}
+          isSubmitting={isSubmitting}
+          warningLabel="인수확정 후에는 정산이 진행됩니다. 서버/캐릭터명 또는 물품 수령 여부를 다시 확인해 주세요."
+          summaryRows={dialog.lines.map((line, index) => ({
+            label: index === 0 ? "확인 사항" : "주의 사항",
+            value: line,
+          }))}
+          onCancel={() => setPendingAction(null)}
+          onConfirm={runPendingAction}
+        />
+      ) : dialog ? (
         <ActionConfirmDialog
           isOpen
           eyebrow={dialog.eyebrow}

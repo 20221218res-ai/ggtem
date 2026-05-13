@@ -1,4 +1,5 @@
 import { getPrismaClient } from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 
 export type CustomerCenterType =
   | "NOTICE"
@@ -93,7 +94,8 @@ const starterDocuments: CustomerCenterDocument[] = [
   },
 ];
 
-export async function getCustomerCenterDocuments() {
+const getCachedCustomerCenterDocuments = unstable_cache(
+  async () => {
   const prisma = getPrismaClient();
   const documents = await prisma.cmsDocument.findMany({
     where: {
@@ -151,6 +153,16 @@ export async function getCustomerCenterDocuments() {
   const fallbackDocuments = starterDocuments.filter((document) => !publishedTypes.has(document.type));
 
   return [...publishedDocuments, ...fallbackDocuments];
+  },
+  ["customer-center-documents-v1"],
+  {
+    revalidate: 60,
+    tags: ["customer-center-documents"],
+  },
+);
+
+export async function getCustomerCenterDocuments() {
+  return getCachedCustomerCenterDocuments();
 }
 
 export function getCustomerCenterTypeLabel(type: string) {

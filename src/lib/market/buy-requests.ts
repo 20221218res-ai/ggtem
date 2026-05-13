@@ -8,6 +8,8 @@ import { calculateMarketplaceOrderFees } from "@/lib/market/order-fees";
 import {
   assertGameMoneyQuantityUnit,
   getGameMoneyUnitName,
+  normalizeGameMoneyPriceUnit,
+  normalizeGameMoneyTradeMode,
 } from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
 import { assertNoOffPlatformContact } from "@/lib/risk/off-platform-contact";
@@ -24,6 +26,7 @@ import {
   type LocalizedGameNames,
   mapGameLocalizedNames,
 } from "@/lib/market/game-localization";
+import { getActiveGameCatalog } from "@/lib/market/listings";
 import { resolveGameNameFilter } from "@/lib/market/game-name-filter";
 import { normalizeServerDetail, validateServerDetail } from "@/lib/market/server-detail-options";
 
@@ -48,6 +51,7 @@ export type MarketplaceBuyRequestFormView = {
     gameId: string;
     code: string;
     name: string;
+    moneyUnitName: string | null;
     localizedNames: LocalizedGameNames;
     servers: Array<{
       serverId: string;
@@ -80,7 +84,11 @@ export type MarketplaceBuyRequestSummary = {
   description: string | null;
   accountTransferType: string | null;
   accountRank: string | null;
+  tradeMode: string;
+  priceUnitQuantity: string;
   quantity: string;
+  minimumQuantity: string;
+  remainingQuantity: string;
   unitPrice: string;
   totalAmount: string;
   lockAmount: string;
@@ -161,6 +169,7 @@ export type MarketplaceBuyRequestFilters = {
   category?: string;
   accountTransferType?: string;
   sort?: string;
+  includeCategories?: boolean;
 };
 
 type BuyRequestRow = {
@@ -174,7 +183,11 @@ type BuyRequestRow = {
   description: string | null;
   accountTransferType: string | null;
   accountRank: string | null;
+  tradeMode?: string;
+  priceUnitQuantity?: { toString(): string };
   quantity: { toString(): string };
+  minimumQuantity?: { toString(): string };
+  remainingQuantity?: { toString(): string };
   unitPrice: { toString(): string };
   totalAmount: { toString(): string };
   lockAmount: { toString(): string };
@@ -244,6 +257,7 @@ export async function getMarketplaceBuyRequestFormView(): Promise<MarketplaceBuy
         nameVn: true,
         namePh: true,
         nameTh: true,
+        moneyUnitName: true,
         servers: {
           where: {
             isActive: true,
@@ -283,6 +297,7 @@ export async function getMarketplaceBuyRequestFormView(): Promise<MarketplaceBuy
       gameId: game.id,
       code: game.code,
       name: game.name,
+      moneyUnitName: game.moneyUnitName,
       localizedNames: mapGameLocalizedNames(game),
       servers: game.servers.map((server) => ({
         serverId: server.id,
@@ -301,40 +316,12 @@ export async function getMarketplaceBuyRequests(
   const normalizedGame = gameFilter.gameName;
   const normalizedCategory = filters?.category?.trim() ?? "";
   const normalizedSort = filters?.sort?.trim() || "latest";
+  const includeCategories = filters?.includeCategories !== false;
   const normalizedServer = filters?.server?.trim() ?? "";
   const normalizedAccountTransferType = normalizeAccountTransferType(
     filters?.accountTransferType,
   );
-  const games = await prisma.game.findMany({
-    where: {
-      isActive: true,
-    },
-    select: {
-      id: true,
-      name: true,
-      code: true,
-      imageUrl: true,
-      moneyUnitName: true,
-      nameKo: true,
-      nameCn: true,
-      nameVn: true,
-      namePh: true,
-      nameTh: true,
-      servers: {
-        where: {
-          isActive: true,
-        },
-        select: {
-          id: true,
-          name: true,
-        },
-        orderBy: {
-          code: "asc",
-        },
-      },
-    },
-    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-  });
+  const games = await getActiveGameCatalog();
   const gameById = new Map(games.map((item) => [item.id, item]));
   const serverById = new Map(
     games.flatMap((item) =>
@@ -414,7 +401,11 @@ export async function getMarketplaceBuyRequests(
       description: true,
       accountTransferType: true,
       accountRank: true,
+      tradeMode: true,
+      priceUnitQuantity: true,
       quantity: true,
+      minimumQuantity: true,
+      remainingQuantity: true,
       unitPrice: true,
       totalAmount: true,
       lockAmount: true,
@@ -453,24 +444,26 @@ export async function getMarketplaceBuyRequests(
 
     return right.createdAt.getTime() - left.createdAt.getTime();
   });
-  const allActiveBuyRequests = await prisma.buyRequest.findMany({
-    where: {
-      status: "ACTIVE",
-      gameId: {
-        in: activeGameIds.length > 0 ? activeGameIds : ["__missing_game__"],
-      },
-      serverId: {
-        in:
-          activeServerIds.length > 0
-            ? activeServerIds
-            : ["__missing_server__"],
-      },
-    },
-    select: {
-      category: true,
-    },
-    distinct: ["category"],
-  });
+  const allActiveBuyRequests = includeCategories
+    ? await prisma.buyRequest.findMany({
+        where: {
+          status: "ACTIVE",
+          gameId: {
+            in: activeGameIds.length > 0 ? activeGameIds : ["__missing_game__"],
+          },
+          serverId: {
+            in:
+              activeServerIds.length > 0
+                ? activeServerIds
+                : ["__missing_server__"],
+          },
+        },
+        select: {
+          category: true,
+        },
+        distinct: ["category"],
+      })
+    : [];
 
   return {
     buyRequests: sortedBuyRequests.map((request) =>
@@ -532,7 +525,11 @@ export async function getMarketplaceMyBuyRequests(): Promise<MarketplaceMyBuyReq
         description: true,
         accountTransferType: true,
         accountRank: true,
+        tradeMode: true,
+        priceUnitQuantity: true,
         quantity: true,
+        minimumQuantity: true,
+        remainingQuantity: true,
         unitPrice: true,
         totalAmount: true,
         lockAmount: true,
@@ -652,6 +649,10 @@ export async function createMarketplaceBuyRequest(input: {
   accountRank?: string;
   quantity: string;
   unitPrice: string;
+  pricePerUnit?: string;
+  priceUnitQuantity?: string;
+  tradeMode?: "BULK" | "SPLIT";
+  minimumQuantity?: string;
   expiresInDays?: number;
   premiumDurationHours?: number;
 }): Promise<MarketplaceBuyRequestCreateResult> {
@@ -686,8 +687,22 @@ export async function createMarketplaceBuyRequest(input: {
     input.accountTransferType,
   );
   const trimmedAccountRank = input.accountRank?.trim() || null;
+  const priceUnitQuantityValue =
+    input.category === "GAME_MONEY"
+      ? normalizeGameMoneyPriceUnit(input.priceUnitQuantity)
+      : "1";
+  const priceUnitQuantity = parseFixedAmount(priceUnitQuantityValue);
   const quantity = parseFixedAmount(input.quantity);
-  const unitPrice = parseFixedAmount(input.unitPrice);
+  const unitPrice =
+    input.category === "GAME_MONEY" && input.pricePerUnit
+      ? (parseFixedAmount(input.pricePerUnit) * FIXED_AMOUNT_SCALE) / priceUnitQuantity
+      : parseFixedAmount(input.unitPrice);
+  const tradeMode =
+    input.category === "GAME_MONEY"
+      ? normalizeGameMoneyTradeMode(input.tradeMode)
+      : "BULK";
+  const minimumQuantity =
+    tradeMode === "BULK" ? quantity : parseFixedAmount(input.minimumQuantity || "1");
   const premiumDurationHours = normalizePremiumDurationHours(
     input.premiumDurationHours,
   );
@@ -702,9 +717,14 @@ export async function createMarketplaceBuyRequest(input: {
   }
 
   assertGameMoneyQuantityUnit(input.category, quantity, "구매 수량");
+  assertGameMoneyQuantityUnit(input.category, minimumQuantity, "최소 판매 수량");
 
   if (unitPrice <= 0n) {
     throw new Error("단가는 0보다 커야 합니다.");
+  }
+
+  if (minimumQuantity <= 0n || minimumQuantity > quantity) {
+    throw new Error("최소 판매 수량은 총 구매 수량보다 클 수 없습니다.");
   }
 
   if (input.category === "GAME_ACCOUNT" && !normalizedAccountTransferType) {
@@ -782,7 +802,11 @@ export async function createMarketplaceBuyRequest(input: {
         accountTransferType:
           input.category === "GAME_ACCOUNT" ? normalizedAccountTransferType : null,
         accountRank: input.category === "GAME_ACCOUNT" ? trimmedAccountRank : null,
+        tradeMode,
+        priceUnitQuantity: formatFixedAmount(priceUnitQuantity),
         quantity: formatFixedAmount(quantity),
+        minimumQuantity: formatFixedAmount(minimumQuantity),
+        remainingQuantity: formatFixedAmount(quantity),
         unitPrice: formatFixedAmount(unitPrice),
         totalAmount: formatFixedAmount(totalAmount),
         lockAmount: formatFixedAmount(totalAmount),
@@ -1178,8 +1202,15 @@ function buildBuyRequestOrderNumber() {
   return `ORD-BR-${Date.now()}-${suffix}`;
 }
 
+function normalizeTradeCharacterName(value?: string) {
+  const nextValue = value?.trim();
+  return nextValue ? nextValue.slice(0, 80) : null;
+}
+
 export async function sellToMarketplaceBuyRequest(input: {
   buyRequestId: string;
+  quantity?: string;
+  tradeCharacterName?: string;
 }): Promise<MarketplaceBuyRequestInstantSaleResult> {
   const prisma = getPrismaClient();
   const sessionUser = await getCurrentSessionUser();
@@ -1257,17 +1288,22 @@ export async function sellToMarketplaceBuyRequest(input: {
       throw new Error("판매자 지갑 통화가 구매요청 통화와 일치하지 않습니다.");
     }
 
-    const requestAmount = parseFixedAmount(buyRequest.totalAmount.toString());
     const requestQuantity = parseFixedAmount(buyRequest.quantity.toString());
+    const remainingQuantity = parseFixedAmount(
+      buyRequest.remainingQuantity?.toString() ?? buyRequest.quantity.toString(),
+    );
+    const minimumQuantity = parseFixedAmount(
+      buyRequest.minimumQuantity?.toString() ?? buyRequest.quantity.toString(),
+    );
     const requestUnitPrice = parseFixedAmount(buyRequest.unitPrice.toString());
+    const saleQuantity = input.quantity
+      ? parseFixedAmount(input.quantity)
+      : remainingQuantity;
+    const requestAmount = (saleQuantity * requestUnitPrice) / FIXED_AMOUNT_SCALE;
     const lockedRequestAmount = parseFixedAmount(buyRequest.lockAmount.toString());
     const buyerBuyRequestLocked = parseFixedAmount(
       buyRequest.buyer.wallet.buyRequestLocked.toString(),
     );
-    const buyerEscrow = parseFixedAmount(
-      buyRequest.buyer.wallet.escrowLockedBalance.toString(),
-    );
-
     if (requestAmount <= 0n) {
       throw new Error("구매요청 금액은 0보다 커야 합니다.");
     }
@@ -1276,8 +1312,18 @@ export async function sellToMarketplaceBuyRequest(input: {
       throw new Error("구매요청 수량과 단가를 확인할 수 없습니다.");
     }
 
-    if (lockedRequestAmount !== requestAmount) {
-      throw new Error("구매요청 예약금이 일치하지 않습니다.");
+    assertGameMoneyQuantityUnit(buyRequest.category, saleQuantity, "판매 수량");
+
+    if (buyRequest.tradeMode === "BULK" && saleQuantity !== remainingQuantity) {
+      throw new Error("일괄구매 요청에는 남은 전체 수량만 즉시판매할 수 있습니다.");
+    }
+
+    if (saleQuantity <= 0n || saleQuantity < minimumQuantity || saleQuantity > remainingQuantity) {
+      throw new Error("판매 수량은 최소 판매 수량 이상, 남은 구매 수량 이하로 입력해 주세요.");
+    }
+
+    if (lockedRequestAmount < requestAmount) {
+      throw new Error("구매요청 예치금이 판매 수량보다 부족합니다.");
     }
 
     if (buyerBuyRequestLocked < requestAmount) {
@@ -1315,9 +1361,13 @@ export async function sellToMarketplaceBuyRequest(input: {
       `${requestGame?.name ?? "게임"} ${requestServer?.name ?? ""} ${getCategoryLabel(
         buyRequest.category,
       )} 구매요청 즉시판매`.trim();
-    const feeBreakdown = calculateMarketplaceOrderFees(
-      buyRequest.totalAmount.toString(),
-    );
+    const saleQuantityText = formatFixedAmount(saleQuantity);
+    const requestAmountText = formatFixedAmount(requestAmount);
+    const nextRemainingQuantity = remainingQuantity - saleQuantity;
+    const nextLockAmount = lockedRequestAmount - requestAmount;
+    const nextBuyRequestStatus = nextRemainingQuantity <= 0n ? "ACCEPTED" : "ACTIVE";
+    const feeBreakdown = calculateMarketplaceOrderFees(requestAmountText);
+    const tradeCharacterName = normalizeTradeCharacterName(input.tradeCharacterName);
 
     const listing = await tx.listing.create({
       data: {
@@ -1329,15 +1379,17 @@ export async function sellToMarketplaceBuyRequest(input: {
         accountTransferType: buyRequest.accountTransferType,
         title: listingTitle,
         description: buyRequest.description,
+        tradeMode: "BULK",
+        priceUnitQuantity: buyRequest.priceUnitQuantity?.toString() ?? "1",
         unitPrice: buyRequest.unitPrice.toString(),
         currency: buyRequest.currency,
         status: "HIDDEN",
         inventory: {
           create: {
-            totalQuantity: buyRequest.quantity.toString(),
-            minimumQuantity: buyRequest.quantity.toString(),
+            totalQuantity: saleQuantityText,
+            minimumQuantity: saleQuantityText,
             availableQuantity: "0",
-            lockedQuantity: buyRequest.quantity.toString(),
+            lockedQuantity: saleQuantityText,
             soldQuantity: "0",
           },
         },
@@ -1351,12 +1403,13 @@ export async function sellToMarketplaceBuyRequest(input: {
         sellerId: seller.id,
         listingId: listing.id,
         status: "ESCROW_LOCKED",
-        quantity: buyRequest.quantity.toString(),
+        quantity: saleQuantityText,
         unitPrice: buyRequest.unitPrice.toString(),
         grossAmount: feeBreakdown.grossAmount,
         platformFeeAmount: feeBreakdown.platformFeeAmount,
         sellerReceivableAmount: feeBreakdown.sellerReceivableAmount,
         currency: buyRequest.currency,
+        tradeCharacterName,
       },
     });
 
@@ -1365,9 +1418,9 @@ export async function sellToMarketplaceBuyRequest(input: {
         buyRequestId: buyRequest.id,
         sellerId: seller.id,
         listingId: listing.id,
-        quantity: buyRequest.quantity.toString(),
+        quantity: saleQuantityText,
         unitPrice: buyRequest.unitPrice.toString(),
-        totalAmount: buyRequest.totalAmount.toString(),
+        totalAmount: requestAmountText,
         currency: buyRequest.currency,
         message: "판매자가 이 구매요청에서 즉시판매를 시작했습니다.",
         status: "ACCEPTED",
@@ -1379,10 +1432,14 @@ export async function sellToMarketplaceBuyRequest(input: {
         id: buyRequest.id,
         status: "ACTIVE",
         lockAmount: buyRequest.lockAmount,
+        remainingQuantity: {
+          gte: saleQuantityText,
+        },
       },
       data: {
-        status: "ACCEPTED",
-        lockAmount: "0",
+        status: nextBuyRequestStatus,
+        lockAmount: formatFixedAmount(nextLockAmount),
+        remainingQuantity: formatFixedAmount(nextRemainingQuantity),
       },
     });
 
@@ -1395,15 +1452,15 @@ export async function sellToMarketplaceBuyRequest(input: {
         id: buyRequest.buyer.wallet.id,
         currency: buyRequest.currency,
         buyRequestLocked: {
-          gte: buyRequest.totalAmount.toString(),
+          gte: requestAmountText,
         },
       },
       data: {
         buyRequestLocked: {
-          decrement: buyRequest.totalAmount.toString(),
+          decrement: requestAmountText,
         },
         escrowLockedBalance: {
-          increment: buyRequest.totalAmount.toString(),
+          increment: requestAmountText,
         },
       },
     });
@@ -1421,10 +1478,11 @@ export async function sellToMarketplaceBuyRequest(input: {
         metadata: {
           buyRequestId: buyRequest.id,
           listingId: listing.id,
-          quantity: buyRequest.quantity.toString(),
+          quantity: saleQuantityText,
           amount: feeBreakdown.grossAmount,
           platformFeeAmount: feeBreakdown.platformFeeAmount,
           sellerReceivableAmount: feeBreakdown.sellerReceivableAmount,
+          tradeCharacterName,
         },
       },
     });
@@ -1474,7 +1532,7 @@ export async function sellToMarketplaceBuyRequest(input: {
           type: "BUYER_ESCROW_LOCKED",
           direction: "DEBIT",
           bucket: "BUY_REQUEST_LOCKED",
-          amount: buyRequest.totalAmount.toString(),
+          amount: requestAmountText,
           currency: buyRequest.currency,
           referenceType: "ORDER",
           referenceId: order.id,
@@ -1486,7 +1544,7 @@ export async function sellToMarketplaceBuyRequest(input: {
           type: "BUYER_ESCROW_LOCKED",
           direction: "CREDIT",
           bucket: "ESCROW_LOCKED",
-          amount: buyRequest.totalAmount.toString(),
+          amount: requestAmountText,
           currency: buyRequest.currency,
           referenceType: "ORDER",
           referenceId: order.id,
@@ -1661,7 +1719,11 @@ function mapBuyRequestSummary({
     description: request.description,
     accountTransferType: request.accountTransferType,
     accountRank: request.accountRank,
+    tradeMode: request.tradeMode ?? "BULK",
+    priceUnitQuantity: request.priceUnitQuantity?.toString() ?? "1",
     quantity: request.quantity.toString(),
+    minimumQuantity: request.minimumQuantity?.toString() ?? request.quantity.toString(),
+    remainingQuantity: request.remainingQuantity?.toString() ?? request.quantity.toString(),
     unitPrice: request.unitPrice.toString(),
     totalAmount: request.totalAmount.toString(),
     lockAmount: request.lockAmount.toString(),

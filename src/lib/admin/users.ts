@@ -2,6 +2,7 @@ import { UserRole, UserStatus } from "@/generated/prisma/enums";
 import type { Prisma } from "@/generated/prisma/client";
 import type { LinkedAccountSignal } from "@/lib/admin/linked-account-risk";
 import { getLinkedAccountSignalsForUser } from "@/lib/admin/linked-account-risk";
+import { getGameMoneyPriceUnitLabel, getGameMoneyUnitName } from "@/lib/market/trade-unit";
 import { getPrismaClient } from "@/lib/prisma";
 
 export const ADMIN_USER_ROLE_OPTIONS = Object.values(UserRole);
@@ -119,6 +120,8 @@ export type AdminUserDetail = {
     status: string;
     unitPrice: string;
     currency: string;
+    tradeModeLabel: string | null;
+    minimumQuantityLabel: string | null;
     createdAt: string;
   }>;
   reportsReceived: Array<{
@@ -422,6 +425,10 @@ export async function getAdminUserDetail(
         take: 8,
       },
       listings: {
+        include: {
+          game: true,
+          inventory: true,
+        },
         orderBy: {
           createdAt: "desc",
         },
@@ -673,8 +680,21 @@ export async function getAdminUserDetail(
       listingId: listing.id,
       title: listing.title,
       status: listing.status,
-      unitPrice: listing.unitPrice.toString(),
+      unitPrice: formatAdminListingPrice(listing),
       currency: listing.currency,
+      tradeModeLabel:
+        listing.category === "GAME_MONEY"
+          ? listing.tradeMode === "BULK"
+            ? "일괄 판매"
+            : "분할 판매"
+          : null,
+      minimumQuantityLabel:
+        listing.category === "GAME_MONEY" && listing.inventory
+          ? `${listing.inventory.minimumQuantity.toString()} ${getGameMoneyUnitName(
+              listing.game.moneyUnitName,
+              listing.game.name,
+            )}`
+          : null,
       createdAt: formatKoreanDate(listing.createdAt),
     })),
     reportsReceived: user.reportsReceived.map((report) => ({
@@ -1043,6 +1063,46 @@ function buildAdminLedgerReferenceHref(
   }
 
   return `/admin/audit?query=${encodeURIComponent(referenceId)}`;
+}
+
+function formatAdminListingPrice(listing: {
+  category: string;
+  unitPrice: { toString(): string };
+  priceUnitQuantity: { toString(): string };
+  currency: string;
+  game: { name: string; moneyUnitName: string | null };
+}) {
+  if (listing.category !== "GAME_MONEY") {
+    return listing.unitPrice.toString();
+  }
+
+  const unitQuantity = Number(listing.priceUnitQuantity);
+  const basePrice = Number(listing.unitPrice);
+  const amount =
+    Number.isFinite(unitQuantity) && Number.isFinite(basePrice)
+      ? basePrice * unitQuantity
+      : basePrice;
+  const moneyUnitName = getGameMoneyUnitName(
+    listing.game.moneyUnitName,
+    listing.game.name,
+  );
+  const unitLabel = getGameMoneyPriceUnitLabel(
+    Number.isFinite(unitQuantity) ? String(Math.trunc(unitQuantity)) : listing.priceUnitQuantity.toString(),
+    moneyUnitName,
+  );
+
+  return `${formatDisplayNumber(amount)} ${listing.currency} / ${unitLabel}`;
+}
+
+function formatDisplayNumber(value: number) {
+  if (!Number.isFinite(value)) {
+    return "-";
+  }
+
+  return value.toLocaleString("ko-KR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 6,
+  });
 }
 
 function formatKoreanDate(date: Date) {

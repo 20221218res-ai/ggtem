@@ -23,6 +23,9 @@ export async function POST(request: NextRequest) {
       title?: string;
       description?: string;
       unitPrice?: string;
+      pricePerUnit?: string;
+      priceUnitQuantity?: string;
+      tradeMode?: "BULK" | "SPLIT";
       quantity?: string;
       minimumQuantity?: string;
       premiumDurationHours?: number;
@@ -51,6 +54,9 @@ export async function POST(request: NextRequest) {
       title: body.title,
       description: body.description,
       unitPrice: body.unitPrice,
+      pricePerUnit: body.pricePerUnit,
+      priceUnitQuantity: body.priceUnitQuantity,
+      tradeMode: body.tradeMode,
       quantity: body.quantity,
       minimumQuantity: body.minimumQuantity,
       premiumDurationHours: body.premiumDurationHours,

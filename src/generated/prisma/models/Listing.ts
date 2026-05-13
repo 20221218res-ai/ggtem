@@ -27,12 +27,14 @@ export type AggregateListing = {
 }
 
 export type ListingAvgAggregateOutputType = {
+  priceUnitQuantity: runtime.Decimal | null
   unitPrice: runtime.Decimal | null
   premiumDurationHours: number | null
   premiumFeeAmount: runtime.Decimal | null
 }
 
 export type ListingSumAggregateOutputType = {
+  priceUnitQuantity: runtime.Decimal | null
   unitPrice: runtime.Decimal | null
   premiumDurationHours: number | null
   premiumFeeAmount: runtime.Decimal | null
@@ -48,6 +50,8 @@ export type ListingMinAggregateOutputType = {
   accountTransferType: string | null
   title: string | null
   description: string | null
+  tradeMode: string | null
+  priceUnitQuantity: runtime.Decimal | null
   unitPrice: runtime.Decimal | null
   currency: string | null
   status: $Enums.ListingStatus | null
@@ -69,6 +73,8 @@ export type ListingMaxAggregateOutputType = {
   accountTransferType: string | null
   title: string | null
   description: string | null
+  tradeMode: string | null
+  priceUnitQuantity: runtime.Decimal | null
   unitPrice: runtime.Decimal | null
   currency: string | null
   status: $Enums.ListingStatus | null
@@ -90,6 +96,8 @@ export type ListingCountAggregateOutputType = {
   accountTransferType: number
   title: number
   description: number
+  tradeMode: number
+  priceUnitQuantity: number
   unitPrice: number
   currency: number
   status: number
@@ -104,12 +112,14 @@ export type ListingCountAggregateOutputType = {
 
 
 export type ListingAvgAggregateInputType = {
+  priceUnitQuantity?: true
   unitPrice?: true
   premiumDurationHours?: true
   premiumFeeAmount?: true
 }
 
 export type ListingSumAggregateInputType = {
+  priceUnitQuantity?: true
   unitPrice?: true
   premiumDurationHours?: true
   premiumFeeAmount?: true
@@ -125,6 +135,8 @@ export type ListingMinAggregateInputType = {
   accountTransferType?: true
   title?: true
   description?: true
+  tradeMode?: true
+  priceUnitQuantity?: true
   unitPrice?: true
   currency?: true
   status?: true
@@ -146,6 +158,8 @@ export type ListingMaxAggregateInputType = {
   accountTransferType?: true
   title?: true
   description?: true
+  tradeMode?: true
+  priceUnitQuantity?: true
   unitPrice?: true
   currency?: true
   status?: true
@@ -167,6 +181,8 @@ export type ListingCountAggregateInputType = {
   accountTransferType?: true
   title?: true
   description?: true
+  tradeMode?: true
+  priceUnitQuantity?: true
   unitPrice?: true
   currency?: true
   status?: true
@@ -275,6 +291,8 @@ export type ListingGroupByOutputType = {
   accountTransferType: string | null
   title: string
   description: string | null
+  tradeMode: string
+  priceUnitQuantity: runtime.Decimal
   unitPrice: runtime.Decimal
   currency: string
   status: $Enums.ListingStatus
@@ -319,6 +337,8 @@ export type ListingWhereInput = {
   accountTransferType?: Prisma.StringNullableFilter<"Listing"> | string | null
   title?: Prisma.StringFilter<"Listing"> | string
   description?: Prisma.StringNullableFilter<"Listing"> | string | null
+  tradeMode?: Prisma.StringFilter<"Listing"> | string
+  priceUnitQuantity?: Prisma.DecimalFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"Listing"> | string
   status?: Prisma.EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
@@ -347,6 +367,8 @@ export type ListingOrderByWithRelationInput = {
   accountTransferType?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  tradeMode?: Prisma.SortOrder
+  priceUnitQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -378,6 +400,8 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   accountTransferType?: Prisma.StringNullableFilter<"Listing"> | string | null
   title?: Prisma.StringFilter<"Listing"> | string
   description?: Prisma.StringNullableFilter<"Listing"> | string | null
+  tradeMode?: Prisma.StringFilter<"Listing"> | string
+  priceUnitQuantity?: Prisma.DecimalFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"Listing"> | string
   status?: Prisma.EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
@@ -406,6 +430,8 @@ export type ListingOrderByWithAggregationInput = {
   accountTransferType?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  tradeMode?: Prisma.SortOrder
+  priceUnitQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -435,6 +461,8 @@ export type ListingScalarWhereWithAggregatesInput = {
   accountTransferType?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
   title?: Prisma.StringWithAggregatesFilter<"Listing"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  tradeMode?: Prisma.StringWithAggregatesFilter<"Listing"> | string
+  priceUnitQuantity?: Prisma.DecimalWithAggregatesFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalWithAggregatesFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringWithAggregatesFilter<"Listing"> | string
   status?: Prisma.EnumListingStatusWithAggregatesFilter<"Listing"> | $Enums.ListingStatus
@@ -453,6 +481,8 @@ export type ListingCreateInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -481,6 +511,8 @@ export type ListingUncheckedCreateInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -503,6 +535,8 @@ export type ListingUpdateInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -531,6 +565,8 @@ export type ListingUncheckedUpdateInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -556,6 +592,8 @@ export type ListingCreateManyInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -574,6 +612,8 @@ export type ListingUpdateManyMutationInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -595,6 +635,8 @@ export type ListingUncheckedUpdateManyInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -626,6 +668,8 @@ export type ListingCountOrderByAggregateInput = {
   accountTransferType?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  tradeMode?: Prisma.SortOrder
+  priceUnitQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -638,6 +682,7 @@ export type ListingCountOrderByAggregateInput = {
 }
 
 export type ListingAvgOrderByAggregateInput = {
+  priceUnitQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   premiumDurationHours?: Prisma.SortOrder
   premiumFeeAmount?: Prisma.SortOrder
@@ -653,6 +698,8 @@ export type ListingMaxOrderByAggregateInput = {
   accountTransferType?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  tradeMode?: Prisma.SortOrder
+  priceUnitQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -674,6 +721,8 @@ export type ListingMinOrderByAggregateInput = {
   accountTransferType?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  tradeMode?: Prisma.SortOrder
+  priceUnitQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -686,6 +735,7 @@ export type ListingMinOrderByAggregateInput = {
 }
 
 export type ListingSumOrderByAggregateInput = {
+  priceUnitQuantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
   premiumDurationHours?: Prisma.SortOrder
   premiumFeeAmount?: Prisma.SortOrder
@@ -916,6 +966,8 @@ export type ListingCreateWithoutSellerInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -942,6 +994,8 @@ export type ListingUncheckedCreateWithoutSellerInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -996,6 +1050,8 @@ export type ListingScalarWhereInput = {
   accountTransferType?: Prisma.StringNullableFilter<"Listing"> | string | null
   title?: Prisma.StringFilter<"Listing"> | string
   description?: Prisma.StringNullableFilter<"Listing"> | string | null
+  tradeMode?: Prisma.StringFilter<"Listing"> | string
+  priceUnitQuantity?: Prisma.DecimalFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"Listing"> | string
   status?: Prisma.EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
@@ -1014,6 +1070,8 @@ export type ListingCreateWithoutGameInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1040,6 +1098,8 @@ export type ListingUncheckedCreateWithoutGameInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1088,6 +1148,8 @@ export type ListingCreateWithoutServerInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1114,6 +1176,8 @@ export type ListingUncheckedCreateWithoutServerInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1162,6 +1226,8 @@ export type ListingCreateWithoutImagesInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1189,6 +1255,8 @@ export type ListingUncheckedCreateWithoutImagesInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1226,6 +1294,8 @@ export type ListingUpdateWithoutImagesInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1253,6 +1323,8 @@ export type ListingUncheckedUpdateWithoutImagesInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1274,6 +1346,8 @@ export type ListingCreateWithoutInventoryInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1301,6 +1375,8 @@ export type ListingUncheckedCreateWithoutInventoryInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1338,6 +1414,8 @@ export type ListingUpdateWithoutInventoryInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1365,6 +1443,8 @@ export type ListingUncheckedUpdateWithoutInventoryInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1386,6 +1466,8 @@ export type ListingCreateWithoutBuyRequestOffersInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1413,6 +1495,8 @@ export type ListingUncheckedCreateWithoutBuyRequestOffersInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1450,6 +1534,8 @@ export type ListingUpdateWithoutBuyRequestOffersInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1477,6 +1563,8 @@ export type ListingUncheckedUpdateWithoutBuyRequestOffersInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1498,6 +1586,8 @@ export type ListingCreateWithoutOrdersInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1525,6 +1615,8 @@ export type ListingUncheckedCreateWithoutOrdersInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1562,6 +1654,8 @@ export type ListingUpdateWithoutOrdersInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1589,6 +1683,8 @@ export type ListingUncheckedUpdateWithoutOrdersInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1612,6 +1708,8 @@ export type ListingCreateManySellerInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1630,6 +1728,8 @@ export type ListingUpdateWithoutSellerInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1656,6 +1756,8 @@ export type ListingUncheckedUpdateWithoutSellerInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1680,6 +1782,8 @@ export type ListingUncheckedUpdateManyWithoutSellerInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1700,6 +1804,8 @@ export type ListingCreateManyGameInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1718,6 +1824,8 @@ export type ListingUpdateWithoutGameInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1744,6 +1852,8 @@ export type ListingUncheckedUpdateWithoutGameInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1768,6 +1878,8 @@ export type ListingUncheckedUpdateManyWithoutGameInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1788,6 +1900,8 @@ export type ListingCreateManyServerInput = {
   accountTransferType?: string | null
   title: string
   description?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.ListingStatus
@@ -1806,6 +1920,8 @@ export type ListingUpdateWithoutServerInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1832,6 +1948,8 @@ export type ListingUncheckedUpdateWithoutServerInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1856,6 +1974,8 @@ export type ListingUncheckedUpdateManyWithoutServerInput = {
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
@@ -1926,6 +2046,8 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   accountTransferType?: boolean
   title?: boolean
   description?: boolean
+  tradeMode?: boolean
+  priceUnitQuantity?: boolean
   unitPrice?: boolean
   currency?: boolean
   status?: boolean
@@ -1955,6 +2077,8 @@ export type ListingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   accountTransferType?: boolean
   title?: boolean
   description?: boolean
+  tradeMode?: boolean
+  priceUnitQuantity?: boolean
   unitPrice?: boolean
   currency?: boolean
   status?: boolean
@@ -1979,6 +2103,8 @@ export type ListingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   accountTransferType?: boolean
   title?: boolean
   description?: boolean
+  tradeMode?: boolean
+  priceUnitQuantity?: boolean
   unitPrice?: boolean
   currency?: boolean
   status?: boolean
@@ -2003,6 +2129,8 @@ export type ListingSelectScalar = {
   accountTransferType?: boolean
   title?: boolean
   description?: boolean
+  tradeMode?: boolean
+  priceUnitQuantity?: boolean
   unitPrice?: boolean
   currency?: boolean
   status?: boolean
@@ -2014,7 +2142,7 @@ export type ListingSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerId" | "gameId" | "serverId" | "serverDetail" | "category" | "accountTransferType" | "title" | "description" | "unitPrice" | "currency" | "status" | "premiumStartedAt" | "premiumEndsAt" | "premiumDurationHours" | "premiumFeeAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["listing"]>
+export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerId" | "gameId" | "serverId" | "serverDetail" | "category" | "accountTransferType" | "title" | "description" | "tradeMode" | "priceUnitQuantity" | "unitPrice" | "currency" | "status" | "premiumStartedAt" | "premiumEndsAt" | "premiumDurationHours" | "premiumFeeAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["listing"]>
 export type ListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   game?: boolean | Prisma.GameDefaultArgs<ExtArgs>
@@ -2057,6 +2185,8 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     accountTransferType: string | null
     title: string
     description: string | null
+    tradeMode: string
+    priceUnitQuantity: runtime.Decimal
     unitPrice: runtime.Decimal
     currency: string
     status: $Enums.ListingStatus
@@ -2505,6 +2635,8 @@ export interface ListingFieldRefs {
   readonly accountTransferType: Prisma.FieldRef<"Listing", 'String'>
   readonly title: Prisma.FieldRef<"Listing", 'String'>
   readonly description: Prisma.FieldRef<"Listing", 'String'>
+  readonly tradeMode: Prisma.FieldRef<"Listing", 'String'>
+  readonly priceUnitQuantity: Prisma.FieldRef<"Listing", 'Decimal'>
   readonly unitPrice: Prisma.FieldRef<"Listing", 'Decimal'>
   readonly currency: Prisma.FieldRef<"Listing", 'String'>
   readonly status: Prisma.FieldRef<"Listing", 'ListingStatus'>

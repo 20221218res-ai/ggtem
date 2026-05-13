@@ -13,6 +13,7 @@ import UserMarketHeader from "./user-market-header";
 import GameNameText from "./game-name-text";
 import OptimizedGameImage from "@/components/optimized-game-image";
 import type { GameCatalogOption } from "@/lib/market/game-localization";
+import { getGameMoneyPriceUnitLabel } from "@/lib/market/trade-unit";
 
 type MarketplaceHomeProps = MarketplaceListingsView;
 
@@ -259,36 +260,43 @@ function LiveTradeBoard({ listings }: { listings: MarketplaceListingSummary[] })
       </div>
 
       <div className="mt-5 grid gap-3">
-        {listings.map((listing, index) => (
-          <Link
-            key={listing.listingId}
-            href={`/listings/${listing.listingId}`}
-            prefetch={false}
-            className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)]"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-black">
-                <GameNameText name={listing.gameName} localizedNames={listing.gameLocalizedNames} />
+        {listings.map((listing, index) => {
+          const price = getListingDisplayPrice(listing);
+
+          return (
+            <Link
+              key={listing.listingId}
+              href={`/listings/${listing.listingId}`}
+              prefetch={false}
+              className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)]"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-black">
+                  <GameNameText name={listing.gameName} localizedNames={listing.gameLocalizedNames} />
+                </p>
+                <span className="text-xs text-[var(--gg-subtle)]">
+                  {index === 0 ? (
+                    <CountryText id="home.justNow" />
+                  ) : (
+                    <>
+                      {index * 6 + 3}
+                      <CountryText id="home.minutesAgoSuffix" />
+                    </>
+                  )}
+                </span>
+              </div>
+              <p className="mt-2 line-clamp-1 text-sm text-[var(--gg-muted)]">
+                <UserContentText text={listing.title} />
               </p>
-              <span className="text-xs text-[var(--gg-subtle)]">
-                {index === 0 ? (
-                  <CountryText id="home.justNow" />
-                ) : (
-                  <>
-                    {index * 6 + 3}
-                    <CountryText id="home.minutesAgoSuffix" />
-                  </>
-                )}
-              </span>
-            </div>
-            <p className="mt-2 line-clamp-1 text-sm text-[var(--gg-muted)]">
-              <UserContentText text={listing.title} />
-            </p>
-            <p className="mt-2 text-sm font-black text-[var(--gg-accent)]">
-              {listing.unitPrice} {listing.currency}
-            </p>
-          </Link>
-        ))}
+              <p className="mt-2 text-sm font-black text-[var(--gg-accent)]">
+                {price.amount} {listing.currency}
+                {price.unitLabel ? (
+                  <span className="text-xs font-bold text-[var(--gg-muted)]"> / {price.unitLabel}</span>
+                ) : null}
+              </p>
+            </Link>
+          );
+        })}
         {listings.length === 0 ? (
           <p className="rounded-xl border border-dashed border-[var(--gg-border)] p-5 text-sm text-[var(--gg-muted)]">
             <CountryText id="common.emptyListings" />
@@ -383,6 +391,8 @@ function FeaturedListings({
 }
 
 export function ListingCard({ listing }: { listing: MarketplaceListingSummary }) {
+  const price = getListingDisplayPrice(listing);
+
   return (
     <Link
       href={`/listings/${listing.listingId}`}
@@ -429,8 +439,13 @@ export function ListingCard({ listing }: { listing: MarketplaceListingSummary })
               <CountryText id="home.unitPrice" />
             </p>
             <p className="text-xl font-black text-[var(--gg-accent)]">
-              {listing.unitPrice} {listing.currency}
+              {price.amount} {listing.currency}
             </p>
+            {price.unitLabel ? (
+              <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">
+                {price.unitLabel} 기준
+              </p>
+            ) : null}
           </div>
           <p className="rounded-lg border border-[var(--gg-border)] px-3 py-2 text-xs font-bold text-[var(--gg-muted)]">
             <CountryText id="home.stock" /> {listing.availableQuantity}
@@ -451,6 +466,40 @@ function CategoryName({ category }: { category: string }) {
   }
 
   return <CountryText id="common.gameMoney" />;
+}
+
+function getListingDisplayPrice(listing: MarketplaceListingSummary) {
+  if (listing.category !== "GAME_MONEY") {
+    return {
+      amount: listing.unitPrice,
+      unitLabel: null,
+    };
+  }
+
+  const unitQuantity = Number(listing.priceUnitQuantity || "1");
+  const unitPrice = Number(listing.unitPrice || "0");
+
+  return {
+    amount: formatDisplayNumber(unitPrice * unitQuantity),
+    unitLabel: getGameMoneyPriceUnitLabel(
+      listing.priceUnitQuantity,
+      listing.moneyUnitName,
+    ),
+  };
+}
+
+function formatDisplayNumber(value: number) {
+  if (!Number.isFinite(value)) {
+    return "0";
+  }
+
+  if (Number.isInteger(value)) {
+    return value.toLocaleString("en-US");
+  }
+
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: 6,
+  });
 }
 
 function EmptyListingNotice() {

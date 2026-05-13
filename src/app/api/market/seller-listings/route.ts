@@ -24,6 +24,10 @@ export async function POST(request: NextRequest) {
       title?: string;
       description?: string;
       unitPrice?: string;
+      pricePerUnit?: string;
+      priceUnitQuantity?: string;
+      tradeMode?: "BULK" | "SPLIT";
+      minimumQuantity?: string;
       totalQuantity?: string;
       action?: "PAUSE" | "RESUME" | "HIDE";
     };
@@ -31,7 +35,7 @@ export async function POST(request: NextRequest) {
     if (body.mode === "STATUS") {
       if (!body.listingId || !body.action) {
         return NextResponse.json(
-          { message: "판매글 정보와 처리할 작업이 필요합니다." },
+          { message: "판매글 정보와 처리 작업이 필요합니다." },
           { status: 400 },
         );
       }
@@ -67,7 +71,7 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json(
         {
-          message: "판매글, 제목, 단가, 총 수량을 모두 입력해 주세요.",
+          message: "판매글, 제목, 금액, 총 수량을 모두 입력해 주세요.",
         },
         { status: 400 },
       );
@@ -78,6 +82,10 @@ export async function POST(request: NextRequest) {
       title: body.title,
       description: body.description,
       unitPrice: body.unitPrice,
+      pricePerUnit: body.pricePerUnit,
+      priceUnitQuantity: body.priceUnitQuantity,
+      tradeMode: body.tradeMode,
+      minimumQuantity: body.minimumQuantity,
       totalQuantity: body.totalQuantity,
     });
 

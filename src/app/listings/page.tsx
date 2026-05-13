@@ -1,7 +1,10 @@
 import Link from "next/link";
 import OptimizedGameImage from "@/components/optimized-game-image";
 import type { MarketplaceListingSummary } from "@/lib/market/listings";
-import { getMarketplaceListings } from "@/lib/market/listings";
+import {
+  getMarketplaceGameDirectory,
+  getMarketplaceListings,
+} from "@/lib/market/listings";
 import { MarketplaceHeader } from "../marketplace-home";
 import type { MarketplaceBuyRequestSummary } from "@/lib/market/buy-requests";
 import { getMarketplaceBuyRequests } from "@/lib/market/buy-requests";
@@ -12,7 +15,11 @@ import UserContentText, { SourceCountryFlag } from "../user-content-text";
 import type { TranslationKey } from "../i18n";
 import GameNameText from "../game-name-text";
 import type { GameCatalogOption, LocalizedGameNames } from "@/lib/market/game-localization";
-import { getTradeUnitLabel } from "@/lib/market/trade-unit";
+import {
+  getGameMoneyPriceUnitLabel,
+  getTradeUnitLabel,
+  normalizeGameMoneyPriceUnit,
+} from "@/lib/market/trade-unit";
 import {
   accountTransferTypeOptions,
   normalizeAccountTransferType,
@@ -89,8 +96,8 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
   const buyRequestCategoryFilter =
     selectedMode === "buy" && !hasCategoryFilter ? "" : selectedCategory;
 
-  const view =
-    selectedMode === "buy"
+  const view = shouldShowResults
+    ? selectedMode === "buy"
       ? await getMarketplaceBuyRequests({
           category: buyRequestCategoryFilter,
           game: selectedGame,
@@ -99,6 +106,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
           serverDetail: selectedServerDetail || undefined,
           sort: resolvedSearchParams?.sort,
           accountTransferType: selectedAccountType || undefined,
+          includeCategories: false,
         })
       : await getMarketplaceListings({
           category: selectedCategory,
@@ -108,25 +116,31 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
           serverDetail: selectedServerDetail || undefined,
           sort: resolvedSearchParams?.sort,
           accountTransferType: selectedAccountType || undefined,
-        });
-  const canonicalSelectedGame = view.appliedFilters.game || selectedGame;
+          includeCategories: false,
+          includeSellerReviewSummaries: false,
+        })
+    : null;
+  const directory = shouldShowResults
+    ? null
+    : await getMarketplaceGameDirectory({
+        category: selectedCategory,
+      });
+  const canonicalSelectedGame = view?.appliedFilters.game || selectedGame;
 
-  const viewItems = getMarketItems(view);
+  const viewItems = view ? getMarketItems(view) : [];
   const gameCards = shouldShowResults
     ? []
-    : buildGameCards(
+    : buildGameCardsFromDirectory(directory?.games ?? [], selectedMode, gameSearch);
+  const visibleItems = view
+    ? filterMarketItemsByServerAndPrice(
         viewItems,
-        view.filterOptions.gameOptions ?? [],
-        gameSearch,
-      );
-  const visibleItems = filterMarketItemsByServerAndPrice(
-    viewItems,
-    selectedServer,
-    selectedServerDetail,
-    minPrice,
-    maxPrice,
-    selectedAccountType,
-  );
+        selectedServer,
+        selectedServerDetail,
+        minPrice,
+        maxPrice,
+        selectedAccountType,
+      )
+    : [];
 
   return (
     <main className="min-h-screen bg-[var(--gg-page-bg)] text-[var(--gg-text)] transition-colors">
@@ -153,9 +167,9 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
                 selectedGame={canonicalSelectedGame}
                 selectedServer={selectedServer}
                 selectedServerDetail={selectedServerDetail}
-                serverOptions={view.filterOptions.serverOptions}
+                serverOptions={view?.filterOptions.serverOptions ?? []}
                 serverDetailOptions={getServerDetailOptionsForGameCode(
-                  view.filterOptions.gameOptions.find((game) => game.name === canonicalSelectedGame)?.code,
+                  view?.filterOptions.gameOptions.find((game) => game.name === canonicalSelectedGame)?.code,
                 )}
                 minPrice={minPrice}
                 maxPrice={maxPrice}
@@ -792,6 +806,59 @@ function ListingSection({
   );
 }
 
+function getDisplayUnitPrice({
+  category,
+  unitPrice,
+  priceUnitQuantity,
+  moneyUnitName,
+}: {
+  category: string;
+  unitPrice: string;
+  priceUnitQuantity: string;
+  moneyUnitName: string;
+}) {
+  if (category !== "GAME_MONEY") {
+    return {
+      price: unitPrice,
+      unitLabel: moneyUnitName,
+    };
+  }
+
+  const normalizedPriceUnitQuantity = normalizeGameMoneyPriceUnit(priceUnitQuantity);
+  const quantity = Number(normalizedPriceUnitQuantity);
+  const price = Number(unitPrice);
+  const displayPrice =
+    Number.isFinite(quantity) && quantity > 0 && Number.isFinite(price)
+      ? price * quantity
+      : price;
+
+  return {
+    price: formatDisplayNumber(displayPrice),
+    unitLabel: getGameMoneyPriceUnitLabel(normalizedPriceUnitQuantity, moneyUnitName),
+  };
+}
+
+function calculateDisplayTotalAmount(quantity: string, unitPrice: string) {
+  const nextQuantity = Number(quantity);
+  const nextUnitPrice = Number(unitPrice);
+
+  if (!Number.isFinite(nextQuantity) || !Number.isFinite(nextUnitPrice)) {
+    return "0";
+  }
+
+  return formatDisplayNumber(nextQuantity * nextUnitPrice);
+}
+
+function formatDisplayNumber(value: number) {
+  if (!Number.isFinite(value)) {
+    return "0";
+  }
+
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: 6,
+  });
+}
+
 function ListingRow({
   listing,
   tone = "regular",
@@ -804,6 +871,12 @@ function ListingRow({
     listing.moneyUnitName,
     listing.gameName,
   );
+  const priceDisplay = getDisplayUnitPrice({
+    category: listing.category,
+    unitPrice: listing.unitPrice,
+    priceUnitQuantity: listing.priceUnitQuantity,
+    moneyUnitName: listing.moneyUnitName,
+  });
   const rowClass = getListingRowClass(tone);
 
   return (
@@ -854,10 +927,10 @@ function ListingRow({
       <div className="flex flex-col justify-between gap-4 md:text-right">
         <div>
           <p className="text-sm font-bold text-[var(--gg-muted)]">
-            {moneyUnit} <CountryText id="listings.unitPricePerUnit" />
+            {priceDisplay.unitLabel} <CountryText id="listings.unitPricePerUnit" />
           </p>
           <p className="mt-1 text-2xl font-black text-[var(--gg-accent)]">
-            {listing.unitPrice} {listing.currency}
+            {priceDisplay.price} {listing.currency}
           </p>
         </div>
         <span className="inline-flex justify-center rounded-xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)]">
@@ -880,6 +953,14 @@ function BuyRequestRow({
     request.moneyUnitName,
     request.gameName,
   );
+  const priceDisplay = getDisplayUnitPrice({
+    category: request.category,
+    unitPrice: request.unitPrice,
+    priceUnitQuantity: request.priceUnitQuantity,
+    moneyUnitName: request.moneyUnitName,
+  });
+  const offerQuantity = request.remainingQuantity || request.quantity;
+  const offerTotalAmount = calculateDisplayTotalAmount(offerQuantity, request.unitPrice);
   const rowClass = getListingRowClass(tone);
 
   return (
@@ -911,8 +992,13 @@ function BuyRequestRow({
             <AccountTypeChip value={request.accountTransferType} />
           ) : null}
           <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
-            <CountryText id="listings.wanted" /> {request.quantity} {moneyUnit}
+            <CountryText id="listings.wanted" /> {request.remainingQuantity} / {request.quantity} {moneyUnit}
           </span>
+          {request.category === "GAME_MONEY" ? (
+            <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
+              {request.tradeMode === "BULK" ? "일괄구매" : "분할구매"} / 최소 {request.minimumQuantity} {moneyUnit}
+            </span>
+          ) : null}
           <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
             <CountryText id="listings.offerCountPrefix" /> {request.offerCount}
             <CountryText id="listings.offerCountSuffix" />
@@ -929,15 +1015,21 @@ function BuyRequestRow({
             {request.totalAmount} {request.currency}
           </p>
           <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">
-            <CountryText id="listings.unitPriceShort" /> {request.unitPrice} {request.currency}
+            <CountryText id="listings.unitPriceShort" /> {priceDisplay.price} {request.currency} / {priceDisplay.unitLabel}
           </p>
         </div>
         <BuyRequestOfferForm
           buyRequestId={request.buyRequestId}
-          defaultQuantity={request.quantity}
-          defaultUnitPrice={request.unitPrice}
-          totalAmount={request.totalAmount}
+          category={request.category}
+          defaultQuantity={offerQuantity}
+          minimumQuantity={request.minimumQuantity}
+          tradeMode={request.tradeMode}
+          defaultUnitPrice={priceDisplay.price}
+          canonicalUnitPrice={request.unitPrice}
+          priceUnitLabel={priceDisplay.unitLabel}
+          totalAmount={offerTotalAmount}
           currency={request.currency}
+          serverLabel={formatServerLabel(request.serverName, request.serverDetail) || "전체 서버"}
         />
       </div>
     </article>
@@ -1199,6 +1291,23 @@ function buildGameCards(
         buyCount: count.buyCount,
       };
     });
+}
+
+function buildGameCardsFromDirectory(
+  games: Array<GameCatalogOption & { sellCount: number; buyCount: number }>,
+  selectedMode: string,
+  gameSearch: string,
+) {
+  const normalizedSearch = gameSearch.toLowerCase();
+
+  return games
+    .filter((game) => !normalizedSearch || game.name.toLowerCase().includes(normalizedSearch))
+    .slice(0, 12)
+    .map((game) => ({
+      ...game,
+      sellCount: selectedMode === "buy" ? 0 : game.sellCount,
+      buyCount: selectedMode === "sell" ? 0 : game.buyCount,
+    }));
 }
 
 function buildListingFilterHref({

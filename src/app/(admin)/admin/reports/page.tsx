@@ -33,6 +33,9 @@ const RANGES = [
   ["custom", "직접 선택"],
 ] as const;
 
+const inputClassName =
+  "rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-950 outline-none focus:border-[var(--gg-accent)]";
+
 export default async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
   const currentUser = await requirePageRole(ROLE_GROUPS.PLATFORM_ADMINS, {
     signInPath: "/admin/sign-in",
@@ -75,6 +78,16 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
     totalRows,
     xlsxExportHref,
   });
+  const walletRequests = state.walletRequests as Array<{
+    kind: string;
+    rawStatus?: string;
+    status: string;
+    user: string;
+    amount: string;
+    provider: string;
+    reference: string;
+    requestedAt: string;
+  }>;
 
   return (
     <main className="bg-slate-100 px-6 py-8 text-slate-950">
@@ -83,6 +96,9 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
           <div>
             <p className="text-sm font-black text-[var(--gg-accent)]">REPORT CENTER</p>
             <h1 className="mt-2 text-3xl font-black tracking-tight">운영 데이터 조회</h1>
+            <p className="mt-2 text-sm font-bold text-slate-500">
+              거래, 입출금, 분쟁, 유저, 관리자 이력을 한 곳에서 조회하고 다운로드합니다.
+            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <TopLink href="/admin/game-settings" label="게임/서버 관리" />
@@ -180,10 +196,16 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
             </Field>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
-            <button type="submit" className="rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-slate-950 hover:brightness-105">
+            <button
+              type="submit"
+              className="rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-slate-950 hover:brightness-105"
+            >
               조회
             </button>
-            <Link href="/admin/reports" className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-700 hover:border-[var(--gg-accent)] hover:text-slate-950">
+            <Link
+              href="/admin/reports"
+              className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-700 hover:border-[var(--gg-accent)] hover:text-slate-950"
+            >
               초기화
             </Link>
           </div>
@@ -210,14 +232,14 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
               ))}
             </div>
           </div>
-          <div className="mt-5 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-            <ExportScopeCard label="일자 요약" value={`${state.dailySummary.length}행`} />
-            <ExportScopeCard label="거래" value={`${state.orders.length}행`} />
-            <ExportScopeCard label="분쟁/신고" value={`${state.disputes.length}행`} />
-            <ExportScopeCard label="입출금" value={`${state.walletRequests.length}행`} />
-            <ExportScopeCard label="매물" value={`${state.listings.length}행`} />
-            <ExportScopeCard label="유저" value={`${state.users.length}행`} />
-            <ExportScopeCard label="관리자 이력" value={`${state.adminActivity.length}행`} />
+          <div className="mt-5 grid gap-3 md:grid-cols-3 xl:grid-cols-7">
+            <ExportScopeCard label="일자 요약" value={`${state.dailySummary.length}개`} />
+            <ExportScopeCard label="거래" value={`${state.orders.length}개`} />
+            <ExportScopeCard label="분쟁/신고" value={`${state.disputes.length}개`} />
+            <ExportScopeCard label="입출금" value={`${state.walletRequests.length}개`} />
+            <ExportScopeCard label="매물" value={`${state.listings.length}개`} />
+            <ExportScopeCard label="유저" value={`${state.users.length}개`} />
+            <ExportScopeCard label="관리자 이력" value={`${state.adminActivity.length}개`} />
           </div>
         </section>
 
@@ -244,7 +266,7 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
             headers={["주문", "상태", "상품", "구매자/판매자", "게임/서버", "금액", "생성/완료"]}
             rows={state.orders.map((row) => [
               row.number,
-              statusOptionLabel(row.status),
+              statusOptionLabel(row.rawStatus ?? row.status),
               row.title,
               `${row.buyer} / ${row.seller}`,
               `${row.game} / ${row.server}`,
@@ -260,7 +282,7 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
             headers={["분류", "상태", "심각도", "신고자/대상", "주문", "접수/종료"]}
             rows={state.disputes.map((row) => [
               reportCategoryLabel(row.category),
-              statusOptionLabel(row.status),
+              statusOptionLabel(row.rawStatus ?? row.status),
               severityLabel(row.severity),
               `${row.reporter} / ${row.target}`,
               row.orderNumber,
@@ -273,9 +295,9 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
         <ReportSection title="입출금 데이터" show={state.filters.kind === "ALL" || state.filters.kind === "WALLET"}>
           <DataTable
             headers={["구분", "상태", "유저", "금액", "수단", "참조", "요청일"]}
-            rows={state.walletRequests.map((row) => [
+            rows={walletRequests.map((row) => [
               walletKindLabel(row.kind),
-              statusOptionLabel(row.status),
+              statusOptionLabel(row.rawStatus ?? row.status),
               row.user,
               row.amount,
               row.provider,
@@ -290,7 +312,7 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
           <DataTable
             headers={["상태", "판매자", "제목", "게임/서버", "유형", "가격", "재고", "등록일"]}
             rows={state.listings.map((row) => [
-              statusOptionLabel(row.status),
+              statusOptionLabel(row.rawStatus ?? row.status),
               row.seller,
               row.title,
               `${row.game} / ${row.server}`,
@@ -309,7 +331,7 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
             rows={state.users.map((row) => [
               row.name,
               row.email,
-              `${roleLabel(row.role)} / ${statusOptionLabel(row.status)}`,
+              `${roleLabel(row.role)} / ${statusOptionLabel(row.rawStatus ?? row.status)}`,
               row.balance,
               `${row.orders.toLocaleString("ko-KR")}건`,
               `${row.reports.toLocaleString("ko-KR")}건`,
@@ -328,7 +350,7 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
               row.action,
               `${row.targetType} / ${row.targetId}`,
               row.reason,
-              row.sensitivity,
+              sensitivityLabel(row.sensitivity),
               row.createdAt,
             ])}
             empty="현재 조건에 맞는 관리자 업무 이력이 없습니다."
@@ -338,9 +360,6 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
     </main>
   );
 }
-
-const inputClassName =
-  "rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-950 outline-none focus:border-[var(--gg-accent)]";
 
 function TopLink({ href, label }: { href: string; label: string }) {
   return (
@@ -371,7 +390,10 @@ function Metric({ label, value }: { label: string; value: string }) {
 function ExportButton({ href, label, disabled, primary = false }: { href: string; label: string; disabled: boolean; primary?: boolean }) {
   if (disabled) {
     return (
-      <span title="현재 리포트는 SUPER 관리자만 다운로드할 수 있습니다." className="cursor-not-allowed rounded-md border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-black text-slate-400">
+      <span
+        title="현재 리포트는 SUPER 관리자만 다운로드할 수 있습니다."
+        className="cursor-not-allowed rounded-md border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-black text-slate-400"
+      >
         {label}
       </span>
     );
@@ -403,7 +425,7 @@ function ReportWorkflow({ canDownloadCurrentView }: { canDownloadCurrentView: bo
   const steps = [
     {
       title: "범위 확인",
-      body: "기간, 상태, 게임/서버 필터를 먼저 좁힌 뒤 데이터를 조회합니다.",
+      body: "기간, 상태, 게임/서버 필터를 먼저 조합해서 필요한 운영 데이터를 조회합니다.",
       href: "/admin/reports",
     },
     {
@@ -415,7 +437,7 @@ function ReportWorkflow({ canDownloadCurrentView }: { canDownloadCurrentView: bo
     },
     {
       title: "감사 추적",
-      body: "다운로드 후에는 감사 로그에서 관리자, 사유, 파일 형식을 확인합니다.",
+      body: "다운로드 전후에는 감사 로그에서 관리자, 사유, 파일 형식을 확인합니다.",
       href: "/admin/audit?action=REPORT_EXPORT_XLSX",
     },
   ];
@@ -515,21 +537,21 @@ function getReportNextAction({
   if (totalRows === 0) {
     return {
       title: "현재 조건에는 데이터가 없습니다",
-      actionLabel: "30일 전체 보기",
+      actionLabel: "최근 30일 전체 보기",
       href: "/admin/reports?range=30d",
     };
   }
 
   if (range === "custom") {
     return {
-      title: `${reportKindLabel(kind)} 데이터 ${totalRows}행 미리보기`,
+      title: `${reportKindLabel(kind)} 데이터 ${totalRows}건 미리보기`,
       actionLabel: "XLSX 다운로드",
       href: xlsxExportHref,
     };
   }
 
   return {
-    title: `${rangeLabel(range)} 기준 ${totalRows}행 조회 중`,
+    title: `${rangeLabel(range)} 기준 ${totalRows}건 조회 중`,
     actionLabel: "감사 로그 확인",
     href: "/admin/audit?action=REPORT_EXPORT_XLSX",
   };
@@ -548,8 +570,20 @@ function statusOptionLabel(status: string) {
     UNDER_REVIEW: "검토 중",
     CONFIRMED: "확인됨",
     REJECTED: "반려",
-    SOLD_OUT: "품절",
+    SOLD_OUT: "판매 완료",
     SUSPENDED: "정지",
+    OPEN: "접수",
+    RESOLVED: "해결",
+    DISMISSED: "기각",
+    APPROVED: "승인",
+    SENT: "전송됨",
+    EXPIRED: "만료",
+    PAUSED: "일시중지",
+    HIDDEN: "숨김",
+    REMOVED: "삭제",
+    BANNED: "차단",
+    SELLING_RESTRICTED: "판매 제한",
+    WITHDRAWAL_HOLD: "출금 보류",
   };
 
   return labels[status] ?? status;
@@ -557,8 +591,10 @@ function statusOptionLabel(status: string) {
 
 function walletKindLabel(kind: string) {
   const labels: Record<string, string> = {
-    DEPOSIT: "입금",
+    DEPOSIT: "충전",
     WITHDRAWAL: "출금",
+    "異⑹쟾": "충전",
+    "異쒓툑": "출금",
   };
   return labels[kind] ?? kind;
 }
@@ -612,7 +648,7 @@ function reportCategoryLabel(category: string) {
 function severityLabel(severity: string) {
   const labels: Record<string, string> = {
     LOW: "낮음",
-    MEDIUM: "중간",
+    MEDIUM: "보통",
     HIGH: "높음",
     CRITICAL: "긴급",
   };
@@ -623,6 +659,7 @@ function severityLabel(severity: string) {
 function roleLabel(role: string) {
   const labels: Record<string, string> = {
     CUSTOMER: "일반",
+    USER: "일반",
     SELLER: "판매자",
     CS: "CS",
     MODERATOR: "모더레이터",
@@ -632,6 +669,17 @@ function roleLabel(role: string) {
   };
 
   return labels[role] ?? role;
+}
+
+function sensitivityLabel(value: string) {
+  const labels: Record<string, string> = {
+    "誘쇨컧": "민감",
+    "?쇰컲": "일반",
+    SENSITIVE: "민감",
+    NORMAL: "일반",
+  };
+
+  return labels[value] ?? value;
 }
 
 function cleanSheetNames(sheets: string[]) {

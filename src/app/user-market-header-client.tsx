@@ -27,6 +27,8 @@ type UserMarketHeaderClientProps = {
 type HeaderCounts = {
   unreadChatCount: number;
   unreadNotificationCount: number;
+  walletAvailableBalance: string;
+  walletCurrency: string;
 };
 
 export default function UserMarketHeaderClient({
@@ -36,11 +38,18 @@ export default function UserMarketHeaderClient({
   const [counts, setCounts] = useState<HeaderCounts>({
     unreadChatCount: 0,
     unreadNotificationCount: 0,
+    walletAvailableBalance: "0",
+    walletCurrency: "USDT",
   });
 
   useEffect(() => {
     if (!currentUser) {
-      setCounts({ unreadChatCount: 0, unreadNotificationCount: 0 });
+      setCounts({
+        unreadChatCount: 0,
+        unreadNotificationCount: 0,
+        walletAvailableBalance: "0",
+        walletCurrency: "USDT",
+      });
       return;
     }
 
@@ -62,6 +71,8 @@ export default function UserMarketHeaderClient({
           setCounts({
             unreadChatCount: data.unreadChatCount ?? 0,
             unreadNotificationCount: data.unreadNotificationCount ?? 0,
+            walletAvailableBalance: data.walletAvailableBalance ?? "0",
+            walletCurrency: data.walletCurrency ?? "USDT",
           });
         }
       } catch {
@@ -111,7 +122,7 @@ export default function UserMarketHeaderClient({
         <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
           {currentUser ? (
             <>
-              <QuickTextLink href="/my/wallet?action=deposit">{t("common.deposit")}</QuickTextLink>
+              <QuickTextLink href="/my/wallet?action=deposit" tone="primary">{t("common.deposit")}</QuickTextLink>
               <QuickTextLink href="/my/wallet?action=withdraw">{t("common.withdraw")}</QuickTextLink>
             </>
           ) : (
@@ -187,7 +198,11 @@ export default function UserMarketHeaderClient({
         <div className="flex shrink-0 items-center gap-2 sm:ml-auto">
           {currentUser ? (
             <>
-              <TextIconLink href="/my/wallet" label={t("common.wallet")} />
+              <TextIconLink
+                href="/my/wallet"
+                label={t("common.wallet")}
+                subLabel={`${formatHeaderBalance(counts.walletAvailableBalance)} ${counts.walletCurrency}`}
+              />
               <TextIconLink href="/my/chat" label={t("common.chat")} badge={counts.unreadChatCount} />
               <TextIconLink href="/my" label={t("common.my")} badge={counts.unreadNotificationCount} />
             </>
@@ -203,12 +218,25 @@ export default function UserMarketHeaderClient({
   );
 }
 
-function QuickTextLink({ href, children }: { href: string; children: ReactNode }) {
+function QuickTextLink({
+  href,
+  children,
+  tone = "default",
+}: {
+  href: string;
+  children: ReactNode;
+  tone?: "default" | "primary";
+}) {
+  const className =
+    tone === "primary"
+      ? "border-[var(--gg-accent)] bg-[var(--gg-accent)] text-[var(--gg-inverse-text)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_25%,transparent)] hover:bg-[var(--gg-accent-hover)]"
+      : "border-[var(--gg-border)] bg-white text-[var(--gg-text)] hover:border-[var(--gg-accent)] hover:bg-[color-mix(in_srgb,var(--gg-accent)_8%,white)] hover:text-[var(--gg-accent)]";
+
   return (
     <Link
       href={href}
       prefetch={false}
-      className="inline-flex h-9 items-center justify-center rounded-full border border-[var(--gg-border)] bg-white px-3 text-xs font-black text-[var(--gg-text)] hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)] sm:h-auto sm:rounded-none sm:border-0 sm:bg-transparent sm:px-0 sm:text-sm"
+      className={`inline-flex h-9 items-center justify-center rounded-full border px-3 text-xs font-black transition ${className}`}
     >
       {children}
     </Link>
@@ -243,11 +271,13 @@ function HeaderAction({
 function TextIconLink({
   href,
   label,
+  subLabel,
   badge,
   tone = "default",
 }: {
   href: string;
   label: string;
+  subLabel?: string;
   badge?: number;
   tone?: "default" | "primary";
 }) {
@@ -255,13 +285,18 @@ function TextIconLink({
     <Link
       href={href}
       prefetch={false}
-      className={`relative flex h-10 min-w-10 items-center justify-center rounded-full border px-3 text-xs font-black ${
+      className={`relative flex min-h-10 min-w-10 flex-col items-center justify-center rounded-full border px-3 py-1 text-xs font-black leading-none ${
         tone === "primary"
           ? "border-[var(--gg-accent)] bg-[var(--gg-accent)] text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
           : "border-[var(--gg-border)] text-[var(--gg-text)] hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)]"
       }`}
     >
-      {label}
+      <span>{label}</span>
+      {subLabel ? (
+        <span className="mt-1 whitespace-nowrap text-[10px] font-black text-[var(--gg-accent)]">
+          {subLabel}
+        </span>
+      ) : null}
       {badge ? (
         <span className="absolute -right-1 -top-1 rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-black text-white">
           {badge > 99 ? "99+" : badge}
@@ -269,4 +304,16 @@ function TextIconLink({
       ) : null}
     </Link>
   );
+}
+
+function formatHeaderBalance(value: string) {
+  const numericValue = Number(value);
+
+  if (!Number.isFinite(numericValue)) {
+    return "0";
+  }
+
+  return numericValue.toLocaleString("en-US", {
+    maximumFractionDigits: numericValue >= 100 ? 2 : 4,
+  });
 }

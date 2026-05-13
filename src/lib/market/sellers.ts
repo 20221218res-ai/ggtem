@@ -1,4 +1,5 @@
 import { getPrismaClient } from "@/lib/prisma";
+import { getGameMoneyUnitName } from "@/lib/market/trade-unit";
 
 export type MarketplaceSellerProfile = {
   sellerId: string;
@@ -29,6 +30,9 @@ export type MarketplaceSellerProfile = {
     gameName: string;
     category: string;
     unitPrice: string;
+    priceUnitQuantity: string;
+    tradeMode: string;
+    moneyUnitName: string;
     currency: string;
     availableQuantity: string;
     lockedQuantity: string;
@@ -65,6 +69,8 @@ export async function getMarketplaceSellerProfile(
           title: true,
           category: true,
           unitPrice: true,
+          priceUnitQuantity: true,
+          tradeMode: true,
           currency: true,
           createdAt: true,
           inventory: {
@@ -77,6 +83,7 @@ export async function getMarketplaceSellerProfile(
           game: {
             select: {
               name: true,
+              moneyUnitName: true,
             },
           },
         },
@@ -227,6 +234,12 @@ export async function getMarketplaceSellerProfile(
       gameName: listing.game.name,
       category: listing.category,
       unitPrice: listing.unitPrice.toString(),
+      priceUnitQuantity: listing.priceUnitQuantity?.toString() ?? "1",
+      tradeMode: listing.tradeMode ?? "SPLIT",
+      moneyUnitName: getGameMoneyUnitName(
+        listing.game.moneyUnitName,
+        listing.game.name,
+      ),
       currency: listing.currency,
       availableQuantity: listing.inventory?.availableQuantity.toString() ?? "0",
       lockedQuantity: listing.inventory?.lockedQuantity.toString() ?? "0",

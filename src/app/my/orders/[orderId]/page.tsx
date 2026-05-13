@@ -68,6 +68,7 @@ export default async function MyOrderDetailPage({ params }: MyOrderDetailPagePro
             <Metric label={<CountryText id="orderManage.gameServer" />} value={gameMeta || <CountryText id="orderManage.gameInfoMissing" />} />
             <Metric label={<CountryText id="orderManage.quantity" />} value={<QuantityValue order={order} />} />
             <Metric label={<CountryText id="orderManage.expectedSettlement" />} value={`${order.sellerReceivableAmount} ${order.currency}`} />
+            {order.tradeCharacterName ? <Metric label="거래 캐릭터명" value={order.tradeCharacterName} /> : null}
           </section>
 
           <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)]">

@@ -1,5 +1,6 @@
 import { getPrismaClient } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
+import { unstable_cache } from "next/cache";
 import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit";
 import { lockPurchaseQuantity } from "@/lib/inventory/purchase-lock";
 import { calculateMarketplacePurchaseAmount } from "@/lib/market/purchase-calculation";
@@ -41,6 +42,8 @@ export type MarketplaceListingSummary = {
   accountTransferType: string | null;
   categoryLabel: string;
   settlementLabel: string;
+  tradeMode: string;
+  priceUnitQuantity: string;
   minimumQuantity: string;
   availableQuantity: string;
   lockedQuantity: string;
@@ -106,6 +109,8 @@ export type MarketplaceListingFilters = {
   server?: string;
   serverDetail?: string;
   limit?: number;
+  includeCategories?: boolean;
+  includeSellerReviewSummaries?: boolean;
 };
 
 export type MarketplaceListingsView = {
@@ -127,6 +132,149 @@ export type MarketplaceListingsView = {
   };
 };
 
+export type MarketplaceGameDirectoryView = {
+  games: Array<
+    GameCatalogOption & {
+      sellCount: number;
+      buyCount: number;
+    }
+  >;
+};
+
+type ActiveGameCatalogRow = {
+  id: string;
+  name: string;
+  code: string;
+  imageUrl: string | null;
+  moneyUnitName: string | null;
+  nameKo: string | null;
+  nameCn: string | null;
+  nameVn: string | null;
+  namePh: string | null;
+  nameTh: string | null;
+  servers: Array<{
+    id: string;
+    name: string;
+  }>;
+};
+
+const getCachedActiveGameCatalog = unstable_cache(
+  async (): Promise<ActiveGameCatalogRow[]> => {
+    const prisma = getPrismaClient();
+
+    return prisma.game.findMany({
+      where: {
+        isActive: true,
+        servers: {
+          some: {
+            isActive: true,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        imageUrl: true,
+        moneyUnitName: true,
+        nameKo: true,
+        nameCn: true,
+        nameVn: true,
+        namePh: true,
+        nameTh: true,
+        servers: {
+          where: {
+            isActive: true,
+          },
+          select: {
+            id: true,
+            name: true,
+          },
+          orderBy: {
+            code: "asc",
+          },
+        },
+      },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    });
+  },
+  ["active-game-catalog-v1"],
+  {
+    revalidate: 60,
+    tags: ["active-game-catalog"],
+  },
+);
+
+export async function getActiveGameCatalog() {
+  return getCachedActiveGameCatalog();
+}
+
+export async function getMarketplaceGameDirectory(filters?: {
+  category?: string;
+}): Promise<MarketplaceGameDirectoryView> {
+  const prisma = getPrismaClient();
+  const normalizedCategory = filters?.category?.trim() ?? "";
+  const games = await getActiveGameCatalog();
+  const activeGameIds = games.map((game) => game.id);
+
+  if (activeGameIds.length === 0) {
+    return { games: [] };
+  }
+
+  const categoryWhere = normalizedCategory
+    ? { category: normalizedCategory as never }
+    : {};
+  const [listingCounts, buyRequestCounts] = await Promise.all([
+    prisma.listing.groupBy({
+      by: ["gameId"],
+      where: {
+        status: "ACTIVE",
+        gameId: {
+          in: activeGameIds,
+        },
+        inventory: {
+          is: {
+            availableQuantity: {
+              gt: 0,
+            },
+          },
+        },
+        ...categoryWhere,
+      },
+      _count: {
+        _all: true,
+      },
+    }),
+    prisma.buyRequest.groupBy({
+      by: ["gameId"],
+      where: {
+        status: "ACTIVE",
+        gameId: {
+          in: activeGameIds,
+        },
+        ...categoryWhere,
+      },
+      _count: {
+        _all: true,
+      },
+    }),
+  ]);
+  const sellCountByGameId = new Map(
+    listingCounts.map((count) => [count.gameId, count._count._all]),
+  );
+  const buyCountByGameId = new Map(
+    buyRequestCounts.map((count) => [count.gameId, count._count._all]),
+  );
+
+  return {
+    games: games.map((game) => ({
+      ...mapGameOption(game),
+      sellCount: sellCountByGameId.get(game.id) ?? 0,
+      buyCount: buyCountByGameId.get(game.id) ?? 0,
+    })),
+  };
+}
+
 export async function getMarketplaceListings(
   filters?: MarketplaceListingFilters,
 ): Promise<MarketplaceListingsView> {
@@ -141,6 +289,9 @@ export async function getMarketplaceListings(
   const normalizedSort = filters?.sort?.trim() || "latest";
   const normalizedServer = filters?.server?.trim() ?? "";
   const take = clampListingLimit(filters?.limit ?? 100);
+  const includeCategories = filters?.includeCategories !== false;
+  const includeSellerReviewSummaries =
+    filters?.includeSellerReviewSummaries !== false;
   const where: Prisma.ListingWhereInput = {
     status: "ACTIVE",
     game: {
@@ -224,6 +375,8 @@ export async function getMarketplaceListings(
         category: true,
         accountTransferType: true,
         serverDetail: true,
+        tradeMode: true,
+        priceUnitQuantity: true,
         unitPrice: true,
         currency: true,
         premiumEndsAt: true,
@@ -274,62 +427,33 @@ export async function getMarketplaceListings(
       orderBy: getListingOrderBy(normalizedSort),
       take,
     }),
-    prisma.listing.findMany({
-      where: {
-        status: "ACTIVE",
-        game: {
-          isActive: true,
-        },
-        server: {
-          is: {
-            isActive: true,
-          },
-        },
-        inventory: {
-          is: {
-            availableQuantity: {
-              gt: 0,
+    includeCategories
+      ? prisma.listing.findMany({
+          where: {
+            status: "ACTIVE",
+            game: {
+              isActive: true,
+            },
+            server: {
+              is: {
+                isActive: true,
+              },
+            },
+            inventory: {
+              is: {
+                availableQuantity: {
+                  gt: 0,
+                },
+              },
             },
           },
-        },
-      },
-      select: {
-        category: true,
-      },
-      distinct: ["category"],
-    }),
-    prisma.game.findMany({
-      where: {
-        isActive: true,
-        servers: {
-          some: {
-            isActive: true,
-          },
-        },
-      },
-      select: {
-        name: true,
-        code: true,
-        imageUrl: true,
-        nameKo: true,
-        nameCn: true,
-        nameVn: true,
-        namePh: true,
-        nameTh: true,
-        servers: {
-          where: {
-            isActive: true,
-          },
           select: {
-            name: true,
+            category: true,
           },
-          orderBy: {
-            code: "asc",
-          },
-        },
-      },
-      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-    }),
+          distinct: ["category"],
+        })
+      : Promise.resolve([]),
+    getActiveGameCatalog(),
   ]);
 
   const sortedListings = [...listings].sort((left, right) => {
@@ -349,10 +473,12 @@ export async function getMarketplaceListings(
 
     return right.createdAt.getTime() - left.createdAt.getTime();
   });
-  const sellerReviewSummaries = await getSellerReviewSummaries(
-    prisma,
-    sortedListings.map((listing) => listing.sellerId),
-  );
+  const sellerReviewSummaries = includeSellerReviewSummaries
+    ? await getSellerReviewSummaries(
+        prisma,
+        sortedListings.map((listing) => listing.sellerId),
+      )
+    : new Map<string, SellerReviewSummary>();
 
   return {
     listings: sortedListings.map((listing) => ({
@@ -376,6 +502,8 @@ export async function getMarketplaceListings(
       accountTransferType: listing.accountTransferType ?? null,
       categoryLabel: getCategoryLabel(listing.category),
       settlementLabel: getSettlementLabel(listing.category),
+      tradeMode: listing.tradeMode ?? "SPLIT",
+      priceUnitQuantity: listing.priceUnitQuantity?.toString() ?? "1",
       minimumQuantity: listing.inventory?.minimumQuantity?.toString() ?? "1",
       availableQuantity: listing.inventory?.availableQuantity?.toString() ?? "0",
       lockedQuantity: listing.inventory?.lockedQuantity?.toString() ?? "0",
@@ -449,16 +577,29 @@ function mapGameOptions(
     }
 
     seen.add(game.name);
-    options.push({
-      name: game.name,
-      code: game.code,
-      imageUrl: game.imageUrl,
-      region: getGameRegion(game.name),
-      localizedNames: mapGameLocalizedNames(game),
-    });
+    options.push(mapGameOption(game));
   }
 
   return options;
+}
+
+function mapGameOption(game: {
+  name: string;
+  code: string;
+  imageUrl: string | null;
+  nameKo?: string | null;
+  nameCn?: string | null;
+  nameVn?: string | null;
+  namePh?: string | null;
+  nameTh?: string | null;
+}): GameCatalogOption {
+  return {
+    name: game.name,
+    code: game.code,
+    imageUrl: game.imageUrl,
+    region: getGameRegion(game.name),
+    localizedNames: mapGameLocalizedNames(game),
+  };
 }
 
 function getServerOptionsForGame(
@@ -511,6 +652,8 @@ export async function getMarketplaceListingDetail(
       category: true,
       accountTransferType: true,
       serverDetail: true,
+      tradeMode: true,
+      priceUnitQuantity: true,
       unitPrice: true,
       currency: true,
       premiumEndsAt: true,
@@ -605,6 +748,8 @@ export async function getMarketplaceListingDetail(
       category: true,
       accountTransferType: true,
       serverDetail: true,
+      tradeMode: true,
+      priceUnitQuantity: true,
       unitPrice: true,
       currency: true,
       premiumEndsAt: true,
@@ -715,6 +860,8 @@ export async function getMarketplaceListingDetail(
     accountTransferType: listing.accountTransferType ?? null,
     categoryLabel: getCategoryLabel(listing.category),
     settlementLabel: getSettlementLabel(listing.category),
+    tradeMode: listing.tradeMode ?? "SPLIT",
+    priceUnitQuantity: listing.priceUnitQuantity?.toString() ?? "1",
     totalQuantity: listing.inventory.totalQuantity.toString(),
     minimumQuantity: listing.inventory.minimumQuantity?.toString() ?? "1",
     availableQuantity: listing.inventory.availableQuantity.toString(),
@@ -766,6 +913,8 @@ export async function getMarketplaceListingDetail(
       accountTransferType: item.accountTransferType ?? null,
       categoryLabel: getCategoryLabel(item.category),
       settlementLabel: getSettlementLabel(item.category),
+      tradeMode: item.tradeMode ?? "SPLIT",
+      priceUnitQuantity: item.priceUnitQuantity?.toString() ?? "1",
       minimumQuantity: item.inventory?.minimumQuantity?.toString() ?? "1",
       availableQuantity: item.inventory?.availableQuantity?.toString() ?? "0",
       lockedQuantity: item.inventory?.lockedQuantity?.toString() ?? "0",
@@ -785,6 +934,7 @@ export async function purchaseMarketplaceListing(input: {
   listingId: string;
   quantity: string;
   amount?: string;
+  tradeCharacterName?: string;
 }): Promise<MarketplacePurchaseResult> {
   const prisma = getPrismaClient();
   const buyerEmail = await getCurrentUserEmailForRole({
@@ -881,6 +1031,7 @@ export async function purchaseMarketplaceListing(input: {
     }
 
     const feeBreakdown = calculateMarketplaceOrderFees(expectedAmount);
+    const tradeCharacterName = normalizeTradeCharacterName(input.tradeCharacterName);
 
     const inventoryResult = lockPurchaseQuantity(
       {
@@ -963,6 +1114,7 @@ export async function purchaseMarketplaceListing(input: {
         platformFeeAmount: feeBreakdown.platformFeeAmount,
         sellerReceivableAmount: feeBreakdown.sellerReceivableAmount,
         currency: listing.currency,
+        tradeCharacterName,
       },
     });
 
@@ -977,6 +1129,7 @@ export async function purchaseMarketplaceListing(input: {
           amount: feeBreakdown.grossAmount,
           platformFeeAmount: feeBreakdown.platformFeeAmount,
           sellerReceivableAmount: feeBreakdown.sellerReceivableAmount,
+          tradeCharacterName,
         },
       },
     });
@@ -1090,6 +1243,11 @@ function buildMarketplaceOrderNumber() {
     .slice(2, 2 + ORDER_NUMBER_RANDOM_LENGTH)
     .toUpperCase();
   return `ORD-${Date.now()}-${suffix}`;
+}
+
+function normalizeTradeCharacterName(value?: string) {
+  const nextValue = value?.trim();
+  return nextValue ? nextValue.slice(0, 80) : null;
 }
 
 function formatKoreanDate(date: Date) {
