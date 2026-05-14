@@ -247,6 +247,7 @@ export default async function ListingDetailPage({
               tradeMode={listing.tradeMode}
               unitPrice={listing.unitPrice}
               displayUnitPrice={priceDisplay.price}
+              priceUnitQuantity={listing.priceUnitQuantity}
               priceUnitLabel={priceDisplay.unitLabel}
               currency={listing.currency}
               availableQuantity={listing.availableQuantity}

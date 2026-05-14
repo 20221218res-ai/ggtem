@@ -69,6 +69,7 @@ export default function WalletActions({
   const [isWithdrawalConfirmOpen, setIsWithdrawalConfirmOpen] = useState(false);
   const [isWithdrawalFinalConfirmOpen, setIsWithdrawalFinalConfirmOpen] = useState(false);
   const [withdrawalConfirmError, setWithdrawalConfirmError] = useState("");
+  const [withdrawPaymentPin, setWithdrawPaymentPin] = useState("");
 
   useEffect(() => {
     if (!depositOptionId && depositOptions[0]) {
@@ -116,6 +117,7 @@ export default function WalletActions({
     destination?: string;
     provider?: string;
     chain?: string;
+    paymentPin?: string;
   }) {
     setError("");
     setSuccess("");
@@ -248,17 +250,25 @@ export default function WalletActions({
     setIsWithdrawalConfirmOpen(false);
     setIsWithdrawalFinalConfirmOpen(true);
     setWithdrawalConfirmError("");
+    setWithdrawPaymentPin("");
   }
 
   function confirmWithdrawalSubmit() {
     const amount = withdrawAmount.trim();
     const destination = withdrawDestination.trim();
+    const paymentPin = withdrawPaymentPin.trim();
+
+    if (!/^\d{4,6}$/.test(paymentPin)) {
+      setWithdrawalConfirmError("결제 PIN은 숫자 4~6자리로 입력해 주세요.");
+      return;
+    }
 
     void submitRequest({
       kind: "WITHDRAWAL",
       amount,
       destination,
       chain: withdrawChain,
+      paymentPin,
       memo: `${withdrawChain} withdrawal request`,
     });
   }
@@ -445,7 +455,13 @@ export default function WalletActions({
           currency={currency}
           chain={withdrawChain}
           destination={withdrawDestination.trim()}
+          paymentPin={withdrawPaymentPin}
+          error={withdrawalConfirmError}
           disabled={isSubmitting}
+          onPaymentPinChange={(value) => {
+            setWithdrawPaymentPin(value.replace(/\D/g, "").slice(0, 6));
+            setWithdrawalConfirmError("");
+          }}
           onBack={() => {
             setIsWithdrawalFinalConfirmOpen(false);
             setIsWithdrawalConfirmOpen(true);
@@ -1222,7 +1238,10 @@ function WithdrawalFinalConfirmModal({
   currency,
   chain,
   destination,
+  paymentPin,
+  error,
   disabled,
+  onPaymentPinChange,
   onBack,
   onCancel,
   onConfirm,
@@ -1233,7 +1252,10 @@ function WithdrawalFinalConfirmModal({
   currency: string;
   chain: string;
   destination: string;
+  paymentPin: string;
+  error: string;
   disabled: boolean;
+  onPaymentPinChange: (value: string) => void;
   onBack: () => void;
   onCancel: () => void;
   onConfirm: () => void;
@@ -1310,6 +1332,26 @@ function WithdrawalFinalConfirmModal({
             <br />
             {selectedChain.id} <CountryText id="wallet.confirmSelectedChain" />
           </div>
+
+          <label className="grid gap-2 text-sm font-black text-[var(--gg-text)]">
+            결제 PIN
+            <input
+              type="password"
+              inputMode="numeric"
+              maxLength={6}
+              value={paymentPin}
+              onChange={(event) => onPaymentPinChange(event.target.value)}
+              autoComplete="one-time-code"
+              placeholder="4~6자리 결제 PIN"
+              className="h-12 rounded-xl border border-[var(--gg-border)] bg-white px-4 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+            />
+          </label>
+
+          {error ? (
+            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+              {error}
+            </p>
+          ) : null}
 
           <div className="grid grid-cols-3 gap-3">
             <button

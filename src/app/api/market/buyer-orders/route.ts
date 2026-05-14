@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/guards";
-import { verifyCurrentUserPassword } from "@/lib/auth/session";
+import { verifyCurrentUserPaymentPin } from "@/lib/auth/payment-pin";
 import { updateMarketplaceBuyerOrderStatus } from "@/lib/market/my-orders";
 
 type BuyerOrderActionBody = {
@@ -8,6 +8,7 @@ type BuyerOrderActionBody = {
   action?: "CANCEL_ORDER" | "CONFIRM_DELIVERY" | "REPORT_PROBLEM";
   reason?: string;
   password?: string;
+  paymentPin?: string;
 };
 
 export async function POST(request: NextRequest) {
@@ -27,22 +28,15 @@ export async function POST(request: NextRequest) {
     }
 
     if (body.action === "CONFIRM_DELIVERY") {
-      if (!body.password) {
-        return NextResponse.json(
-          { message: "결제 비밀번호를 입력해 주세요." },
-          { status: 400 },
-        );
-      }
-
-      const passwordOk = await verifyCurrentUserPassword({
+      const pinCheck = await verifyCurrentUserPaymentPin({
         userId: auth.user.userId,
-        password: body.password,
+        paymentPin: body.paymentPin ?? body.password,
       });
 
-      if (!passwordOk) {
+      if (!pinCheck.ok) {
         return NextResponse.json(
-          { message: "결제 비밀번호가 일치하지 않습니다." },
-          { status: 403 },
+          { code: pinCheck.code, message: pinCheck.message },
+          { status: pinCheck.status },
         );
       }
     }

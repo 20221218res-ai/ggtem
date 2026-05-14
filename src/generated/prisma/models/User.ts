@@ -29,6 +29,10 @@ export type UserMinAggregateOutputType = {
   email: string | null
   displayName: string | null
   passwordHash: string | null
+  paymentPinHash: string | null
+  paymentPinSetAt: Date | null
+  paymentPinUpdatedAt: Date | null
+  paymentPinResetAt: Date | null
   emailVerifiedAt: Date | null
   role: $Enums.UserRole | null
   status: $Enums.UserStatus | null
@@ -41,6 +45,10 @@ export type UserMaxAggregateOutputType = {
   email: string | null
   displayName: string | null
   passwordHash: string | null
+  paymentPinHash: string | null
+  paymentPinSetAt: Date | null
+  paymentPinUpdatedAt: Date | null
+  paymentPinResetAt: Date | null
   emailVerifiedAt: Date | null
   role: $Enums.UserRole | null
   status: $Enums.UserStatus | null
@@ -53,6 +61,10 @@ export type UserCountAggregateOutputType = {
   email: number
   displayName: number
   passwordHash: number
+  paymentPinHash: number
+  paymentPinSetAt: number
+  paymentPinUpdatedAt: number
+  paymentPinResetAt: number
   emailVerifiedAt: number
   role: number
   status: number
@@ -67,6 +79,10 @@ export type UserMinAggregateInputType = {
   email?: true
   displayName?: true
   passwordHash?: true
+  paymentPinHash?: true
+  paymentPinSetAt?: true
+  paymentPinUpdatedAt?: true
+  paymentPinResetAt?: true
   emailVerifiedAt?: true
   role?: true
   status?: true
@@ -79,6 +95,10 @@ export type UserMaxAggregateInputType = {
   email?: true
   displayName?: true
   passwordHash?: true
+  paymentPinHash?: true
+  paymentPinSetAt?: true
+  paymentPinUpdatedAt?: true
+  paymentPinResetAt?: true
   emailVerifiedAt?: true
   role?: true
   status?: true
@@ -91,6 +111,10 @@ export type UserCountAggregateInputType = {
   email?: true
   displayName?: true
   passwordHash?: true
+  paymentPinHash?: true
+  paymentPinSetAt?: true
+  paymentPinUpdatedAt?: true
+  paymentPinResetAt?: true
   emailVerifiedAt?: true
   role?: true
   status?: true
@@ -176,6 +200,10 @@ export type UserGroupByOutputType = {
   email: string
   displayName: string
   passwordHash: string | null
+  paymentPinHash: string | null
+  paymentPinSetAt: Date | null
+  paymentPinUpdatedAt: Date | null
+  paymentPinResetAt: Date | null
   emailVerifiedAt: Date | null
   role: $Enums.UserRole
   status: $Enums.UserStatus
@@ -209,6 +237,10 @@ export type UserWhereInput = {
   email?: Prisma.StringFilter<"User"> | string
   displayName?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
+  paymentPinHash?: Prisma.StringNullableFilter<"User"> | string | null
+  paymentPinSetAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  paymentPinUpdatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  paymentPinResetAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
@@ -249,6 +281,10 @@ export type UserOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPinHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPinSetAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPinUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPinResetAt?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -292,6 +328,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   displayName?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
+  paymentPinHash?: Prisma.StringNullableFilter<"User"> | string | null
+  paymentPinSetAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  paymentPinUpdatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  paymentPinResetAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
@@ -332,6 +372,10 @@ export type UserOrderByWithAggregationInput = {
   email?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPinHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPinSetAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPinUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPinResetAt?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -350,6 +394,10 @@ export type UserScalarWhereWithAggregatesInput = {
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   displayName?: Prisma.StringWithAggregatesFilter<"User"> | string
   passwordHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  paymentPinHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  paymentPinSetAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  paymentPinUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  paymentPinResetAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
@@ -362,6 +410,10 @@ export type UserCreateInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -402,6 +454,10 @@ export type UserUncheckedCreateInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -442,6 +498,10 @@ export type UserUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -482,6 +542,10 @@ export type UserUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -522,6 +586,10 @@ export type UserCreateManyInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -534,6 +602,10 @@ export type UserUpdateManyMutationInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -546,6 +618,10 @@ export type UserUncheckedUpdateManyInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -558,6 +634,10 @@ export type UserCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  paymentPinHash?: Prisma.SortOrder
+  paymentPinSetAt?: Prisma.SortOrder
+  paymentPinUpdatedAt?: Prisma.SortOrder
+  paymentPinResetAt?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -570,6 +650,10 @@ export type UserMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  paymentPinHash?: Prisma.SortOrder
+  paymentPinSetAt?: Prisma.SortOrder
+  paymentPinUpdatedAt?: Prisma.SortOrder
+  paymentPinResetAt?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -582,6 +666,10 @@ export type UserMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  paymentPinHash?: Prisma.SortOrder
+  paymentPinSetAt?: Prisma.SortOrder
+  paymentPinUpdatedAt?: Prisma.SortOrder
+  paymentPinResetAt?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -1026,6 +1114,10 @@ export type UserCreateWithoutSessionsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1065,6 +1157,10 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1120,6 +1216,10 @@ export type UserUpdateWithoutSessionsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -1159,6 +1259,10 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -1198,6 +1302,10 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1237,6 +1345,10 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1292,6 +1404,10 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -1331,6 +1447,10 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -1370,6 +1490,10 @@ export type UserCreateWithoutEmailVerificationTokensInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1409,6 +1533,10 @@ export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1464,6 +1592,10 @@ export type UserUpdateWithoutEmailVerificationTokensInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -1503,6 +1635,10 @@ export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -1542,6 +1678,10 @@ export type UserCreateWithoutEmailVerificationLoginTokensInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1581,6 +1721,10 @@ export type UserUncheckedCreateWithoutEmailVerificationLoginTokensInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1636,6 +1780,10 @@ export type UserUpdateWithoutEmailVerificationLoginTokensInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -1675,6 +1823,10 @@ export type UserUncheckedUpdateWithoutEmailVerificationLoginTokensInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -1714,6 +1866,10 @@ export type UserCreateWithoutAdminInviteTokensInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1753,6 +1909,10 @@ export type UserUncheckedCreateWithoutAdminInviteTokensInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1797,6 +1957,10 @@ export type UserCreateWithoutAdminInvitesCreatedInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1836,6 +2000,10 @@ export type UserUncheckedCreateWithoutAdminInvitesCreatedInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -1891,6 +2059,10 @@ export type UserUpdateWithoutAdminInviteTokensInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -1930,6 +2102,10 @@ export type UserUncheckedUpdateWithoutAdminInviteTokensInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -1980,6 +2156,10 @@ export type UserUpdateWithoutAdminInvitesCreatedInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -2019,6 +2199,10 @@ export type UserUncheckedUpdateWithoutAdminInvitesCreatedInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -2058,6 +2242,10 @@ export type UserCreateWithoutWalletInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2097,6 +2285,10 @@ export type UserUncheckedCreateWithoutWalletInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2152,6 +2344,10 @@ export type UserUpdateWithoutWalletInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -2191,6 +2387,10 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -2230,6 +2430,10 @@ export type UserCreateWithoutListingsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2269,6 +2473,10 @@ export type UserUncheckedCreateWithoutListingsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2324,6 +2532,10 @@ export type UserUpdateWithoutListingsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -2363,6 +2575,10 @@ export type UserUncheckedUpdateWithoutListingsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -2402,6 +2618,10 @@ export type UserCreateWithoutBuyRequestsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2441,6 +2661,10 @@ export type UserUncheckedCreateWithoutBuyRequestsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2496,6 +2720,10 @@ export type UserUpdateWithoutBuyRequestsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -2535,6 +2763,10 @@ export type UserUncheckedUpdateWithoutBuyRequestsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -2574,6 +2806,10 @@ export type UserCreateWithoutBuyRequestOffersInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2613,6 +2849,10 @@ export type UserUncheckedCreateWithoutBuyRequestOffersInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2668,6 +2908,10 @@ export type UserUpdateWithoutBuyRequestOffersInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -2707,6 +2951,10 @@ export type UserUncheckedUpdateWithoutBuyRequestOffersInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -2746,6 +2994,10 @@ export type UserCreateWithoutBuyerOrdersInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2785,6 +3037,10 @@ export type UserUncheckedCreateWithoutBuyerOrdersInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2829,6 +3085,10 @@ export type UserCreateWithoutSellerOrdersInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2868,6 +3128,10 @@ export type UserUncheckedCreateWithoutSellerOrdersInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -2923,6 +3187,10 @@ export type UserUpdateWithoutBuyerOrdersInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -2962,6 +3230,10 @@ export type UserUncheckedUpdateWithoutBuyerOrdersInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3012,6 +3284,10 @@ export type UserUpdateWithoutSellerOrdersInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3051,6 +3327,10 @@ export type UserUncheckedUpdateWithoutSellerOrdersInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3090,6 +3370,10 @@ export type UserCreateWithoutBuyerChatRoomsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -3129,6 +3413,10 @@ export type UserUncheckedCreateWithoutBuyerChatRoomsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -3173,6 +3461,10 @@ export type UserCreateWithoutSellerChatRoomsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -3212,6 +3504,10 @@ export type UserUncheckedCreateWithoutSellerChatRoomsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -3267,6 +3563,10 @@ export type UserUpdateWithoutBuyerChatRoomsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3306,6 +3606,10 @@ export type UserUncheckedUpdateWithoutBuyerChatRoomsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3356,6 +3660,10 @@ export type UserUpdateWithoutSellerChatRoomsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3395,6 +3703,10 @@ export type UserUncheckedUpdateWithoutSellerChatRoomsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3434,6 +3746,10 @@ export type UserCreateWithoutSentChatMessagesInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -3473,6 +3789,10 @@ export type UserUncheckedCreateWithoutSentChatMessagesInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -3528,6 +3848,10 @@ export type UserUpdateWithoutSentChatMessagesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3567,6 +3891,10 @@ export type UserUncheckedUpdateWithoutSentChatMessagesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3606,6 +3934,10 @@ export type UserCreateWithoutReviewsGivenInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -3645,6 +3977,10 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -3689,6 +4025,10 @@ export type UserCreateWithoutReviewsReceivedInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -3728,6 +4068,10 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -3783,6 +4127,10 @@ export type UserUpdateWithoutReviewsGivenInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3822,6 +4170,10 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3872,6 +4224,10 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3911,6 +4267,10 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -3950,6 +4310,10 @@ export type UserCreateWithoutDepositRequestsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -3989,6 +4353,10 @@ export type UserUncheckedCreateWithoutDepositRequestsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4044,6 +4412,10 @@ export type UserUpdateWithoutDepositRequestsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -4083,6 +4455,10 @@ export type UserUncheckedUpdateWithoutDepositRequestsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -4122,6 +4498,10 @@ export type UserCreateWithoutWithdrawalRequestsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4161,6 +4541,10 @@ export type UserUncheckedCreateWithoutWithdrawalRequestsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4216,6 +4600,10 @@ export type UserUpdateWithoutWithdrawalRequestsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -4255,6 +4643,10 @@ export type UserUncheckedUpdateWithoutWithdrawalRequestsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -4294,6 +4686,10 @@ export type UserCreateWithoutAdminAuditLogsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4333,6 +4729,10 @@ export type UserUncheckedCreateWithoutAdminAuditLogsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4388,6 +4788,10 @@ export type UserUpdateWithoutAdminAuditLogsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -4427,6 +4831,10 @@ export type UserUncheckedUpdateWithoutAdminAuditLogsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -4466,6 +4874,10 @@ export type UserCreateWithoutSupportInquiriesInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4505,6 +4917,10 @@ export type UserUncheckedCreateWithoutSupportInquiriesInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4560,6 +4976,10 @@ export type UserUpdateWithoutSupportInquiriesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -4599,6 +5019,10 @@ export type UserUncheckedUpdateWithoutSupportInquiriesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -4638,6 +5062,10 @@ export type UserCreateWithoutSlaIncidentNotesInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4677,6 +5105,10 @@ export type UserUncheckedCreateWithoutSlaIncidentNotesInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4732,6 +5164,10 @@ export type UserUpdateWithoutSlaIncidentNotesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -4771,6 +5207,10 @@ export type UserUncheckedUpdateWithoutSlaIncidentNotesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -4810,6 +5250,10 @@ export type UserCreateWithoutReportsMadeInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4849,6 +5293,10 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4893,6 +5341,10 @@ export type UserCreateWithoutReportsReceivedInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4932,6 +5384,10 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -4987,6 +5443,10 @@ export type UserUpdateWithoutReportsMadeInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -5026,6 +5486,10 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -5076,6 +5540,10 @@ export type UserUpdateWithoutReportsReceivedInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -5115,6 +5583,10 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -5154,6 +5626,10 @@ export type UserCreateWithoutAdminNotesReceivedInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -5193,6 +5669,10 @@ export type UserUncheckedCreateWithoutAdminNotesReceivedInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -5237,6 +5717,10 @@ export type UserCreateWithoutAdminNotesAuthoredInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -5276,6 +5760,10 @@ export type UserUncheckedCreateWithoutAdminNotesAuthoredInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -5331,6 +5819,10 @@ export type UserUpdateWithoutAdminNotesReceivedInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -5370,6 +5862,10 @@ export type UserUncheckedUpdateWithoutAdminNotesReceivedInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -5420,6 +5916,10 @@ export type UserUpdateWithoutAdminNotesAuthoredInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -5459,6 +5959,10 @@ export type UserUncheckedUpdateWithoutAdminNotesAuthoredInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -5498,6 +6002,10 @@ export type UserCreateWithoutAdminGameNotesInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -5537,6 +6045,10 @@ export type UserUncheckedCreateWithoutAdminGameNotesInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -5592,6 +6104,10 @@ export type UserUpdateWithoutAdminGameNotesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -5631,6 +6147,10 @@ export type UserUncheckedUpdateWithoutAdminGameNotesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -5670,6 +6190,10 @@ export type UserCreateWithoutNotificationsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -5709,6 +6233,10 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   email: string
   displayName: string
   passwordHash?: string | null
+  paymentPinHash?: string | null
+  paymentPinSetAt?: Date | string | null
+  paymentPinUpdatedAt?: Date | string | null
+  paymentPinResetAt?: Date | string | null
   emailVerifiedAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
@@ -5764,6 +6292,10 @@ export type UserUpdateWithoutNotificationsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -5803,6 +6335,10 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPinSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPinResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
@@ -6107,6 +6643,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   email?: boolean
   displayName?: boolean
   passwordHash?: boolean
+  paymentPinHash?: boolean
+  paymentPinSetAt?: boolean
+  paymentPinUpdatedAt?: boolean
+  paymentPinResetAt?: boolean
   emailVerifiedAt?: boolean
   role?: boolean
   status?: boolean
@@ -6148,6 +6688,10 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   displayName?: boolean
   passwordHash?: boolean
+  paymentPinHash?: boolean
+  paymentPinSetAt?: boolean
+  paymentPinUpdatedAt?: boolean
+  paymentPinResetAt?: boolean
   emailVerifiedAt?: boolean
   role?: boolean
   status?: boolean
@@ -6160,6 +6704,10 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   displayName?: boolean
   passwordHash?: boolean
+  paymentPinHash?: boolean
+  paymentPinSetAt?: boolean
+  paymentPinUpdatedAt?: boolean
+  paymentPinResetAt?: boolean
   emailVerifiedAt?: boolean
   role?: boolean
   status?: boolean
@@ -6172,6 +6720,10 @@ export type UserSelectScalar = {
   email?: boolean
   displayName?: boolean
   passwordHash?: boolean
+  paymentPinHash?: boolean
+  paymentPinSetAt?: boolean
+  paymentPinUpdatedAt?: boolean
+  paymentPinResetAt?: boolean
   emailVerifiedAt?: boolean
   role?: boolean
   status?: boolean
@@ -6179,7 +6731,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "displayName" | "passwordHash" | "emailVerifiedAt" | "role" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "displayName" | "passwordHash" | "paymentPinHash" | "paymentPinSetAt" | "paymentPinUpdatedAt" | "paymentPinResetAt" | "emailVerifiedAt" | "role" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
   listings?: boolean | Prisma.User$listingsArgs<ExtArgs>
@@ -6251,6 +6803,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     email: string
     displayName: string
     passwordHash: string | null
+    paymentPinHash: string | null
+    paymentPinSetAt: Date | null
+    paymentPinUpdatedAt: Date | null
+    paymentPinResetAt: Date | null
     emailVerifiedAt: Date | null
     role: $Enums.UserRole
     status: $Enums.UserStatus
@@ -6711,6 +7267,10 @@ export interface UserFieldRefs {
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly displayName: Prisma.FieldRef<"User", 'String'>
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
+  readonly paymentPinHash: Prisma.FieldRef<"User", 'String'>
+  readonly paymentPinSetAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly paymentPinUpdatedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly paymentPinResetAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly emailVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
   readonly status: Prisma.FieldRef<"User", 'UserStatus'>

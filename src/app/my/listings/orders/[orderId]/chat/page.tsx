@@ -91,6 +91,11 @@ export default async function SellerOrderChatPage({
               <InfoRow label={<CountryText id="orderManage.expectedSettlement" />} value={`${view.sellerReceivableAmount} ${view.currency}`} />
             </div>
           </details>
+
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-black text-amber-800">
+            <p>반드시 판매자 및 구매자의 게임 아이디를 확인 후 거래하시기 바랍니다.</p>
+            <p className="mt-1">게임 아이디 미확인으로 인한 사칭 및 사기 피해 발생 시 본 업체는 책임지지 않습니다.</p>
+          </div>
         </aside>
       </section>
     </main>

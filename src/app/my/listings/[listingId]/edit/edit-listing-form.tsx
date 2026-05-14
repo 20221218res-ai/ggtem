@@ -7,8 +7,10 @@ import { useEffect, useMemo, useState } from "react";
 import {
   GAME_MONEY_PRICE_UNIT_OPTIONS,
   getGameMoneyPriceUnitLabel,
-  isGameMoneyQuantityUnit,
+  isGameMoneyDisplayQuantity,
   normalizeGameMoneyPriceUnit,
+  toGameMoneyActualQuantity,
+  toGameMoneyDisplayQuantity,
 } from "@/lib/market/trade-unit";
 
 const LISTING_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
@@ -55,6 +57,18 @@ export default function EditListingForm({
         Number(initialUnitPrice) * Number(normalizedInitialPriceUnitQuantity),
       )
     : initialUnitPrice;
+  const initialDisplayTotalQuantity = isGameMoneyListing
+    ? toGameMoneyDisplayQuantity(
+        initialTotalQuantity,
+        normalizedInitialPriceUnitQuantity,
+      )
+    : initialTotalQuantity;
+  const initialDisplayMinimumQuantity = isGameMoneyListing
+    ? toGameMoneyDisplayQuantity(
+        initialMinimumQuantity,
+        normalizedInitialPriceUnitQuantity,
+      )
+    : initialMinimumQuantity;
   const initialNormalizedTradeMode: TradeMode =
     initialTradeMode === "BULK" ? "BULK" : "SPLIT";
 
@@ -65,8 +79,10 @@ export default function EditListingForm({
     normalizedInitialPriceUnitQuantity,
   );
   const [tradeMode, setTradeMode] = useState<TradeMode>(initialNormalizedTradeMode);
-  const [totalQuantity, setTotalQuantity] = useState(initialTotalQuantity);
-  const [minimumQuantity, setMinimumQuantity] = useState(initialMinimumQuantity);
+  const [totalQuantity, setTotalQuantity] = useState(initialDisplayTotalQuantity);
+  const [minimumQuantity, setMinimumQuantity] = useState(
+    initialDisplayMinimumQuantity,
+  );
   const [imageAlt, setImageAlt] = useState(initialImageAlt);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState(initialImageUrl);
@@ -80,10 +96,23 @@ export default function EditListingForm({
 
   const effectiveMinimumQuantity =
     isGameMoneyListing && tradeMode === "BULK" ? totalQuantity : minimumQuantity;
+  const actualTotalQuantity = isGameMoneyListing
+    ? isGameMoneyDisplayQuantity(totalQuantity)
+      ? toGameMoneyActualQuantity(totalQuantity, priceUnitQuantity)
+      : "0"
+    : totalQuantity;
+  const actualMinimumQuantity = isGameMoneyListing
+    ? isGameMoneyDisplayQuantity(effectiveMinimumQuantity)
+      ? toGameMoneyActualQuantity(effectiveMinimumQuantity, priceUnitQuantity)
+      : "0"
+    : effectiveMinimumQuantity;
   const priceUnitLabel = getGameMoneyPriceUnitLabel(
     priceUnitQuantity,
     moneyUnitName,
   );
+  const gameMoneyQuantityHelperText =
+    "게임머니 수량과 최소 구매 수량은 선택한 단위 기준으로 입력 가능합니다.";
+  const selectedUnitPlaceholder = `예: 1 = ${priceUnitLabel}`;
 
   useEffect(() => {
     if (isGameMoneyListing && tradeMode === "BULK") {
@@ -97,8 +126,8 @@ export default function EditListingForm({
     unitPrice !== initialDisplayUnitPrice ? "단위당 금액" : null,
     priceUnitQuantity !== normalizedInitialPriceUnitQuantity ? "가격 단위" : null,
     tradeMode !== initialNormalizedTradeMode ? "거래 방식" : null,
-    totalQuantity !== initialTotalQuantity ? "총 수량" : null,
-    effectiveMinimumQuantity !== initialMinimumQuantity ? "최소 거래 수량" : null,
+    actualTotalQuantity !== initialTotalQuantity ? "총 수량" : null,
+    actualMinimumQuantity !== initialMinimumQuantity ? "최소 거래 수량" : null,
   ].filter(Boolean);
 
   const imagePreviewUrl = useMemo(() => {
@@ -129,6 +158,17 @@ export default function EditListingForm({
         throw new Error("단위당 금액은 0보다 커야 합니다.");
       }
 
+      if (isGameMoneyListing && !isGameMoneyDisplayQuantity(totalQuantity)) {
+        throw new Error("게임머니 총 수량은 선택한 단위 기준 숫자로 입력해 주세요.");
+      }
+
+      if (
+        isGameMoneyListing &&
+        !isGameMoneyDisplayQuantity(effectiveMinimumQuantity)
+      ) {
+        throw new Error("게임머니 최소 거래 수량은 선택한 단위 기준 숫자로 입력해 주세요.");
+      }
+
       if (Number(totalQuantity) <= 0) {
         throw new Error("총 수량은 0보다 커야 합니다.");
       }
@@ -137,18 +177,8 @@ export default function EditListingForm({
         throw new Error("최소 거래 수량은 0보다 커야 합니다.");
       }
 
-      if (Number(effectiveMinimumQuantity) > Number(totalQuantity)) {
+      if (Number(actualMinimumQuantity) > Number(actualTotalQuantity)) {
         throw new Error("최소 거래 수량은 총 수량보다 클 수 없습니다.");
-      }
-
-      if (isGameMoneyListing) {
-        if (!isGameMoneyQuantityUnit(totalQuantity)) {
-          throw new Error("게임머니 총 수량은 10,000 단위로만 입력할 수 있습니다.");
-        }
-
-        if (!isGameMoneyQuantityUnit(effectiveMinimumQuantity)) {
-          throw new Error("게임머니 최소 거래 수량은 10,000 단위로만 입력할 수 있습니다.");
-        }
       }
 
       const response = await fetch("/api/market/seller-listings", {
@@ -165,8 +195,8 @@ export default function EditListingForm({
           pricePerUnit: isGameMoneyListing ? unitPrice : undefined,
           priceUnitQuantity: isGameMoneyListing ? priceUnitQuantity : undefined,
           tradeMode: isGameMoneyListing ? tradeMode : undefined,
-          minimumQuantity: isGameMoneyListing ? effectiveMinimumQuantity : undefined,
-          totalQuantity,
+          minimumQuantity: isGameMoneyListing ? actualMinimumQuantity : undefined,
+          totalQuantity: isGameMoneyListing ? actualTotalQuantity : totalQuantity,
         }),
       });
       const result = (await response.json()) as { message?: string };
@@ -361,12 +391,13 @@ export default function EditListingForm({
               value={totalQuantity}
               onChange={(event) => setTotalQuantity(event.target.value)}
               inputMode={isGameMoneyListing ? "numeric" : "decimal"}
-              step={isGameMoneyListing ? 10000 : undefined}
+              step={isGameMoneyListing ? 1 : undefined}
+              placeholder={isGameMoneyListing ? selectedUnitPlaceholder : undefined}
               className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-3 text-[var(--gg-text)] outline-none focus:border-[var(--gg-accent)]"
             />
             {isGameMoneyListing ? (
               <span className="text-xs font-bold text-[var(--gg-muted)]">
-                게임머니 총 수량은 10,000 단위로만 입력할 수 있습니다.
+                {gameMoneyQuantityHelperText}
               </span>
             ) : null}
           </label>
@@ -378,7 +409,8 @@ export default function EditListingForm({
                 value={effectiveMinimumQuantity}
                 onChange={(event) => setMinimumQuantity(event.target.value)}
                 inputMode="numeric"
-                step={10000}
+                step={1}
+                placeholder={selectedUnitPlaceholder}
                 disabled={tradeMode === "BULK"}
                 className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-3 text-[var(--gg-text)] outline-none focus:border-[var(--gg-accent)] disabled:cursor-not-allowed disabled:opacity-70"
               />

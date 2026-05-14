@@ -6,7 +6,12 @@ import { useEffect, useMemo, useState } from "react";
 import { TradeSafetyConfirmDialog } from "@/components/trade-safety-confirm-dialog";
 import useCountryTranslation from "@/app/use-country-translation";
 import type { TranslationKey } from "@/app/i18n";
-import { isGameMoneyQuantityUnit } from "@/lib/market/trade-unit";
+import {
+  isGameMoneyDisplayQuantity,
+  normalizeGameMoneyPriceUnit,
+  toGameMoneyActualQuantity,
+  toGameMoneyDisplayQuantity,
+} from "@/lib/market/trade-unit";
 import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit";
 
 const FIXED_AMOUNT_SCALE = 1_000_000n;
@@ -27,6 +32,7 @@ export default function BuyRequestOfferForm({
   tradeMode,
   defaultUnitPrice,
   canonicalUnitPrice,
+  priceUnitQuantity,
   priceUnitLabel,
   totalAmount,
   currency,
@@ -39,6 +45,7 @@ export default function BuyRequestOfferForm({
   tradeMode: string;
   defaultUnitPrice: string;
   canonicalUnitPrice: string;
+  priceUnitQuantity: string;
   priceUnitLabel: string;
   totalAmount: string;
   currency: string;
@@ -50,20 +57,39 @@ export default function BuyRequestOfferForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [result, setResult] = useState<InstantSaleResult | null>(null);
-  const [quantity, setQuantity] = useState(defaultQuantity);
   const isGameMoneyRequest = category === "GAME_MONEY";
   const isSplitMode = tradeMode === "SPLIT";
   const isBulkMode = tradeMode === "BULK";
+  const normalizedPriceUnitQuantity = isGameMoneyRequest
+    ? normalizeGameMoneyPriceUnit(priceUnitQuantity)
+    : "1";
+  const displayDefaultQuantity = isGameMoneyRequest
+    ? toGameMoneyDisplayQuantity(defaultQuantity, normalizedPriceUnitQuantity)
+    : defaultQuantity;
+  const displayMinimumQuantity = isGameMoneyRequest
+    ? toGameMoneyDisplayQuantity(minimumQuantity, normalizedPriceUnitQuantity)
+    : minimumQuantity;
+  const [quantity, setQuantity] = useState(displayDefaultQuantity);
+  const actualQuantity = isGameMoneyRequest && isGameMoneyDisplayQuantity(quantity)
+    ? toGameMoneyActualQuantity(quantity, normalizedPriceUnitQuantity)
+    : quantity;
 
   useEffect(() => {
     if (isBulkMode) {
-      setQuantity(defaultQuantity);
+      setQuantity(displayDefaultQuantity);
     }
-  }, [defaultQuantity, isBulkMode]);
+  }, [displayDefaultQuantity, isBulkMode]);
 
   const quantityStatus = useMemo(() => {
     try {
-      const normalizedQuantity = parseFixedAmount(quantity || "0");
+      if (isGameMoneyRequest && !isGameMoneyDisplayQuantity(quantity)) {
+        return {
+          isValid: false,
+          message: "게임머니 판매 수량은 선택한 단위 기준 숫자로 입력해 주세요.",
+        };
+      }
+
+      const normalizedQuantity = parseFixedAmount(actualQuantity || "0");
       const normalizedMinimum = parseFixedAmount(minimumQuantity);
       const normalizedDefault = parseFixedAmount(defaultQuantity);
 
@@ -81,21 +107,14 @@ export default function BuyRequestOfferForm({
       if (normalizedQuantity < normalizedMinimum) {
         return {
           isValid: false,
-          message: `판매 수량은 최소 ${minimumQuantity} 이상이어야 합니다.`,
+          message: `판매 수량은 최소 ${displayMinimumQuantity} 이상이어야 합니다.`,
         };
       }
 
       if (normalizedQuantity > normalizedDefault) {
         return {
           isValid: false,
-          message: `판매 수량은 남은 구매 수량 ${defaultQuantity} 이하로 입력해 주세요.`,
-        };
-      }
-
-      if (isGameMoneyRequest && !isGameMoneyQuantityUnit(quantity)) {
-        return {
-          isValid: false,
-          message: "게임머니 판매 수량은 10,000 단위로만 입력할 수 있습니다.",
+          message: `판매 수량은 남은 구매 수량 ${displayDefaultQuantity} 이하로 입력해 주세요.`,
         };
       }
 
@@ -103,7 +122,16 @@ export default function BuyRequestOfferForm({
     } catch {
       return { isValid: false, message: "수량은 숫자로 입력해 주세요." };
     }
-  }, [defaultQuantity, isBulkMode, isGameMoneyRequest, minimumQuantity, quantity]);
+  }, [
+    actualQuantity,
+    defaultQuantity,
+    displayDefaultQuantity,
+    displayMinimumQuantity,
+    isBulkMode,
+    isGameMoneyRequest,
+    minimumQuantity,
+    quantity,
+  ]);
 
   const effectiveTotalAmount = useMemo(() => {
     if (!quantityStatus.isValid) {
@@ -111,13 +139,13 @@ export default function BuyRequestOfferForm({
     }
 
     try {
-      const normalizedQuantity = parseFixedAmount(quantity || "0");
+      const normalizedQuantity = parseFixedAmount(actualQuantity || "0");
       const normalizedUnitPrice = parseFixedAmount(canonicalUnitPrice);
       return formatFixedAmount((normalizedQuantity * normalizedUnitPrice) / FIXED_AMOUNT_SCALE);
     } catch {
       return totalAmount;
     }
-  }, [canonicalUnitPrice, quantity, quantityStatus.isValid, totalAmount]);
+  }, [actualQuantity, canonicalUnitPrice, quantityStatus.isValid, totalAmount]);
 
   async function submitInstantSale(input: { password: string; characterName: string }) {
     setIsSubmitting(true);
@@ -131,8 +159,8 @@ export default function BuyRequestOfferForm({
         },
         body: JSON.stringify({
           buyRequestId,
-          quantity,
-          password: input.password,
+          quantity: actualQuantity,
+          paymentPin: input.password,
           characterName: input.characterName,
         }),
       });
@@ -171,7 +199,8 @@ export default function BuyRequestOfferForm({
                   value={quantity}
                   onChange={(event) => setQuantity(event.target.value)}
                   inputMode="numeric"
-                  step={isGameMoneyRequest ? 10000 : undefined}
+                  step={isGameMoneyRequest ? 1 : undefined}
+                  placeholder={isGameMoneyRequest ? `예: 1 = ${priceUnitLabel}` : undefined}
                   className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-sm font-black text-[var(--gg-text)] outline-none focus:border-[var(--gg-accent)]"
                 />
                 <span className={quantityStatus.isValid ? "text-[var(--gg-accent)]" : "text-rose-500"}>
@@ -179,14 +208,14 @@ export default function BuyRequestOfferForm({
                 </span>
               </label>
             ) : (
-              <SummaryRow label={t("sale.quantity")} value={defaultQuantity} />
+              <SummaryRow label={t("sale.quantity")} value={isGameMoneyRequest ? displayDefaultQuantity : defaultQuantity} />
             )}
             {isBulkMode ? (
               <p className="text-xs font-bold leading-5 text-[var(--gg-muted)]">
                 일괄구매 요청은 남은 전체 수량만 한 번에 즉시판매할 수 있습니다.
               </p>
             ) : null}
-            <SummaryRow label="최소 판매 수량" value={minimumQuantity} />
+            <SummaryRow label="최소 판매 수량" value={isGameMoneyRequest ? displayMinimumQuantity : minimumQuantity} />
             <SummaryRow label={t("sale.unitPrice")} value={`${defaultUnitPrice} ${currency} / ${priceUnitLabel}`} />
             <div className="flex items-center justify-between gap-3 border-t border-[var(--gg-border-soft)] pt-2">
               <span className="font-bold text-[var(--gg-muted)]">{t("sale.expectedTotal")}</span>
@@ -259,7 +288,7 @@ export default function BuyRequestOfferForm({
         serverLabel={serverLabel}
         requireCharacterName
         summaryRows={[
-          { label: String(t("sale.quantity")), value: quantity },
+          { label: String(t("sale.quantity")), value: actualQuantity },
           { label: String(t("sale.unitPrice")), value: `${defaultUnitPrice} ${currency} / ${priceUnitLabel}` },
           { label: String(t("sale.expectedTotal")), value: `${effectiveTotalAmount} ${currency}` },
         ]}

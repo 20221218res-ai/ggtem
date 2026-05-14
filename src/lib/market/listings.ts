@@ -458,11 +458,13 @@ export async function getMarketplaceListings(
 
   const sortedListings = [...listings].sort((left, right) => {
     if (normalizedSort === "price_low") {
-      return left.unitPrice.comparedTo(right.unitPrice);
+      const priceCompare = left.unitPrice.comparedTo(right.unitPrice);
+      return priceCompare || comparePremiumThenCreated(left, right);
     }
 
     if (normalizedSort === "price_high") {
-      return right.unitPrice.comparedTo(left.unitPrice);
+      const priceCompare = right.unitPrice.comparedTo(left.unitPrice);
+      return priceCompare || comparePremiumThenCreated(left, right);
     }
 
     if (normalizedSort === "quantity_high") {
@@ -554,6 +556,20 @@ function getListingOrderBy(sort: string): Prisma.ListingOrderByWithRelationInput
   }
 
   return { createdAt: "desc" };
+}
+
+function comparePremiumThenCreated(
+  left: { premiumEndsAt: Date | null; createdAt: Date },
+  right: { premiumEndsAt: Date | null; createdAt: Date },
+) {
+  const leftPremium = isPremiumActive(left.premiumEndsAt);
+  const rightPremium = isPremiumActive(right.premiumEndsAt);
+
+  if (leftPremium !== rightPremium) {
+    return leftPremium ? -1 : 1;
+  }
+
+  return right.createdAt.getTime() - left.createdAt.getTime();
 }
 
 function mapGameOptions(

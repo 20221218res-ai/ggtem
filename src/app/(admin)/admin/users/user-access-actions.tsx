@@ -31,11 +31,15 @@ export default function UserAccessActions({
   const [passwordResetReason, setPasswordResetReason] = useState(
     "유저 요청으로 비밀번호 재설정 지원",
   );
+  const [pinResetReason, setPinResetReason] = useState("유저 요청으로 결제 PIN 초기화 지원");
   const [error, setError] = useState("");
   const [passwordResetMessage, setPasswordResetMessage] = useState("");
   const [passwordResetError, setPasswordResetError] = useState("");
+  const [pinResetMessage, setPinResetMessage] = useState("");
+  const [pinResetError, setPinResetError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPasswordResetting, setIsPasswordResetting] = useState(false);
+  const [isPinResetting, setIsPinResetting] = useState(false);
   const roleChanged = role !== currentRole;
   const statusChanged = status !== currentStatus;
   const isOperatorRoleChange =
@@ -162,6 +166,59 @@ export default function UserAccessActions({
     }
   }
 
+  async function resetPaymentPin() {
+    const trimmedReason = pinResetReason.trim();
+
+    if (trimmedReason.length < 10) {
+      setPinResetError("결제 PIN 초기화 사유를 10자 이상 입력해 주세요.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      [
+        "이 유저의 결제 PIN을 초기화할까요?",
+        "",
+        `대상: ${userEmail}`,
+        `사유: ${trimmedReason}`,
+        "",
+        "초기화 후 유저는 다음 결제/출금 전에 새 결제 PIN을 직접 설정해야 합니다.",
+      ].join("\n"),
+    );
+
+    if (!confirmed) return;
+
+    setPinResetMessage("");
+    setPinResetError("");
+    setIsPinResetting(true);
+
+    try {
+      const response = await fetch("/api/admin/users/payment-pin-reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          reason: trimmedReason,
+        }),
+      });
+      const result = (await response.json()) as { message?: string };
+
+      if (!response.ok) {
+        throw new Error(result.message ?? "결제 PIN을 초기화하지 못했습니다.");
+      }
+
+      setPinResetMessage(result.message ?? "결제 PIN을 초기화했습니다.");
+      router.refresh();
+    } catch (resetError) {
+      setPinResetError(
+        resetError instanceof Error ? resetError.message : "결제 PIN을 초기화하지 못했습니다.",
+      );
+    } finally {
+      setIsPinResetting(false);
+    }
+  }
+
   return (
     <div className="mt-4 space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
       <div className="grid gap-3 lg:grid-cols-[1fr_1fr_1.5fr_auto]">
@@ -266,6 +323,43 @@ export default function UserAccessActions({
         {passwordResetError ? (
           <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-bold text-red-700">
             {passwordResetError}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="rounded-md border border-slate-200 bg-white p-3">
+        <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
+          <label className="flex flex-col gap-1 text-xs font-black text-slate-600">
+            결제 PIN 초기화 사유
+            <input
+              value={pinResetReason}
+              onChange={(event) => setPinResetReason(event.target.value)}
+              className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-emerald-500"
+              placeholder="유저 요청, 본인 확인 기록, 상담 번호"
+            />
+          </label>
+          <div className="flex items-end">
+            <button
+              type="button"
+              onClick={() => void resetPaymentPin()}
+              disabled={isPinResetting || pinResetReason.trim().length < 10}
+              className="w-full rounded-md border border-sky-300 bg-sky-50 px-4 py-2 text-sm font-black text-sky-900 hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isPinResetting ? "초기화 중..." : "결제 PIN 초기화"}
+            </button>
+          </div>
+        </div>
+        <p className="mt-2 text-xs font-bold text-slate-500">
+          운영자는 유저 결제 PIN을 확인하지 않습니다. 초기화만 가능하며 모든 조치는 감사 로그에 남습니다.
+        </p>
+        {pinResetMessage ? (
+          <p className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700">
+            {pinResetMessage}
+          </p>
+        ) : null}
+        {pinResetError ? (
+          <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-bold text-red-700">
+            {pinResetError}
           </p>
         ) : null}
       </div>

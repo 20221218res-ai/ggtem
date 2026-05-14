@@ -64,7 +64,7 @@ export function assertGameMoneyQuantityUnit(
   }
 
   if (quantity % GAME_MONEY_FIXED_QUANTITY_UNIT !== 0n) {
-    throw new Error(`${label}은 10,000 단위로만 입력할 수 있습니다.`);
+    throw new Error(`${label}은 선택한 게임머니 단위 기준으로 입력해 주세요.`);
   }
 }
 
@@ -75,7 +75,10 @@ export function isGameMoneyQuantityUnit(value: string) {
     return false;
   }
 
-  return Number(normalized) > 0 && Number(normalized) % GAME_MONEY_QUANTITY_UNIT === 0;
+  return (
+    BigInt(normalized) > 0n &&
+    BigInt(normalized) % BigInt(GAME_MONEY_QUANTITY_UNIT) === 0n
+  );
 }
 
 export function normalizeGameMoneyTradeMode(value: unknown): GameMoneyTradeMode {
@@ -90,6 +93,52 @@ export function normalizeGameMoneyPriceUnit(value: string | null | undefined) {
   }
 
   return normalized;
+}
+
+export function isGameMoneyDisplayQuantity(value: string) {
+  const normalized = value.trim();
+
+  return /^\d+$/.test(normalized) && BigInt(normalized) > 0n;
+}
+
+export function toGameMoneyActualQuantity(
+  displayQuantity: string,
+  priceUnitQuantity: string | null | undefined,
+) {
+  const normalizedDisplayQuantity = displayQuantity.trim();
+
+  if (!isGameMoneyDisplayQuantity(normalizedDisplayQuantity)) {
+    throw new Error("게임머니 수량은 선택한 단위 기준 숫자로 입력해 주세요.");
+  }
+
+  return (
+    BigInt(normalizedDisplayQuantity) *
+    BigInt(normalizeGameMoneyPriceUnit(priceUnitQuantity))
+  ).toString();
+}
+
+export function toGameMoneyDisplayQuantity(
+  actualQuantity: string | null | undefined,
+  priceUnitQuantity: string | null | undefined,
+) {
+  const normalizedActualQuantity = actualQuantity?.trim();
+
+  if (!normalizedActualQuantity || !/^\d+$/.test(normalizedActualQuantity)) {
+    return "1";
+  }
+
+  const actual = BigInt(normalizedActualQuantity);
+  const unit = BigInt(normalizeGameMoneyPriceUnit(priceUnitQuantity));
+
+  if (actual <= 0n || unit <= 0n) {
+    return "1";
+  }
+
+  if (actual % unit !== 0n) {
+    return normalizedActualQuantity;
+  }
+
+  return (actual / unit).toString();
 }
 
 export function getGameMoneyPriceUnitLabel(

@@ -106,6 +106,12 @@ export default function PriorityNotificationModal() {
       return;
     }
 
+    const nextNotification = notification;
+    const targetHref = nextNotification.href ?? "/my/notifications";
+    window.sessionStorage.setItem(DISMISSED_STORAGE_KEY, nextNotification.notificationId);
+    setDismissedId(nextNotification.notificationId);
+    setNotification(null);
+
     try {
       await fetch("/api/notifications", {
         method: "POST",
@@ -114,11 +120,11 @@ export default function PriorityNotificationModal() {
         },
         body: JSON.stringify({
           mode: "READ_ONE",
-          notificationId: notification.notificationId,
+          notificationId: nextNotification.notificationId,
         }),
       });
     } finally {
-      router.push(notification.href ?? "/my/notifications");
+      router.push(targetHref);
       router.refresh();
     }
   }

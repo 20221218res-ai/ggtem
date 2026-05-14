@@ -3,10 +3,7 @@ import {
   createHash,
   randomBytes,
   randomUUID,
-  scrypt as nodeScrypt,
-  timingSafeEqual,
 } from "node:crypto";
-import { promisify } from "node:util";
 import { isDemoModeEnabled } from "@/lib/demo-mode";
 import {
   assertTransactionalEmailReady,
@@ -17,12 +14,12 @@ import {
 } from "@/lib/email/transactional-email";
 import { getPrismaClient } from "@/lib/prisma";
 import { ensureUserWallet } from "@/lib/market/wallets";
+import { hashSecret, verifySecret } from "@/lib/auth/secret-hash";
 
 const SESSION_COOKIE_NAME = "ggitem_session";
 const SESSION_DURATION_DAYS = 7;
 const SESSION_IDLE_TIMEOUT_HOURS = 24;
 const SESSION_TOUCH_INTERVAL_MINUTES = 10;
-const PASSWORD_KEY_LENGTH = 64;
 const LOGIN_FAILURE_LIMIT = 5;
 const LOGIN_LOCK_MINUTES = 15;
 const UNKNOWN_IP_KEY = "unknown";
@@ -30,7 +27,6 @@ const PASSWORD_RESET_TOKEN_MINUTES = 30;
 const EMAIL_VERIFICATION_TOKEN_HOURS = 24;
 const PENDING_EMAIL_VERIFICATION_COOKIE_NAME = "ggitem_pending_email_verification";
 const PENDING_EMAIL_VERIFICATION_TOKEN_HOURS = 24;
-const scrypt = promisify(nodeScrypt);
 
 const DEMO_ACCOUNTS = [
   {
@@ -100,27 +96,11 @@ export class EmailVerificationRequiredError extends Error {
 }
 
 async function hashPassword(password: string) {
-  const salt = randomBytes(16).toString("hex");
-  const derived = (await scrypt(password, salt, PASSWORD_KEY_LENGTH)) as Buffer;
-
-  return `scrypt$${salt}$${derived.toString("hex")}`;
+  return hashSecret(password);
 }
 
 async function verifyPassword(password: string, passwordHash: string) {
-  const [algorithm, salt, digest] = passwordHash.split("$");
-
-  if (algorithm !== "scrypt" || !salt || !digest) {
-    return false;
-  }
-
-  const derived = (await scrypt(password, salt, PASSWORD_KEY_LENGTH)) as Buffer;
-  const stored = Buffer.from(digest, "hex");
-
-  if (stored.length !== derived.length) {
-    return false;
-  }
-
-  return timingSafeEqual(stored, derived);
+  return verifySecret(password, passwordHash);
 }
 
 export async function verifyCurrentUserPassword(input: {

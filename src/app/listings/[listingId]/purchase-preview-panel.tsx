@@ -6,7 +6,12 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { TradeSafetyConfirmDialog } from "@/components/trade-safety-confirm-dialog";
 import { calculateMarketplacePurchaseAmount } from "@/lib/market/purchase-calculation";
-import { isGameMoneyQuantityUnit } from "@/lib/market/trade-unit";
+import {
+  isGameMoneyDisplayQuantity,
+  normalizeGameMoneyPriceUnit,
+  toGameMoneyActualQuantity,
+  toGameMoneyDisplayQuantity,
+} from "@/lib/market/trade-unit";
 import { parseFixedAmount } from "@/lib/wallet/manual-deposit";
 import useCountryTranslation from "@/app/use-country-translation";
 import type { TranslationKey } from "@/app/i18n";
@@ -17,6 +22,7 @@ type PurchasePreviewPanelProps = {
   tradeMode: string;
   unitPrice: string;
   displayUnitPrice: string;
+  priceUnitQuantity: string;
   priceUnitLabel: string;
   currency: string;
   availableQuantity: string;
@@ -49,6 +55,7 @@ export function PurchasePreviewPanel({
   tradeMode,
   unitPrice,
   displayUnitPrice,
+  priceUnitQuantity,
   priceUnitLabel,
   currency,
   availableQuantity,
@@ -58,23 +65,42 @@ export function PurchasePreviewPanel({
 }: PurchasePreviewPanelProps) {
   const router = useRouter();
   const { t } = useCountryTranslation();
-  const [quantity, setQuantity] = useState(minimumQuantity);
   const [error, setError] = useState("");
   const [result, setResult] = useState<PurchaseResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const isGameMoneyListing = category === "GAME_MONEY";
   const isBulkMode = tradeMode === "BULK";
+  const normalizedPriceUnitQuantity = isGameMoneyListing
+    ? normalizeGameMoneyPriceUnit(priceUnitQuantity)
+    : "1";
+  const displayMinimumQuantity = isGameMoneyListing
+    ? toGameMoneyDisplayQuantity(minimumQuantity, normalizedPriceUnitQuantity)
+    : minimumQuantity;
+  const displayAvailableQuantity = isGameMoneyListing
+    ? toGameMoneyDisplayQuantity(availableQuantity, normalizedPriceUnitQuantity)
+    : availableQuantity;
+  const [quantity, setQuantity] = useState(displayMinimumQuantity);
+  const actualQuantity = isGameMoneyListing && isGameMoneyDisplayQuantity(quantity)
+    ? toGameMoneyActualQuantity(quantity, normalizedPriceUnitQuantity)
+    : quantity;
 
   useEffect(() => {
     if (isBulkMode) {
-      setQuantity(availableQuantity);
+      setQuantity(displayAvailableQuantity);
     }
-  }, [availableQuantity, isBulkMode]);
+  }, [displayAvailableQuantity, isBulkMode]);
 
   const quantityStatus = useMemo(() => {
     try {
-      const normalizedQuantity = parseFixedAmount(quantity || "0");
+      if (isGameMoneyListing && !isGameMoneyDisplayQuantity(quantity)) {
+        return {
+          isValid: false,
+          message: "게임머니 구매 수량은 선택한 단위 기준 숫자로 입력해 주세요.",
+        };
+      }
+
+      const normalizedQuantity = parseFixedAmount(actualQuantity || "0");
       const normalizedMinimum = parseFixedAmount(minimumQuantity);
       const normalizedAvailable = parseFixedAmount(availableQuantity);
 
@@ -93,7 +119,7 @@ export function PurchasePreviewPanel({
         return {
           isValid: false,
           message: formatMessage(t("purchase.minimumQuantityMessage"), {
-            quantity: minimumQuantity,
+            quantity: displayMinimumQuantity,
           }),
         };
       }
@@ -102,14 +128,8 @@ export function PurchasePreviewPanel({
         return {
           isValid: false,
           message: formatMessage(t("purchase.availableStockMessage"), {
-            quantity: availableQuantity,
+            quantity: displayAvailableQuantity,
           }),
-        };
-      }
-      if (isGameMoneyListing && !isGameMoneyQuantityUnit(quantity)) {
-        return {
-          isValid: false,
-          message: "게임머니 구매 수량은 10,000 단위로만 입력할 수 있습니다.",
         };
       }
 
@@ -117,7 +137,17 @@ export function PurchasePreviewPanel({
     } catch {
       return { isValid: false, message: t("purchase.numberOnly") };
     }
-  }, [availableQuantity, isBulkMode, isGameMoneyListing, minimumQuantity, quantity, t]);
+  }, [
+    actualQuantity,
+    availableQuantity,
+    displayAvailableQuantity,
+    displayMinimumQuantity,
+    isBulkMode,
+    isGameMoneyListing,
+    minimumQuantity,
+    quantity,
+    t,
+  ]);
 
   const expectedAmount = useMemo(() => {
     try {
@@ -125,18 +155,18 @@ export function PurchasePreviewPanel({
         return "0";
       }
 
-      return calculateMarketplacePurchaseAmount(quantity || "0", unitPrice);
+      return calculateMarketplacePurchaseAmount(actualQuantity || "0", unitPrice);
     } catch {
       return "0";
     }
-  }, [quantity, quantityStatus.isValid, unitPrice]);
+  }, [actualQuantity, quantityStatus.isValid, unitPrice]);
 
   const quickQuantitySeeds = isBulkMode
-    ? [availableQuantity]
+    ? [displayAvailableQuantity]
     : [
-        minimumQuantity,
-        ...(isGameMoneyListing ? ["10000", "50000", "100000"] : ["10", "100", "1000"]),
-        availableQuantity,
+        displayMinimumQuantity,
+        ...(isGameMoneyListing ? ["1", "5", "10"] : ["10", "100", "1000"]),
+        displayAvailableQuantity,
       ];
 
   const quickQuantities = Array.from(
@@ -145,10 +175,11 @@ export function PurchasePreviewPanel({
     ),
   ).filter((option) => {
     try {
-      if (isGameMoneyListing && !isGameMoneyQuantityUnit(option)) {
-        return false;
-      }
-      const normalizedOption = parseFixedAmount(option);
+      const normalizedOption = parseFixedAmount(
+        isGameMoneyListing
+          ? toGameMoneyActualQuantity(option, normalizedPriceUnitQuantity)
+          : option,
+      );
       const normalizedMinimum = parseFixedAmount(minimumQuantity);
       const normalizedAvailable = parseFixedAmount(availableQuantity);
 
@@ -186,9 +217,9 @@ export function PurchasePreviewPanel({
         },
         body: JSON.stringify({
           listingId,
-          quantity,
+          quantity: actualQuantity,
           amount: expectedAmount,
-          password: input.password,
+          paymentPin: input.password,
           characterName: input.characterName,
         }),
       });
@@ -231,7 +262,8 @@ export function PurchasePreviewPanel({
           value={quantity}
           onChange={(event) => setQuantity(event.target.value)}
           inputMode={isGameMoneyListing ? "numeric" : "decimal"}
-          step={isGameMoneyListing ? 10000 : undefined}
+          step={isGameMoneyListing ? 1 : undefined}
+          placeholder={isGameMoneyListing ? `예: 1 = ${priceUnitLabel}` : undefined}
           disabled={isBulkMode}
           className="mt-2 h-12 w-full rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-4 text-sm font-black outline-none focus:border-[var(--gg-accent)] disabled:cursor-not-allowed disabled:opacity-70"
         />
@@ -349,7 +381,7 @@ export function PurchasePreviewPanel({
         serverLabel={serverLabel}
         requireCharacterName
         summaryRows={[
-          { label: String(t("purchase.quantity")), value: formatTradeQuantity(quantity, tradeUnitLabel) },
+          { label: String(t("purchase.quantity")), value: formatTradeQuantity(actualQuantity, tradeUnitLabel) },
           { label: String(t("purchase.unitPrice")), value: `${displayUnitPrice} ${currency} / ${priceUnitLabel}` },
           { label: String(t("purchase.expectedPayment")), value: `${expectedAmount} ${currency}` },
         ]}

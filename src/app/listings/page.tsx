@@ -895,7 +895,7 @@ function ListingRow({
             </span>
           ) : null}
           {listing.isPremium ? (
-            <span className="rounded-full bg-[color-mix(in_srgb,var(--gg-accent)_14%,white)] px-3 py-1 text-xs font-black text-[var(--gg-accent)]">
+            <span className="rounded-full border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_16%,white)] px-3 py-1 text-xs font-black text-[var(--gg-accent)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_18%,transparent)]">
               프리미엄
             </span>
           ) : null}
@@ -971,7 +971,7 @@ function BuyRequestRow({
             <CountryText id="listings.buyRequestChip" />
           </span>
           {request.isPremium ? (
-            <span className="rounded-full bg-[color-mix(in_srgb,var(--gg-accent)_14%,white)] px-3 py-1 text-xs font-black text-[var(--gg-accent)]">
+            <span className="rounded-full border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_16%,white)] px-3 py-1 text-xs font-black text-[var(--gg-accent)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_18%,transparent)]">
               프리미엄
             </span>
           ) : null}
@@ -1026,6 +1026,7 @@ function BuyRequestRow({
           tradeMode={request.tradeMode}
           defaultUnitPrice={priceDisplay.price}
           canonicalUnitPrice={request.unitPrice}
+          priceUnitQuantity={request.priceUnitQuantity}
           priceUnitLabel={priceDisplay.unitLabel}
           totalAmount={offerTotalAmount}
           currency={request.currency}
@@ -1052,11 +1053,20 @@ function buildListingSections(
     selectedMode === "sell" &&
     selectedCategory === "GAME_MONEY" &&
     items.some((entry) => entry.type === "listing");
+  const canShowHighestBuyRequests =
+    selectedMode === "buy" &&
+    selectedCategory === "GAME_MONEY" &&
+    items.some((entry) => entry.type === "buyRequest");
 
   if (canShowLowest) {
     const lowestItems = items
       .filter((entry): entry is { type: "listing"; item: MarketplaceListingSummary } => entry.type === "listing")
-      .sort((left, right) => Number(left.item.unitPrice) - Number(right.item.unitPrice))
+      .sort((left, right) => {
+        const priceCompare = Number(left.item.unitPrice) - Number(right.item.unitPrice);
+        if (priceCompare !== 0) return priceCompare;
+        if (left.item.isPremium !== right.item.isPremium) return left.item.isPremium ? -1 : 1;
+        return 0;
+      })
       .slice(0, 5);
 
     for (const entry of lowestItems) {
@@ -1068,6 +1078,29 @@ function buildListingSections(
       title: "최저가 판매글",
       tone: "lowest",
       items: lowestItems,
+    });
+  }
+
+  if (canShowHighestBuyRequests) {
+    const highestBuyItems = items
+      .filter((entry): entry is { type: "buyRequest"; item: MarketplaceBuyRequestSummary } => entry.type === "buyRequest")
+      .sort((left, right) => {
+        const priceCompare = Number(right.item.unitPrice) - Number(left.item.unitPrice);
+        if (priceCompare !== 0) return priceCompare;
+        if (left.item.isPremium !== right.item.isPremium) return left.item.isPremium ? -1 : 1;
+        return 0;
+      })
+      .slice(0, 5);
+
+    for (const entry of highestBuyItems) {
+      usedIds.add(getMarketItemId(entry));
+    }
+
+    sections.push({
+      key: "highest-buy",
+      title: "최고가 구매글",
+      tone: "lowest",
+      items: highestBuyItems,
     });
   }
 
@@ -1109,7 +1142,7 @@ function isMarketItemPremium(entry: MarketFeedItem) {
 
 function getListingRowClass(tone: ListingSectionTone) {
   if (tone === "premium") {
-    return "border-[var(--gg-accent)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_24%,transparent)]";
+    return "border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_5%,white)] shadow-md shadow-[color-mix(in_srgb,var(--gg-accent)_24%,transparent)]";
   }
 
   if (tone === "lowest") {

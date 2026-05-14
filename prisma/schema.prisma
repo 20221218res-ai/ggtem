@@ -130,6 +130,10 @@ model User {
   email              String              @unique
   displayName        String
   passwordHash       String?
+  paymentPinHash     String?
+  paymentPinSetAt    DateTime?
+  paymentPinUpdatedAt DateTime?
+  paymentPinResetAt  DateTime?
   emailVerifiedAt    DateTime?
   role               UserRole            @default(CUSTOMER)
   status             UserStatus          @default(ACTIVE)

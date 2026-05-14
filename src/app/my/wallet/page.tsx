@@ -4,6 +4,7 @@ import { getMarketplaceWalletView } from "@/lib/market/my-wallet";
 import { getPublicDepositWalletAddresses } from "@/lib/wallet/deposit-addresses";
 import CountryText from "../../country-text";
 import type { TranslationKey } from "../../i18n";
+import PaymentPinSetupPanel from "@/components/payment-pin-setup-panel";
 import WalletActions from "./wallet-actions";
 import WalletRequestCancel from "./wallet-request-cancel";
 
@@ -112,6 +113,8 @@ export default async function MyWalletPage({ searchParams }: MyWalletPageProps) 
           mode={mode}
           depositOptions={depositOptions}
         />
+
+        <PaymentPinSetupPanel />
 
         <section className="overflow-hidden rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] shadow-sm shadow-[var(--gg-shadow)]">
           <div className="flex items-center justify-between border-b border-[var(--gg-border-soft)] px-5 py-4">

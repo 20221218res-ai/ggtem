@@ -10,6 +10,7 @@ import {
   createMarketplaceWalletRequest,
   getMarketplaceWalletView,
 } from "@/lib/market/my-wallet";
+import { verifyCurrentUserPaymentPin } from "@/lib/auth/payment-pin";
 
 export async function GET() {
   try {
@@ -46,6 +47,7 @@ export async function POST(request: NextRequest) {
       destination?: string;
       provider?: string;
       chain?: string;
+      paymentPin?: string;
     };
 
     if (body.mode === "CANCEL") {
@@ -70,6 +72,18 @@ export async function POST(request: NextRequest) {
       const capabilityError = requireAccountCapability(auth.user, "WITHDRAWAL");
       if (capabilityError) {
         return capabilityError;
+      }
+
+      const pinCheck = await verifyCurrentUserPaymentPin({
+        userId: auth.user.userId,
+        paymentPin: body.paymentPin,
+      });
+
+      if (!pinCheck.ok) {
+        return NextResponse.json(
+          { code: pinCheck.code, message: pinCheck.message },
+          { status: pinCheck.status },
+        );
       }
     }
 

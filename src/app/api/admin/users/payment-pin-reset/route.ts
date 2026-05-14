@@ -1,0 +1,89 @@
+import { NextRequest, NextResponse } from "next/server";
+import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
+import { resetUserPaymentPin } from "@/lib/auth/payment-pin";
+import { getPrismaClient } from "@/lib/prisma";
+
+export async function POST(request: NextRequest) {
+  try {
+    const auth = await requireApiRole(ROLE_GROUPS.PLATFORM_ADMINS);
+    if (!auth.ok) {
+      return auth.response;
+    }
+
+    const body = (await request.json()) as {
+      userId?: string;
+      reason?: string;
+    };
+    const userId = body.userId?.trim();
+    const reason = body.reason?.trim() ?? "";
+
+    if (!userId) {
+      return NextResponse.json({ message: "유저 ID가 필요합니다." }, { status: 400 });
+    }
+
+    if (reason.length < 10) {
+      return NextResponse.json(
+        { message: "결제 PIN 초기화 사유를 10자 이상 입력해 주세요." },
+        { status: 400 },
+      );
+    }
+
+    const prisma = getPrismaClient();
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+        role: true,
+        paymentPinHash: true,
+        paymentPinSetAt: true,
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json({ message: "유저를 찾을 수 없습니다." }, { status: 404 });
+    }
+
+    if (user.role === "SUPER" && auth.user.role !== "SUPER") {
+      return NextResponse.json(
+        { message: "최고관리자 계정은 최고관리자만 초기화할 수 있습니다." },
+        { status: 403 },
+      );
+    }
+
+    await resetUserPaymentPin(user.id);
+
+    await prisma.adminAuditLog.create({
+      data: {
+        adminId: auth.user.userId,
+        action: "USER_PAYMENT_PIN_RESET",
+        targetType: "USER",
+        targetId: user.id,
+        reason,
+        before: {
+          email: user.email,
+          role: user.role,
+          hadPaymentPin: Boolean(user.paymentPinHash),
+          paymentPinSetAt: user.paymentPinSetAt,
+        },
+        after: {
+          paymentPinReset: true,
+          displayName: user.displayName,
+        },
+      },
+    });
+
+    return NextResponse.json({
+      message: "유저 결제 PIN을 초기화했습니다. 다음 결제 또는 출금 전에 유저가 새 PIN을 설정해야 합니다.",
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        message:
+          error instanceof Error ? error.message : "결제 PIN 초기화에 실패했습니다.",
+      },
+      { status: 400 },
+    );
+  }
+}

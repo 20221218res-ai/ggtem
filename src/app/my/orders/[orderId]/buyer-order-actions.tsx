@@ -98,7 +98,7 @@ export function BuyerOrderActions({ orderId, status }: BuyerOrderActionsProps) {
           orderId,
           action,
           reason: disputeReason,
-          password: input?.password,
+          paymentPin: input?.password,
         }),
       });
       const result = (await response.json()) as BuyerOrderActionResponse | { message?: string };
