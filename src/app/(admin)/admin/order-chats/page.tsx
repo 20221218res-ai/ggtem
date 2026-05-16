@@ -40,17 +40,13 @@ export default async function AdminOrderChatsPage({
         <header className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-sm font-black text-[var(--gg-accent)]">
-                ORDER CHAT MONITOR
-              </p>
-              <h1 className="mt-1 text-2xl font-black">주문 채팅 열람</h1>
+              <p className="text-sm font-black text-[var(--gg-accent)]">ORDER CHAT MONITOR</p>
+              <h1 className="mt-1 text-2xl font-black">주문 채팅 모니터</h1>
             </div>
             <div className="flex flex-wrap gap-2">
-              <AdminLink href="/admin/risk">리스크</AdminLink>
+              <AdminLink href="/admin/risk">위험 관리</AdminLink>
               <AdminLink href="/admin/disputes">분쟁</AdminLink>
-              <AdminLink href="/admin/audit?action=ADMIN_ORDER_CHAT_VIEWED">
-                열람 로그
-              </AdminLink>
+              <AdminLink href="/admin/audit?action=ADMIN_ORDER_CHAT_VIEWED">열람 로그</AdminLink>
             </div>
           </div>
 
@@ -63,23 +59,14 @@ export default async function AdminOrderChatsPage({
               placeholder="주문번호, 제목, 이메일, 닉네임 검색"
               className="min-h-11 flex-1 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none focus:border-[var(--gg-accent)]"
             />
-            <button
-              type="submit"
-              className="rounded-md bg-[var(--gg-accent)] px-5 py-2 text-sm font-black text-white"
-            >
+            <button type="submit" className="rounded-md bg-[var(--gg-accent)] px-5 py-2 text-sm font-black text-white">
               검색
             </button>
-            <Link
-              href="/admin/order-chats"
-              className="rounded-md border border-slate-200 bg-white px-5 py-2 text-center text-sm font-black text-slate-700"
-            >
+            <Link href="/admin/order-chats" className="rounded-md border border-slate-200 bg-white px-5 py-2 text-center text-sm font-black text-slate-700">
               초기화
             </Link>
           </form>
-          <AdminOrderChatsRefresh
-            autoRefresh={params?.refresh === "1"}
-            riskOnly={state.filters.riskOnly}
-          />
+          <AdminOrderChatsRefresh autoRefresh={params?.refresh === "1"} riskOnly={state.filters.riskOnly} />
         </header>
 
         <section className="grid gap-3 md:grid-cols-3">
@@ -89,10 +76,7 @@ export default async function AdminOrderChatsPage({
         </section>
 
         <section className="grid gap-5 xl:grid-cols-[440px_1fr]">
-          <ChatRoomList
-            rooms={state.rooms}
-            selectedOrderId={state.selectedRoom?.orderId ?? null}
-          />
+          <ChatRoomList rooms={state.rooms} selectedOrderId={state.selectedRoom?.orderId ?? null} />
           <ChatDetailPanel detail={state.selectedRoom} />
         </section>
       </section>
@@ -115,6 +99,7 @@ function ChatRoomList({
       <div className="max-h-[760px] overflow-y-auto p-3">
         {rooms.map((room) => {
           const active = room.orderId === selectedOrderId;
+          const risky = room.riskSignalCount > 0;
 
           return (
             <Link
@@ -123,7 +108,7 @@ function ChatRoomList({
               className={`mb-3 block rounded-lg border p-4 transition ${
                 active
                   ? "border-[var(--gg-accent)] bg-cyan-50"
-                  : room.riskSignalCount > 0
+                  : risky
                     ? "border-red-200 bg-red-50 hover:border-red-300"
                     : "border-slate-200 bg-white hover:border-slate-300"
               }`}
@@ -131,22 +116,20 @@ function ChatRoomList({
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="font-black text-slate-950">{room.orderNumber}</p>
-                  <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">
-                    {room.listingTitle}
-                  </p>
+                  <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{room.listingTitle}</p>
                 </div>
-                <Badge tone={room.riskSignalCount > 0 ? "red" : "slate"}>
-                  위험 {room.riskSignalCount}건
-                </Badge>
+                <Badge tone={risky ? "red" : "slate"}>위험 {room.riskSignalCount}건</Badge>
               </div>
-              <p className="mt-3 line-clamp-2 text-sm font-semibold text-slate-700">
-                {room.lastMessagePreview}
-              </p>
+              <p className="mt-3 line-clamp-2 text-sm font-semibold text-slate-700">{room.lastMessagePreview}</p>
               <div className="mt-3 grid gap-1 text-xs font-semibold text-slate-500">
-                <span>구매자 {room.buyerName} / {room.buyerEmail}</span>
-                <span>판매자 {room.sellerName} / {room.sellerEmail}</span>
                 <span>
-                  {room.gameName} / {room.orderStatus} / 메시지 {room.messageCount}건
+                  구매자 {room.buyerName} / {room.buyerEmail}
+                </span>
+                <span>
+                  판매자 {room.sellerName} / {room.sellerEmail}
+                </span>
+                <span>
+                  {room.gameName} / {formatOrderStatus(room.orderStatus)} / 메시지 {room.messageCount}건
                 </span>
                 <span>{room.lastMessageAt ?? "메시지 없음"}</span>
               </div>
@@ -155,9 +138,7 @@ function ChatRoomList({
         })}
 
         {rooms.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-sm font-semibold text-slate-500">
-            채팅방 없음
-          </p>
+          <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-sm font-semibold text-slate-500">채팅방 없음</p>
         ) : null}
       </div>
     </section>
@@ -168,7 +149,7 @@ function ChatDetailPanel({ detail }: { detail: ChatDetail | null }) {
   if (!detail) {
     return (
       <section className="rounded-lg border border-slate-200 bg-white p-8 text-center text-sm font-semibold text-slate-500 shadow-sm">
-        채팅방을 선택하세요.
+        채팅방을 선택하세요
       </section>
     );
   }
@@ -179,33 +160,22 @@ function ChatDetailPanel({ detail }: { detail: ChatDetail | null }) {
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <div className="flex flex-wrap gap-2">
-              <Badge tone="blue">{detail.orderStatus}</Badge>
+              <Badge tone="blue">{formatOrderStatus(detail.orderStatus)}</Badge>
               <Badge tone="slate">{detail.gameName}</Badge>
               <Badge tone="emerald">
                 {detail.grossAmount} {detail.currency}
               </Badge>
             </div>
-            <h2 className="mt-3 text-xl font-black text-slate-950">
-              {detail.orderNumber}
-            </h2>
-            <p className="mt-1 text-sm font-semibold text-slate-600">
-              {detail.listingTitle}
-            </p>
+            <h2 className="mt-3 text-xl font-black text-slate-950">{detail.orderNumber}</h2>
+            <p className="mt-1 text-sm font-semibold text-slate-600">{detail.listingTitle}</p>
             <p className="mt-2 text-xs font-semibold text-slate-500">
-              구매자 {detail.buyerName} / {detail.buyerEmail} · 판매자{" "}
-              {detail.sellerName} / {detail.sellerEmail}
+              구매자 {detail.buyerName} / {detail.buyerEmail} · 판매자 {detail.sellerName} / {detail.sellerEmail}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <AdminLink href={`/admin/orders?orderId=${detail.orderId}`}>
-              주문 보기
-            </AdminLink>
-            <AdminLink href={`/admin/risk?query=${encodeURIComponent(detail.orderId)}`}>
-              신고 보기
-            </AdminLink>
-            <AdminLink href={`/admin/audit?query=${encodeURIComponent(detail.orderId)}`}>
-              감사 로그
-            </AdminLink>
+            <AdminLink href={`/admin/orders?orderId=${detail.orderId}`}>주문 보기</AdminLink>
+            <AdminLink href={`/admin/risk?query=${encodeURIComponent(detail.orderId)}`}>신고 보기</AdminLink>
+            <AdminLink href={`/admin/audit?query=${encodeURIComponent(detail.orderId)}`}>감사 로그</AdminLink>
           </div>
         </div>
       </div>
@@ -215,31 +185,16 @@ function ChatDetailPanel({ detail }: { detail: ChatDetail | null }) {
           const risky = message.riskLabels.length > 0;
 
           return (
-            <article
-              key={message.messageId}
-              className={`rounded-lg border p-4 ${
-                risky ? "border-red-300 bg-red-50" : "border-slate-200 bg-white"
-              }`}
-            >
+            <article key={message.messageId} className={`rounded-lg border p-4 ${risky ? "border-red-300 bg-red-50" : "border-slate-200 bg-white"}`}>
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge tone={message.senderRole === "BUYER" ? "blue" : "emerald"}>
-                    {senderRoleLabel(message.senderRole)}
-                  </Badge>
-                  <span className="text-sm font-black text-slate-950">
-                    {message.senderName}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-500">
-                    {message.senderEmail}
-                  </span>
+                  <Badge tone={message.senderRole === "BUYER" ? "blue" : "emerald"}>{senderRoleLabel(message.senderRole)}</Badge>
+                  <span className="text-sm font-black text-slate-950">{message.senderName}</span>
+                  <span className="text-xs font-semibold text-slate-500">{message.senderEmail}</span>
                 </div>
-                <span className="text-xs font-semibold text-slate-500">
-                  {message.createdAt}
-                </span>
+                <span className="text-xs font-semibold text-slate-500">{message.createdAt}</span>
               </div>
-              <p className="mt-3 whitespace-pre-wrap text-sm font-semibold leading-6 text-slate-700">
-                {message.body}
-              </p>
+              <p className="mt-3 whitespace-pre-wrap text-sm font-semibold leading-6 text-slate-700">{message.body}</p>
               {risky ? (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {message.riskLabels.map((label) => (
@@ -254,9 +209,7 @@ function ChatDetailPanel({ detail }: { detail: ChatDetail | null }) {
         })}
 
         {detail.messages.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm font-semibold text-slate-500">
-            아직 메시지가 없습니다.
-          </p>
+          <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm font-semibold text-slate-500">아직 메시지가 없습니다.</p>
         ) : null}
       </div>
     </section>
@@ -274,27 +227,37 @@ function Metric({ label, value, tone }: { label: string; value: number; tone: To
 
 function AdminLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <Link
-      href={href}
-      className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 shadow-sm hover:border-[var(--gg-accent)] hover:text-slate-950"
-    >
+    <Link href={href} className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 shadow-sm hover:border-[var(--gg-accent)] hover:text-slate-950">
       {children}
     </Link>
   );
 }
 
 function Badge({ tone, children }: { tone: Tone; children: ReactNode }) {
-  return (
-    <span className={`rounded-full px-2.5 py-1 text-xs font-black ${badgeClass(tone)}`}>
-      {children}
-    </span>
-  );
+  return <span className={`rounded-full px-2.5 py-1 text-xs font-black ${badgeClass(tone)}`}>{children}</span>;
 }
 
 function senderRoleLabel(role: string) {
   if (role === "BUYER") return "구매자";
   if (role === "SELLER") return "판매자";
   return "기타";
+}
+
+function formatOrderStatus(status: string) {
+  const labels: Record<string, string> = {
+    REQUESTED: "요청",
+    ESCROW_LOCKED: "에스크로",
+    SELLER_RESPONSE_PENDING: "판매자 응답",
+    DELIVERY_IN_PROGRESS: "전달 중",
+    DELIVERY_COMPLETED: "전달 완료",
+    BUYER_CONFIRM_PENDING: "인수 대기",
+    COMPLETED: "완료",
+    DISPUTED: "분쟁",
+    REFUNDED: "환불",
+    CANCELED: "취소",
+    CANCELLED: "취소",
+  };
+  return labels[status] ?? status;
 }
 
 function badgeClass(tone: Tone) {
