@@ -225,7 +225,16 @@ function BuyRequestRow({ request }: { request: MyBuyRequest }) {
             <InfoChip label={<CountryText id="manage.unitPrice" />} value={`${price.amount} ${request.currency}${price.unitLabel ? ` / ${price.unitLabel}` : ""}`} />
             {request.category === "GAME_MONEY" ? (
               <>
-                <InfoChip label="거래 방식" value={request.tradeMode === "BULK" ? "일괄 구매" : "분할 구매"} />
+                <InfoChip
+                  label={<CountryText id="listingForm.buyMode" />}
+                  value={
+                    request.tradeMode === "BULK" ? (
+                      <CountryText id="listingForm.bulkBuy" />
+                    ) : (
+                      <CountryText id="listingForm.splitBuy" />
+                    )
+                  }
+                />
                 <InfoChip label={<CountryText id="manage.minimumQuantity" />} value={minimumQuantityLabel} />
               </>
             ) : null}
@@ -338,7 +347,7 @@ function SummaryBox({ label, value }: { label: ReactNode; value: string | number
   );
 }
 
-function InfoChip({ label, value }: { label: ReactNode; value: string }) {
+function InfoChip({ label, value }: { label: ReactNode; value: ReactNode }) {
   return (
     <span className="rounded-full border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-1">
       {label} {value}

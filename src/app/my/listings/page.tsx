@@ -235,8 +235,14 @@ function ListingRow({ listing }: { listing: MyListing }) {
           <InfoChip label={<CountryText id="manage.soldQuantity" />} value={soldQuantityLabel} />
           {listing.category === "GAME_MONEY" ? (
             <InfoChip
-              label="거래 방식"
-              value={listing.tradeMode === "BULK" ? "일괄 판매" : "분할 판매"}
+              label={<CountryText id="listingForm.sellMode" />}
+              value={
+                listing.tradeMode === "BULK" ? (
+                  <CountryText id="listingForm.bulkSell" />
+                ) : (
+                  <CountryText id="listingForm.splitSell" />
+                )
+              }
             />
           ) : null}
         </div>
@@ -335,7 +341,7 @@ function SummaryBox({ label, value }: { label: ReactNode; value: string | number
   );
 }
 
-function InfoChip({ label, value }: { label: ReactNode; value: string }) {
+function InfoChip({ label, value }: { label: ReactNode; value: ReactNode }) {
   return (
     <span className="rounded-full border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-1">
       {label} {value}
