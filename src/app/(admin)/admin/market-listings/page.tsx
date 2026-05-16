@@ -30,44 +30,65 @@ export default async function AdminMarketListingsPage({
 
   const params = searchParams ? await searchParams : {};
   const state = await getAdminMarketListingsState(params);
+  const reviewCount =
+    state.summary.sellHidden + state.summary.sellRemoved + state.summary.buyActive;
 
   return (
-    <main className="min-h-screen bg-[#f3f6fa] px-5 py-7 text-slate-950">
-      <section className="mx-auto max-w-[1720px] space-y-5">
-        <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <main className="min-h-screen bg-[#f3f6fa] px-5 py-6 text-slate-950">
+      <section className="mx-auto max-w-[1720px] space-y-4">
+        <header className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-wide text-[var(--color-primary)]">
               MARKET CONTROL
             </p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">거래글 관리</h1>
+            <h1 className="mt-1 text-3xl font-black tracking-tight">거래글 관리</h1>
           </div>
           <div className="flex flex-wrap gap-2">
-            <TopLink href="/admin/audit?targetType=LISTING">판매글 감사</TopLink>
-            <TopLink href="/admin/audit?targetType=BUY_REQUEST">구매글 감사</TopLink>
-            <TopLink href="/admin/reports">리포트</TopLink>
+            <QuickLink href="/admin/market-listings?mode=SELL&status=ACTIVE">판매중</QuickLink>
+            <QuickLink href="/admin/market-listings?mode=BUY&status=ACTIVE">구매중</QuickLink>
+            <QuickLink href="/admin/audit?targetType=LISTING">감사</QuickLink>
           </div>
         </header>
 
         {params.notice === "moderated" ? (
-          <Banner tone="success">거래글 조치가 완료되었습니다.</Banner>
+          <Banner tone="success">거래글 조치 완료</Banner>
         ) : null}
         {params.notice === "buy-request-canceled" ? (
-          <Banner tone="success">구매글 취소와 예약금 환불이 완료되었습니다.</Banner>
+          <Banner tone="success">구매글 취소와 예약금 환불 완료</Banner>
         ) : null}
         {params.error ? <Banner tone="error">{params.error}</Banner> : null}
 
-        <section className="grid gap-4 md:grid-cols-4 xl:grid-cols-7">
-          <Metric label="판매글 전체" value={state.summary.sellTotal} />
+        <section className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 shadow-sm">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-sm font-black text-amber-700">다음 액션</p>
+              <p className="mt-1 text-2xl font-black text-slate-950">
+                검토 대상 {reviewCount.toLocaleString("ko-KR")}건
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <ActionButton href="/admin/market-listings?mode=SELL&status=HIDDEN">
+                숨김 판매글
+              </ActionButton>
+              <ActionButton href="/admin/market-listings?mode=BUY&status=ACTIVE">
+                구매글 환불
+              </ActionButton>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-3 md:grid-cols-4 xl:grid-cols-7">
+          <Metric label="판매 전체" value={state.summary.sellTotal} />
           <Metric label="판매중" value={state.summary.sellActive} tone="green" />
           <Metric label="숨김" value={state.summary.sellHidden} tone="amber" />
           <Metric label="삭제 처리" value={state.summary.sellRemoved} tone="red" />
-          <Metric label="구매글 전체" value={state.summary.buyTotal} />
-          <Metric label="구매 활성" value={state.summary.buyActive} tone="green" />
+          <Metric label="구매 전체" value={state.summary.buyTotal} />
+          <Metric label="구매중" value={state.summary.buyActive} tone="green" />
           <Metric label="수락됨" value={state.summary.buyAccepted} tone="cyan" />
         </section>
 
-        <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <form className="grid gap-3 lg:grid-cols-[160px_180px_180px_1fr_120px]">
+        <section className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+          <form className="grid gap-2 lg:grid-cols-[130px_150px_150px_1fr_96px]">
             <select name="mode" defaultValue={state.filters.mode} className={inputClass}>
               <option value="ALL">전체</option>
               <option value="SELL">판매글</option>
@@ -94,9 +115,9 @@ export default async function AdminMarketListingsPage({
               name="query"
               defaultValue={state.filters.query}
               className={inputClass}
-              placeholder="제목, ID, 유저, 게임, 서버 검색"
+              placeholder="제목, ID, 유저, 게임, 서버"
             />
-            <button className="rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
+            <button className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-black text-black">
               검색
             </button>
           </form>
@@ -104,9 +125,9 @@ export default async function AdminMarketListingsPage({
 
         {state.filters.mode !== "BUY" ? (
           <Panel title={`판매글 ${state.listings.length.toLocaleString("ko-KR")}건`}>
-            <div className="space-y-3">
+            <div className="divide-y divide-slate-100">
               {state.listings.map((listing) => (
-                <SellerListingCard key={listing.id} listing={listing} />
+                <SellerListingRow key={listing.id} listing={listing} />
               ))}
               {state.listings.length === 0 ? <EmptyState label="판매글 없음" /> : null}
             </div>
@@ -115,9 +136,9 @@ export default async function AdminMarketListingsPage({
 
         {state.filters.mode !== "SELL" ? (
           <Panel title={`구매글 ${state.buyRequests.length.toLocaleString("ko-KR")}건`}>
-            <div className="space-y-3">
+            <div className="divide-y divide-slate-100">
               {state.buyRequests.map((request) => (
-                <BuyRequestCard key={request.id} request={request} />
+                <BuyRequestRow key={request.id} request={request} />
               ))}
               {state.buyRequests.length === 0 ? <EmptyState label="구매글 없음" /> : null}
             </div>
@@ -128,85 +149,81 @@ export default async function AdminMarketListingsPage({
   );
 }
 
-function SellerListingCard({ listing }: { listing: SellerListingRow }) {
+function SellerListingRow({ listing }: { listing: SellerListingRow }) {
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="grid gap-4 xl:grid-cols-[1fr_520px]">
-        <ListingMain
-          kind="판매"
-          title={listing.title}
-          status={listing.status}
-          category={listing.category}
-          ownerName={listing.ownerName}
-          createdAt={listing.createdAt}
-          price={`${listing.price} ${listing.currency}`}
-          href={listing.href}
-          auditHref={listing.auditHref}
-          badges={[
-            listing.gameName,
-            listing.serverName,
-            `주문 ${listing.orderCount}건`,
-            `이미지 ${listing.imageCount}장`,
-            listing.isPremium ? "프리미엄" : "",
-          ]}
-        />
-        <form action={moderateSellerListingAction} className="grid gap-2 lg:grid-cols-[150px_1fr_100px_100px]">
-          <input type="hidden" name="listingId" value={listing.id} />
-          <select name="nextStatus" defaultValue="HIDDEN" className={inputClass}>
-            <option value="HIDDEN">숨김</option>
-            <option value="REMOVED">삭제 처리</option>
-            <option value="PAUSED">중지</option>
-            <option value="ACTIVE">복구</option>
-          </select>
-          <input name="reason" className={inputClass} placeholder="조치 사유" />
-          <FormSubmitButton className="rounded-lg bg-slate-950 px-4 py-3 text-sm font-black text-white">
-            저장
-          </FormSubmitButton>
-          <Link href={listing.href} className="rounded-lg border border-slate-200 px-4 py-3 text-center text-sm font-black">
-            보기
-          </Link>
-        </form>
-      </div>
+    <article className="grid gap-3 py-4 xl:grid-cols-[1fr_560px]">
+      <ListingMain
+        kind="판매"
+        title={listing.title}
+        status={listing.status}
+        category={listing.category}
+        ownerName={listing.ownerName}
+        createdAt={listing.createdAt}
+        price={`${listing.price} ${listing.currency}`}
+        href={listing.href}
+        auditHref={listing.auditHref}
+        badges={[
+          listing.gameName,
+          listing.serverName,
+          `주문 ${listing.orderCount}`,
+          `이미지 ${listing.imageCount}`,
+          listing.isPremium ? "프리미엄" : "",
+        ]}
+      />
+      <form action={moderateSellerListingAction} className="grid gap-2 lg:grid-cols-[130px_1fr_78px_78px]">
+        <input type="hidden" name="listingId" value={listing.id} />
+        <select name="nextStatus" defaultValue="HIDDEN" className={inputClass}>
+          <option value="HIDDEN">숨김</option>
+          <option value="REMOVED">삭제 처리</option>
+          <option value="PAUSED">중지</option>
+          <option value="ACTIVE">복구</option>
+        </select>
+        <input name="reason" className={inputClass} placeholder="조치 사유" />
+        <FormSubmitButton className="rounded-lg bg-slate-950 px-3 py-2.5 text-sm font-black text-white">
+          저장
+        </FormSubmitButton>
+        <Link href={listing.href} className="rounded-lg border border-slate-200 px-3 py-2.5 text-center text-sm font-black">
+          보기
+        </Link>
+      </form>
     </article>
   );
 }
 
-function BuyRequestCard({ request }: { request: BuyRequestRow }) {
+function BuyRequestRow({ request }: { request: BuyRequestRow }) {
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="grid gap-4 xl:grid-cols-[1fr_360px]">
-        <ListingMain
-          kind="구매"
-          title={request.title}
-          status={request.status}
-          category={request.category}
-          ownerName={request.ownerName}
-          createdAt={request.createdAt}
-          price={`${request.price} ${request.currency}`}
-          href={request.href}
-          auditHref={request.auditHref}
-          badges={[
-            `총액 ${request.totalAmount} ${request.currency}`,
-            `잠금 ${request.lockAmount} ${request.currency}`,
-            `제안 ${request.offerCount}건`,
-            `이미지 ${request.imageCount}장`,
-            request.isPremium ? "프리미엄" : "",
-          ]}
-        />
-        {request.actionLocked ? (
-          <form action={cancelBuyRequestByAdminAction} className="grid gap-2">
-            <input type="hidden" name="buyRequestId" value={request.id} />
-            <input name="reason" className={inputClass} placeholder="취소/환불 사유" />
-            <FormSubmitButton className="rounded-lg bg-red-600 px-4 py-3 text-sm font-black text-white">
-              구매글 취소 + 환불
-            </FormSubmitButton>
-          </form>
-        ) : (
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-600">
-            ACTIVE 상태이며 잠금 금액이 있는 구매글만 여기서 취소/환불할 수 있습니다.
-          </div>
-        )}
-      </div>
+    <article className="grid gap-3 py-4 xl:grid-cols-[1fr_360px]">
+      <ListingMain
+        kind="구매"
+        title={request.title}
+        status={request.status}
+        category={request.category}
+        ownerName={request.ownerName}
+        createdAt={request.createdAt}
+        price={`${request.price} ${request.currency}`}
+        href={request.href}
+        auditHref={request.auditHref}
+        badges={[
+          `총액 ${request.totalAmount} ${request.currency}`,
+          `잠금 ${request.lockAmount} ${request.currency}`,
+          `제안 ${request.offerCount}`,
+          `이미지 ${request.imageCount}`,
+          request.isPremium ? "프리미엄" : "",
+        ]}
+      />
+      {request.actionLocked ? (
+        <form action={cancelBuyRequestByAdminAction} className="grid gap-2 lg:grid-cols-[1fr_150px]">
+          <input type="hidden" name="buyRequestId" value={request.id} />
+          <input name="reason" className={inputClass} placeholder="취소/환불 사유" />
+          <FormSubmitButton className="rounded-lg bg-red-600 px-3 py-2.5 text-sm font-black text-white">
+            취소 + 환불
+          </FormSubmitButton>
+        </form>
+      ) : (
+        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold text-slate-600">
+          조치 불가
+        </div>
+      )}
     </article>
   );
 }
@@ -243,18 +260,18 @@ function ListingMain({
         </Pill>
         <Pill tone="slate">{category}</Pill>
       </div>
-      <h2 className="mt-3 truncate text-xl font-black">{title}</h2>
+      <h2 className="mt-2 truncate text-lg font-black">{title}</h2>
       <p className="mt-1 text-sm font-bold text-slate-500">
         {ownerName} / {createdAt} / {price}
       </p>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-2 flex flex-wrap gap-2">
         {badges.filter(Boolean).map((badge) => (
-          <span key={badge} className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-600">
+          <span key={badge} className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-black text-slate-600">
             {badge}
           </span>
         ))}
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-2 flex flex-wrap gap-3">
         <Link href={href} className="text-sm font-black text-[var(--color-primary)]">
           유저 화면
         </Link>
@@ -268,8 +285,8 @@ function ListingMain({
 
 function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h2 className="mb-4 text-lg font-black">{title}</h2>
+    <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <h2 className="mb-2 text-lg font-black">{title}</h2>
       {children}
     </section>
   );
@@ -292,16 +309,24 @@ function Metric({
     cyan: "text-[var(--color-primary)]",
   };
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="text-sm font-black text-slate-600">{label}</p>
-      <p className={`mt-2 text-3xl font-black ${colors[tone]}`}>{value.toLocaleString("ko-KR")}</p>
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <p className="text-xs font-black text-slate-600">{label}</p>
+      <p className={`mt-1 text-2xl font-black ${colors[tone]}`}>{value.toLocaleString("ko-KR")}</p>
     </div>
   );
 }
 
-function TopLink({ href, children }: { href: string; children: ReactNode }) {
+function QuickLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <Link href={href} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-900 shadow-sm">
+    <Link href={href} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-900 shadow-sm">
+      {children}
+    </Link>
+  );
+}
+
+function ActionButton({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link href={href} className="rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-black text-white">
       {children}
     </Link>
   );
@@ -341,4 +366,4 @@ function EmptyState({ label }: { label: string }) {
 }
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-950 outline-none focus:border-[var(--color-primary)]";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-950 outline-none focus:border-[var(--color-primary)]";
