@@ -24,6 +24,7 @@ export type AdminPremiumItem = {
 };
 
 export type AdminPremiumState = {
+  schemaWarning: string | null;
   summary: {
     activeCount: number;
     expiringSoonCount: number;
@@ -48,7 +49,7 @@ export async function getAdminPremiumState(): Promise<AdminPremiumState> {
     return await getAdminPremiumStateUnsafe();
   } catch (error) {
     if (isMissingPremiumSchemaError(error)) {
-      return getEmptyAdminPremiumState();
+      return getEmptyAdminPremiumState("프리미엄 DB 스키마 확인 필요");
     }
 
     throw error;
@@ -215,6 +216,7 @@ async function getAdminPremiumStateUnsafe(): Promise<AdminPremiumState> {
   ].sort((left, right) => comparePremiumEnd(right, left));
 
   return {
+    schemaWarning: null,
     summary: {
       activeCount: activeItems.length,
       expiringSoonCount: activeItems.filter((item) => {
@@ -238,8 +240,9 @@ async function getAdminPremiumStateUnsafe(): Promise<AdminPremiumState> {
   };
 }
 
-function getEmptyAdminPremiumState(): AdminPremiumState {
+function getEmptyAdminPremiumState(schemaWarning: string | null): AdminPremiumState {
   return {
+    schemaWarning,
     summary: {
       activeCount: 0,
       expiringSoonCount: 0,

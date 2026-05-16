@@ -35,6 +35,12 @@ export default async function AdminPremiumPage() {
           <SummaryCard label="누적 수익" value={`${state.summary.revenueTotal} USDT`} tone="green" />
         </section>
 
+        {state.schemaWarning ? (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-black text-amber-800">
+            {state.schemaWarning}
+          </div>
+        ) : null}
+
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-black">현재 노출</h2>
