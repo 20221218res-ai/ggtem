@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import type {
   MarketplaceListingSummary,
@@ -400,25 +399,8 @@ export function ListingCard({ listing }: { listing: MarketplaceListingSummary })
     <Link
       href={`/listings/${listing.listingId}`}
       prefetch={false}
-      className="grid gap-4 rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)] lg:grid-cols-[120px_1fr]"
+      className="block rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)]"
     >
-      <div className="overflow-hidden rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)]">
-        {listing.primaryImageUrl ? (
-          <Image
-            src={listing.primaryImageUrl}
-            alt={listing.title}
-            width={240}
-            height={180}
-            sizes="(min-width: 1024px) 120px, (min-width: 768px) 50vw, 100vw"
-            className="aspect-[4/3] h-full w-full object-cover"
-          />
-        ) : (
-          <div className="flex aspect-[4/3] items-center justify-center text-sm font-black text-[var(--gg-subtle)]">
-            GG
-          </div>
-        )}
-      </div>
-
       <div className="min-w-0">
         <div className="flex flex-wrap gap-2">
           <span className="rounded-md bg-[var(--gg-control-bg)] px-2 py-1 text-xs font-bold text-[var(--gg-muted)]">

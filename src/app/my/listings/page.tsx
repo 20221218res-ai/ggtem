@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import CountryText from "@/app/country-text";
 import type { TranslationKey } from "@/app/i18n";
@@ -186,24 +185,7 @@ function ListingRow({ listing }: { listing: MyListing }) {
   const soldQuantityLabel = formatListingQuantity(listing, listing.soldQuantity);
 
   return (
-    <article className="grid gap-4 border-b border-[var(--gg-border-soft)] p-5 transition last:border-b-0 hover:bg-[var(--gg-card-soft-bg)] lg:grid-cols-[90px_1fr_190px]">
-      <Link
-        href={soldOut ? editHref : publicHref}
-        className="flex h-[90px] w-[90px] items-center justify-center overflow-hidden rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)]"
-      >
-        {listing.primaryImageUrl ? (
-          <Image
-            src={listing.primaryImageUrl}
-            alt={listing.title}
-            width={180}
-            height={180}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span className="text-xs font-black text-[var(--gg-subtle)]">GG</span>
-        )}
-      </Link>
-
+    <article className="grid gap-4 border-b border-[var(--gg-border-soft)] p-5 transition last:border-b-0 hover:bg-[var(--gg-card-soft-bg)] lg:grid-cols-[1fr_190px]">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <StatusBadge status={listing.status} soldOut={soldOut} />
