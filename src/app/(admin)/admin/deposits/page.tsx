@@ -20,28 +20,25 @@ export default async function AdminDepositsPage() {
           <div>
             <p className="text-sm font-black text-[var(--color-primary)]">DEPOSIT DESK</p>
             <h1 className="mt-2 text-3xl font-black tracking-tight">충전 승인</h1>
-            <p className="mt-2 text-sm font-semibold text-slate-600">
-              TXID, 체인, 입금 주소, 금액을 대조한 뒤 승인 또는 반려합니다.
-            </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <HeaderLink href="/admin/withdrawals" label="출금 처리" />
-            <HeaderLink href="/admin/finance/ledger" label="지갑 원장" />
-            <HeaderLink href="/admin/audit?targetType=DEPOSIT_REQUEST" label="입금 감사 로그" />
+            <HeaderLink href="/admin/withdrawals" label="출금" />
+            <HeaderLink href="/admin/finance/ledger" label="원장" />
+            <HeaderLink href="/admin/audit?targetType=DEPOSIT_REQUEST" label="감사 로그" />
           </div>
         </header>
 
         <section className="grid gap-4 md:grid-cols-3">
           <MetricCard label="승인 대기" value={`${state.summary.pendingDeposits}건`} tone="emerald" />
           <MetricCard label="대기 금액" value={`${state.summary.pendingDepositAmount} USDT`} tone="sky" />
-          <MetricCard label="처리 기준" value="TXID 확인 후 승인" tone="amber" />
+          <MetricCard label="필수 확인" value="TXID / 체인 / 주소" tone="amber" />
         </section>
 
         <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-sm font-semibold text-slate-500">입금 요청</p>
-              <h2 className="mt-1 text-xl font-black">확인 대기 중인 USDT 입금</h2>
+              <h2 className="mt-1 text-xl font-black">대기 목록</h2>
             </div>
             <StatusBadge
               label={hasPendingDeposits ? "승인 대기 있음" : "승인 대기 없음"}
@@ -55,9 +52,9 @@ export default async function AdminDepositsPage() {
             ))}
             {!hasPendingDeposits ? (
               <EmptyState
-                title="확인 대기 중인 입금 요청이 없습니다."
+                title="대기 없음"
                 href="/admin/finance?kind=deposit"
-                label="입금 처리 이력 보기"
+                label="처리 이력"
               />
             ) : null}
           </div>
@@ -76,7 +73,7 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
       <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <StatusBadge label="1. 입금 정보 확인" tone="emerald" />
+            <StatusBadge label="입금 확인" tone="emerald" />
             <StatusBadge label={requestStatusLabel(item.status)} tone="amber" />
             <StatusBadge
               label={hasRiskFlags ? `위험 신호 ${item.riskFlags.length}개` : "위험 신호 없음"}
@@ -88,7 +85,7 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
           <p className="mt-1 text-xs font-semibold text-slate-500">{item.userEmail}</p>
         </div>
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-left lg:text-right">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">요청 금액</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">금액</p>
           <p className="mt-1 text-2xl font-black text-emerald-800">
             {item.amount} {item.currency}
           </p>
@@ -96,7 +93,7 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
       </div>
 
       <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_1fr]">
-        <InfoPanel title="2. 입금 증빙">
+        <InfoPanel title="입금 증빙">
           <InfoRow label="코인" value={item.evidence.asset ?? "미확인"} />
           <InfoRow label="네트워크" value={item.evidence.network ?? "미확인"} />
           <InfoRow label="입금 주소" value={item.evidence.depositAddress ?? "미입력"} breakAll />
@@ -108,7 +105,7 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
           />
         </InfoPanel>
 
-        <InfoPanel title="3. 요청 정보">
+        <InfoPanel title="요청 정보">
           <InfoRow label="방식" value={item.provider} />
           <InfoRow label="요청 시각" value={item.requestedAt} />
           <InfoRow label="메모" value={item.evidence.note ?? item.memo ?? "없음"} />
@@ -116,7 +113,7 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
       </div>
 
       <Checklist
-        title="4. 승인 전 체크"
+        title="승인 체크"
         items={[
           { label: "코인 정보 확인", done: Boolean(item.evidence.asset) },
           { label: "네트워크 확인", done: Boolean(item.evidence.network) },

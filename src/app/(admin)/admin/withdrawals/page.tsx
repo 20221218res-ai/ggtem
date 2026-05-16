@@ -20,28 +20,25 @@ export default async function AdminWithdrawalsPage() {
           <div>
             <p className="text-sm font-black text-amber-700">WITHDRAWAL DESK</p>
             <h1 className="mt-2 text-3xl font-black tracking-tight">출금 처리</h1>
-            <p className="mt-2 text-sm font-semibold text-slate-600">
-              받을 주소, 체인, 수수료, 총 차감액을 확인하고 실제 송금 후 TXID를 남깁니다.
-            </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <HeaderLink href="/admin/deposits" label="충전 승인" />
-            <HeaderLink href="/admin/finance/ledger?q=WITHDRAWAL" label="출금 원장" />
-            <HeaderLink href="/admin/audit?targetType=WITHDRAWAL_REQUEST" label="출금 감사 로그" />
+            <HeaderLink href="/admin/deposits" label="충전" />
+            <HeaderLink href="/admin/finance/ledger?q=WITHDRAWAL" label="원장" />
+            <HeaderLink href="/admin/audit?targetType=WITHDRAWAL_REQUEST" label="감사 로그" />
           </div>
         </header>
 
         <section className="grid gap-4 md:grid-cols-3">
           <MetricCard label="처리 대기" value={`${state.summary.pendingWithdrawals}건`} tone="amber" />
           <MetricCard label="대기 금액" value={`${state.summary.pendingWithdrawalAmount} USDT`} tone="sky" />
-          <MetricCard label="처리 기준" value="실제 송금 후 TXID 입력" tone="red" />
+          <MetricCard label="필수 확인" value="주소 / 체인 / TXID" tone="red" />
         </section>
 
         <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-sm font-semibold text-slate-500">출금 요청</p>
-              <h2 className="mt-1 text-xl font-black">처리 대기 중인 USDT 출금</h2>
+              <h2 className="mt-1 text-xl font-black">대기 목록</h2>
             </div>
             <StatusBadge
               label={hasPendingWithdrawals ? "출금 처리 필요" : "출금 대기 없음"}
@@ -55,9 +52,9 @@ export default async function AdminWithdrawalsPage() {
             ))}
             {!hasPendingWithdrawals ? (
               <EmptyState
-                title="처리 대기 중인 출금 요청이 없습니다."
+                title="대기 없음"
                 href="/admin/finance?kind=withdrawal"
-                label="출금 처리 이력 보기"
+                label="처리 이력"
               />
             ) : null}
           </div>
@@ -75,7 +72,7 @@ function WithdrawalReviewCard({ item }: { item: PendingWithdrawal }) {
       <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <StatusBadge label="1. 출금 요청 확인" tone="amber" />
+            <StatusBadge label="출금 확인" tone="amber" />
             <StatusBadge label={requestStatusLabel(item.status)} tone="amber" />
             <StatusBadge
               label={hasRiskFlags ? `위험 신호 ${item.riskFlags.length}개` : "위험 신호 없음"}
@@ -86,7 +83,7 @@ function WithdrawalReviewCard({ item }: { item: PendingWithdrawal }) {
           <p className="mt-1 text-xs font-semibold text-slate-500">{item.userEmail}</p>
         </div>
         <div className="rounded-xl border border-amber-200 bg-white px-4 py-3 text-left lg:text-right">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">출금 금액</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">금액</p>
           <p className="mt-1 text-2xl font-black text-amber-700">
             {item.amount} {item.currency}
           </p>
@@ -97,14 +94,14 @@ function WithdrawalReviewCard({ item }: { item: PendingWithdrawal }) {
       </div>
 
       <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_1fr]">
-        <InfoPanel title="2. 송금 정보">
+        <InfoPanel title="송금 정보">
           <InfoRow label="체인" value={item.chain ?? "TRC20"} />
           <InfoRow label="받을 주소" value={item.destination} breakAll />
           <InfoRow label="실수령" value={`${item.netAmount} ${item.currency}`} />
           <InfoRow label="요청 시각" value={item.requestedAt} />
         </InfoPanel>
 
-        <InfoPanel title="3. 금액 확인">
+        <InfoPanel title="금액 확인">
           <InfoRow label="출금 요청액" value={`${item.amount} ${item.currency}`} />
           <InfoRow label="수수료" value={`${item.fee} ${item.currency}`} />
           <InfoRow label="총 차감" value={`${item.totalDebit} ${item.currency}`} />
@@ -127,7 +124,7 @@ function WithdrawalReviewCard({ item }: { item: PendingWithdrawal }) {
       ) : null}
 
       <Checklist
-        title="4. 완료 전 체크"
+        title="완료 체크"
         items={[
           { label: "받을 주소 확인", done: Boolean(item.destination) },
           { label: "체인 확인", done: Boolean(item.chain) },

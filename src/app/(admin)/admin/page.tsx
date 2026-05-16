@@ -15,13 +15,13 @@ const primaryQueues = [
 ] as const;
 
 const quickActions = [
-  { href: "/admin/deposits", label: "충전 처리" },
-  { href: "/admin/withdrawals", label: "출금 처리" },
-  { href: "/admin/disputes", label: "분쟁 처리" },
-  { href: "/admin/risk", label: "신고 확인" },
+  { href: "/admin/deposits", label: "충전" },
+  { href: "/admin/withdrawals", label: "출금" },
+  { href: "/admin/disputes", label: "분쟁" },
+  { href: "/admin/risk", label: "신고" },
   { href: "/admin/order-chats?risk=1&refresh=1", label: "위험 채팅" },
   { href: "/admin/support-inquiries", label: "1:1 문의" },
-  { href: "/admin/sla-incidents", label: "SLA 확인" },
+  { href: "/admin/sla-incidents", label: "SLA" },
 ];
 
 export default async function AdminDashboardPage() {
@@ -42,7 +42,7 @@ export default async function AdminDashboardPage() {
       href: item?.href ?? fallbackQueueHref(key),
       priority: item?.priority ?? "LOW",
       slaBreached: item?.slaBreached ?? false,
-      previewLabel: cleanPreview(item?.previewLabel, queueLabel(key)),
+      previewLabel: cleanPreview(item?.previewLabel, "대기 없음"),
     };
   });
   const totalQueueCount = state.operationsQueue.reduce(
@@ -57,7 +57,7 @@ export default async function AdminDashboardPage() {
   return (
     <main className="min-h-screen bg-[#f3f7fb] px-5 py-8 text-slate-950">
       <section className="mx-auto max-w-7xl space-y-5">
-        <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-wide text-[var(--color-primary)]">
               Admin Today
@@ -66,7 +66,7 @@ export default async function AdminDashboardPage() {
               오늘 처리할 업무
             </h1>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <nav className="flex flex-wrap gap-2" aria-label="관리자 빠른 이동">
             {quickActions.map((action) => (
               <Link
                 key={action.href}
@@ -76,22 +76,29 @@ export default async function AdminDashboardPage() {
                 {action.label}
               </Link>
             ))}
-          </div>
+          </nav>
         </header>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div>
-              <p className="text-sm font-black text-slate-500">운영 큐</p>
-              <h2 className="mt-1 text-2xl font-black">
-                대기 {totalQueueCount.toLocaleString("ko-KR")}건 · 긴급{" "}
-                {urgentCount.toLocaleString("ko-KR")}건
-              </h2>
-              <p className="mt-2 text-sm font-semibold text-slate-500">
-                {firstAction
-                  ? `${firstAction.label}: ${firstAction.actionHint}`
-                  : "현재 즉시 처리해야 할 운영 큐가 없습니다."}
-              </p>
+            <div className="flex flex-wrap items-end gap-4">
+              <div>
+                <p className="text-sm font-black text-slate-500">운영 큐</p>
+                <h2 className="mt-1 text-2xl font-black">
+                  대기 {totalQueueCount.toLocaleString("ko-KR")}건
+                </h2>
+              </div>
+              <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3">
+                <p className="text-xs font-black text-red-600">긴급</p>
+                <p className="text-xl font-black text-red-700">
+                  {urgentCount.toLocaleString("ko-KR")}건
+                </p>
+              </div>
+              {firstAction ? (
+                <p className="text-sm font-bold text-slate-500">
+                  다음: {firstAction.label}
+                </p>
+              ) : null}
             </div>
             <Link
               href={firstAction?.href ?? "/admin/deposits"}
@@ -119,17 +126,12 @@ export default async function AdminDashboardPage() {
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-lg font-black">전체 작업 큐</h2>
-              <p className="mt-1 text-sm font-semibold text-slate-500">
-                처리 순서, 최장 대기, 다음 액션을 한 화면에서 확인합니다.
-              </p>
-            </div>
+            <h2 className="text-lg font-black">전체 작업 큐</h2>
             <Link
               href="/admin/sla-incidents"
               className="inline-flex justify-center rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
             >
-              SLA 알림
+              SLA
             </Link>
           </div>
 
@@ -138,7 +140,7 @@ export default async function AdminDashboardPage() {
               activeQueue.map((item) => <QueueListItem key={item.key} item={item} />)
             ) : (
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm font-bold text-slate-500">
-                대기 중인 운영 작업이 없습니다.
+                대기 없음
               </div>
             )}
           </div>
@@ -146,7 +148,7 @@ export default async function AdminDashboardPage() {
 
         <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <summary className="cursor-pointer text-lg font-black text-slate-950">
-            최근 주문 / 분쟁 보기
+            최근 주문 / 분쟁
           </summary>
           <div className="mt-5 grid gap-5 lg:grid-cols-2">
             <MiniPanel title="최근 주문" href="/admin/orders">
@@ -176,7 +178,7 @@ export default async function AdminDashboardPage() {
                 >
                   <p className="truncate text-sm font-black">{dispute.listingTitle}</p>
                   <p className="mt-2 text-xs font-bold text-red-700">
-                    {cleanPreview(dispute.latestNote, "분쟁 내용")}
+                    {cleanPreview(dispute.latestNote, "분쟁 메모 없음")}
                   </p>
                 </Link>
               ))}
@@ -201,6 +203,7 @@ function QueueCard({
   };
 }) {
   const tone = queueTone(item.key, item.slaBreached, item.priority);
+  const hasWork = item.count > 0;
 
   return (
     <Link
@@ -217,7 +220,7 @@ function QueueCard({
         </span>
       </div>
       <p className="mt-4 line-clamp-2 text-sm font-semibold text-slate-600">
-        {item.previewLabel}
+        {hasWork ? item.previewLabel : "대기 없음"}
       </p>
     </Link>
   );
@@ -234,26 +237,23 @@ function OffPlatformAlertPanel({
     <section className="rounded-2xl border border-red-200 bg-white p-5 shadow-sm">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-sm font-black text-red-600">OFF-PLATFORM CHAT WATCH</p>
+          <p className="text-sm font-black text-red-600">위험 채팅</p>
           <h2 className="mt-1 text-xl font-black text-slate-950">
-            외부거래 의심 채팅 {alertCount.toLocaleString("ko-KR")}건
+            외부거래 감지 {alertCount.toLocaleString("ko-KR")}건
           </h2>
-          <p className="mt-1 text-sm font-semibold text-slate-500">
-            연락처, SNS, 외부 링크, 개인 지갑주소 교환이 감지된 주문 채팅입니다.
-          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
             href="/admin/order-chats?risk=1&refresh=1"
             className="rounded-full bg-red-600 px-4 py-2 text-sm font-black text-white shadow-sm hover:bg-red-700"
           >
-            위험 채팅 실시간 보기
+            채팅 보기
           </Link>
           <Link
             href="/admin/risk?status=ALL&query=OFF_PLATFORM"
             className="rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-black text-red-700 hover:bg-red-50"
           >
-            신고 목록 보기
+            신고 목록
           </Link>
         </div>
       </div>
@@ -279,10 +279,10 @@ function OffPlatformAlertPanel({
               {alert.listingTitle ?? alert.orderNumber ?? "주문 정보 없음"}
             </p>
             <p className="mt-2 line-clamp-2 text-xs font-semibold text-red-700">
-              {cleanPreview(alert.description, "외부거래 의심 채팅")}
+              {cleanPreview(alert.description, "외부거래 의심")}
             </p>
             <p className="mt-3 text-xs font-semibold text-slate-500">
-              대상: {alert.targetName} / {alert.targetEmail}
+              대상 {alert.targetName} / {alert.targetEmail}
             </p>
             <p className="mt-1 text-xs font-semibold text-slate-500">
               {alert.createdAt}
@@ -292,7 +292,7 @@ function OffPlatformAlertPanel({
 
         {alerts.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm font-bold text-slate-500 lg:col-span-5">
-            현재 열려 있는 외부거래 의심 채팅 신고가 없습니다.
+            감지 없음
           </div>
         ) : null}
       </div>
@@ -314,31 +314,25 @@ function QueueListItem({ item }: { item: QueueItem }) {
             <span className={`rounded-full px-3 py-1 text-xs font-black ${tone.badge}`}>
               {item.slaBreached ? "SLA 초과" : priorityLabel(item.priority)}
             </span>
-            <h3 className="text-base font-black">{item.label}</h3>
+            <h3 className="text-base font-black">{cleanPreview(item.label, queueLabel(item.key))}</h3>
             <span className="text-sm font-black text-slate-500">
               {item.count.toLocaleString("ko-KR")}건
             </span>
           </div>
-          <p className="mt-2 text-sm font-semibold text-slate-600">
-            {item.description}
-          </p>
-          <p className="mt-1 text-sm font-bold text-slate-500">
-            {cleanPreview(item.previewLabel, item.label)}
+          <p className="mt-2 text-sm font-bold text-slate-500">
+            {cleanPreview(item.previewLabel, "확인 필요")}
           </p>
         </div>
         <div className="shrink-0 text-left lg:text-right">
-          <p className="text-sm font-black text-slate-700">{item.slaLabel}</p>
+          <p className="text-sm font-black text-slate-700">{cleanPreview(item.slaLabel, "SLA")}</p>
           <p className="mt-1 text-xs font-bold text-slate-500">
-            {item.oldestWaitingLabel}
+            {cleanPreview(item.oldestWaitingLabel, "대기 시간")}
           </p>
           <p className="mt-3 text-sm font-black text-[var(--color-primary)]">
-            {item.quickLinkLabel}
+            {cleanPreview(item.quickLinkLabel, "바로 처리")}
           </p>
         </div>
       </div>
-      <p className="mt-3 rounded-lg bg-white/70 px-3 py-2 text-sm font-semibold text-slate-600">
-        {item.actionHint}
-      </p>
     </Link>
   );
 }
@@ -462,7 +456,7 @@ function priorityLabel(priority: string) {
 }
 
 function cleanPreview(value: string | null | undefined, fallback: string) {
-  if (!value || hasCorruptedText(value)) return `${fallback} 확인 필요`;
+  if (!value || hasCorruptedText(value)) return fallback;
   return value;
 }
 

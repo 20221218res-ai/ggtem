@@ -80,9 +80,9 @@ const initialState: AdminDisputesState = {
 };
 
 const disputeTabs = [
-  { value: "OPEN", label: "처리 대기" },
-  { value: "REFUNDED", label: "구매자 환불" },
-  { value: "RELEASED", label: "판매자 정산" },
+  { value: "OPEN", label: "대기" },
+  { value: "REFUNDED", label: "환불" },
+  { value: "RELEASED", label: "정산" },
 ];
 
 export default function AdminDisputesPage() {
@@ -219,9 +219,9 @@ export default function AdminDisputesPage() {
               <h1 className="mt-1 text-2xl font-black">분쟁 처리</h1>
             </div>
             <div className="grid grid-cols-3 gap-2 text-sm">
-              <Metric label="처리 대기" value={summary.open} tone="red" />
-              <Metric label="환불 완료" value={summary.refunded} tone="blue" />
-              <Metric label="정산 완료" value={summary.released} tone="emerald" />
+              <Metric label="대기" value={summary.open} tone="red" />
+              <Metric label="환불" value={summary.refunded} tone="blue" />
+              <Metric label="정산" value={summary.released} tone="emerald" />
             </div>
           </div>
         </header>
@@ -292,9 +292,9 @@ export default function AdminDisputesPage() {
             </div>
             <div className="max-h-[860px] overflow-y-auto p-3">
               {isLoading ? (
-                <EmptyState title="불러오는 중" description="분쟁 주문을 확인하고 있습니다." />
+                <EmptyState title="불러오는 중" />
               ) : state.disputes.length === 0 ? (
-                <EmptyState title="표시할 분쟁이 없습니다" description="필터를 바꾸거나 검색어를 지워보세요." />
+                <EmptyState title="표시할 분쟁 없음" />
               ) : (
                 <div className="flex flex-col gap-2">
                   {state.disputes.map((dispute) => (
@@ -355,7 +355,7 @@ export default function AdminDisputesPage() {
                       {state.detail.orderNumber} / 생성 {state.detail.createdAt}
                     </p>
                   </div>
-                  <TraceLink href={state.detail.links.adminOrder} label="주문 운영 화면" />
+                  <TraceLink href={state.detail.links.adminOrder} label="주문 보기" />
                 </div>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
@@ -372,16 +372,13 @@ export default function AdminDisputesPage() {
               <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div>
-                    <h3 className="font-black">분쟁 종료 처리</h3>
-                    <p className="mt-1 text-sm font-semibold text-slate-500">
-                      채팅, 원장, 신고 내용을 확인한 뒤 최종 결정을 선택하세요.
-                    </p>
+                    <h3 className="font-black">종료 처리</h3>
                   </div>
                   <div className="text-sm text-slate-500">
                     메모 {noteLength}자{" "}
                     {noteIsShort || noteLength === 0 ? (
                       <span className="font-semibold text-amber-600">
-                        / 종료 처리 전 판단 근거를 20자 이상 남겨주세요.
+                        / 판단 근거 20자 이상
                       </span>
                     ) : null}
                   </div>
@@ -421,16 +418,16 @@ export default function AdminDisputesPage() {
                   </div>
                 ) : (
                   <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-                    이미 종료된 분쟁입니다. 이벤트와 감사 로그에서 처리 결과를 확인하세요.
+                    이미 종료됨
                   </div>
                 )}
               </section>
 
               <details className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <summary className="cursor-pointer font-black">증빙 / 체크 / 기록 보기</summary>
+                <summary className="cursor-pointer font-black">증빙 / 기록</summary>
                 <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_360px]">
                   <section className="rounded-lg border border-slate-200 bg-white p-5">
-                    <h3 className="font-black">증빙 동선</h3>
+                    <h3 className="font-black">증빙</h3>
                     <div className="mt-4 grid gap-2 sm:grid-cols-2">
                       <TraceLink href={state.detail.links.buyerChat} label="구매자 채팅" />
                       <TraceLink href={state.detail.links.sellerChat} label="판매자 채팅" />
@@ -442,7 +439,7 @@ export default function AdminDisputesPage() {
                   </section>
 
                   <aside className="rounded-lg border border-slate-200 bg-white p-5">
-                    <h3 className="font-black">확인 체크</h3>
+                    <h3 className="font-black">체크</h3>
                     <div className="mt-4 flex flex-col gap-3">
                       <ReviewCheckItem label="채팅 증빙" />
                       <ReviewCheckItem label="상품/수량 일치" />
@@ -476,7 +473,7 @@ export default function AdminDisputesPage() {
             </section>
           ) : (
             <section className="rounded-xl border border-slate-200 bg-white p-10 shadow-sm">
-              <EmptyState title="선택한 분쟁이 없습니다" description="왼쪽 목록에서 분쟁 주문을 선택하세요." />
+              <EmptyState title="분쟁을 선택하세요" />
             </section>
           )}
         </section>
@@ -712,11 +709,11 @@ function ReviewCheckItem({ label }: { label: string }) {
   );
 }
 
-function EmptyState({ title, description }: { title: string; description: string }) {
+function EmptyState({ title, description }: { title: string; description?: string }) {
   return (
     <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
       <p className="font-bold text-slate-700">{title}</p>
-      <p className="mt-1 text-sm text-slate-500">{description}</p>
+      {description ? <p className="mt-1 text-sm text-slate-500">{description}</p> : null}
     </div>
   );
 }
