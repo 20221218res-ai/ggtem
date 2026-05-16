@@ -18,18 +18,13 @@ export default async function AdminPremiumPage() {
             <p className="text-sm font-black uppercase tracking-wide text-[var(--color-primary)]">
               Premium Exposure
             </p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">
-              프리미엄 노출 관리
-            </h1>
-            <p className="mt-2 text-sm font-semibold text-slate-500">
-              판매글과 구매글의 유료 상단 노출, 만료 예정, 플랫폼 수익을 확인합니다.
-            </p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight">프리미엄 노출</h1>
           </div>
           <Link
             href="/admin/finance/ledger?type=PREMIUM_PROMOTION_PURCHASED"
             className="inline-flex rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-700 shadow-sm hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
           >
-            프리미엄 원장 보기
+            원장
           </Link>
         </header>
 
@@ -42,14 +37,9 @@ export default async function AdminPremiumPage() {
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-black">현재 프리미엄 글</h2>
-              <p className="mt-1 text-sm font-semibold text-slate-500">
-                만료 시간이 가까운 순서로 표시합니다.
-              </p>
-            </div>
+            <h2 className="text-lg font-black">현재 노출</h2>
             <span className="rounded-full bg-[color-mix(in_srgb,var(--color-primary)_12%,white)] px-3 py-1 text-xs font-black text-[var(--color-primary)]">
-              전체 {state.activeItems.length.toLocaleString("ko-KR")}건
+              {state.activeItems.length.toLocaleString("ko-KR")}건
             </span>
           </div>
           <div className="mt-4 space-y-3">
@@ -58,27 +48,27 @@ export default async function AdminPremiumPage() {
                 <PremiumItemRow key={`${item.type}-${item.id}`} item={item} />
               ))
             ) : (
-              <EmptyState label="현재 노출 중인 프리미엄 글이 없습니다." />
+              <EmptyState label="노출 중인 글 없음" />
             )}
           </div>
         </section>
 
         <section className="grid gap-5 lg:grid-cols-[1fr_0.8fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-lg font-black">최근 만료된 프리미엄 글</h2>
+            <h2 className="text-lg font-black">최근 만료</h2>
             <div className="mt-4 space-y-3">
               {state.expiredItems.length > 0 ? (
                 state.expiredItems.slice(0, 10).map((item) => (
                   <PremiumItemRow key={`${item.type}-${item.id}`} item={item} muted />
                 ))
               ) : (
-                <EmptyState label="최근 만료된 프리미엄 글이 없습니다." />
+                <EmptyState label="최근 만료 없음" />
               )}
             </div>
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-lg font-black">최근 결제 원장</h2>
+            <h2 className="text-lg font-black">최근 결제</h2>
             <div className="mt-4 space-y-3">
               {state.recentLedgerEntries.length > 0 ? (
                 state.recentLedgerEntries.map((entry) => (
@@ -103,7 +93,7 @@ export default async function AdminPremiumPage() {
                   </div>
                 ))
               ) : (
-                <EmptyState label="프리미엄 결제 원장이 없습니다." />
+                <EmptyState label="결제 원장 없음" />
               )}
             </div>
           </section>

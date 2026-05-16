@@ -31,13 +31,13 @@ type GameRow = GameSettingsState["games"][number];
 type ServerRow = GameRow["servers"][number];
 
 const noticeMessages: Record<string, string> = {
-  "created-game": "게임을 추가했습니다.",
-  "created-note": "운영 메모를 저장했습니다.",
-  "created-server": "서버를 추가했습니다.",
-  "created-servers": "서버 목록을 일괄 추가했습니다.",
-  updated: "상태를 변경했습니다.",
-  "updated-game": "게임 정보를 수정했습니다.",
-  "updated-server": "서버 정보를 수정했습니다.",
+  "created-game": "게임 추가 완료",
+  "created-note": "메모 저장 완료",
+  "created-server": "서버 추가 완료",
+  "created-servers": "서버 일괄 추가 완료",
+  updated: "상태 변경 완료",
+  "updated-game": "게임 수정 완료",
+  "updated-server": "서버 수정 완료",
 };
 
 export default async function AdminGameSettingsPage({ searchParams }: AdminGameSettingsPageProps) {
@@ -82,14 +82,11 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
             <p className="text-sm font-black uppercase tracking-wide text-[var(--color-primary)]">
               GAME CATALOG
             </p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">게임 / 서버 설정</h1>
-            <p className="mt-2 text-sm font-semibold text-slate-600">
-              게임, 서버, 게임 이미지와 게임머니 단위를 관리합니다. 이미지는 유저 페이지의 게임 카드와 검색 화면에 사용됩니다.
-            </p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight">게임 / 서버</h1>
           </div>
           <div className="flex flex-wrap gap-2">
-            <TopLink href="/admin/audit?targetType=GAME">감사 로그</TopLink>
-            <TopLink href="/listings">유저 화면 확인</TopLink>
+            <TopLink href="/admin/audit?targetType=GAME">감사</TopLink>
+            <TopLink href="/listings">유저 화면</TopLink>
             <TopLink href="#create-game">게임 추가</TopLink>
           </div>
         </header>
@@ -111,30 +108,30 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
           <Metric label="전체 서버" value={state.summary.totalServers} />
           <Metric label="활성 서버" value={state.summary.activeServers} tone="green" />
           <Metric label="판매글" value={state.summary.totalListings} />
-          <Metric label="구매요청" value={state.summary.totalBuyRequests} tone="cyan" />
+          <Metric label="구매글" value={state.summary.totalBuyRequests} tone="cyan" />
         </section>
 
         <section className="grid gap-4 xl:grid-cols-3">
           <ActionCard
-            title={gamesWithoutServers.length > 0 ? "서버 없는 게임" : "게임 선택지 정상"}
+            title={gamesWithoutServers.length > 0 ? "서버 없음" : "서버 정상"}
             value={`${gamesWithoutServers.length}개`}
             tone={gamesWithoutServers.length > 0 ? "amber" : "green"}
             href="#create-server"
-            action="서버 추가"
+            action="추가"
           />
           <ActionCard
             title="비활성 서버"
             value={`${inactiveServers.length}개`}
             tone={inactiveServers.length > 0 ? "amber" : "green"}
             href="?status=HAS_INACTIVE_SERVER"
-            action="목록 보기"
+            action="보기"
           />
           <ActionCard
-            title="이미지 없는 게임"
+            title="이미지 없음"
             value={`${gamesWithoutImages.length}개`}
             tone={gamesWithoutImages.length > 0 ? "amber" : "cyan"}
             href="?status=NO_IMAGE"
-            action="이미지 등록"
+            action="등록"
           />
         </section>
 
@@ -193,7 +190,7 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
               name="q"
               defaultValue={params.q}
               className={inputClass}
-              placeholder="게임명, 서버명, 코드 검색"
+              placeholder="게임명, 서버명, 코드"
             />
             <select name="status" defaultValue={status} className={inputClass}>
               <option value="ALL">전체</option>
@@ -213,12 +210,12 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
           ))}
           {filteredGames.length === 0 ? (
             <Panel title="검색 결과 없음">
-              <p className="text-sm font-semibold text-slate-600">조건에 맞는 게임이 없습니다.</p>
+              <p className="text-sm font-semibold text-slate-600">게임 없음</p>
             </Panel>
           ) : null}
         </section>
 
-        <Panel title="최근 변경 이력">
+        <Panel title="최근 변경">
           <div className="divide-y divide-slate-100">
             {state.recentChanges.map((change) => (
               <div
@@ -266,7 +263,7 @@ function GameCard({ game }: { game: GameRow }) {
               서버 {game.servers.length}개 / 판매글 {game.listingCount}개 / 구매요청 {game.buyRequestCount}개
             </p>
             <p className="mt-1 text-xs font-bold text-slate-400">
-              {game.imageUrl ? "게임 이미지 등록됨" : "이미지 없음"}
+              {game.imageUrl ? "이미지 있음" : "이미지 없음"}
             </p>
           </div>
         </div>
@@ -278,7 +275,7 @@ function GameCard({ game }: { game: GameRow }) {
               game.isActive ? "bg-slate-100 text-slate-700" : "bg-[var(--color-primary)] text-black"
             }`}
           >
-            {game.isActive ? "게임 숨김" : "게임 활성화"}
+            {game.isActive ? "숨김" : "활성화"}
           </FormSubmitButton>
         </form>
       </div>
@@ -299,7 +296,7 @@ function GameCard({ game }: { game: GameRow }) {
             <Field name="imageAlt" label="이미지 설명" defaultValue={game.imageAlt || game.name} />
             <FileField name="image" label="이미지 교체" />
             <FormSubmitButton className="w-full rounded-lg bg-slate-950 px-4 py-3 text-sm font-black text-white">
-              게임 정보 저장
+              저장
             </FormSubmitButton>
           </form>
 
@@ -310,7 +307,7 @@ function GameCard({ game }: { game: GameRow }) {
               <textarea
                 name="body"
                 className="mt-2 min-h-24 w-full rounded-lg border border-slate-200 px-3 py-2 font-semibold"
-                placeholder="운영 중 확인한 내용을 남깁니다."
+                placeholder="확인 내용"
               />
             </label>
             <FormSubmitButton className="w-full rounded-lg border border-[var(--color-primary)] px-4 py-3 text-sm font-black text-[var(--color-primary)]">
@@ -334,13 +331,13 @@ function GameCard({ game }: { game: GameRow }) {
         </div>
 
         <div className="space-y-3">
-          <h3 className="text-lg font-black">서버 목록</h3>
+          <h3 className="text-lg font-black">서버</h3>
           {game.servers.map((server) => (
             <ServerItem key={server.id} server={server} />
           ))}
           {game.servers.length === 0 ? (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm font-black text-amber-800">
-              서버가 없습니다. 위의 서버 추가 또는 일괄 추가로 등록하세요.
+              서버 없음
             </div>
           ) : null}
         </div>
