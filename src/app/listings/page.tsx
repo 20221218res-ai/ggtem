@@ -747,7 +747,7 @@ function GameListingView({
           {sections.map((section) => (
             <ListingSection
               key={section.key}
-              title={section.title}
+              titleKey={section.titleKey}
               tone={section.tone}
               items={section.items}
             />
@@ -767,11 +767,11 @@ function GameListingView({
 }
 
 function ListingSection({
-  title,
+  titleKey,
   tone,
   items,
 }: {
-  title: string;
+  titleKey: TranslationKey;
   tone: ListingSectionTone;
   items: MarketFeedItem[];
 }) {
@@ -791,7 +791,9 @@ function ListingSection({
   return (
     <section className={sectionClass}>
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className="text-lg font-black">{title}</h3>
+        <h3 className="text-lg font-black">
+          <CountryText id={titleKey} />
+        </h3>
         <span className="rounded-full bg-[var(--gg-card-bg)] px-3 py-1 text-xs font-black text-[var(--gg-muted)]">
           {items.length}
           <CountryText id="home.countSuffix" />
@@ -929,17 +931,17 @@ function ListingRow({
           </span>
           {tone === "lowest" ? (
             <span className="rounded-full bg-[#10b981] px-3 py-1 text-xs font-black text-white">
-              최저가 TOP
+              <CountryText id="listings.lowestPriceTop" />
             </span>
           ) : null}
           {tone === "highest" ? (
             <span className="rounded-full bg-[#22c55e] px-3 py-1 text-xs font-black text-white">
-              최고가 TOP
+              <CountryText id="listings.highestPriceTop" />
             </span>
           ) : null}
           {listing.isPremium ? (
             <span className="rounded-full border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_16%,white)] px-3 py-1 text-xs font-black text-[var(--gg-accent)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_18%,transparent)]">
-              프리미엄
+              <CountryText id="listings.premiumBadge" />
             </span>
           ) : null}
           <span className="text-xs font-bold text-[var(--gg-muted)]">
@@ -1036,12 +1038,12 @@ function BuyRequestRow({
           </span>
           {tone === "highest" ? (
             <span className="rounded-full bg-[#22c55e] px-3 py-1 text-xs font-black text-white">
-              최고가 TOP
+              <CountryText id="listings.highestPriceTop" />
             </span>
           ) : null}
           {request.isPremium ? (
             <span className="rounded-full border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_16%,white)] px-3 py-1 text-xs font-black text-[var(--gg-accent)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_18%,transparent)]">
-              프리미엄
+              <CountryText id="listings.premiumBadge" />
             </span>
           ) : null}
           <span className="text-xs font-bold text-[var(--gg-muted)]">
@@ -1065,7 +1067,10 @@ function BuyRequestRow({
           </span>
           {request.category === "GAME_MONEY" ? (
             <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
-              {request.tradeMode === "BULK" ? "일괄구매" : "분할구매"} / 최소 {minimumQuantityLabel}
+              <CountryText
+                id={request.tradeMode === "BULK" ? "listingForm.bulkBuy" : "listingForm.splitBuy"}
+              />{" "}
+              / <CountryText id="listings.minimum" /> {minimumQuantityLabel}
             </span>
           ) : null}
           <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
@@ -1099,7 +1104,7 @@ function BuyRequestRow({
           priceUnitLabel={priceDisplay.unitLabel}
           totalAmount={offerTotalAmount}
           currency={request.currency}
-          serverLabel={formatServerLabel(request.serverName, request.serverDetail) || "전체 서버"}
+          serverLabel={formatServerLabel(request.serverName, request.serverDetail) || undefined}
         />
       </div>
     </article>
@@ -1114,7 +1119,7 @@ function buildListingSections(
   const usedIds = new Set<string>();
   const sections: Array<{
     key: string;
-    title: string;
+    titleKey: TranslationKey;
     tone: ListingSectionTone;
     items: MarketFeedItem[];
   }> = [];
@@ -1144,7 +1149,7 @@ function buildListingSections(
 
     sections.push({
       key: "lowest",
-      title: "최저가 판매글",
+      titleKey: "listings.lowestSellSection",
       tone: "lowest",
       items: lowestItems,
     });
@@ -1167,7 +1172,7 @@ function buildListingSections(
 
     sections.push({
       key: "highest-buy",
-      title: "최고가 구매글",
+      titleKey: "listings.highestBuySection",
       tone: "highest",
       items: highestBuyItems,
     });
@@ -1185,7 +1190,7 @@ function buildListingSections(
   if (premiumItems.length > 0) {
     sections.push({
       key: "premium",
-      title: "프리미엄글",
+      titleKey: "listings.premiumSection",
       tone: "premium",
       items: premiumItems,
     });
@@ -1193,7 +1198,7 @@ function buildListingSections(
 
   sections.push({
     key: "regular",
-    title: "일반글",
+    titleKey: "listings.regularSection",
     tone: "regular",
     items: items.filter((entry) => !usedIds.has(getMarketItemId(entry))),
   });
