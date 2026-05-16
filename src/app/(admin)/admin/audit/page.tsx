@@ -115,6 +115,16 @@ export default async function AdminAuditPage({
                 active={state.filters.followupStatus === "resolved"}
                 label="보완 완료"
               />
+              <FilterTab
+                href={buildAuditHref({ ...state.filters, targetType: "LISTING" })}
+                active={state.filters.targetType === "LISTING"}
+                label="판매글 조치"
+              />
+              <FilterTab
+                href={buildAuditHref({ ...state.filters, targetType: "BUY_REQUEST" })}
+                active={state.filters.targetType === "BUY_REQUEST"}
+                label="구매글 조치"
+              />
             </div>
 
             <form action="/admin/audit" className="mt-5 grid gap-3 md:grid-cols-2">
@@ -506,6 +516,8 @@ function buildTargetHref(targetType: string, targetId: string) {
   if (type === "ORDER") return `/admin/orders?orderId=${targetId}&query=${targetId}`;
   if (type === "DEPOSIT_REQUEST") return `/admin/deposits?requestId=${targetId}`;
   if (type === "WITHDRAWAL_REQUEST") return `/admin/withdrawals?requestId=${targetId}`;
+  if (type === "LISTING") return `/admin/market-listings?mode=SELL&query=${targetId}`;
+  if (type === "BUY_REQUEST") return `/admin/market-listings?mode=BUY&query=${targetId}`;
   if (type === "USER") return `/admin/users/${targetId}`;
   if (type === "ADMIN_ACCOUNT") return `/admin/admin-accounts?query=${targetId}`;
   if (type === "GAME" || type === "GAME_SERVER") return `/admin/game-settings?query=${targetId}`;
@@ -537,6 +549,12 @@ function actionLabel(action: string) {
     AUDIT_FOLLOWUP_RESOLVED: "감사 사유 보완",
   };
 
+  labels.LISTING_HIDDEN = "판매글 숨김";
+  labels.LISTING_REMOVED = "판매글 삭제 처리";
+  labels.LISTING_PAUSED = "판매글 중지";
+  labels.LISTING_ACTIVE = "판매글 복구";
+  labels.BUY_REQUEST_ADMIN_CANCELED = "구매글 취소 및 환불";
+
   return labels[action] ?? action.replaceAll("_", " ");
 }
 
@@ -553,6 +571,9 @@ function targetTypeLabel(targetType: string) {
     TRUST_REPORT: "신고",
     DISPUTE: "분쟁",
   };
+
+  labels.LISTING = "판매글";
+  labels.BUY_REQUEST = "구매글";
 
   return labels[targetType] ?? targetType.replaceAll("_", " ");
 }
