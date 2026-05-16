@@ -653,10 +653,6 @@ function LinkedAccountSignalsSection({ detail }: { detail: UserDetail }) {
           <h2 className="mt-1 text-xl font-black text-slate-950">
             1인 1계정 원칙 점검
           </h2>
-          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-            같은 출금 주소, 출금 IP, 기기키, 로그인 IP를 공유하는 계정이 있는지 확인합니다.
-            이 신호만으로 제재하지 말고 주문/출금/상담 기록과 함께 판단하세요.
-          </p>
         </div>
         <Badge tone={highSignalCount > 0 ? "red" : detail.linkedAccountSignals.length > 0 ? "amber" : "emerald"}>
           {detail.linkedAccountSignals.length > 0
@@ -756,7 +752,7 @@ function OperationalSignalCard({
     >
       <p className="text-sm font-bold">{title}</p>
       <p className="mt-2 line-clamp-2 text-xl font-black tracking-tight">{value}</p>
-      <p className="mt-3 line-clamp-3 text-xs font-semibold leading-5 opacity-80">
+      <p className="sr-only">
         {body}
       </p>
       <p className="mt-3 text-xs font-black underline underline-offset-4">

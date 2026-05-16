@@ -122,8 +122,6 @@ export default function UserAccessActions({
         "",
         `대상: ${userEmail}`,
         `사유: ${trimmedReason}`,
-        "",
-        "기존 비밀번호는 운영자가 볼 수 없으며, 유저가 메일 링크에서 직접 새 비밀번호를 설정합니다.",
       ].join("\n"),
     );
 
@@ -180,8 +178,6 @@ export default function UserAccessActions({
         "",
         `대상: ${userEmail}`,
         `사유: ${trimmedReason}`,
-        "",
-        "초기화 후 유저는 다음 결제/출금 전에 새 결제 PIN을 직접 설정해야 합니다.",
       ].join("\n"),
     );
 
@@ -280,7 +276,7 @@ export default function UserAccessActions({
 
       {isOperatorRoleChange ? (
         <div className="rounded-md border border-[color-mix(in_srgb,var(--gg-accent)_40%,transparent)] bg-[color-mix(in_srgb,var(--gg-accent)_12%,transparent)] px-3 py-2 text-xs font-bold text-[var(--gg-accent)]">
-          운영 권한 변경이 포함됩니다. 최고관리자 또는 책임자의 승인 근거를 사유에 남겨 주세요.
+          운영 권한 변경
         </div>
       ) : null}
 
@@ -312,9 +308,6 @@ export default function UserAccessActions({
             </button>
           </div>
         </div>
-        <p className="mt-2 text-xs font-bold text-slate-500">
-          운영자는 유저 비밀번호를 직접 확인하지 않습니다. 메일 링크로 유저가 직접 재설정합니다.
-        </p>
         {passwordResetMessage ? (
           <p className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700">
             {passwordResetMessage}
@@ -349,9 +342,6 @@ export default function UserAccessActions({
             </button>
           </div>
         </div>
-        <p className="mt-2 text-xs font-bold text-slate-500">
-          운영자는 유저 결제 PIN을 확인하지 않습니다. 초기화만 가능하며 모든 조치는 감사 로그에 남습니다.
-        </p>
         {pinResetMessage ? (
           <p className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700">
             {pinResetMessage}
