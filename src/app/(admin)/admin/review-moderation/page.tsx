@@ -25,9 +25,6 @@ export default async function ReviewModerationPage() {
               REVIEW DESK
             </p>
             <h1 className="mt-1 text-2xl font-black">리뷰 모더레이션</h1>
-            <p className="sr-only">
-              신고 리뷰와 AI 감지 리뷰를 한 화면에서 검토하고 공개 상태를 관리합니다.
-            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <AdminLink href="/admin/risk">신고·리스크</AdminLink>
@@ -82,9 +79,6 @@ export default async function ReviewModerationPage() {
               ) : (
                 <div className="p-10 text-center">
                   <p className="text-2xl font-black">검토 대기 항목 없음</p>
-                  <p className="sr-only">
-                    새 신고나 AI 감지 항목이 생기면 여기에 표시됩니다.
-                  </p>
                 </div>
               )}
             </div>
@@ -129,18 +123,6 @@ export default async function ReviewModerationPage() {
               </div>
             </section>
 
-            <section className="sr-only">
-              <p className="text-sm font-black uppercase tracking-wide text-[var(--gg-accent)]">
-                CHECKLIST
-              </p>
-              <h2 className="mt-1 text-xl font-black">처리 순서</h2>
-              <ol className="mt-4 space-y-3 text-sm font-bold text-slate-600">
-                <li>1. 주문·채팅·신고 근거 확인</li>
-                <li>2. 운영 메모 10자 이상 작성</li>
-                <li>3. 상태 변경 후 감사 로그 확인</li>
-                <li>4. 반복 신고자는 리스크 화면에서 제한 검토</li>
-              </ol>
-            </section>
           </aside>
         </div>
       </div>
@@ -237,7 +219,7 @@ function getNextAction(state: ReviewModerationState) {
   if (state.summary.openReports > 0) {
     return {
       label: "우선 처리",
-      title: `신고 대기 ${state.summary.openReports}건을 먼저 확인하세요.`,
+      title: `신고 대기 ${state.summary.openReports}건`,
       href: "/admin/review-moderation",
       className: "border-red-200 bg-red-50 text-red-800",
     };

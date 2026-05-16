@@ -32,9 +32,6 @@ export default async function AdminSlaIncidentDetailPage({
             <h1 className="mt-3 text-3xl font-semibold tracking-tight">
               {queueLabel(detail.queueKey)}
             </h1>
-            <p className="sr-only">
-              {cleanPreview(detail.queueKey, detail.previewLabel)}
-            </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
@@ -231,14 +228,6 @@ function queueLabel(queueKey: string) {
   };
 
   return labels[queueKey] ?? queueKey;
-}
-
-function cleanPreview(queueKey: string, preview: string) {
-  if (hasCorruptedText(preview) || preview === "No preview") {
-    return `${queueLabel(queueKey)} 항목의 원본 화면을 열어 실제 상태를 확인하세요.`;
-  }
-
-  return preview;
 }
 
 function cleanSlaLabel(label: string) {

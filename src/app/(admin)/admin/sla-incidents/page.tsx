@@ -81,7 +81,7 @@ export default async function AdminSlaIncidentsPage({
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs font-black text-blue-700">NEXT ACTION</p>
-              <h2 className="mt-1 text-xl font-black text-slate-950">미확인 HIGH 먼저 처리</h2>
+              <h2 className="mt-1 text-xl font-black text-slate-950">미확인 HIGH</h2>
             </div>
             <div className="flex flex-wrap gap-2">
               <Link
@@ -120,9 +120,6 @@ export default async function AdminSlaIncidentsPage({
                   <div>
                     <p className="text-sm font-semibold text-slate-950">
                       {queueLabel(item.queueKey)}
-                    </p>
-                    <p className="sr-only">
-                      평균 해결 {item.averageResolutionHours}시간
                     </p>
                   </div>
                   <p className="text-2xl font-semibold text-[var(--gg-accent)]">
@@ -170,11 +167,6 @@ export default async function AdminSlaIncidentsPage({
                   <p className="text-2xl font-semibold text-sky-700">
                     {operator.acknowledgedCount}
                   </p>
-                </div>
-                <div className="sr-only">
-                  <p>진행 중 확인  {operator.openAcknowledgedCount}</p>
-                  <p>해결 확인 {operator.resolvedAcknowledgedCount}</p>
-                  <p>최근 확인  {operator.lastAcknowledgedAt}</p>
                 </div>
               </div>
             ))}
@@ -296,36 +288,10 @@ export default async function AdminSlaIncidentsPage({
               </div>
 
               <div className="mt-4 grid gap-2 text-xs text-slate-500 md:grid-cols-2 xl:grid-cols-3">
-                <p className="sr-only">최초 감지 {incident.firstDetectedAt}</p>
-                <p className="sr-only">최근 감지 {incident.lastDetectedAt}</p>
                 <p>확인 {incident.acknowledgedAt ?? "미확인"}</p>
                 <p>해결 {incident.resolvedAt ?? "미해결"}</p>
                 <p>경과 {incident.elapsedTime}</p>
                 <p>해결 시간 {incident.resolutionTime ?? "진행 중"}</p>
-              </div>
-
-              <div className="sr-only">
-                <div className="flex items-center justify-between gap-4">
-                  <p className="text-sm font-semibold text-slate-950">운영 메모</p>
-                  <p className="text-xs text-slate-500">최근 {incident.notes.length}개</p>
-                </div>
-                <div className="mt-3 space-y-3">
-                  {incident.notes.map((note) => (
-                    <div
-                      key={note.noteId}
-                      className="rounded-md border border-slate-200 bg-white p-3"
-                    >
-                      <p className="text-sm leading-6 text-slate-700">{note.body}</p>
-                      <p className="mt-2 text-xs text-slate-500">
-                        {note.adminName} / {note.adminEmail} / {note.createdAt}
-                      </p>
-                    </div>
-                  ))}
-
-                  {incident.notes.length === 0 ? (
-                    <p className="text-sm text-slate-500">아직 운영 메모가 없습니다.</p>
-                  ) : null}
-                </div>
               </div>
 
               <div className="mt-4 flex flex-wrap gap-3">
@@ -430,7 +396,7 @@ function queueLabel(queueKey: string) {
 
 function cleanPreview(queueKey: string, preview: string) {
   if (hasCorruptedText(preview) || preview === "No preview") {
-    return `${queueLabel(queueKey)} 항목입니다. 상세 화면에서 실제 상태를 확인하세요.`;
+    return `${queueLabel(queueKey)} 항목`;
   }
 
   return preview;

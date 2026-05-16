@@ -76,9 +76,6 @@ export default async function AdminAuditPage({
         <section className="rounded-lg border border-amber-200 bg-amber-50 p-5">
           <p className="text-sm font-black text-amber-800">다음 행동</p>
           <h2 className="mt-2 text-2xl font-black">{nextAction.title}</h2>
-          <p className="sr-only">
-            {nextAction.body}
-          </p>
           <Link
             href={nextAction.href}
             className="mt-4 inline-flex rounded-md bg-amber-600 px-4 py-2 text-sm font-black text-white hover:bg-amber-700"
@@ -376,41 +373,6 @@ function HeaderLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-function AuditWorkflow() {
-  const steps = [
-    {
-      title: "민감 작업 확인",
-      body: "출금, 입금, 분쟁, 권한 변경 로그를 우선 확인합니다.",
-      href: "/admin/audit?sensitivity=sensitive",
-    },
-    {
-      title: "사유 보완",
-      body: "사유가 비어 있는 민감 작업은 운영 메모를 남겨 추적 가능하게 만듭니다.",
-      href: "/admin/audit?sensitivity=sensitive&reason=missing&followupStatus=unresolved",
-    },
-    {
-      title: "업무 연결",
-      body: "대상 ID에서 주문, 지갑 요청, 유저 상세로 이동해 실제 상태를 대조합니다.",
-      href: "/admin/reports",
-    },
-  ];
-
-  return (
-    <section className="grid gap-3 md:grid-cols-3">
-      {steps.map((step) => (
-        <Link
-          key={step.title}
-          href={step.href}
-          className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-[var(--color-primary)]"
-        >
-          <p className="text-sm font-black text-slate-950">{step.title}</p>
-          <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{step.body}</p>
-        </Link>
-      ))}
-    </section>
-  );
-}
-
 function MetricCard({
   label,
   value,
@@ -605,7 +567,6 @@ function getAuditNextAction(state: AuditState) {
   if (unresolvedCount > 0) {
     return {
       title: `사유 보완이 필요한 민감 로그 ${unresolvedCount}건`,
-      body: "출금, 입금, 분쟁, 권한 변경처럼 돈과 권한에 닿는 작업은 사유가 비어 있으면 운영 리스크가 큽니다.",
       actionLabel: "보완 대상 보기",
       href: unresolvedMissingReasonsHref,
     };
@@ -614,7 +575,6 @@ function getAuditNextAction(state: AuditState) {
   if (state.summary.shownLogs === 0) {
     return {
       title: "조건에 맞는 로그가 없습니다",
-      body: "필터를 초기화한 뒤 주문 ID나 대상 ID로 다시 검색해 보세요.",
       actionLabel: "전체 로그 보기",
       href: "/admin/audit",
     };
@@ -622,7 +582,6 @@ function getAuditNextAction(state: AuditState) {
 
   return {
     title: "감사 로그 추적 상태 양호",
-    body: "최근 작업의 관리자, 대상, 사유, 변경 전후 데이터를 확인할 수 있습니다.",
     actionLabel: "민감 작업만 보기",
     href: "/admin/audit?sensitivity=sensitive",
   };
