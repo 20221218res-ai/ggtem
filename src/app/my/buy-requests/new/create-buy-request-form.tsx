@@ -128,6 +128,9 @@ export default function CreateBuyRequestForm({
     estimatedReserveAmount > 0 &&
     Number.isFinite(availableBalanceAmount) &&
     requiredBalanceAmount <= availableBalanceAmount;
+  const selectedGameName = selectedGame
+    ? getLocalizedGameName(selectedGame.name, selectedGame.localizedNames, countryCode)
+    : "GGtem";
 
   useEffect(() => {
     const handleCountryChange = () => setCountryCode(getCurrentCountryCode());
@@ -259,7 +262,7 @@ export default function CreateBuyRequestForm({
             title.trim() ||
             defaultBuyRequestTitle({
               category,
-              gameName: selectedGame?.name,
+              gameName: selectedGameName,
               serverName: selectedServer?.name,
               serverDetail,
               t,
@@ -617,7 +620,7 @@ export default function CreateBuyRequestForm({
             <FinalSummary
               rows={[
                 [t("listingForm.summaryCategory"), categoryLabel(category, t)],
-                [t("listingForm.summaryGameServer"), `${selectedGame?.name ?? "GGtem"} / ${formatServerLabel(selectedServer?.name ?? "-", serverDetail)}`],
+                [t("listingForm.summaryGameServer"), `${selectedGameName} / ${formatServerLabel(selectedServer?.name ?? "-", serverDetail)}`],
                 [t("listingForm.summaryTradeMode"), category === "GAME_MONEY" ? (tradeMode === "BULK" ? t("listingForm.bulkBuy") : t("listingForm.splitBuy")) : categoryLabel(category, t)],
                 [t("listingForm.summarySelectedUnit"), selectedPriceUnitLabel || "-"],
                 [t("listingForm.summaryInputQuantity"), category === "GAME_MONEY" ? `${quantityInput} x ${selectedPriceUnitLabel}` : quantityInput],

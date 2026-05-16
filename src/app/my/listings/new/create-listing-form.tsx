@@ -654,7 +654,7 @@ export default function CreateListingForm({
             {estimatedFullAmount} {currency}
           </p>
           <div className="mt-4 space-y-2 text-sm font-bold text-[var(--gg-muted)]">
-            <p>{selectedGame?.name ?? t("listingForm.game")}</p>
+            <p>{selectedGameName}</p>
             <p>{selectedServer?.name ?? t("listingForm.server")}</p>
             <p>{categoryLabel(category, t)}</p>
             {isAccountListing ? (
