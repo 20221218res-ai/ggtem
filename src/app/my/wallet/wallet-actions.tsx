@@ -259,7 +259,7 @@ export default function WalletActions({
     const paymentPin = withdrawPaymentPin.trim();
 
     if (!/^\d{4,6}$/.test(paymentPin)) {
-      setWithdrawalConfirmError("결제 PIN은 숫자 4~6자리로 입력해 주세요.");
+      setWithdrawalConfirmError(t("tradeSafety.paymentPinInvalid"));
       return;
     }
 
@@ -1334,7 +1334,7 @@ function WithdrawalFinalConfirmModal({
           </div>
 
           <label className="grid gap-2 text-sm font-black text-[var(--gg-text)]">
-            결제 PIN
+            <CountryText id="tradeSafety.paymentPinLabel" />
             <input
               type="password"
               inputMode="numeric"
@@ -1342,7 +1342,7 @@ function WithdrawalFinalConfirmModal({
               value={paymentPin}
               onChange={(event) => onPaymentPinChange(event.target.value)}
               autoComplete="one-time-code"
-              placeholder="4~6자리 결제 PIN"
+              placeholder={t("tradeSafety.paymentPinPlaceholder")}
               className="h-12 rounded-xl border border-[var(--gg-border)] bg-white px-4 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
             />
           </label>
