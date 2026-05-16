@@ -111,9 +111,7 @@ export default function AdminOrdersPage() {
 
   const summary = useMemo(() => getOrderListSummary(state.orders), [state.orders]);
   const selectedAction = state.detail ? getOrderNextAction(state.detail.status) : null;
-  const disputeDecisionNote = state.detail
-    ? extractDisputeDecisionNote(state.detail.events)
-    : null;
+  const disputeDecisionNote = state.detail ? extractDisputeDecisionNote(state.detail.events) : null;
 
   async function loadOrders(orderId?: string, nextStatus?: string, nextQuery?: string) {
     setError("");
@@ -134,11 +132,7 @@ export default function AdminOrdersPage() {
       const nextState = (await response.json()) as AdminOrdersState | { message?: string };
 
       if (!response.ok) {
-        throw new Error(
-          "message" in nextState && nextState.message
-            ? nextState.message
-            : "주문 목록을 불러오지 못했습니다.",
-        );
+        throw new Error("message" in nextState && nextState.message ? nextState.message : "주문 목록을 불러오지 못했습니다.");
       }
 
       const typedState = nextState as AdminOrdersState;
@@ -147,11 +141,7 @@ export default function AdminOrdersPage() {
       setStatusFilter(typedState.filters.status);
       setSearchQuery(typedState.filters.query);
     } catch (loadError) {
-      setError(
-        loadError instanceof Error
-          ? loadError.message
-          : "주문 목록을 불러오지 못했습니다.",
-      );
+      setError(loadError instanceof Error ? loadError.message : "주문 목록을 불러오지 못했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -165,13 +155,13 @@ export default function AdminOrdersPage() {
         ? [
             `주문 ${state.detail.orderNumber}을 구매자 환불로 종료할까요?`,
             `구매자 환불: ${state.detail.grossAmount} ${state.detail.currency}`,
-            `플랫폼 수수료 ${state.detail.platformFeeAmount} ${state.detail.currency}도 함께 정리됩니다.`,
+            `플랫폼 수수료: ${state.detail.platformFeeAmount} ${state.detail.currency}`,
             `메모: ${disputeNote.trim() || "없음"}`,
           ].join("\n")
         : [
             `주문 ${state.detail.orderNumber}을 판매자 정산으로 종료할까요?`,
             `판매자 정산: ${state.detail.sellerReceivableAmount} ${state.detail.currency}`,
-            `플랫폼 수수료 ${state.detail.platformFeeAmount} ${state.detail.currency}는 판매자에게 지급하지 않습니다.`,
+            `플랫폼 수수료: ${state.detail.platformFeeAmount} ${state.detail.currency}`,
             `메모: ${disputeNote.trim() || "없음"}`,
           ].join("\n"),
     );
@@ -202,11 +192,7 @@ export default function AdminOrdersPage() {
       await loadOrders(state.detail.orderId, statusFilter, searchQuery);
       setDisputeNote("");
     } catch (resolveError) {
-      setError(
-        resolveError instanceof Error
-          ? resolveError.message
-          : "분쟁 처리를 완료하지 못했습니다.",
-      );
+      setError(resolveError instanceof Error ? resolveError.message : "분쟁 처리를 완료하지 못했습니다.");
     } finally {
       setIsResolving(false);
     }
@@ -293,38 +279,24 @@ export default function AdminOrdersPage() {
                 </option>
               ))}
             </select>
-            <button
-              type="submit"
-              className="rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-slate-950 hover:brightness-105"
-            >
+            <button type="submit" className="rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-slate-950 hover:brightness-105">
               검색
             </button>
           </form>
         </section>
 
-        {error ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-700">
-            {error}
-          </div>
-        ) : null}
+        {error ? <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-700">{error}</div> : null}
 
         <section className="grid gap-5 xl:grid-cols-[420px_1fr]">
           <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between gap-4">
               <h2 className="text-lg font-black">주문 목록</h2>
-              <span className="text-sm font-black text-slate-500">
-                {state.orders.length.toLocaleString("ko-KR")}건
-              </span>
+              <span className="text-sm font-black text-slate-500">{state.orders.length.toLocaleString("ko-KR")}건</span>
             </div>
 
             <div className="mt-4 space-y-3">
-              {isLoading ? (
-                <EmptyState title="불러오는 중" />
-              ) : null}
-
-              {!isLoading && state.orders.length === 0 ? (
-                <EmptyState title="주문 없음" />
-              ) : null}
+              {isLoading ? <EmptyState title="불러오는 중" /> : null}
+              {!isLoading && state.orders.length === 0 ? <EmptyState title="주문 없음" /> : null}
 
               {state.orders.map((order) => (
                 <button
@@ -339,9 +311,7 @@ export default function AdminOrdersPage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-black text-slate-950">
-                        {order.listingTitle}
-                      </p>
+                      <p className="text-sm font-black text-slate-950">{order.listingTitle}</p>
                       <p className="mt-1 text-xs font-bold text-slate-500">
                         {order.orderNumber} / {order.buyerName} / {order.sellerName}
                       </p>
@@ -425,15 +395,10 @@ function OrderDetail({
         </div>
       ) : null}
 
-      <SettlementDecisionGuide detail={detail} />
-
       <div className="grid gap-3 md:grid-cols-4">
         <DetailCard label="주문 금액" value={`${detail.grossAmount} ${detail.currency}`} />
         <DetailCard label="에스크로" value={`${detail.escrowAmount} ${detail.currency}`} />
-        <DetailCard
-          label="판매자 정산"
-          value={`${detail.sellerReceivableAmount} ${detail.currency}`}
-        />
+        <DetailCard label="판매자 정산" value={`${detail.sellerReceivableAmount} ${detail.currency}`} />
         <DetailCard label="플랫폼 수수료" value={`${detail.platformFeeAmount} ${detail.currency}`} />
       </div>
 
@@ -441,8 +406,8 @@ function OrderDetail({
         <summary className="cursor-pointer text-base font-black">상세 정보 / 바로가기</summary>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <DetailRow label="수량" value={detail.quantity} />
-          <DetailRow label="구매자 게임 아이디" value={detail.buyerGameNickname ?? detail.tradeCharacterName ?? "-"} />
-          <DetailRow label="판매자 게임 아이디" value={detail.sellerGameNickname ?? detail.tradeCharacterName ?? "-"} />
+          <DetailRow label="구매자 게임 ID" value={detail.buyerGameNickname ?? detail.tradeCharacterName ?? "-"} />
+          <DetailRow label="판매자 게임 ID" value={detail.sellerGameNickname ?? detail.tradeCharacterName ?? "-"} />
           <DetailRow label="생성일" value={detail.createdAt} />
           <DetailRow label="완료일" value={detail.completedAt ?? "-"} />
           <DetailRow label="취소일" value={detail.canceledAt ?? "-"} />
@@ -460,15 +425,10 @@ function OrderDetail({
       {detail.status === "DISPUTED" ? (
         <section className="rounded-xl border border-red-200 bg-red-50 p-4">
           <h3 className="text-base font-black text-red-800">분쟁 처리</h3>
-          <p className="mt-2 text-sm font-bold text-red-700">
-            {detail.disputeReason ?? disputeDecisionNote ?? "분쟁 사유 확인 필요"}
-          </p>
+          <p className="mt-2 text-sm font-bold text-red-700">{detail.disputeReason ?? disputeDecisionNote ?? "분쟁 사유 확인 필요"}</p>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             <DecisionPreview label="구매자 환불" body={detail.decisionPreview.refundBuyer} />
-            <DecisionPreview
-              label="판매자 정산"
-              body={detail.decisionPreview.releaseToSeller}
-            />
+            <DecisionPreview label="판매자 정산" body={detail.decisionPreview.releaseToSeller} />
           </div>
           <textarea
             value={disputeNote}
@@ -499,9 +459,7 @@ function OrderDetail({
       ) : null}
 
       <details className="rounded-xl border border-slate-200 p-4">
-        <summary className="cursor-pointer text-base font-black">
-          원장 / 이벤트 기록
-        </summary>
+        <summary className="cursor-pointer text-base font-black">원장 / 이벤트 기록</summary>
         <div className="mt-4 grid gap-5 xl:grid-cols-2">
           <LedgerSection entries={detail.ledgerEntries} />
           <section className="rounded-lg border border-slate-200 p-4">
@@ -513,9 +471,7 @@ function OrderDetail({
                     <StatusBadge status={event.status} />
                     <span className="text-xs font-bold text-slate-500">{event.createdAt}</span>
                   </div>
-                  <p className="mt-2 text-sm font-bold text-slate-700">
-                    {cleanEventMessage(event.message)}
-                  </p>
+                  <p className="mt-2 text-sm font-bold text-slate-700">{cleanEventMessage(event.message)}</p>
                 </div>
               ))}
             </div>
@@ -526,41 +482,13 @@ function OrderDetail({
   );
 }
 
-function SettlementDecisionGuide({ detail }: { detail: AdminOrderDetail }) {
-  return (
-    <section className="grid gap-3 lg:grid-cols-[1fr_1fr_1fr]">
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="text-xs font-black uppercase text-slate-500">구매자 결제 / 에스크로</p>
-        <p className="mt-2 text-2xl font-black text-slate-950">
-          {detail.grossAmount} {detail.currency}
-        </p>
-      </div>
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
-        <p className="text-xs font-black uppercase text-emerald-700">판매자 실제 정산</p>
-        <p className="mt-2 text-2xl font-black text-emerald-700">
-          {detail.sellerReceivableAmount} {detail.currency}
-        </p>
-      </div>
-      <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 shadow-sm">
-        <p className="text-xs font-black uppercase text-sky-700">플랫폼 수수료</p>
-        <p className="mt-2 text-2xl font-black text-sky-700">
-          {detail.platformFeeAmount} {detail.currency}
-        </p>
-      </div>
-    </section>
-  );
-}
-
 function LedgerSection({ entries }: { entries: AdminOrderDetail["ledgerEntries"] }) {
   return (
     <section className="rounded-lg border border-slate-200 p-4">
       <h3 className="text-base font-black">원장</h3>
       <div className="mt-3 space-y-2">
         {entries.map((entry) => (
-          <div
-            key={entry.entryId}
-            className="grid gap-2 rounded-md bg-slate-50 p-3 text-xs font-bold text-slate-600 md:grid-cols-[1fr_auto_auto]"
-          >
+          <div key={entry.entryId} className="grid gap-2 rounded-md bg-slate-50 p-3 text-xs font-bold text-slate-600 md:grid-cols-[1fr_auto_auto]">
             <div>
               <p className="text-sm font-black text-slate-900">
                 {ledgerTypeLabel(entry.type)} / {bucketLabel(entry.bucket)}
@@ -571,9 +499,7 @@ function LedgerSection({ entries }: { entries: AdminOrderDetail["ledgerEntries"]
             <span className="font-black text-slate-950">{entry.amount}</span>
           </div>
         ))}
-        {entries.length === 0 ? (
-          <EmptyState title="원장 없음" />
-        ) : null}
+        {entries.length === 0 ? <EmptyState title="원장 없음" /> : null}
       </div>
     </section>
   );
@@ -597,14 +523,7 @@ function getOrderListSummary(orders: AdminOrdersState["orders"]) {
   return {
     total: orders.length,
     active: orders.filter((order) =>
-      [
-        "REQUESTED",
-        "ESCROW_LOCKED",
-        "SELLER_RESPONSE_PENDING",
-        "DELIVERY_IN_PROGRESS",
-        "DELIVERY_COMPLETED",
-        "BUYER_CONFIRM_PENDING",
-      ].includes(order.status),
+      ["REQUESTED", "ESCROW_LOCKED", "SELLER_RESPONSE_PENDING", "DELIVERY_IN_PROGRESS", "DELIVERY_COMPLETED", "BUYER_CONFIRM_PENDING"].includes(order.status),
     ).length,
     disputed: orders.filter((order) => order.status === "DISPUTED").length,
     completed: orders.filter((order) => order.status === "COMPLETED").length,
@@ -663,9 +582,7 @@ function cleanEventMessage(message: string) {
     .replaceAll("Note:", "메모:");
 }
 
-function extractDisputeDecisionNote(
-  events: NonNullable<AdminOrdersState["detail"]>["events"],
-) {
+function extractDisputeDecisionNote(events: NonNullable<AdminOrdersState["detail"]>["events"]) {
   const event = events.find((item) => item.status === "DISPUTED");
   return event ? cleanEventMessage(event.message) : null;
 }
@@ -705,11 +622,7 @@ function bucketLabel(bucket: string) {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  return (
-    <span className={`rounded px-2 py-1 text-xs font-black ${statusTone(status)}`}>
-      {formatOrderStatus(status)}
-    </span>
-  );
+  return <span className={`rounded px-2 py-1 text-xs font-black ${statusTone(status)}`}>{formatOrderStatus(status)}</span>;
 }
 
 function Metric({
@@ -756,10 +669,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 
 function TraceLink({ href, label }: { href: string; label: string }) {
   return (
-    <a
-      href={href}
-      className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-50"
-    >
+    <a href={href} className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-50">
       {label}
     </a>
   );
@@ -776,10 +686,7 @@ function DecisionPreview({ label, body }: { label: string; body: string }) {
 
 function ActionLink({ href, label }: { href: string; label: string }) {
   return (
-    <a
-      href={href}
-      className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 hover:bg-slate-50"
-    >
+    <a href={href} className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 hover:bg-slate-50">
       {label}
     </a>
   );
