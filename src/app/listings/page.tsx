@@ -924,7 +924,7 @@ function ListingRow({
   return (
     <Link
       href={`/listings/${listing.listingId}`}
-      className={`grid gap-4 rounded-2xl border bg-[var(--gg-card-bg)] p-4 hover:border-[var(--gg-accent)] md:grid-cols-[1fr_220px] ${rowClass}`}
+      className={`grid gap-4 rounded-2xl border bg-[var(--gg-card-bg)] p-4 hover:border-[var(--gg-accent)] md:grid-cols-[minmax(0,1fr)_340px_220px] md:items-center ${rowClass}`}
     >
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
@@ -958,12 +958,19 @@ function ListingRow({
           {formatServerLabel(listing.serverName, listing.serverDetail) || <CountryText id="listings.noServer" />} /{" "}
           <CountryText id="listings.seller" /> {listing.sellerName}
         </p>
-        <div className="mt-3 flex flex-wrap gap-2 text-xs font-black text-[var(--gg-muted)]">
+        <div className="mt-3 flex flex-wrap gap-2">
           {listing.category === "GAME_ACCOUNT" ? (
             <AccountTypeChip value={listing.accountTransferType} />
           ) : null}
-          <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
-            <CountryText id="listings.minimum" />{" "}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 text-sm font-black text-[var(--gg-muted)] md:items-center md:justify-self-center">
+        <div className="grid grid-cols-[72px_minmax(0,1fr)] items-baseline gap-3">
+          <span className="text-center">
+            <CountryText id="listings.minimum" />
+          </span>
+          <span className="text-[var(--gg-text)]">
             {listing.category === "GAME_MONEY" ? (
               <GameMoneyQuantityText
                 quantity={listing.minimumQuantity}
@@ -974,8 +981,12 @@ function ListingRow({
               minimumQuantityLabel
             )}
           </span>
-          <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
-            <CountryText id="listings.stock" />{" "}
+        </div>
+        <div className="grid grid-cols-[72px_minmax(0,1fr)] items-baseline gap-3">
+          <span className="text-center">
+            <CountryText id="listings.stock" />
+          </span>
+          <span className="text-[var(--gg-text)]">
             {listing.category === "GAME_MONEY" ? (
               <GameMoneyQuantityText
                 quantity={listing.availableQuantity}
