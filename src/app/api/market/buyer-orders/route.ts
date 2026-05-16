@@ -22,7 +22,10 @@ export async function POST(request: NextRequest) {
 
     if (!body.orderId || !body.action) {
       return NextResponse.json(
-        { message: "주문 정보와 처리할 작업이 필요합니다." },
+        {
+          message: "주문 정보와 처리할 작업이 필요합니다.",
+          messageKey: "orderManage.actionInfoRequired",
+        },
         { status: 400 },
       );
     }
@@ -35,7 +38,11 @@ export async function POST(request: NextRequest) {
 
       if (!pinCheck.ok) {
         return NextResponse.json(
-          { code: pinCheck.code, message: pinCheck.message },
+          {
+            code: pinCheck.code,
+            message: pinCheck.message,
+            messageKey: getPaymentPinErrorKey(pinCheck.code),
+          },
           { status: pinCheck.status },
         );
       }
@@ -47,7 +54,10 @@ export async function POST(request: NextRequest) {
       reason: body.reason,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey: getBuyerActionMessageKey(body.action),
+    });
   } catch (error) {
     return NextResponse.json(
       {
@@ -55,8 +65,23 @@ export async function POST(request: NextRequest) {
           error instanceof Error
             ? error.message
             : "구매 주문 상태 변경에 실패했습니다.",
+        messageKey: "orderManage.updateFailed",
       },
       { status: 400 },
     );
   }
+}
+
+function getBuyerActionMessageKey(action: BuyerOrderActionBody["action"]) {
+  if (action === "CANCEL_ORDER") return "orderManage.cancelSuccess";
+  if (action === "CONFIRM_DELIVERY") return "orderManage.confirmSuccess";
+  if (action === "REPORT_PROBLEM") return "orderManage.disputeSuccess";
+  return "common.confirm";
+}
+
+function getPaymentPinErrorKey(code: string) {
+  if (code === "PAYMENT_PIN_NOT_SET") return "tradeSafety.paymentPinMissing";
+  if (code === "PAYMENT_PIN_INVALID_FORMAT") return "tradeSafety.paymentPinInvalid";
+  if (code === "PAYMENT_PIN_MISMATCH") return "tradeSafety.paymentPinStatusError";
+  return "tradeSafety.paymentPinStatusError";
 }

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { TranslationKey } from "@/app/i18n";
 import useCountryTranslation from "@/app/use-country-translation";
 import { ActionConfirmDialog } from "@/components/action-confirm-dialog";
 import { TradeSafetyConfirmDialog } from "@/components/trade-safety-confirm-dialog";
@@ -17,6 +18,7 @@ type BuyerOrderActionResponse = {
   orderId: string;
   status: string;
   message: string;
+  messageKey?: TranslationKey;
 };
 
 export function BuyerOrderActions({ orderId, status }: BuyerOrderActionsProps) {
@@ -101,13 +103,15 @@ export function BuyerOrderActions({ orderId, status }: BuyerOrderActionsProps) {
           paymentPin: input?.password,
         }),
       });
-      const result = (await response.json()) as BuyerOrderActionResponse | { message?: string };
+      const result = (await response.json()) as BuyerOrderActionResponse | { message?: string; messageKey?: TranslationKey };
 
       if (!response.ok) {
-        throw new Error("message" in result && result.message ? result.message : t("orderManage.updateFailed"));
+        throw new Error(
+          result.messageKey ? t(result.messageKey) : "message" in result && result.message ? result.message : t("orderManage.updateFailed"),
+        );
       }
 
-      setSuccess((result as BuyerOrderActionResponse).message || t("common.confirm"));
+      setSuccess(result.messageKey ? t(result.messageKey) : (result as BuyerOrderActionResponse).message || t("common.confirm"));
       setPendingAction(null);
       router.refresh();
     } catch (submitError) {

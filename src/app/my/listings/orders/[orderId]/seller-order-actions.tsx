@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { TranslationKey } from "@/app/i18n";
 import useCountryTranslation from "@/app/use-country-translation";
 import { ActionConfirmDialog } from "@/components/action-confirm-dialog";
 
@@ -19,6 +20,7 @@ type SellerOrderActionResponse = {
   orderId: string;
   status: string;
   message: string;
+  messageKey?: TranslationKey;
 };
 
 export function SellerOrderActions({ orderId, status }: SellerOrderActionsProps) {
@@ -53,13 +55,15 @@ export function SellerOrderActions({ orderId, status }: SellerOrderActionsProps)
         },
         body: JSON.stringify({ orderId, action }),
       });
-      const result = (await response.json()) as SellerOrderActionResponse | { message?: string };
+      const result = (await response.json()) as SellerOrderActionResponse | { message?: string; messageKey?: TranslationKey };
 
       if (!response.ok) {
-        throw new Error("message" in result && result.message ? result.message : t("orderManage.updateFailed"));
+        throw new Error(
+          result.messageKey ? t(result.messageKey) : "message" in result && result.message ? result.message : t("orderManage.updateFailed"),
+        );
       }
 
-      setSuccess((result as SellerOrderActionResponse).message || t("common.confirm"));
+      setSuccess(result.messageKey ? t(result.messageKey) : (result as SellerOrderActionResponse).message || t("common.confirm"));
       setPendingAction(null);
       router.refresh();
     } catch (submitError) {
