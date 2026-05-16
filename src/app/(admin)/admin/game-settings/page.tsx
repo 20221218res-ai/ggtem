@@ -147,7 +147,7 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
               <Field name="nameVn" label="베트남어 게임명" placeholder="Lineage W" />
               <Field name="namePh" label="필리핀/영어 게임명" placeholder="Lineage W" />
               <Field name="nameTh" label="태국어 게임명" placeholder="Lineage W" />
-              <Field name="imageAlt" label="이미지 설명" placeholder="Lineage W 대표 이미지" />
+              <Field name="imageAlt" label="이미지 ALT" placeholder="Lineage W" />
               <FileField name="image" label="게임 이미지" />
               <FormSubmitButton className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
                 게임 추가
@@ -293,7 +293,7 @@ function GameCard({ game }: { game: GameRow }) {
             <Field name="nameVn" label="베트남어 게임명" defaultValue={game.nameVn || ""} />
             <Field name="namePh" label="필리핀/영어 게임명" defaultValue={game.namePh || ""} />
             <Field name="nameTh" label="태국어 게임명" defaultValue={game.nameTh || ""} />
-            <Field name="imageAlt" label="이미지 설명" defaultValue={game.imageAlt || game.name} />
+            <Field name="imageAlt" label="이미지 ALT" defaultValue={game.imageAlt || game.name} />
             <FileField name="image" label="이미지 교체" />
             <FormSubmitButton className="w-full rounded-lg bg-slate-950 px-4 py-3 text-sm font-black text-white">
               저장

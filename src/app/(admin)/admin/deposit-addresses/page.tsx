@@ -33,7 +33,7 @@ export default async function AdminDepositAddressesPage({
     <AdminMockPage
       icon="USDT"
       title="입금 주소"
-      subtitle=""
+      subtitle=" "
       actions={null}
     >
       <MetricGrid
@@ -118,9 +118,6 @@ export default async function AdminDepositAddressesPage({
         })}
       </section>
 
-      <SoftNotice tone="amber">
-        최고관리자 전용 작업입니다. 저장 시 비밀번호 재확인과 감사 로그가 남습니다.
-      </SoftNotice>
     </AdminMockPage>
   );
 }
