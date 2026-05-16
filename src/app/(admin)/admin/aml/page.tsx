@@ -26,13 +26,13 @@ export default async function AmlPage() {
     <AdminMockPage
       icon="AML"
       title="AML 점검"
-      subtitle="의심 거래 점검 진입 화면"
+      subtitle=""
       actions={
         <>
           <LinkLike href="/admin/risk">리스크</LinkLike>
           <LinkLike href="/admin/finance/ledger">원장</LinkLike>
           <LinkLike href="/admin/audit?query=AML">감사</LinkLike>
-          <ButtonLike tone="primary" disabled title="STR/FIU 보고 기능은 연결 전입니다.">
+          <ButtonLike tone="primary" disabled>
             보고 준비중
           </ButtonLike>
         </>
