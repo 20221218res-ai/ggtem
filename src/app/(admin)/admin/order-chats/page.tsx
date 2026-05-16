@@ -44,10 +44,6 @@ export default async function AdminOrderChatsPage({
                 ORDER CHAT MONITOR
               </p>
               <h1 className="mt-1 text-2xl font-black">주문 채팅 열람</h1>
-              <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-600">
-                분쟁 중재, 외부거래 단속, 사기 방지를 위해 운영자가 주문 채팅을 확인하는
-                화면입니다. 채팅 상세를 열람하면 감사 로그에 기록됩니다.
-              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <AdminLink href="/admin/risk">리스크</AdminLink>
@@ -87,9 +83,9 @@ export default async function AdminOrderChatsPage({
         </header>
 
         <section className="grid gap-3 md:grid-cols-3">
-          <Metric label="전체 채팅방" value={state.summary.totalRooms} tone="blue" />
-          <Metric label="표시 중" value={state.summary.shownRooms} tone="slate" />
-          <Metric label="위험 신호 포함" value={state.summary.riskyRooms} tone="red" />
+          <Metric label="전체" value={state.summary.totalRooms} tone="blue" />
+          <Metric label="표시" value={state.summary.shownRooms} tone="slate" />
+          <Metric label="위험" value={state.summary.riskyRooms} tone="red" />
         </section>
 
         <section className="grid gap-5 xl:grid-cols-[440px_1fr]">
@@ -114,7 +110,7 @@ function ChatRoomList({
   return (
     <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
       <div className="border-b border-slate-200 p-4">
-        <p className="text-sm font-black text-slate-500">채팅방 목록</p>
+        <p className="text-sm font-black text-slate-500">채팅방</p>
       </div>
       <div className="max-h-[760px] overflow-y-auto p-3">
         {rooms.map((room) => {
@@ -160,7 +156,7 @@ function ChatRoomList({
 
         {rooms.length === 0 ? (
           <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-sm font-semibold text-slate-500">
-            조건에 맞는 주문 채팅방이 없습니다.
+            채팅방 없음
           </p>
         ) : null}
       </div>
@@ -172,7 +168,7 @@ function ChatDetailPanel({ detail }: { detail: ChatDetail | null }) {
   if (!detail) {
     return (
       <section className="rounded-lg border border-slate-200 bg-white p-8 text-center text-sm font-semibold text-slate-500 shadow-sm">
-        왼쪽에서 채팅방을 선택하면 전체 주문 채팅이 표시됩니다.
+        채팅방을 선택하세요.
       </section>
     );
   }

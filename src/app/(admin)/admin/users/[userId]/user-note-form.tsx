@@ -53,27 +53,15 @@ export default function UserNoteForm({ userId }: { userId: string }) {
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
       <p className="text-sm font-semibold text-slate-600">운영 메모</p>
-      <h2 className="mt-1 text-xl font-black text-slate-950">
-        운영 메모 추가
-      </h2>
-      <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
-        신고 근거, 계정 조치 사유, 후속 확인 일정을 다음 운영자가 이해할 수
-        있게 남깁니다.
-      </p>
-      <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold leading-5 text-emerald-800">
-        추천 형식: 확인한 근거 / 판단 내용 / 다음 조치. 주문번호, 신고번호,
-        지갑 원장 항목을 함께 적으면 추적이 쉬워집니다.
-      </div>
+      <h2 className="mt-1 text-xl font-black text-slate-950">메모 추가</h2>
       <textarea
         value={body}
         onChange={(event) => setBody(event.target.value)}
         rows={4}
         className="mt-4 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-emerald-500"
-        placeholder="예: 주문 OOO 분쟁 확인, 채팅 증거 검토 필요, 출금 보류 유지 후 24시간 뒤 재확인"
+        placeholder="예: 주문번호 / 확인 근거 / 다음 조치"
       />
-      <p className="mt-2 text-xs font-semibold text-slate-500">
-        {body.length}자
-      </p>
+      <p className="mt-2 text-xs font-semibold text-slate-500">{body.length}자</p>
       <button
         type="button"
         onClick={() => void submitNote()}

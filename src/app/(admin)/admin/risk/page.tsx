@@ -39,12 +39,9 @@ export default async function AdminRiskPage({ searchParams }: AdminRiskPageProps
           <div>
             <p className="text-sm font-black text-[var(--color-primary)]">RISK DESK</p>
             <h1 className="mt-1 text-2xl font-black">신고·리스크 관리</h1>
-            <p className="mt-2 text-sm font-semibold text-slate-500">
-              신고, 위험 신호, 판매 제한 후보를 한 화면에서 확인하고 조치합니다.
-            </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <AdminLink href="/admin/users">유저 관리</AdminLink>
+            <AdminLink href="/admin/users">유저</AdminLink>
             <AdminLink href="/admin/orders?status=DISPUTED">분쟁 주문</AdminLink>
             <AdminLink href="/admin/review-moderation">리뷰 검토</AdminLink>
             <AdminLink href="/admin/audit?targetType=TRUST_REPORT">감사 로그</AdminLink>
@@ -73,8 +70,6 @@ export default async function AdminRiskPage({ searchParams }: AdminRiskPageProps
             </Link>
           </div>
         </section>
-
-        <RiskOperationFlow />
 
         <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-4 flex flex-wrap gap-2">
@@ -201,9 +196,6 @@ function SellerRiskCandidatesSection({ candidates }: { candidates: SellerRiskCan
                   <p className="mt-1 text-lg font-black text-red-950">
                     {candidate.offPlatformReportCount.toLocaleString("ko-KR")}건
                   </p>
-                  <p className="mt-1 text-xs font-semibold leading-5 text-red-800">
-                    채팅 원문과 감사 로그를 확인한 뒤 판매 제한 또는 출금 보류를 검토하세요.
-                  </p>
                 </div>
               ) : null}
 
@@ -238,7 +230,7 @@ function RiskReportList({ reports }: { reports: RiskReport[] }) {
       <div className="flex flex-col gap-2 border-b border-slate-200 p-5 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm font-black text-[var(--color-primary)]">REPORT QUEUE</p>
-          <h2 className="text-xl font-black">신고 처리 목록</h2>
+          <h2 className="text-xl font-black">신고 목록</h2>
         </div>
         <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-black text-slate-600">
           {reports.length}건
@@ -248,7 +240,7 @@ function RiskReportList({ reports }: { reports: RiskReport[] }) {
       <div className="divide-y divide-slate-100">
         {reports.map((report) => {
           const signal = getReportReviewSignal(report);
-          const description = cleanText(report.description, "신고 내용이 비어 있거나 표시할 수 없습니다.");
+          const description = cleanText(report.description, "내용 없음");
 
           return (
             <article key={report.reportId} className="p-5">
@@ -398,13 +390,12 @@ function OffPlatformReportPanel({ report }: { report: RiskReport }) {
         )}
       </div>
       <p className="mt-3 font-semibold leading-6">
-        GGtem 채팅과 에스크로 밖으로 이동시키는 시도입니다. 주문 채팅 원문과 감사 로그를 먼저 확인하고,
-        반복 시 판매 제한 또는 출금 보류를 검토하세요.
+        외부거래 의심 신호입니다. 채팅 원문과 감사 로그를 확인하세요.
       </p>
       <div className="mt-3 grid gap-2 md:grid-cols-3">
         <SignalPill label="연결 주문" value={report.orderNumber ?? report.orderId ?? "주문 없음"} />
         <SignalPill label="대상 계정" value={`${report.targetName} / ${userStatusLabel(report.targetStatus)}`} />
-        <SignalPill label="권장 처리" value="검토 중 전환 후 증거 확인" />
+        <SignalPill label="권장 처리" value="검토 중" />
       </div>
     </div>
   );

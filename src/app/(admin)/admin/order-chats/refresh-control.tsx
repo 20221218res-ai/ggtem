@@ -42,10 +42,7 @@ export function AdminOrderChatsRefresh({
   return (
     <div className="mt-4 flex flex-col gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 md:flex-row md:items-center md:justify-between">
       <div>
-        <p className="text-sm font-black text-slate-800">운영 감시 옵션</p>
-        <p className="mt-1 text-xs font-semibold text-slate-500">
-          위험 채팅 필터와 자동 새로고침은 현재 검색 조건을 유지합니다.
-        </p>
+        <p className="text-sm font-black text-slate-800">감시 옵션</p>
       </div>
       <div className="flex flex-wrap gap-2">
         <button
@@ -57,7 +54,7 @@ export function AdminOrderChatsRefresh({
               : "border border-red-200 bg-white text-red-700"
           }`}
         >
-          위험 채팅만 보기 {riskOnly ? "ON" : "OFF"}
+          위험만 {riskOnly ? "ON" : "OFF"}
         </button>
         <button
           type="button"
@@ -68,7 +65,7 @@ export function AdminOrderChatsRefresh({
               : "border border-slate-200 bg-white text-slate-700"
           }`}
         >
-          15초 자동 갱신 {autoRefresh ? "ON" : "OFF"}
+          자동 갱신 {autoRefresh ? "ON" : "OFF"}
         </button>
       </div>
     </div>

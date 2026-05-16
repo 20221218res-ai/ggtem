@@ -50,8 +50,8 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
               <h1 className="mt-1 text-2xl font-black">유저 관리</h1>
             </div>
             <div className="flex flex-wrap gap-2">
-              <HeaderLink href="/admin/admin-accounts" label="관리자 계정" />
-              <HeaderLink href="/admin/finance/ledger" label="지갑 원장" />
+              <HeaderLink href="/admin/admin-accounts" label="관리자" />
+              <HeaderLink href="/admin/finance/ledger" label="원장" />
               <HeaderLink href="/admin/audit?targetType=USER" label="감사 로그" />
             </div>
           </div>
@@ -67,7 +67,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
         <section className="rounded-lg border border-amber-200 bg-amber-50 p-5 shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-sm font-black text-amber-700">우선 확인</p>
+              <p className="text-sm font-black text-amber-700">다음 액션</p>
               <h2 className="mt-1 text-xl font-black text-slate-950">
                 {nextAction.title}
               </h2>
@@ -211,7 +211,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                       tone={statusTone(user.status)}
                     />
                     <Badge
-                      label={user.isOperator ? "운영 계정" : "일반 유저"}
+                      label={user.isOperator ? "운영" : "일반"}
                       tone={user.isOperator ? "blue" : "slate"}
                     />
                   </div>
@@ -433,31 +433,31 @@ function getUsersNextAction(summary: {
 }) {
   if (summary.withdrawalHoldUsers > 0) {
     return {
-      title: "출금 보류 계정을 확인하세요",
+      title: `출금 보류 ${summary.withdrawalHoldUsers.toLocaleString("ko-KR")}명`,
       href: "/admin/users?status=WITHDRAWAL_HOLD",
-      actionLabel: "출금 보류 보기",
+      actionLabel: "바로 보기",
     };
   }
 
   if (summary.restrictedUsers > 0) {
     return {
-      title: "판매 제한 계정을 확인하세요",
+      title: `판매 제한 ${summary.restrictedUsers.toLocaleString("ko-KR")}명`,
       href: "/admin/users?status=SELLING_RESTRICTED",
-      actionLabel: "판매 제한 보기",
+      actionLabel: "바로 보기",
     };
   }
 
   if (summary.suspendedUsers + summary.bannedUsers > 0) {
     return {
-      title: "정지/차단 계정을 점검하세요",
+      title: `정지/차단 ${(summary.suspendedUsers + summary.bannedUsers).toLocaleString("ko-KR")}명`,
       href: "/admin/users?status=SUSPENDED",
-      actionLabel: "정지 계정 보기",
+      actionLabel: "바로 보기",
     };
   }
 
   return {
-    title: "운영 계정 권한을 주기적으로 점검하세요",
+    title: `운영 계정 ${summary.operatorUsers.toLocaleString("ko-KR")}명`,
     href: "/admin/users?role=ADMIN",
-    actionLabel: "관리자 보기",
+    actionLabel: "권한 보기",
   };
 }

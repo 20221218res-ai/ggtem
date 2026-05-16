@@ -48,9 +48,7 @@ export default async function AdminUserDetailPage({
       <section className="mx-auto flex max-w-[1500px] flex-col gap-5">
         <header className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-black text-emerald-600">
-              관리자 / 유저 상세
-            </p>
+            <p className="text-sm font-black text-emerald-600">USER DETAIL</p>
             <h1 className="mt-1 text-2xl font-black">
               {detail.user.displayName}
             </h1>
@@ -60,21 +58,21 @@ export default async function AdminUserDetailPage({
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <LinkButton href="/admin/users" label="유저 목록" tone="dark" />
+            <LinkButton href="/admin/users" label="목록" tone="dark" />
             <LinkButton
               href={`/admin/risk?query=${encodeURIComponent(detail.user.email)}`}
-              label="신고/위험"
+              label="위험"
               tone="amber"
             />
             <LinkButton
               href={`/admin/audit?query=${encodeURIComponent(detail.user.email)}`}
-              label="감사 로그"
+              label="감사"
             />
             <LinkButton
               href={`/admin/finance/ledger?q=${encodeURIComponent(
                 detail.user.userId,
               )}`}
-              label="지갑 원장"
+              label="원장"
               tone="blue"
             />
           </div>
@@ -84,25 +82,25 @@ export default async function AdminUserDetailPage({
           <SummaryCard
             label="계정 상태"
             value={statusLabel(detail.user.status)}
-            body={accountStatusHint(detail.user.status)}
+            body=""
             tone={detail.user.status === "ACTIVE" ? "emerald" : "amber"}
           />
           <SummaryCard
             label="거래 신호"
             value={`${totalTradeSignals.toLocaleString("ko-KR")}건`}
-            body="구매 주문, 판매 주문, 등록 매물을 합산한 활동 신호입니다."
+            body=""
             tone="cyan"
           />
           <SummaryCard
             label="신고/리뷰 신호"
             value={`${reportSignalCount.toLocaleString("ko-KR")}건`}
-            body="작성한 신고와 받은 신고를 함께 보고 반복 패턴을 확인하세요."
+            body=""
             tone={reportSignalCount > 0 ? "amber" : "slate"}
           />
           <SummaryCard
             label="지갑 주의"
             value={walletHasLocks ? "잠금 있음" : "정상"}
-            body={walletStatusHint(walletHasLocks, detail.wallet !== null)}
+            body=""
             tone={walletHasLocks ? "red" : "blue"}
           />
         </section>
@@ -161,10 +159,7 @@ export default async function AdminUserDetailPage({
 
         {detail.user.isOperator ? (
           <section className="rounded-lg border border-[color-mix(in_srgb,var(--gg-accent)_40%,transparent)] bg-[color-mix(in_srgb,var(--gg-accent)_12%,transparent)] p-5 text-sm font-semibold leading-6 text-[var(--gg-accent)]">
-            <p className="font-black">운영 계정 상세 확인</p>
-            <p className="mt-2">
-              이 유저는 관리자 페이지 접근 권한이 있는 운영 계정입니다. 권한 변경, 상태 제한, 감사 로그 확인은 일반 유저보다 더 보수적으로 처리하세요.
-            </p>
+            <p className="font-black">운영 계정</p>
           </section>
         ) : null}
 
@@ -432,10 +427,6 @@ function OffPlatformRiskSection({ detail }: { detail: UserDetail }) {
           <h2 className="mt-1 text-xl font-black text-slate-950">
             {risk.escalationLabel}
           </h2>
-          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-            이 화면은 “이 유저가 시도한 외부거래”와 “이 유저가 대상이 된 외부거래”를 분리해서 보여줍니다.
-            제재 단계는 최근 30일간 이 유저가 직접 시도한 차단 기록을 기준으로 계산합니다.
-          </p>
           <p className="mt-3 rounded-lg border border-white/70 bg-white/70 p-3 text-sm font-semibold leading-6 text-slate-700">
             {risk.recommendedAction}
           </p>
@@ -585,9 +576,6 @@ function WalletLedgerSection({ detail }: { detail: UserDetail }) {
           <h2 className="mt-1 text-xl font-black text-slate-950">
             최근 금액 이동
           </h2>
-          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-            충전, 출금, 에스크로, 환불, 정산 문의를 처리하기 전에 이 유저의 최근 원장 흐름을 확인합니다.
-          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <LinkButton
@@ -743,7 +731,7 @@ function SummaryCard({
     <div className={`rounded-lg border p-5 shadow-sm ${toneClasses(tone)}`}>
       <p className="text-sm font-bold">{label}</p>
       <p className="mt-2 text-2xl font-black tracking-tight">{value}</p>
-      <p className="mt-3 text-xs font-semibold leading-5 opacity-80">{body}</p>
+      {body ? <p className="mt-3 text-xs font-semibold leading-5 opacity-80">{body}</p> : null}
     </div>
   );
 }
