@@ -181,7 +181,7 @@ function SellerRiskCandidatesSection({ candidates }: { candidates: SellerRiskCan
                 <AdminLink href={`/admin/users/${candidate.userId}`}>유저 상세</AdminLink>
               </div>
 
-              <RiskSignalBox title={signal.title} body={signal.body} tone={signal.tone} />
+              <RiskSignalBox title={signal.title} tone={signal.tone} />
 
               <div className="mt-4 grid gap-2 text-sm text-slate-700 md:grid-cols-2">
                 <SignalPill label="낮은 리뷰" value={`${candidate.lowReviewCount}건`} />
@@ -268,7 +268,7 @@ function RiskReportList({ reports }: { reports: RiskReport[] }) {
                         <OffPlatformReportPanel report={report} />
                       ) : null}
                     </div>
-                    <RiskSignalBox title={signal.title} body={signal.body} tone={signal.tone} />
+                    <RiskSignalBox title={signal.title} tone={signal.tone} />
                   </div>
 
                   <div className="mt-4 grid gap-2 text-sm text-slate-700 md:grid-cols-3">
@@ -449,11 +449,10 @@ function SignalPill({ label, value }: { label: string; value: string }) {
   );
 }
 
-function RiskSignalBox({ title, body, tone }: { title: string; body: string; tone: Tone }) {
+function RiskSignalBox({ title, tone }: { title: string; tone: Tone }) {
   return (
     <div className={`mt-3 rounded-lg border p-3 ${toneClasses(tone)}`}>
       <p className="text-sm font-black">{title}</p>
-      <p className="sr-only">{body}</p>
     </div>
   );
 }

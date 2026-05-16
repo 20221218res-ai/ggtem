@@ -129,8 +129,6 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
           ) : null}
         </section>
 
-        <ReportWorkflow canDownloadCurrentView={canDownloadCurrentView} />
-
         <form className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="grid gap-3 lg:grid-cols-4 xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.5fr]">
             <Field label="데이터 종류">
