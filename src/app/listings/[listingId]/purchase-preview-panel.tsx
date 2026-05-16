@@ -223,14 +223,10 @@ export function PurchasePreviewPanel({
       });
       const responseBody = (await response.json()) as
         | PurchaseResult
-        | { message?: string };
+        | { message?: string; messageKey?: TranslationKey };
 
       if (!response.ok) {
-        throw new Error(
-          "message" in responseBody && responseBody.message
-            ? responseBody.message
-            : t("purchase.failed"),
-        );
+        throw new Error(getApiMessage(responseBody, t, "purchase.failed"));
       }
 
       setResult(responseBody as PurchaseResult);
@@ -421,6 +417,20 @@ function getPurchaseStatusLabel(status: string) {
 function TranslatedStatus({ labelKey }: { labelKey: TranslationKey }) {
   const { t } = useCountryTranslation();
   return <>{t(labelKey)}</>;
+}
+
+function getApiMessage(
+  responseBody: PurchaseResult | { message?: string; messageKey?: TranslationKey },
+  t: (key: TranslationKey) => string,
+  fallbackKey: TranslationKey,
+) {
+  if ("messageKey" in responseBody && responseBody.messageKey) {
+    return t(responseBody.messageKey);
+  }
+
+  return "message" in responseBody && responseBody.message
+    ? responseBody.message
+    : t(fallbackKey);
 }
 
 function formatTradeQuantity(quantity: string, unitLabel: string) {

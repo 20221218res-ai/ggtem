@@ -22,7 +22,10 @@ export async function POST(request: NextRequest) {
 
     if (!body.buyRequestId) {
       return NextResponse.json(
-        { message: "즉시판매할 구매요청 정보가 필요합니다." },
+        {
+          message: "즉시판매할 구매요청 정보가 필요합니다.",
+          messageKey: "sale.required",
+        },
         { status: 400 },
       );
     }
@@ -53,6 +56,7 @@ export async function POST(request: NextRequest) {
           error instanceof Error
             ? error.message
             : "즉시판매 주문 생성에 실패했습니다.",
+        messageKey: "sale.failed",
       },
       { status: 400 },
     );

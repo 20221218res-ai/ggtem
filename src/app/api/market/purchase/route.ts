@@ -23,7 +23,10 @@ export async function POST(request: NextRequest) {
 
     if (!body.listingId || !body.quantity) {
       return NextResponse.json(
-        { message: "구매할 매물과 수량 정보가 필요합니다." },
+        {
+          message: "구매할 매물과 수량 정보가 필요합니다.",
+          messageKey: "purchase.required",
+        },
         { status: 400 },
       );
     }
@@ -53,6 +56,7 @@ export async function POST(request: NextRequest) {
       {
         message:
           error instanceof Error ? error.message : "구매 주문 생성에 실패했습니다.",
+        messageKey: "purchase.failed",
       },
       { status: 400 },
     );

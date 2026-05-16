@@ -22,6 +22,7 @@ type InstantSaleResult = {
   status?: string;
   redirectHref?: string;
   message?: string;
+  messageKey?: TranslationKey;
 };
 
 export default function BuyRequestOfferForm({
@@ -178,7 +179,7 @@ export default function BuyRequestOfferForm({
       const nextResult = (await response.json()) as InstantSaleResult;
 
       if (!response.ok) {
-        throw new Error(nextResult.message || t("sale.failed"));
+        throw new Error(getApiMessage(nextResult, t, "sale.failed"));
       }
 
       setResult(nextResult);
@@ -345,6 +346,14 @@ function getInstantSaleStatusLabel(status?: string) {
 function TranslatedStatus({ labelKey }: { labelKey: TranslationKey }) {
   const { t } = useCountryTranslation();
   return <>{t(labelKey)}</>;
+}
+
+function getApiMessage(
+  result: InstantSaleResult,
+  t: (key: TranslationKey) => string,
+  fallbackKey: TranslationKey,
+) {
+  return result.messageKey ? t(result.messageKey) : result.message || t(fallbackKey);
 }
 
 function formatMessage(template: string, values: Record<string, string>) {
