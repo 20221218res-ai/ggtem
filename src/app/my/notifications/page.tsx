@@ -92,7 +92,9 @@ export default async function MyNotificationsPage() {
         <header className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)]">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-sm font-black text-[var(--gg-accent)]">NOTIFICATIONS</p>
+              <p className="text-sm font-black text-[var(--gg-accent)]">
+                <CountryText id="notification.eyebrow" />
+              </p>
               <h1 className="mt-1 text-3xl font-black">
                 <CountryText id="notification.title" />
               </h1>

@@ -19,6 +19,7 @@ export async function GET() {
     return NextResponse.json(
       {
         message: error instanceof Error ? error.message : "Could not load notifications.",
+        messageKey: "notification.loadFailed",
       },
       { status: 400 },
     );
@@ -45,7 +46,10 @@ export async function POST(request: NextRequest) {
     if (body.mode === "READ_ONE") {
       if (!body.notificationId) {
         return NextResponse.json(
-          { message: "Notification id is required." },
+          {
+            message: "Notification id is required.",
+            messageKey: "notification.idRequired",
+          },
           { status: 400 },
         );
       }
@@ -55,13 +59,17 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { message: "Unsupported notification action." },
+      {
+        message: "Unsupported notification action.",
+        messageKey: "notification.unsupportedAction",
+      },
       { status: 400 },
     );
   } catch (error) {
     return NextResponse.json(
       {
         message: error instanceof Error ? error.message : "Could not update notification status.",
+        messageKey: "notification.markFailed",
       },
       { status: 400 },
     );

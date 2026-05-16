@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { TranslationKey } from "@/app/i18n";
 import useCountryTranslation from "@/app/use-country-translation";
 
 export default function MarkAllReadButton({ disabled }: { disabled: boolean }) {
@@ -24,10 +25,12 @@ export default function MarkAllReadButton({ disabled }: { disabled: boolean }) {
           mode: "READ_ALL",
         }),
       });
-      const result = (await response.json()) as { message?: string };
+      const result = (await response.json()) as { message?: string; messageKey?: TranslationKey };
 
       if (!response.ok) {
-        throw new Error(result.message || t("notification.markFailed"));
+        throw new Error(
+          result.messageKey ? t(result.messageKey) : result.message || t("notification.markFailed"),
+        );
       }
 
       router.refresh();
