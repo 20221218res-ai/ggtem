@@ -1,19 +1,30 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import useCountryTranslation from "@/app/use-country-translation";
+import PasswordVisibilityInput from "@/components/password-visibility-input";
 
 type PaymentPinStatus = {
   hasPaymentPin: boolean;
   paymentPinSetAt?: string | null;
 };
 
+type PaymentPinSetupPanelProps = {
+  variant?: "default" | "onboarding";
+  completionRedirectHref?: string;
+};
+
 function cleanPin(value: string) {
   return value.replace(/\D/g, "").slice(0, 6);
 }
 
-export default function PaymentPinSetupPanel() {
+export default function PaymentPinSetupPanel({
+  variant = "default",
+  completionRedirectHref,
+}: PaymentPinSetupPanelProps = {}) {
   const { t } = useCountryTranslation();
+  const router = useRouter();
   const [status, setStatus] = useState<PaymentPinStatus | null>(null);
   const [currentPin, setCurrentPin] = useState("");
   const [newPin, setNewPin] = useState("");
@@ -22,6 +33,8 @@ export default function PaymentPinSetupPanel() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const isOnboarding = variant === "onboarding";
 
   useEffect(() => {
     let isMounted = true;
@@ -99,6 +112,9 @@ export default function PaymentPinSetupPanel() {
       setNewPin("");
       setConfirmPin("");
       setMessage(result.message ?? (status?.hasPaymentPin ? t("paymentPin.changed") : t("paymentPin.saved")));
+      if (completionRedirectHref) {
+        setShowCompletionModal(true);
+      }
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : t("paymentPin.saveFailed"));
     } finally {
@@ -107,100 +123,131 @@ export default function PaymentPinSetupPanel() {
   }
 
   return (
-    <section
-      id="payment-pin"
-      className="rounded-2xl border border-[color-mix(in_srgb,var(--gg-accent)_28%,transparent)] bg-[color-mix(in_srgb,var(--gg-accent)_7%,white)] p-5 shadow-sm shadow-[var(--gg-shadow)]"
-    >
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <p className="text-sm font-black text-[var(--gg-accent)]">{t("paymentPin.eyebrow")}</p>
-          <h2 className="mt-1 text-2xl font-black text-[var(--gg-text)]">{t("paymentPin.title")}</h2>
-          <p className="mt-2 max-w-2xl text-sm font-bold leading-6 text-[var(--gg-muted)]">
-            {t("paymentPin.description")}
-          </p>
+    <>
+      <section
+        id="payment-pin"
+        className={`scroll-mt-24 rounded-2xl border border-[color-mix(in_srgb,var(--gg-accent)_28%,transparent)] bg-[color-mix(in_srgb,var(--gg-accent)_7%,white)] p-5 shadow-sm shadow-[var(--gg-shadow)] ${
+          isOnboarding ? "p-6 shadow-xl" : ""
+        }`}
+      >
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black text-[var(--gg-accent)]">
+              {t(isOnboarding ? "paymentPin.onboardingEyebrow" : "paymentPin.eyebrow")}
+            </p>
+            <h2 className="mt-1 text-2xl font-black text-[var(--gg-text)]">
+              {t(isOnboarding ? "paymentPin.onboardingTitle" : "paymentPin.title")}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm font-bold leading-6 text-[var(--gg-muted)]">
+              {t(isOnboarding ? "paymentPin.onboardingDescription" : "paymentPin.description")}
+            </p>
+          </div>
+          <span className="w-fit rounded-full border border-[var(--gg-border)] bg-white px-3 py-1 text-xs font-black text-[var(--gg-muted)]">
+            {isLoading ? t("paymentPin.statusChecking") : status?.hasPaymentPin ? t("paymentPin.statusSet") : t("paymentPin.statusMissing")}
+          </span>
         </div>
-        <span className="w-fit rounded-full border border-[var(--gg-border)] bg-white px-3 py-1 text-xs font-black text-[var(--gg-muted)]">
-          {isLoading ? t("paymentPin.statusChecking") : status?.hasPaymentPin ? t("paymentPin.statusSet") : t("paymentPin.statusMissing")}
-        </span>
-      </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-3">
-        {status?.hasPaymentPin ? (
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          {status?.hasPaymentPin ? (
+            <label className="grid gap-2 text-sm font-black text-[var(--gg-text)]">
+              {t("paymentPin.currentPin")}
+              <PasswordVisibilityInput
+                inputMode="numeric"
+                maxLength={6}
+                value={currentPin}
+                onChange={(event) => {
+                  setCurrentPin(cleanPin(event.target.value));
+                  setError("");
+                }}
+                autoComplete="one-time-code"
+                className="h-12 bg-white px-4 font-bold"
+                placeholder={t("paymentPin.currentPin")}
+              />
+            </label>
+          ) : null}
           <label className="grid gap-2 text-sm font-black text-[var(--gg-text)]">
-            {t("paymentPin.currentPin")}
-            <input
-              type="password"
+            {t("paymentPin.newPin")}
+            <PasswordVisibilityInput
               inputMode="numeric"
               maxLength={6}
-              value={currentPin}
+              value={newPin}
               onChange={(event) => {
-                setCurrentPin(cleanPin(event.target.value));
+                setNewPin(cleanPin(event.target.value));
                 setError("");
               }}
-              autoComplete="one-time-code"
-              className="h-12 rounded-xl border border-[var(--gg-border)] bg-white px-4 font-bold outline-none focus:border-[var(--gg-accent)]"
-              placeholder={t("paymentPin.currentPin")}
+              autoComplete="new-password"
+              className="h-12 bg-white px-4 font-bold"
+              placeholder={t("paymentPin.pinDigitsPlaceholder")}
             />
           </label>
+          <label className="grid gap-2 text-sm font-black text-[var(--gg-text)]">
+            {t("paymentPin.confirmPin")}
+            <PasswordVisibilityInput
+              inputMode="numeric"
+              maxLength={6}
+              value={confirmPin}
+              onChange={(event) => {
+                setConfirmPin(cleanPin(event.target.value));
+                setError("");
+              }}
+              autoComplete="new-password"
+              className="h-12 bg-white px-4 font-bold"
+              placeholder={t("paymentPin.confirmPlaceholder")}
+            />
+          </label>
+        </div>
+
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button
+            type="button"
+            onClick={() => void submitPin()}
+            disabled={isLoading || isSubmitting}
+            className="h-12 rounded-xl bg-[var(--gg-accent)] px-6 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:bg-slate-300"
+          >
+            {isSubmitting ? t("paymentPin.saving") : status?.hasPaymentPin ? t("paymentPin.change") : t("paymentPin.set")}
+          </button>
+          <p className="text-xs font-bold text-[var(--gg-muted)]">
+            {t("paymentPin.forgotNotice")}
+          </p>
+        </div>
+
+        {message ? (
+          <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
+            {message}
+          </p>
         ) : null}
-        <label className="grid gap-2 text-sm font-black text-[var(--gg-text)]">
-          {t("paymentPin.newPin")}
-          <input
-            type="password"
-            inputMode="numeric"
-            maxLength={6}
-            value={newPin}
-            onChange={(event) => {
-              setNewPin(cleanPin(event.target.value));
-              setError("");
-            }}
-            autoComplete="new-password"
-            className="h-12 rounded-xl border border-[var(--gg-border)] bg-white px-4 font-bold outline-none focus:border-[var(--gg-accent)]"
-            placeholder={t("paymentPin.pinDigitsPlaceholder")}
-          />
-        </label>
-        <label className="grid gap-2 text-sm font-black text-[var(--gg-text)]">
-          {t("paymentPin.confirmPin")}
-          <input
-            type="password"
-            inputMode="numeric"
-            maxLength={6}
-            value={confirmPin}
-            onChange={(event) => {
-              setConfirmPin(cleanPin(event.target.value));
-              setError("");
-            }}
-            autoComplete="new-password"
-            className="h-12 rounded-xl border border-[var(--gg-border)] bg-white px-4 font-bold outline-none focus:border-[var(--gg-accent)]"
-            placeholder={t("paymentPin.confirmPlaceholder")}
-          />
-        </label>
-      </div>
+        {error ? (
+          <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+            {error}
+          </p>
+        ) : null}
+      </section>
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <button
-          type="button"
-          onClick={() => void submitPin()}
-          disabled={isLoading || isSubmitting}
-          className="h-12 rounded-xl bg-[var(--gg-accent)] px-6 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:bg-slate-300"
-        >
-          {isSubmitting ? t("paymentPin.saving") : status?.hasPaymentPin ? t("paymentPin.change") : t("paymentPin.set")}
-        </button>
-        <p className="text-xs font-bold text-[var(--gg-muted)]">
-          {t("paymentPin.forgotNotice")}
-        </p>
-      </div>
-
-      {message ? (
-        <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
-          {message}
-        </p>
+      {showCompletionModal ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4">
+          <div className="w-full max-w-md rounded-2xl border border-[var(--gg-border)] bg-white p-6 text-center shadow-2xl">
+            <p className="text-sm font-black text-[var(--gg-accent)]">
+              {t("paymentPin.setupCompleteEyebrow")}
+            </p>
+            <h3 className="mt-2 text-2xl font-black text-[var(--gg-text)]">
+              {t("paymentPin.setupCompleteTitle")}
+            </h3>
+            <p className="mt-3 text-sm font-bold leading-6 text-[var(--gg-muted)]">
+              {t("paymentPin.setupCompleteBody")}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                router.replace(completionRedirectHref ?? "/");
+                router.refresh();
+              }}
+              className="mt-5 h-12 w-full rounded-xl bg-[var(--gg-accent)] px-6 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
+            >
+              {t("paymentPin.goHome")}
+            </button>
+          </div>
+        </div>
       ) : null}
-      {error ? (
-        <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
-          {error}
-        </p>
-      ) : null}
-    </section>
+    </>
   );
 }

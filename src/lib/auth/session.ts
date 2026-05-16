@@ -772,7 +772,7 @@ export async function getPendingEmailVerificationStatus() {
 
   return {
     status: "verified" as const,
-    redirectPath: "/my",
+    redirectPath: "/my/payment-pin/setup",
   };
 }
 
@@ -839,7 +839,7 @@ export async function verifyEmailWithToken(input: { token: string }) {
 
   return {
     message: "\uC774\uBA54\uC77C \uC778\uC99D\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.",
-    redirectPath: "/my",
+    redirectPath: "/my/payment-pin/setup",
   };
 }
 async function assertLoginIsNotLocked(email: string, ipKey: string) {

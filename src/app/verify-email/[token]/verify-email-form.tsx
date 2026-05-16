@@ -13,6 +13,7 @@ export default function VerifyEmailForm({ token }: { token: string }) {
   const { t } = useCountryTranslation();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [redirectPath, setRedirectPath] = useState("/my/payment-pin/setup");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const didAutoSubmit = useRef(false);
 
@@ -40,8 +41,9 @@ export default function VerifyEmailForm({ token }: { token: string }) {
       }
 
       setMessage(getAuthApiMessage(result, t, "auth.verifyEmailCompleted"));
+      setRedirectPath(result.redirectPath ?? "/my/payment-pin/setup");
       setTimeout(() => {
-        router.replace(result.redirectPath ?? "/my");
+        router.replace(result.redirectPath ?? "/my/payment-pin/setup");
         router.refresh();
       }, 900);
     } catch (submitError) {
@@ -74,8 +76,8 @@ export default function VerifyEmailForm({ token }: { token: string }) {
         <div className="mt-4">
           <Alert tone="success">
             <p>{message}</p>
-            <Link href="/my" className="mt-2 inline-flex font-semibold underline underline-offset-4">
-              <CountryText id="auth.goMyPage" />
+            <Link href={redirectPath} className="mt-2 inline-flex font-semibold underline underline-offset-4">
+              <CountryText id="paymentPin.set" />
             </Link>
           </Alert>
         </div>

@@ -61,7 +61,7 @@ export default function SignUpForm() {
         if (result.status === "verified") {
           setMessage(t("auth.emailVerificationCompletedSignIn"));
           setPendingVerificationEmail("");
-          router.replace(result.redirectPath ?? "/my");
+          router.replace(result.redirectPath ?? "/my/payment-pin/setup");
           router.refresh();
         } else if (result.status === "blocked") {
           setError(getAuthApiMessage(result, t, "auth.accountUnavailable"));
