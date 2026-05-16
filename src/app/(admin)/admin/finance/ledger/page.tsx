@@ -44,27 +44,27 @@ export default async function AdminFinanceLedgerPage({
           <div>
             <p className="text-sm font-black text-emerald-700">WALLET LEDGER</p>
             <h1 className="mt-2 text-3xl font-black tracking-tight">
-              지갑 원장 조회
+              지갑 원장
             </h1>
           </div>
           <div className="flex flex-wrap gap-2">
-            <HeaderLink href={buildLedgerExportHref(state.filters)} label="CSV 내보내기" tone="emerald" />
-            <HeaderLink href="/admin/deposits" label="입금 처리" />
-            <HeaderLink href="/admin/withdrawals" label="출금 처리" />
-            <HeaderLink href="/admin/finance/reconciliation" label="정산 대조" />
-            <HeaderLink href="/admin/audit" label="감사 로그" />
+            <HeaderLink href={buildLedgerExportHref(state.filters)} label="CSV" tone="emerald" />
+            <HeaderLink href="/admin/deposits" label="입금" />
+            <HeaderLink href="/admin/withdrawals" label="출금" />
+            <HeaderLink href="/admin/finance/reconciliation" label="정산" />
+            <HeaderLink href="/admin/audit" label="감사" />
           </div>
         </header>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MetricCard label="전체 원장" value={`${state.summary.totalEntries}건`} tone="sky" />
+          <MetricCard label="전체" value={`${state.summary.totalEntries}건`} tone="sky" />
           <MetricCard label="현재 표시" value={`${state.summary.shownEntries}건`} tone="sky" />
           <MetricCard label="증가 합계" value={`${state.summary.creditAmount} USDT`} tone="emerald" />
           <MetricCard label="차감 합계" value={`${state.summary.debitAmount} USDT`} tone="rose" />
         </section>
 
         <section className="rounded-lg border border-amber-200 bg-amber-50 p-5">
-          <p className="text-sm font-black text-amber-800">다음 행동</p>
+          <p className="text-sm font-black text-amber-800">다음 액션</p>
           <h2 className="mt-2 text-2xl font-black">{nextAction.title}</h2>
           <Link
             href={nextAction.href}
@@ -78,9 +78,9 @@ export default async function AdminFinanceLedgerPage({
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-sm font-black text-slate-600">필터</p>
-              <h2 className="mt-1 text-xl font-black">원장 검색</h2>
+              <h2 className="mt-1 text-xl font-black">검색</h2>
             </div>
-            <HeaderLink href="/admin/users" label="유저 검색" />
+            <HeaderLink href="/admin/users" label="유저" />
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
@@ -145,7 +145,7 @@ export default async function AdminFinanceLedgerPage({
             <input
               name="q"
               defaultValue={state.filters.query}
-              placeholder="유저, 이메일, 금액, 메모, 참조 ID 검색"
+              placeholder="유저, 이메일, 금액, 메모, 참조 ID"
               className="min-h-11 flex-1 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-emerald-400"
             />
             <button className="rounded-md bg-[var(--color-primary)] px-5 py-2 text-sm font-black text-slate-950 hover:brightness-105">
@@ -162,8 +162,8 @@ export default async function AdminFinanceLedgerPage({
 
         <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
           <div className="border-b border-slate-200 p-5">
-            <p className="text-sm font-black text-slate-600">원장 목록</p>
-            <h2 className="mt-1 text-xl font-black">최근 지갑 기록</h2>
+            <p className="text-sm font-black text-slate-600">원장</p>
+            <h2 className="mt-1 text-xl font-black">최근 기록</h2>
           </div>
 
           <div className="divide-y divide-slate-200">
@@ -174,7 +174,7 @@ export default async function AdminFinanceLedgerPage({
 
           {state.entries.length === 0 ? (
             <div className="p-5">
-              <EmptyBox message="조건에 맞는 원장 기록이 없습니다." />
+              <EmptyBox message="원장 기록 없음" />
             </div>
           ) : null}
         </section>
@@ -484,26 +484,26 @@ function referenceLabel(referenceType: string | null) {
 function getLedgerNextAction(state: LedgerState) {
   if (state.summary.shownEntries === 0) {
     return {
-      title: "필터 조건을 다시 확인하세요",
+      title: "결과 없음",
       body: "현재 조건에는 표시할 원장 기록이 없습니다. 전체 방향과 전체 영역으로 먼저 확인해 보세요.",
-      actionLabel: "전체 원장 보기",
+      actionLabel: "전체 보기",
       href: "/admin/finance/ledger",
     };
   }
 
   if (state.filters.direction || state.filters.bucket || state.filters.query) {
     return {
-      title: "필터 결과를 CSV로 보관하세요",
+      title: "CSV 보관",
       body: "현재 필터가 적용된 상태입니다. 정산 검토나 분쟁 증빙으로 사용할 수 있도록 같은 조건의 CSV를 내려받을 수 있습니다.",
-      actionLabel: "CSV 내보내기",
+      actionLabel: "CSV",
       href: buildLedgerExportHref(state.filters),
     };
   }
 
   return {
-    title: "정산 대조 화면에서 마감 가능 여부를 확인하세요",
+    title: "정산 확인",
     body: "원장 흐름이 맞다면 정산 대조에서 보류 항목, 이상 신호, 최근 마감 리포트를 함께 확인하세요.",
-    actionLabel: "정산 대조로 이동",
+    actionLabel: "정산",
     href: "/admin/finance/reconciliation",
   };
 }

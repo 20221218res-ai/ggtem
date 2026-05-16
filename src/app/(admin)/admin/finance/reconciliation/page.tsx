@@ -51,34 +51,28 @@ export default async function AdminFinanceReconciliationPage({
               RECONCILIATION
             </p>
             <h1 className="mt-2 text-3xl font-black tracking-tight">
-              정산 대조 및 마감
+              정산 대조
             </h1>
-            <p className="mt-2 text-sm font-semibold text-slate-600">
-              기간별 원장 흐름, 이상 신호, 마감 리포트를 확인합니다.
-            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <HeaderLink
               href={buildReconciliationExportHref(state.filters.range)}
-              label="CSV 내보내기"
+              label="CSV"
               tone="emerald"
             />
-            <HeaderLink href="/admin/finance/ledger" label="지갑 원장" />
-            <HeaderLink href="/admin/deposits" label="입금 처리" />
-            <HeaderLink href="/admin/withdrawals" label="출금 처리" />
+            <HeaderLink href="/admin/finance/ledger" label="원장" />
+            <HeaderLink href="/admin/deposits" label="입금" />
+            <HeaderLink href="/admin/withdrawals" label="출금" />
             <HeaderLink
               href="/admin/audit?action=FINANCE_RECONCILIATION_CLOSED"
-              label="마감 감사 로그"
+              label="감사"
             />
           </div>
         </header>
 
         <section className="rounded-lg border border-amber-200 bg-amber-50 p-5">
-          <p className="text-sm font-black text-amber-800">다음 행동</p>
+          <p className="text-sm font-black text-amber-800">다음 액션</p>
           <h2 className="mt-2 text-2xl font-black">{nextAction.title}</h2>
-          <p className="mt-3 text-sm font-semibold leading-6 text-amber-950">
-            {nextAction.body}
-          </p>
           <Link
             href={nextAction.href}
             className="mt-4 inline-flex rounded-md bg-amber-600 px-4 py-2 text-sm font-black text-white hover:bg-amber-700"
@@ -91,7 +85,7 @@ export default async function AdminFinanceReconciliationPage({
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-sm font-black text-slate-600">기간</p>
-              <h2 className="mt-1 text-xl font-black">정산 대조 범위</h2>
+              <h2 className="mt-1 text-xl font-black">기간</h2>
               <p className="mt-2 text-sm font-semibold text-slate-700">
                 {state.summary.from}부터 {state.summary.to}까지
               </p>
@@ -128,19 +122,19 @@ export default async function AdminFinanceReconciliationPage({
           <StatusCard
             label="마감 보류"
             value={`${blockedCount}건`}
-            body="해결 전에는 마감 리포트 저장을 보류하는 항목입니다."
+            body="보류"
             status={blockedCount > 0 ? "danger" : "ok"}
           />
           <StatusCard
             label="검토 필요"
             value={`${reviewCount}건`}
-            body="CSV와 운영 기록을 한 번 더 확인할 항목입니다."
+            body="검토"
             status={reviewCount > 0 ? "warn" : "ok"}
           />
           <StatusCard
             label="긴급 이상 신호"
             value={`${criticalCount}건`}
-            body="대기 출금이나 미처리 충전처럼 즉시 확인할 신호입니다."
+            body="즉시 확인"
             status={criticalCount > 0 ? "danger" : "info"}
           />
         </section>
@@ -150,12 +144,12 @@ export default async function AdminFinanceReconciliationPage({
             <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <p className="text-sm font-black text-sky-700">
-                  마감 체크리스트                </p>
+                  체크리스트                </p>
                 <h2 className="mt-2 text-2xl font-black text-slate-950">
-                  업무 마감 전 확인
+                  마감 전 확인
                 </h2>
               </div>
-              <HeaderLink href="/admin/finance/ledger" label="원장 보기" />
+              <HeaderLink href="/admin/finance/ledger" label="원장" />
             </div>
 
             <div className="mt-5 grid gap-3">
@@ -168,7 +162,7 @@ export default async function AdminFinanceReconciliationPage({
           <section className="rounded-lg border border-amber-200 bg-amber-50 p-5">
             <p className="text-sm font-black text-amber-800">이상 신호</p>
             <h2 className="mt-2 text-2xl font-black text-slate-950">
-              확인 필요 목록
+              확인 필요
             </h2>
 
             <div className="mt-5 space-y-3">
@@ -177,7 +171,7 @@ export default async function AdminFinanceReconciliationPage({
               ))}
 
               {state.anomalyFlags.length === 0 ? (
-                <EmptyBox message="선택한 기간에는 정산 이상 신호가 없습니다." />
+                <EmptyBox message="이상 신호 없음" />
               ) : null}
             </div>
           </section>
@@ -196,11 +190,11 @@ export default async function AdminFinanceReconciliationPage({
               <div>
                 <p className="text-sm font-black text-slate-600">마감 이력</p>
                 <h2 className="mt-1 text-xl font-black">
-                  최근 저장된 마감 리포트                </h2>
+                  최근 마감                </h2>
               </div>
               <HeaderLink
                 href="/admin/audit?action=FINANCE_RECONCILIATION_CLOSED"
-                label="감사 로그"
+                label="감사"
               />
             </div>
 
@@ -237,7 +231,7 @@ export default async function AdminFinanceReconciliationPage({
               ))}
 
               {state.closeReports.length === 0 ? (
-                <EmptyBox message="아직 이 범위로 저장된 마감 리포트가 없습니다." />
+                <EmptyBox message="마감 리포트 없음" />
               ) : null}
             </div>
           </section>
@@ -246,7 +240,7 @@ export default async function AdminFinanceReconciliationPage({
         <div className="grid gap-6 xl:grid-cols-2">
           <BreakdownTable
             title="잔액 영역별 흐름"
-            emptyLabel="선택한 기간에는 영역별 이동이 없습니다."
+            emptyLabel="영역별 이동 없음"
             rows={state.bucketBreakdown.map((item) => ({
               key: item.bucket,
               label: ledgerBucketLabel(item.bucket),
@@ -259,7 +253,7 @@ export default async function AdminFinanceReconciliationPage({
           />
           <BreakdownTable
             title="원장 유형별 흐름"
-            emptyLabel="선택한 기간에는 유형별 이동이 없습니다."
+            emptyLabel="유형별 이동 없음"
             rows={state.typeBreakdown.map((item) => ({
               key: item.type,
               label: ledgerTypeLabel(item.type),
@@ -278,7 +272,7 @@ export default async function AdminFinanceReconciliationPage({
               <p className="text-sm font-black text-slate-600">최근 증빙</p>
               <h2 className="mt-1 text-xl font-black">최근 원장 기록</h2>
             </div>
-            <HeaderLink href="/admin/finance/ledger" label="전체 원장 보기" />
+            <HeaderLink href="/admin/finance/ledger" label="전체 원장" />
           </div>
 
           <div className="mt-5 space-y-3">
@@ -287,7 +281,7 @@ export default async function AdminFinanceReconciliationPage({
             ))}
 
             {state.recentEntries.length === 0 ? (
-              <EmptyBox message="선택한 정산 범위에는 원장 기록이 없습니다." />
+              <EmptyBox message="원장 기록 없음" />
             ) : null}
           </div>
         </section>
@@ -568,26 +562,26 @@ function getCloseNextAction({
 }) {
   if (blockedCount > 0 || criticalCount > 0) {
     return {
-      title: "마감 전 보류 항목부터 확인하세요",
+      title: `보류 ${blockedCount}건`,
       body: `마감 보류 ${blockedCount}건, 긴급 이상 신호 ${criticalCount}건이 있습니다. 충전, 출금, 주문 증빙을 먼저 확인하세요.`,
-      actionLabel: "입출금 처리 확인",
+      actionLabel: "입출금",
       href: "/admin/finance",
     };
   }
 
   if (reviewCount > 0) {
     return {
-      title: "검토 필요 항목을 마감 메모에 남기세요",
+      title: `검토 ${reviewCount}건`,
       body: `검토 필요 ${reviewCount}건이 있습니다. 원장과 CSV를 확인한 뒤 마감 리포트 메모에 결과를 남기세요.`,
-      actionLabel: "CSV 내보내기",
+      actionLabel: "CSV",
       href: buildReconciliationExportHref(range),
     };
   }
 
   return {
-    title: "마감 리포트를 저장할 준비가 됐습니다",
+    title: "마감 가능",
     body: "보류와 긴급 신호가 없습니다. CSV를 보관하고 마감 메모를 남겨 운영 기록을 저장하세요.",
-    actionLabel: "CSV 내보내기",
+    actionLabel: "CSV",
     href: buildReconciliationExportHref(range),
   };
 }

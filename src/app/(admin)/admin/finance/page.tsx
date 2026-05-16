@@ -69,11 +69,11 @@ export default async function AdminFinancePage({
             <h1 className="mt-2 text-3xl font-black tracking-tight">입출금 운영</h1>
           </div>
           <div className="flex flex-wrap gap-2">
-            <HeaderLink href="/admin/deposits" label="입금 처리" />
-            <HeaderLink href="/admin/withdrawals" label="출금 처리" />
-            <HeaderLink href="/admin/finance/ledger" label="지갑 원장" />
-            <HeaderLink href="/admin/finance/reconciliation" label="정산 대조" />
-            <HeaderLink href="/admin/audit" label="감사 로그" />
+            <HeaderLink href="/admin/deposits" label="입금" />
+            <HeaderLink href="/admin/withdrawals" label="출금" />
+            <HeaderLink href="/admin/finance/ledger" label="원장" />
+            <HeaderLink href="/admin/finance/reconciliation" label="정산" />
+            <HeaderLink href="/admin/audit" label="감사" />
           </div>
         </header>
 
@@ -83,7 +83,7 @@ export default async function AdminFinancePage({
             eyebrow="입금"
             title={`${state.summary.pendingDeposits}건 승인 대기`}
             amount={`${state.summary.pendingDepositAmount} USDT`}
-            actionLabel="입금 처리"
+            actionLabel="입금"
             tone="emerald"
           />
           <QueueCard
@@ -91,7 +91,7 @@ export default async function AdminFinancePage({
             eyebrow="출금"
             title={`${state.summary.pendingWithdrawals}건 처리 대기`}
             amount={`${state.summary.pendingWithdrawalAmount} USDT`}
-            actionLabel="출금 처리"
+            actionLabel="출금"
             tone="amber"
           />
           <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
@@ -132,28 +132,28 @@ export default async function AdminFinancePage({
         <div className="grid gap-6 xl:grid-cols-2">
           <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <div id="pending-deposits">
-              <SectionTitle eyebrow="입금 요청" title="확인 대기 중인 입금" />
+              <SectionTitle eyebrow="입금" title="대기 입금" />
             </div>
             <div className="mt-5 space-y-3">
               {state.pendingDeposits.map((item) => (
                 <DepositCard key={item.requestId} item={item} />
               ))}
               {state.pendingDeposits.length === 0 ? (
-                <EmptyBox message="확인 대기 중인 입금 요청이 없습니다." />
+                <EmptyBox message="대기 입금 없음" />
               ) : null}
             </div>
           </section>
 
           <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <div id="pending-withdrawals">
-              <SectionTitle eyebrow="출금 요청" title="처리 대기 중인 출금" />
+              <SectionTitle eyebrow="출금" title="대기 출금" />
             </div>
             <div className="mt-5 space-y-3">
               {state.pendingWithdrawals.map((item) => (
                 <WithdrawalCard key={item.requestId} item={item} />
               ))}
               {state.pendingWithdrawals.length === 0 ? (
-                <EmptyBox message="처리 대기 중인 출금 요청이 없습니다." />
+                <EmptyBox message="대기 출금 없음" />
               ) : null}
             </div>
           </section>
@@ -161,8 +161,8 @@ export default async function AdminFinancePage({
 
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <SectionTitle eyebrow="처리 이력" title="최근 처리 기록" />
-            <HeaderLink href="/admin/audit" label="감사 로그 보기" />
+            <SectionTitle eyebrow="이력" title="처리 기록" />
+            <HeaderLink href="/admin/audit" label="감사" />
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
@@ -201,7 +201,7 @@ export default async function AdminFinancePage({
             <FilterTab
               href={buildFinanceHistoryHref({ q: query, kind })}
               active={status === "ALL"}
-              label="전체 상태"
+              label="상태 전체"
             />
             <FilterTab
               href={buildFinanceHistoryHref({
@@ -234,7 +234,7 @@ export default async function AdminFinancePage({
               type="text"
               name="q"
               defaultValue={query}
-              placeholder="유저명, 이메일, 금액, 요청 ID 검색"
+              placeholder="유저, 이메일, 금액, 요청 ID"
               className="min-w-0 flex-1 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400"
             />
             <button
@@ -256,7 +256,7 @@ export default async function AdminFinancePage({
               <HistoryCard key={item.requestId} item={item} />
             ))}
             {filteredHistory.length === 0 ? (
-              <EmptyBox message="조건에 맞는 처리 기록이 없습니다." />
+              <EmptyBox message="처리 기록 없음" />
             ) : null}
           </div>
         </section>
@@ -816,26 +816,26 @@ function getOperationNextAction({
 }) {
   if (pendingWithdrawals > 0) {
     return {
-      title: "출금 요청부터 확인하세요",
+      title: `출금 대기 ${pendingWithdrawals}건`,
       body: `${pendingWithdrawals}건, 총 ${pendingWithdrawalAmount} USDT 출금 요청이 대기 중입니다. 실제 송금 완료 전에 완료 처리하지 마세요.`,
-      actionLabel: "출금 처리 화면",
+      actionLabel: "출금",
       href: "/admin/withdrawals",
     };
   }
 
   if (pendingDeposits > 0) {
     return {
-      title: "입금 TXID를 확인하세요",
+      title: `입금 대기 ${pendingDeposits}건`,
       body: `${pendingDeposits}건, 총 ${pendingDepositAmount} USDT 입금 요청이 대기 중입니다. 코인, 네트워크, 입금 주소, TXID를 대조하세요.`,
-      actionLabel: "입금 처리 화면",
+      actionLabel: "입금",
       href: "/admin/deposits",
     };
   }
 
   return {
-    title: "대기 중인 입출금이 없습니다",
+    title: "대기 없음",
     body: "새 요청이 들어오면 이곳에 우선 처리 카드가 표시됩니다.",
-    actionLabel: "처리 이력 보기",
+    actionLabel: "이력",
     href: "/admin/finance",
   };
 }
