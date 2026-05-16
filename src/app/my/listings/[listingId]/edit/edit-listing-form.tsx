@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
+import type { TranslationKey } from "@/app/i18n";
+import useCountryTranslation from "@/app/use-country-translation";
 import {
   GAME_MONEY_PRICE_UNIT_OPTIONS,
   getGameMoneyPriceUnitLabel,
@@ -17,6 +19,12 @@ const LISTING_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const LISTING_IMAGE_ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 type TradeMode = "BULK" | "SPLIT";
+
+type ApiResult = {
+  message?: string;
+  messageKey?: TranslationKey;
+  imageUrl?: string;
+};
 
 export default function EditListingForm({
   listingId,
@@ -48,6 +56,7 @@ export default function EditListingForm({
   initialImageAlt: string;
 }) {
   const router = useRouter();
+  const { t } = useCountryTranslation();
   const isGameMoneyListing = initialCategory === "GAME_MONEY";
   const normalizedInitialPriceUnitQuantity = isGameMoneyListing
     ? normalizeGameMoneyPriceUnit(initialPriceUnitQuantity)
@@ -110,9 +119,10 @@ export default function EditListingForm({
     priceUnitQuantity,
     moneyUnitName,
   );
-  const gameMoneyQuantityHelperText =
-    "게임머니 수량과 최소 구매 수량은 선택한 단위 기준으로 입력 가능합니다.";
-  const selectedUnitPlaceholder = `예: 1 = ${priceUnitLabel}`;
+  const selectedUnitPlaceholder = t("listingEdit.selectedUnitPlaceholder").replace(
+    "{unit}",
+    priceUnitLabel,
+  );
 
   useEffect(() => {
     if (isGameMoneyListing && tradeMode === "BULK") {
@@ -121,13 +131,17 @@ export default function EditListingForm({
   }, [isGameMoneyListing, totalQuantity, tradeMode]);
 
   const changedFields = [
-    title !== initialTitle ? "제목" : null,
-    description !== initialDescription ? "내용" : null,
-    unitPrice !== initialDisplayUnitPrice ? "단위당 금액" : null,
-    priceUnitQuantity !== normalizedInitialPriceUnitQuantity ? "가격 단위" : null,
-    tradeMode !== initialNormalizedTradeMode ? "거래 방식" : null,
-    actualTotalQuantity !== initialTotalQuantity ? "총 수량" : null,
-    actualMinimumQuantity !== initialMinimumQuantity ? "최소 거래 수량" : null,
+    title !== initialTitle ? t("listingForm.title") : null,
+    description !== initialDescription ? t("listingForm.tradeContent") : null,
+    unitPrice !== initialDisplayUnitPrice ? t("listingForm.unitPrice") : null,
+    priceUnitQuantity !== normalizedInitialPriceUnitQuantity
+      ? t("listingForm.priceUnitBasis")
+      : null,
+    tradeMode !== initialNormalizedTradeMode ? t("listingForm.sellMode") : null,
+    actualTotalQuantity !== initialTotalQuantity ? t("listingEdit.totalQuantity") : null,
+    actualMinimumQuantity !== initialMinimumQuantity
+      ? t("listingEdit.minimumTradeQuantity")
+      : null,
   ].filter(Boolean);
 
   const imagePreviewUrl = useMemo(() => {
@@ -151,34 +165,34 @@ export default function EditListingForm({
 
     try {
       if (!title.trim()) {
-        throw new Error("제목을 입력해 주세요.");
+        throw new Error(t("listingEdit.titleRequired"));
       }
 
       if (Number(unitPrice) <= 0) {
-        throw new Error("단위당 금액은 0보다 커야 합니다.");
+        throw new Error(t("listingForm.unitPriceInvalid"));
       }
 
       if (isGameMoneyListing && !isGameMoneyDisplayQuantity(totalQuantity)) {
-        throw new Error("게임머니 총 수량은 선택한 단위 기준 숫자로 입력해 주세요.");
+        throw new Error(t("listingEdit.gameMoneyTotalQuantityInvalid"));
       }
 
       if (
         isGameMoneyListing &&
         !isGameMoneyDisplayQuantity(effectiveMinimumQuantity)
       ) {
-        throw new Error("게임머니 최소 거래 수량은 선택한 단위 기준 숫자로 입력해 주세요.");
+        throw new Error(t("listingEdit.gameMoneyMinimumQuantityInvalid"));
       }
 
       if (Number(totalQuantity) <= 0) {
-        throw new Error("총 수량은 0보다 커야 합니다.");
+        throw new Error(t("listingEdit.totalQuantityInvalid"));
       }
 
       if (Number(effectiveMinimumQuantity) <= 0) {
-        throw new Error("최소 거래 수량은 0보다 커야 합니다.");
+        throw new Error(t("listingForm.minimumQuantityInvalid"));
       }
 
       if (Number(actualMinimumQuantity) > Number(actualTotalQuantity)) {
-        throw new Error("최소 거래 수량은 총 수량보다 클 수 없습니다.");
+        throw new Error(t("listingForm.minimumOverQuantity"));
       }
 
       const response = await fetch("/api/market/seller-listings", {
@@ -199,19 +213,19 @@ export default function EditListingForm({
           totalQuantity: isGameMoneyListing ? actualTotalQuantity : totalQuantity,
         }),
       });
-      const result = (await response.json()) as { message?: string };
+      const result = (await response.json()) as ApiResult;
 
       if (!response.ok) {
-        throw new Error(result.message ?? "판매글 수정에 실패했습니다.");
+        throw new Error(getApiMessage(result, t, "listingEdit.updateFailed"));
       }
 
-      setSuccess(result.message ?? "판매글을 수정했습니다.");
+      setSuccess(getApiMessage(result, t, "listingEdit.updateSuccess"));
       router.refresh();
     } catch (submitError) {
       setError(
         submitError instanceof Error
           ? submitError.message
-          : "판매글 수정에 실패했습니다.",
+          : t("listingEdit.updateFailed"),
       );
     } finally {
       setIsSubmitting(false);
@@ -231,14 +245,14 @@ export default function EditListingForm({
     if (!LISTING_IMAGE_ALLOWED_TYPES.includes(file.type)) {
       setSelectedImage(null);
       event.target.value = "";
-      setImageError("PNG, JPG, WEBP 이미지만 업로드할 수 있습니다.");
+      setImageError(t("listingForm.imageTypeError"));
       return;
     }
 
     if (file.size > LISTING_IMAGE_MAX_BYTES) {
       setSelectedImage(null);
       event.target.value = "";
-      setImageError("대표 이미지는 5MB 이하만 업로드할 수 있습니다.");
+      setImageError(t("listingForm.imageSizeError"));
       return;
     }
 
@@ -251,7 +265,7 @@ export default function EditListingForm({
     setImageSuccess("");
 
     if (!selectedImage) {
-      setImageError("업로드할 이미지를 선택해 주세요.");
+      setImageError(t("listingEdit.imageRequired"));
       return;
     }
 
@@ -267,24 +281,21 @@ export default function EditListingForm({
         method: "POST",
         body: formData,
       });
-      const result = (await response.json()) as {
-        message?: string;
-        imageUrl?: string;
-      };
+      const result = (await response.json()) as ApiResult;
 
       if (!response.ok) {
-        throw new Error(result.message ?? "대표 이미지 업로드에 실패했습니다.");
+        throw new Error(getApiMessage(result, t, "listingForm.imageUploadFailed"));
       }
 
       setImageUrl(result.imageUrl ?? imageUrl);
-      setImageSuccess(result.message ?? "대표 이미지가 저장되었습니다.");
+      setImageSuccess(getApiMessage(result, t, "listingEdit.imageSaveSuccess"));
       setSelectedImage(null);
       router.refresh();
     } catch (uploadError) {
       setImageError(
         uploadError instanceof Error
           ? uploadError.message
-          : "대표 이미지 업로드에 실패했습니다.",
+          : t("listingForm.imageUploadFailed"),
       );
     } finally {
       setIsUploadingImage(false);
@@ -303,24 +314,22 @@ export default function EditListingForm({
           method: "DELETE",
         },
       );
-      const result = (await response.json()) as {
-        message?: string;
-      };
+      const result = (await response.json()) as ApiResult;
 
       if (!response.ok) {
-        throw new Error(result.message ?? "대표 이미지 삭제에 실패했습니다.");
+        throw new Error(getApiMessage(result, t, "listingEdit.imageRemoveFailed"));
       }
 
       setImageUrl(null);
       setImageAlt("");
       setSelectedImage(null);
-      setImageSuccess(result.message ?? "대표 이미지가 삭제되었습니다.");
+      setImageSuccess(getApiMessage(result, t, "listingEdit.imageRemoveSuccess"));
       router.refresh();
     } catch (removeError) {
       setImageError(
         removeError instanceof Error
           ? removeError.message
-          : "대표 이미지 삭제에 실패했습니다.",
+          : t("listingEdit.imageRemoveFailed"),
       );
     } finally {
       setIsRemovingImage(false);
@@ -334,11 +343,11 @@ export default function EditListingForm({
         className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-lg shadow-[var(--gg-shadow)]"
       >
         <p className="text-sm font-black text-[var(--gg-accent)]">SELL</p>
-        <h2 className="mt-1 text-2xl font-black">판매글 수정</h2>
+        <h2 className="mt-1 text-2xl font-black">{t("listingEdit.formTitle")}</h2>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <label className="flex flex-col gap-2 text-sm font-black md:col-span-2">
-            제목
+            {t("listingForm.title")}
             <input
               value={title}
               onChange={(event) => setTitle(event.target.value)}
@@ -348,14 +357,14 @@ export default function EditListingForm({
 
           {isGameMoneyListing ? (
             <div className="md:col-span-2">
-              <p className="text-sm font-black">거래 방식</p>
+              <p className="text-sm font-black">{t("listingForm.sellMode")}</p>
               <SegmentedTradeMode value={tradeMode} onChange={setTradeMode} />
             </div>
           ) : null}
 
           {isGameMoneyListing ? (
             <label className="flex flex-col gap-2 text-sm font-black">
-              가격 단위
+              {t("listingForm.priceUnitBasis")}
               <select
                 value={priceUnitQuantity}
                 onChange={(event) => setPriceUnitQuantity(event.target.value)}
@@ -371,7 +380,7 @@ export default function EditListingForm({
           ) : null}
 
           <label className="flex flex-col gap-2 text-sm font-black">
-            단위당 금액 ({currency})
+            {t("listingEdit.unitAmount").replace("{currency}", currency)}
             <input
               value={unitPrice}
               onChange={(event) => setUnitPrice(event.target.value)}
@@ -380,13 +389,13 @@ export default function EditListingForm({
             />
             {isGameMoneyListing ? (
               <span className="text-xs font-bold text-[var(--gg-muted)]">
-                선택한 {priceUnitLabel}당 금액을 입력합니다.
+                {t("listingEdit.selectedUnitPriceHint").replace("{unit}", priceUnitLabel)}
               </span>
             ) : null}
           </label>
 
           <label className="flex flex-col gap-2 text-sm font-black">
-            총 수량
+            {t("listingEdit.totalQuantity")}
             <input
               value={totalQuantity}
               onChange={(event) => setTotalQuantity(event.target.value)}
@@ -397,14 +406,14 @@ export default function EditListingForm({
             />
             {isGameMoneyListing ? (
               <span className="text-xs font-bold text-[var(--gg-muted)]">
-                {gameMoneyQuantityHelperText}
+                {t("listingForm.sellGameMoneyUnitHelper")}
               </span>
             ) : null}
           </label>
 
           {isGameMoneyListing ? (
             <label className="flex flex-col gap-2 text-sm font-black">
-              최소 거래 수량
+              {t("listingEdit.minimumTradeQuantity")}
               <input
                 value={effectiveMinimumQuantity}
                 onChange={(event) => setMinimumQuantity(event.target.value)}
@@ -416,14 +425,14 @@ export default function EditListingForm({
               />
               <span className="text-xs font-bold text-[var(--gg-muted)]">
                 {tradeMode === "BULK"
-                  ? "일괄판매는 등록된 전체 수량만 거래할 수 있습니다."
-                  : "분할판매는 구매자가 최소 거래 수량 이상으로 구매할 수 있습니다."}
+                  ? t("listingEdit.bulkSellHint")
+                  : t("listingEdit.splitSellHint")}
               </span>
             </label>
           ) : null}
 
           <label className="flex flex-col gap-2 text-sm font-black md:col-span-2">
-            내용
+            {t("listingForm.tradeContent")}
             <textarea
               value={description}
               onChange={(event) => setDescription(event.target.value)}
@@ -434,15 +443,19 @@ export default function EditListingForm({
         </div>
 
         <div className="mt-5 rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] p-4">
-          <p className="text-sm font-black text-[var(--gg-text)]">변경 항목</p>
+          <p className="text-sm font-black text-[var(--gg-text)]">
+            {t("listingEdit.changedFields")}
+          </p>
           <div className="mt-3 grid gap-2 text-sm leading-6 text-[var(--gg-muted)]">
             <p>
               <span className="font-bold text-[var(--gg-text)]">
-                {changedFields.length ? changedFields.join(", ") : "변경 없음"}
+                {changedFields.length
+                  ? changedFields.join(", ")
+                  : t("listingEdit.noChanges")}
               </span>
             </p>
             <p>
-              현재 금액{" "}
+              {t("listingEdit.currentAmount")}{" "}
               <span className="font-bold text-[var(--gg-accent)]">
                 {unitPrice || "0"} {currency}
                 {isGameMoneyListing ? ` / ${priceUnitLabel}` : ""}
@@ -450,21 +463,23 @@ export default function EditListingForm({
             </p>
             {isGameMoneyListing ? (
               <p>
-                거래 방식{" "}
+                {t("listingForm.sellMode")}{" "}
                 <span className="font-bold text-[var(--gg-text)]">
-                  {tradeMode === "BULK" ? "일괄 판매" : "분할 판매"}
+                  {tradeMode === "BULK"
+                    ? t("listingForm.bulkSell")
+                    : t("listingForm.splitSell")}
                 </span>
               </p>
             ) : null}
             <p>
-              총 수량{" "}
+              {t("listingEdit.totalQuantity")}{" "}
               <span className="font-bold text-[var(--gg-text)]">
                 {totalQuantity || "0"}
               </span>
             </p>
             {isGameMoneyListing ? (
               <p>
-                최소 거래 수량{" "}
+                {t("listingEdit.minimumTradeQuantity")}{" "}
                 <span className="font-bold text-[var(--gg-text)]">
                   {effectiveMinimumQuantity || "0"}
                 </span>
@@ -479,7 +494,7 @@ export default function EditListingForm({
             disabled={isSubmitting}
             className="rounded-xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isSubmitting ? "저장 중..." : "변경사항 저장"}
+            {isSubmitting ? t("listingEdit.saving") : t("listingEdit.saveChanges")}
           </button>
         </div>
 
@@ -492,7 +507,7 @@ export default function EditListingForm({
         className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-lg shadow-[var(--gg-shadow)]"
       >
         <p className="text-sm font-black text-[var(--gg-accent)]">IMAGE</p>
-        <h2 className="mt-1 text-2xl font-black">대표 이미지</h2>
+        <h2 className="mt-1 text-2xl font-black">{t("listingForm.imageSection")}</h2>
 
         <div className="mt-5 overflow-hidden rounded-2xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)]">
           {imagePreviewUrl ? (
@@ -514,24 +529,24 @@ export default function EditListingForm({
             />
           ) : (
             <div className="flex aspect-[4/3] items-center justify-center px-6 text-center text-sm font-bold text-[var(--gg-subtle)]">
-              대표 이미지 없음
+              {t("listingForm.noImage")}
             </div>
           )}
         </div>
 
         <div className="mt-4 grid gap-4">
           <label className="flex flex-col gap-2 text-sm font-black">
-            이미지 설명
+            {t("listingForm.imageAltPlaceholder")}
             <input
               value={imageAlt}
               onChange={(event) => setImageAlt(event.target.value)}
-              placeholder="이미지 내용을 짧게 입력"
+              placeholder={t("listingEdit.imageAltInputPlaceholder")}
               className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-3 text-[var(--gg-text)] outline-none placeholder:text-[var(--gg-subtle)] focus:border-[var(--gg-accent)]"
             />
           </label>
 
           <label className="flex flex-col gap-2 text-sm font-black">
-            이미지 파일
+            {t("listingEdit.imageFile")}
             <input
               type="file"
               accept="image/png,image/jpeg,image/webp"
@@ -543,7 +558,7 @@ export default function EditListingForm({
 
         {selectedImage ? (
           <p className="mt-3 text-xs text-[var(--gg-muted)]">
-            선택한 이미지: {selectedImage.name}
+            {t("listingEdit.selectedImage").replace("{name}", selectedImage.name)}
           </p>
         ) : null}
 
@@ -553,7 +568,7 @@ export default function EditListingForm({
             disabled={isUploadingImage}
             className="rounded-xl bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isUploadingImage ? "업로드 중..." : "이미지 저장"}
+            {isUploadingImage ? t("listingEdit.uploading") : t("listingEdit.imageSave")}
           </button>
           <button
             type="button"
@@ -561,7 +576,7 @@ export default function EditListingForm({
             onClick={() => void handleImageRemove()}
             className="rounded-xl border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm font-black text-red-600 hover:bg-red-400/20 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {isRemovingImage ? "삭제 중..." : "이미지 삭제"}
+            {isRemovingImage ? t("listingEdit.removing") : t("listingEdit.imageRemove")}
           </button>
         </div>
 
@@ -579,18 +594,20 @@ function SegmentedTradeMode({
   value: TradeMode;
   onChange: (value: TradeMode) => void;
 }) {
+  const { t } = useCountryTranslation();
+
   return (
     <div className="mt-2 grid gap-2 sm:grid-cols-2">
       <TradeModeButton
         active={value === "BULK"}
-        title="일괄 판매"
-        description="등록한 전체 수량을 한 번에 판매합니다."
+        title={t("listingForm.bulkSell")}
+        description={t("listingEdit.bulkSellDescription")}
         onClick={() => onChange("BULK")}
       />
       <TradeModeButton
         active={value === "SPLIT"}
-        title="분할 판매"
-        description="구매자가 최소 거래 수량 이상으로 나누어 구매합니다."
+        title={t("listingForm.splitSell")}
+        description={t("listingEdit.splitSellDescription")}
         onClick={() => onChange("SPLIT")}
       />
     </div>
@@ -644,6 +661,14 @@ function Notice({
       {children}
     </p>
   );
+}
+
+function getApiMessage(
+  result: ApiResult,
+  t: (key: TranslationKey) => string,
+  fallbackKey: TranslationKey,
+) {
+  return result.messageKey ? t(result.messageKey) : result.message ?? t(fallbackKey);
 }
 
 function formatDisplayNumber(value: number) {

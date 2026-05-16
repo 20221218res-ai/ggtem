@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
+import CountryText from "@/app/country-text";
+import type { TranslationKey } from "@/app/i18n";
 import { getMarketplaceSellerListingEditorView } from "@/lib/market/my-listings";
 import { formatGameMoneyQuantityWithUnit } from "@/lib/market/trade-unit";
 import SellerListingActions from "../../seller-listing-actions";
@@ -38,27 +41,38 @@ export default async function EditListingPage({
             href="/my/listings"
             className="rounded-xl border border-[var(--gg-border)] px-4 py-3 text-sm font-black hover:bg-[var(--gg-control-bg)]"
           >
-            내 판매글
+            <CountryText id="manage.mySellPosts" />
           </Link>
           {isPubliclyVisible ? (
             <Link
               href={`/listings/${listing.listingId}`}
               className="rounded-xl bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
             >
-              공개 매물 보기
+              <CountryText id="listingEdit.viewPublicListing" />
             </Link>
           ) : null}
         </div>
       </header>
 
       <section className="mt-6 grid gap-3 md:grid-cols-4">
-        <SummaryCard label="상태" value={formatStatus(listing.status)} />
         <SummaryCard
-          label="게임 / 서버"
-          value={`${listing.gameName} / ${listing.serverName ?? "서버 없음"}`}
+          label={<CountryText id="listingEdit.status" />}
+          value={<CountryText id={getStatusKey(listing.status)} />}
         />
-        <SummaryCard label="카테고리" value={formatCategory(listing.category)} />
-        <SummaryCard label="재고" value={inventorySummary} />
+        <SummaryCard
+          label={<CountryText id="listingForm.gameAndServer" />}
+          value={
+            listing.serverName
+              ? `${listing.gameName} / ${listing.serverName}`
+              : listing.gameName
+          }
+          emptySuffix={!listing.serverName ? <CountryText id="listingEdit.noServer" /> : null}
+        />
+        <SummaryCard
+          label={<CountryText id="listingEdit.category" />}
+          value={<CountryText id={getCategoryKey(listing.category)} />}
+        />
+        <SummaryCard label={<CountryText id="listingEdit.inventory" />} value={inventorySummary} />
       </section>
 
       <section className={`mt-6 rounded-2xl border p-5 ${statusGuide.className}`}>
@@ -68,7 +82,9 @@ export default async function EditListingPage({
             <h2 className="mt-2 text-2xl font-black">{statusGuide.title}</h2>
           </div>
           <div className="min-w-[180px] rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 text-sm font-bold text-[var(--gg-muted)]">
-            {isPubliclyVisible ? "공개 중" : "목록 숨김"}
+            <CountryText
+              id={isPubliclyVisible ? "listingEdit.publicNow" : "listingEdit.hiddenFromList"}
+            />
           </div>
         </div>
         <div className="mt-4">
@@ -101,11 +117,27 @@ export default async function EditListingPage({
   );
 }
 
-function SummaryCard({ label, value }: { label: string; value: string }) {
+function SummaryCard({
+  label,
+  value,
+  emptySuffix,
+}: {
+  label: ReactNode;
+  value: ReactNode;
+  emptySuffix?: ReactNode;
+}) {
   return (
     <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 shadow-sm shadow-[var(--gg-shadow)]">
       <p className="text-xs font-bold text-[var(--gg-muted)]">{label}</p>
-      <p className="mt-2 text-lg font-black">{value}</p>
+      <p className="mt-2 text-lg font-black">
+        {value}
+        {emptySuffix ? (
+          <>
+            {" / "}
+            {emptySuffix}
+          </>
+        ) : null}
+      </p>
     </div>
   );
 }
@@ -113,70 +145,70 @@ function SummaryCard({ label, value }: { label: string; value: string }) {
 function getStatusGuide(status: string, availableQuantity: string) {
   if (status === "ACTIVE" && Number(availableQuantity) > 0) {
     return {
-      eyebrow: "판매중",
-      title: "공개 목록에 노출 중입니다.",
+      eyebrow: <CountryText id="listingEdit.statusActiveEyebrow" />,
+      title: <CountryText id="listingEdit.statusActiveTitle" />,
       className: "border-emerald-200 bg-emerald-50 text-emerald-800",
     };
   }
 
   if (status === "ACTIVE" && Number(availableQuantity) <= 0) {
     return {
-      eyebrow: "재고 없음",
-      title: "판매 가능한 수량이 없어 목록에서 숨겨집니다.",
+      eyebrow: <CountryText id="listingEdit.statusNoStockEyebrow" />,
+      title: <CountryText id="listingEdit.statusNoStockTitle" />,
       className: "border-sky-200 bg-sky-50 text-sky-800",
     };
   }
 
   if (status === "PAUSED") {
     return {
-      eyebrow: "일시중지",
-      title: "판매자가 판매를 멈춘 상태입니다.",
+      eyebrow: <CountryText id="listingEdit.statusPausedEyebrow" />,
+      title: <CountryText id="listingEdit.statusPausedTitle" />,
       className: "border-amber-200 bg-amber-50 text-amber-800",
     };
   }
 
   if (status === "HIDDEN") {
     return {
-      eyebrow: "숨김",
-      title: "공개 목록에서 숨겨진 판매글입니다.",
+      eyebrow: <CountryText id="listingEdit.statusHiddenEyebrow" />,
+      title: <CountryText id="listingEdit.statusHiddenTitle" />,
       className: "border-slate-200 bg-slate-50 text-slate-800",
     };
   }
 
   if (status === "SOLD_OUT") {
     return {
-      eyebrow: "판매완료",
-      title: "더 이상 공개 판매되지 않는 글입니다.",
+      eyebrow: <CountryText id="listingEdit.statusSoldOutEyebrow" />,
+      title: <CountryText id="listingEdit.statusSoldOutTitle" />,
       className: "border-sky-200 bg-sky-50 text-sky-800",
     };
   }
 
   return {
-    eyebrow: "상태 확인",
-    title: "판매글 상태를 확인해 주세요.",
+    eyebrow: <CountryText id="listingEdit.statusCheckEyebrow" />,
+    title: <CountryText id="listingEdit.statusCheckTitle" />,
     className: "border-[var(--gg-border)] bg-[var(--gg-card-bg)] text-[var(--gg-text)]",
   };
 }
 
-function formatStatus(status: string) {
-  const labels: Record<string, string> = {
-    ACTIVE: "판매중",
-    PAUSED: "일시중지",
-    SOLD_OUT: "판매완료",
-    HIDDEN: "숨김",
+function getStatusKey(status: string): TranslationKey {
+  const labels: Record<string, TranslationKey> = {
+    ACTIVE: "manage.statusActiveSell",
+    PAUSED: "manage.statusPaused",
+    SOLD_OUT: "manage.soldOut",
+    HIDDEN: "manage.statusHidden",
   };
 
-  return labels[status] ?? status;
+  return labels[status] ?? "listingEdit.statusCheckEyebrow";
 }
 
-function formatCategory(category: string) {
-  const labels: Record<string, string> = {
-    GAME_MONEY: "게임머니",
-    GAME_ITEM: "아이템",
-    GAME_ACCOUNT: "계정",
+function getCategoryKey(category: string): TranslationKey {
+  const labels: Record<string, TranslationKey> = {
+    GAME_MONEY: "common.gameMoney",
+    GAME_ITEM: "common.item",
+    GAME_ACCOUNT: "common.account",
   };
 
-  return labels[category] ?? category;
+  return labels[category] ?? "common.trade";
 }
 
 function formatInventorySummary(listing: SellerListingEditorView) {
