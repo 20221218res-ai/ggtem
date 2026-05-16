@@ -50,13 +50,7 @@ export default async function AdminDepositsPage() {
             {state.pendingDeposits.map((item) => (
               <DepositReviewCard key={item.requestId} item={item} />
             ))}
-            {!hasPendingDeposits ? (
-              <EmptyState
-                title="대기 없음"
-                href="/admin/finance?kind=deposit"
-                label="처리 이력"
-              />
-            ) : null}
+            {!hasPendingDeposits ? <EmptyState title="대기 없음" href="/admin/finance?kind=deposit" label="처리 이력" /> : null}
           </div>
         </section>
       </section>
@@ -111,16 +105,6 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
           <InfoRow label="메모" value={item.evidence.note ?? item.memo ?? "없음"} />
         </InfoPanel>
       </div>
-
-      <Checklist
-        title="승인 체크"
-        items={[
-          { label: "코인 정보 확인", done: Boolean(item.evidence.asset) },
-          { label: "네트워크 확인", done: Boolean(item.evidence.network) },
-          { label: "입금 주소 확인", done: Boolean(item.evidence.depositAddress) },
-          { label: "TXID 제출 확인", done: hasValidTxId },
-        ]}
-      />
 
       <TraceLinks requestId={item.requestId} />
       <FinanceActions
@@ -179,29 +163,21 @@ function InfoPanel({ title, children }: { title: string; children: ReactNode }) 
   );
 }
 
-function InfoRow({ label, value, breakAll = false, tone = "text-slate-900" }: { label: string; value: string; breakAll?: boolean; tone?: string }) {
+function InfoRow({
+  label,
+  value,
+  breakAll = false,
+  tone = "text-slate-900",
+}: {
+  label: string;
+  value: string;
+  breakAll?: boolean;
+  tone?: string;
+}) {
   return (
     <div>
       <dt className="text-xs font-black text-slate-500">{label}</dt>
       <dd className={`mt-1 font-bold ${breakAll ? "break-all" : ""} ${tone}`}>{value}</dd>
-    </div>
-  );
-}
-
-function Checklist({ title, items }: { title: string; items: Array<{ label: string; done: boolean }> }) {
-  return (
-    <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950">
-      <p className="text-sm font-black">{title}</p>
-      <div className="mt-3 grid gap-2 md:grid-cols-2">
-        {items.map((item) => (
-          <div key={item.label} className="flex items-center gap-2 text-xs font-bold">
-            <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${item.done ? "bg-emerald-600 text-white" : "bg-white text-amber-700"}`}>
-              {item.done ? "OK" : "!"}
-            </span>
-            {item.label}
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
