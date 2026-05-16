@@ -11,7 +11,10 @@ export async function GET(request: NextRequest) {
 
     if (!orderId) {
       return NextResponse.json(
-        { message: "주문 ID가 필요합니다." },
+        {
+          message: "주문 ID가 필요합니다.",
+          messageKey: "accountCredential.orderRequired",
+        },
         { status: 400 },
       );
     }
@@ -25,6 +28,7 @@ export async function GET(request: NextRequest) {
           error instanceof Error
             ? error.message
             : "계정 전달 정보를 확인하지 못했습니다.",
+        messageKey: "accountCredential.loadFailed",
       },
       { status: 400 },
     );
@@ -42,7 +46,10 @@ export async function POST(request: NextRequest) {
 
     if (!body.orderId || !body.accountId || !body.password) {
       return NextResponse.json(
-        { message: "주문 ID, 계정, 비밀번호를 모두 입력해 주세요." },
+        {
+          message: "주문 ID, 계정, 비밀번호를 모두 입력해 주세요.",
+          messageKey: "accountCredential.submitRequired",
+        },
         { status: 400 },
       );
     }
@@ -54,7 +61,10 @@ export async function POST(request: NextRequest) {
       note: body.note ?? null,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey: "accountCredential.saveSuccess",
+    });
   } catch (error) {
     return NextResponse.json(
       {
@@ -62,6 +72,7 @@ export async function POST(request: NextRequest) {
           error instanceof Error
             ? error.message
             : "계정 전달 정보를 저장하지 못했습니다.",
+        messageKey: "accountCredential.saveFailed",
       },
       { status: 400 },
     );

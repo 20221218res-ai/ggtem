@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { translate, type TranslationKey } from "./i18n";
+import type { TranslationKey } from "./i18n";
 import useCountryTranslation from "./use-country-translation";
 
 type TFunction = (key: TranslationKey) => string;
@@ -29,7 +29,7 @@ export default function AccountCredentialPanel({
   orderId,
   mode,
 }: AccountCredentialPanelProps) {
-  const { countryCode, t } = useCountryTranslation();
+  const { t } = useCountryTranslation();
   const [view, setView] = useState<CredentialView | null>(null);
   const [accountId, setAccountId] = useState("");
   const [password, setPassword] = useState("");
@@ -52,12 +52,12 @@ export default function AccountCredentialPanel({
         );
         const data = (await response.json()) as CredentialView & {
           message?: string;
+          messageKey?: TranslationKey;
         };
 
         if (!response.ok) {
           throw new Error(
-            data.message ??
-              translate("accountCredential.loadFailed", countryCode),
+            getApiMessage(data, t, "accountCredential.loadFailed"),
           );
         }
 
@@ -66,13 +66,13 @@ export default function AccountCredentialPanel({
         setMessage(
           error instanceof Error
             ? error.message
-            : translate("accountCredential.processingFailed", countryCode),
+            : t("accountCredential.processingFailed"),
         );
       } finally {
         setIsLoading(false);
       }
     },
-    [countryCode, orderId],
+    [orderId, t],
   );
 
   useEffect(() => {
@@ -100,16 +100,19 @@ export default function AccountCredentialPanel({
           note,
         }),
       });
-      const data = (await response.json()) as { message?: string };
+      const data = (await response.json()) as {
+        message?: string;
+        messageKey?: TranslationKey;
+      };
 
       if (!response.ok) {
-        throw new Error(data.message ?? t("accountCredential.saveFailed"));
+        throw new Error(getApiMessage(data, t, "accountCredential.saveFailed"));
       }
 
       setAccountId("");
       setPassword("");
       setNote("");
-      setMessage(data.message ?? t("accountCredential.saveSuccess"));
+      setMessage(getApiMessage(data, t, "accountCredential.saveSuccess"));
       await loadCredential(false);
     } catch (error) {
       setMessage(
@@ -438,4 +441,12 @@ function SecretRow({
       </div>
     </div>
   );
+}
+
+function getApiMessage(
+  result: { message?: string; messageKey?: TranslationKey },
+  t: TFunction,
+  fallbackKey: TranslationKey,
+) {
+  return result.messageKey ? t(result.messageKey) : result.message ?? t(fallbackKey);
 }
