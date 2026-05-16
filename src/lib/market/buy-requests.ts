@@ -390,6 +390,7 @@ export async function getMarketplaceBuyRequests(
           }
         : {}),
     },
+    orderBy: getBuyRequestOrderBy(normalizedSort),
     select: {
       id: true,
       buyerId: true,
@@ -1706,6 +1707,22 @@ function comparePremiumThenCreated(
   }
 
   return right.createdAt.getTime() - left.createdAt.getTime();
+}
+
+function getBuyRequestOrderBy(sort: string) {
+  if (sort === "price_low") {
+    return { unitPrice: "asc" } as const;
+  }
+
+  if (sort === "price_high") {
+    return { unitPrice: "desc" } as const;
+  }
+
+  if (sort === "quantity_high") {
+    return { quantity: "desc" } as const;
+  }
+
+  return { createdAt: "desc" } as const;
 }
 
 function mapBuyRequestSummary({
