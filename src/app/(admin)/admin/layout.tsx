@@ -26,6 +26,13 @@ const adminLinks = [
     roles: ROLE_GROUPS.ORDER_OPERATORS,
   },
   {
+    href: "/admin/market-listings",
+    label: "거래글",
+    description: "판매글/구매글 상태와 위반 조치 관리",
+    group: "?ㅻ뒛 ?낅Т",
+    roles: ROLE_GROUPS.ORDER_OPERATORS,
+  },
+  {
     href: "/admin/order-chats",
     label: "채팅",
     description: "주문 채팅 열람과 외부거래 위험 신호 확인",
