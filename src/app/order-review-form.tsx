@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { TranslationKey } from "./i18n";
+import useCountryTranslation from "./use-country-translation";
 
 type OrderReviewFormProps = {
   orderId: string;
@@ -13,20 +15,25 @@ type OrderReviewFormProps = {
   } | null;
 };
 
-const ratingLabels: Record<number, string> = {
-  5: "매우 만족",
-  4: "만족",
-  3: "보통",
-  2: "아쉬움",
-  1: "문제 있음",
+const ratingLabels: Record<number, TranslationKey> = {
+  5: "orderReview.ratingVerySatisfied",
+  4: "orderReview.ratingSatisfied",
+  3: "orderReview.ratingNormal",
+  2: "orderReview.ratingDisappointed",
+  1: "orderReview.ratingProblem",
 };
 
 const reviewTemplates = [
-  "응답이 빠르고 약속한 시간에 전달받았습니다.",
-  "거래 과정이 깔끔했습니다.",
-  "등록된 내용과 실제 전달 내용이 일치했습니다.",
-  "거래 중 확인이 필요한 부분이 있었습니다.",
-];
+  "orderReview.templateFast",
+  "orderReview.templateClean",
+  "orderReview.templateMatched",
+  "orderReview.templateNeedsCheck",
+] satisfies TranslationKey[];
+
+type OrderReviewApiPayload = {
+  message?: string;
+  messageKey?: TranslationKey;
+};
 
 export default function OrderReviewForm({
   orderId,
@@ -34,13 +41,15 @@ export default function OrderReviewForm({
   existing,
 }: OrderReviewFormProps) {
   const router = useRouter();
+  const { t } = useCountryTranslation();
   const [rating, setRating] = useState(existing?.rating ?? 5);
   const [comment, setComment] = useState(existing?.comment ?? "");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const applyTemplate = (template: string) => {
+  const applyTemplate = (templateKey: TranslationKey) => {
+    const template = t(templateKey);
     setComment((current) => {
       const next = current.trim() ? `${current.trim()}\n${template}` : template;
       return next.slice(0, 1000);
@@ -52,10 +61,7 @@ export default function OrderReviewForm({
       return;
     }
 
-    if (
-      rating <= 2 &&
-      !window.confirm("낮은 평점으로 리뷰를 등록할까요?")
-    ) {
+    if (rating <= 2 && !window.confirm(t("orderReview.lowRatingConfirm"))) {
       return;
     }
 
@@ -69,33 +75,37 @@ export default function OrderReviewForm({
       body: JSON.stringify({ orderId, rating, comment }),
     });
 
-    const payload = (await response.json().catch(() => null)) as {
-      message?: string;
-    } | null;
+    const payload = (await response.json().catch(() => null)) as
+      | OrderReviewApiPayload
+      | null;
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setError(payload?.message ?? "리뷰를 등록하지 못했습니다.");
+      setError(getApiMessage(payload, t, "orderReview.submitFailed"));
       return;
     }
 
-    setMessage(payload?.message ?? "리뷰가 등록되었습니다.");
+    setMessage(getApiMessage(payload, t, "orderReview.submitted"));
     router.refresh();
   };
 
   return (
     <section className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
       <div>
-        <p className="text-sm font-black text-[var(--gg-accent)]">리뷰</p>
+        <p className="text-sm font-black text-[var(--gg-accent)]">
+          {t("orderReview.eyebrow")}
+        </p>
         <h2 className="mt-1 text-xl font-black">
-          {existing ? "작성한 리뷰" : "판매자 평가"}
+          {existing ? t("orderReview.titleExisting") : t("orderReview.titleNew")}
         </h2>
         <p className="mt-1 text-sm font-bold text-[#6b7280]">{sellerName}</p>
       </div>
 
       {existing ? (
         <p className="mt-4 rounded-md bg-emerald-100 px-3 py-2 text-xs font-black text-emerald-800">
-          {existing.createdAt}에 {existing.rating}점 리뷰를 작성했습니다.
+          {t("orderReview.existingSummary")
+            .replace("{date}", existing.createdAt)
+            .replace("{rating}", String(existing.rating))}
         </p>
       ) : null}
       {message ? (
@@ -111,7 +121,7 @@ export default function OrderReviewForm({
 
       <div className="mt-4 grid gap-3">
         <label className="grid gap-2 text-sm font-black">
-          평점
+          {t("orderReview.rating")}
           <select
             value={rating}
             onChange={(event) => setRating(Number(event.target.value))}
@@ -120,7 +130,9 @@ export default function OrderReviewForm({
           >
             {[5, 4, 3, 2, 1].map((value) => (
               <option key={value} value={value}>
-                {value}점 - {ratingLabels[value]}
+                {t("orderReview.ratingOption")
+                  .replace("{value}", String(value))
+                  .replace("{label}", t(ratingLabels[value]))}
               </option>
             ))}
           </select>
@@ -128,28 +140,28 @@ export default function OrderReviewForm({
 
         {!existing ? (
           <div className="flex flex-wrap gap-2">
-            {reviewTemplates.map((template) => (
+            {reviewTemplates.map((templateKey) => (
               <button
-                key={template}
+                key={templateKey}
                 type="button"
-                onClick={() => applyTemplate(template)}
+                onClick={() => applyTemplate(templateKey)}
                 className="rounded-full border border-[#d8dde5] bg-[#f8fafc] px-3 py-2 text-xs font-black text-[#6b7280] hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)]"
               >
-                {template}
+                {t(templateKey)}
               </button>
             ))}
           </div>
         ) : null}
 
         <label className="grid gap-2 text-sm font-black">
-          내용
+          {t("orderReview.content")}
           <textarea
             value={comment}
             onChange={(event) => setComment(event.target.value)}
             disabled={Boolean(existing)}
             rows={4}
             className="resize-none rounded-xl border border-[#d8dde5] bg-white px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)] disabled:bg-[#f3f4f6]"
-            placeholder="거래 경험을 입력해 주세요."
+            placeholder={t("orderReview.placeholder")}
             maxLength={1000}
           />
         </label>
@@ -162,8 +174,20 @@ export default function OrderReviewForm({
         disabled={Boolean(existing) || isSubmitting}
         className="mt-4 w-full rounded-xl bg-[var(--gg-accent)] px-4 py-4 text-sm font-black text-white disabled:bg-[#d1d5db]"
       >
-        {existing ? "등록 완료" : isSubmitting ? "저장 중" : "리뷰 등록"}
+        {existing
+          ? t("orderReview.completed")
+          : isSubmitting
+            ? t("orderReview.saving")
+            : t("orderReview.submit")}
       </button>
     </section>
   );
+}
+
+function getApiMessage(
+  payload: OrderReviewApiPayload | null,
+  t: (key: TranslationKey) => string,
+  fallbackKey: TranslationKey,
+) {
+  return payload?.messageKey ? t(payload.messageKey) : payload?.message ?? t(fallbackKey);
 }

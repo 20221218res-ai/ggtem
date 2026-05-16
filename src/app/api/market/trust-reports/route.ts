@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           message: "주문, 신고 유형, 신고 내용을 모두 입력해 주세요.",
+          messageKey: "trustReport.required",
         },
         {
           status: 400,
@@ -32,12 +33,16 @@ export async function POST(request: NextRequest) {
       description: body.description,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey: "trustReport.submitted",
+    });
   } catch (error) {
     return NextResponse.json(
       {
         message:
           error instanceof Error ? error.message : "신고 접수에 실패했습니다.",
+        messageKey: "trustReport.submitFailed",
       },
       {
         status: 400,

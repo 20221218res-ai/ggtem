@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           message: "주문 정보와 평점이 필요합니다.",
+          messageKey: "orderReview.required",
         },
         {
           status: 400,
@@ -32,12 +33,16 @@ export async function POST(request: NextRequest) {
       comment: body.comment,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey: "orderReview.submitted",
+    });
   } catch (error) {
     return NextResponse.json(
       {
         message:
           error instanceof Error ? error.message : "리뷰를 등록하지 못했습니다.",
+        messageKey: "orderReview.submitFailed",
       },
       {
         status: 400,

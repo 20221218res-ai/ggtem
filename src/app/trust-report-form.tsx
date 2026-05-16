@@ -1,24 +1,32 @@
 "use client";
 
 import { useState } from "react";
+import type { TranslationKey } from "./i18n";
+import useCountryTranslation from "./use-country-translation";
 
 const reportCategories = [
-  { value: "NO_DELIVERY", label: "전달 지연/미전달" },
-  { value: "WRONG_ITEM", label: "다른 물품 전달" },
-  { value: "OFF_PLATFORM_PAYMENT", label: "외부 결제 유도" },
-  { value: "ABUSIVE_CHAT", label: "부적절한 채팅" },
-  { value: "FRAUD", label: "사기 의심" },
-  { value: "OTHER", label: "기타" },
-];
+  { value: "NO_DELIVERY", labelKey: "trustReport.categoryNoDelivery" },
+  { value: "WRONG_ITEM", labelKey: "trustReport.categoryWrongItem" },
+  { value: "OFF_PLATFORM_PAYMENT", labelKey: "trustReport.categoryOffPlatformPayment" },
+  { value: "ABUSIVE_CHAT", labelKey: "trustReport.categoryAbusiveChat" },
+  { value: "FRAUD", labelKey: "trustReport.categoryFraud" },
+  { value: "OTHER", labelKey: "trustReport.categoryOther" },
+] satisfies Array<{ value: string; labelKey: TranslationKey }>;
 
 const reportTemplates = [
-  "약속한 시간까지 물품을 받지 못했습니다.",
-  "등록 내용과 실제 전달 내용이 다릅니다.",
-  "외부 연락 또는 외부 결제를 요구했습니다.",
-  "채팅에서 부적절한 표현이 있었습니다.",
-];
+  "trustReport.templateNoDelivery",
+  "trustReport.templateWrongItem",
+  "trustReport.templateOffPlatform",
+  "trustReport.templateAbusiveChat",
+] satisfies TranslationKey[];
+
+type TrustReportApiPayload = {
+  message?: string;
+  messageKey?: TranslationKey;
+};
 
 export default function TrustReportForm({ orderId }: { orderId: string }) {
+  const { t } = useCountryTranslation();
   const [category, setCategory] = useState("NO_DELIVERY");
   const [description, setDescription] = useState("");
   const [evidenceSummary, setEvidenceSummary] = useState("");
@@ -33,7 +41,7 @@ export default function TrustReportForm({ orderId }: { orderId: string }) {
 
     const mainDescription = description.trim();
     if (mainDescription.length < 10) {
-      setError("신고 내용은 10자 이상 입력해 주세요.");
+      setError(t("trustReport.descriptionMin"));
       return;
     }
 
@@ -44,7 +52,7 @@ export default function TrustReportForm({ orderId }: { orderId: string }) {
     });
 
     if (fullDescription.length > 2000) {
-      setError("신고 내용과 증거 기록은 합쳐서 2,000자 이하로 입력해 주세요.");
+      setError(t("trustReport.descriptionMax"));
       return;
     }
 
@@ -62,28 +70,29 @@ export default function TrustReportForm({ orderId }: { orderId: string }) {
           description: fullDescription,
         }),
       });
-      const result = (await response.json()) as { message?: string };
+      const result = (await response.json()) as TrustReportApiPayload;
 
       if (!response.ok) {
-        throw new Error(result.message ?? "신고 접수에 실패했습니다.");
+        throw new Error(getApiMessage(result, t, "trustReport.submitFailed"));
       }
 
       setDescription("");
       setEvidenceSummary("");
       setEvidenceLinks("");
-      setMessage(result.message ?? "신고가 접수되었습니다.");
+      setMessage(getApiMessage(result, t, "trustReport.submitted"));
     } catch (reportError) {
       setError(
         reportError instanceof Error
           ? reportError.message
-          : "신고 접수에 실패했습니다.",
+          : t("trustReport.submitFailed"),
       );
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  function applyTemplate(template: string) {
+  function applyTemplate(templateKey: TranslationKey) {
+    const template = t(templateKey);
     setDescription((current) => {
       const next = current.trim() ? `${current.trim()}\n${template}` : template;
       return next.slice(0, 1200);
@@ -100,17 +109,19 @@ export default function TrustReportForm({ orderId }: { orderId: string }) {
     <section className="rounded-2xl border border-red-200 bg-red-50/70 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-black text-red-600">REPORT</p>
-          <h2 className="mt-1 text-lg font-black text-red-900">신고/분쟁 접수</h2>
+          <p className="text-xs font-black text-red-600">{t("trustReport.eyebrow")}</p>
+          <h2 className="mt-1 text-lg font-black text-red-900">
+            {t("trustReport.title")}
+          </h2>
         </div>
         <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-black text-red-700">
-          관리자 검토
+          {t("trustReport.adminReview")}
         </span>
       </div>
 
       <div className="mt-4 grid gap-3">
         <div className="grid gap-2">
-          <p className="text-sm font-black text-red-900">문제 유형</p>
+          <p className="text-sm font-black text-red-900">{t("trustReport.category")}</p>
           <div className="grid gap-2 sm:grid-cols-2">
             {reportCategories.map((item) => {
               const active = category === item.value;
@@ -126,7 +137,7 @@ export default function TrustReportForm({ orderId }: { orderId: string }) {
                       : "rounded-xl border border-red-200 bg-[var(--gg-card-bg)] px-3 py-3 text-left text-sm font-black text-[var(--gg-text)] hover:border-red-400"
                   }
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                 </button>
               );
             })}
@@ -134,50 +145,50 @@ export default function TrustReportForm({ orderId }: { orderId: string }) {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {reportTemplates.map((template) => (
+          {reportTemplates.map((templateKey) => (
             <button
-              key={template}
+              key={templateKey}
               type="button"
-              onClick={() => applyTemplate(template)}
+              onClick={() => applyTemplate(templateKey)}
               className="rounded-full border border-red-200 bg-[var(--gg-card-bg)] px-3 py-2 text-xs font-black text-red-700 hover:border-red-500"
             >
-              {template}
+              {t(templateKey)}
             </button>
           ))}
         </div>
 
         <label className="grid gap-2 text-sm font-black text-red-900">
-          신고 내용
+          {t("trustReport.description")}
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             rows={4}
             className="resize-none rounded-xl border border-red-200 bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold text-[var(--gg-text)] outline-none focus:border-red-500"
-            placeholder="무슨 문제가 있었는지 적어 주세요."
+            placeholder={t("trustReport.descriptionPlaceholder")}
             maxLength={1200}
           />
         </label>
 
         <label className="grid gap-2 text-sm font-black text-red-900">
-          증거 요약
+          {t("trustReport.evidenceSummary")}
           <textarea
             value={evidenceSummary}
             onChange={(event) => setEvidenceSummary(event.target.value)}
             rows={3}
             className="resize-none rounded-xl border border-red-200 bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold text-[var(--gg-text)] outline-none focus:border-red-500"
-            placeholder="채팅 시간, 전달받은 내용, 누락 수량처럼 운영자가 바로 볼 핵심만 적어 주세요."
+            placeholder={t("trustReport.evidenceSummaryPlaceholder")}
             maxLength={500}
           />
         </label>
 
         <label className="grid gap-2 text-sm font-black text-red-900">
-          증거 링크 / TXID
+          {t("trustReport.evidenceLinks")}
           <textarea
             value={evidenceLinks}
             onChange={(event) => setEvidenceLinks(event.target.value)}
             rows={3}
             className="resize-none rounded-xl border border-red-200 bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold text-[var(--gg-text)] outline-none focus:border-red-500"
-            placeholder="스크린샷 링크, TXID, 채팅 캡처 링크 등을 한 줄에 하나씩 입력"
+            placeholder={t("trustReport.evidenceLinksPlaceholder")}
             maxLength={600}
           />
         </label>
@@ -193,7 +204,7 @@ export default function TrustReportForm({ orderId }: { orderId: string }) {
         disabled={isSubmitting}
         className="mt-4 w-full rounded-xl bg-red-600 px-4 py-4 text-sm font-black text-white hover:bg-red-700 disabled:opacity-60"
       >
-        {isSubmitting ? "접수 중..." : "신고 접수"}
+        {isSubmitting ? t("trustReport.submitting") : t("trustReport.submit")}
       </button>
 
       {message ? (
@@ -208,6 +219,14 @@ export default function TrustReportForm({ orderId }: { orderId: string }) {
       ) : null}
     </section>
   );
+}
+
+function getApiMessage(
+  result: TrustReportApiPayload,
+  t: (key: TranslationKey) => string,
+  fallbackKey: TranslationKey,
+) {
+  return result.messageKey ? t(result.messageKey) : result.message ?? t(fallbackKey);
 }
 
 function buildReportDescription(input: {
