@@ -128,7 +128,15 @@ export default async function ListingDetailPage({
                     <Metric
                       label={<CountryText id="listingDetail.unitPrice" />}
                       value={`${priceDisplay.price} ${listing.currency}`}
-                      hint={`${priceDisplay.unitLabel} 기준`}
+                      hint={
+                        priceDisplay.unitLabel ? (
+                          <>
+                            {priceDisplay.unitLabel} <CountryText id="listingDetail.unitBasisSuffix" />
+                          </>
+                        ) : (
+                          <CountryText id="listingDetail.eachBasis" />
+                        )
+                      }
                       strong
                     />
                     <Metric label={<CountryText id="listingDetail.minimumQuantity" />} value={minimumQuantityLabel} />
@@ -258,7 +266,7 @@ export default async function ListingDetailPage({
               availableQuantity={listing.availableQuantity}
               minimumQuantity={listing.minimumQuantity}
               tradeUnitLabel={moneyUnit}
-              serverLabel={serverLabel ?? "전체 서버"}
+              serverLabel={serverLabel ?? undefined}
             />
 
             <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5">
@@ -299,7 +307,7 @@ function getListingPriceDisplay({
   if (category !== "GAME_MONEY") {
     return {
       price: formatDisplayNumber(Number(unitPrice)),
-      unitLabel: "1개",
+      unitLabel: "",
     };
   }
 

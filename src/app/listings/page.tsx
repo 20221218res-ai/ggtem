@@ -269,7 +269,7 @@ function ServerPriceSelector({
       </FilterRow>
 
       {serverDetailOptions.length > 0 ? (
-        <FilterRow label="서버 상세">
+        <FilterRow label={<CountryText id="listingForm.serverDetail" />}>
           <div className="flex flex-wrap gap-3">
             {[
               { key: "__all__", label: <CountryText id="listings.all" />, value: "" },

@@ -71,6 +71,8 @@ export function PurchasePreviewPanel({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const isGameMoneyListing = category === "GAME_MONEY";
+  const priceUnitDisplayLabel = priceUnitLabel || t("listingDetail.eachBasis");
+  const safetyServerLabel = serverLabel || t("listingDetail.allServers");
   const isBulkMode = tradeMode === "BULK";
   const normalizedPriceUnitQuantity = isGameMoneyListing
     ? normalizeGameMoneyPriceUnit(priceUnitQuantity)
@@ -297,7 +299,7 @@ export function PurchasePreviewPanel({
       </div>
 
       <div className="mt-5 grid gap-3">
-        <PreviewRow label={t("purchase.unitPrice")} value={`${displayUnitPrice} ${currency} / ${priceUnitLabel}`} />
+        <PreviewRow label={t("purchase.unitPrice")} value={`${displayUnitPrice} ${currency} / ${priceUnitDisplayLabel}`} />
         <PreviewRow label={t("purchase.minimumQuantity")} value={minimumQuantityLabel} />
         <PreviewRow label={t("purchase.availableStock")} value={availableQuantityLabel} />
         <PreviewRow
@@ -383,13 +385,13 @@ export function PurchasePreviewPanel({
         confirmLabel={t("purchase.confirmLabel")}
         cancelLabel={t("common.cancel")}
         isSubmitting={isSubmitting}
-        serverLabel={serverLabel}
+        serverLabel={safetyServerLabel}
         requireCharacterName
         characterNameLabel={t("listingForm.buyerGameNickname")}
         characterNamePlaceholder={t("listingForm.buyerGameNicknamePlaceholder")}
         summaryRows={[
           { label: String(t("purchase.quantity")), value: actualQuantityLabel },
-          { label: String(t("purchase.unitPrice")), value: `${displayUnitPrice} ${currency} / ${priceUnitLabel}` },
+          { label: String(t("purchase.unitPrice")), value: `${displayUnitPrice} ${currency} / ${priceUnitDisplayLabel}` },
           { label: String(t("purchase.expectedPayment")), value: `${expectedAmount} ${currency}` },
         ]}
         onCancel={() => setIsConfirmOpen(false)}
