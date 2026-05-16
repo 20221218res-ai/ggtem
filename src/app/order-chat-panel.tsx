@@ -53,7 +53,7 @@ export default function OrderChatPanel({
   const [body, setBody] = useState("");
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
-  const [riskWarning, setRiskWarning] = useState<string[]>([]);
+  const [riskWarning, setRiskWarning] = useState<TranslationKey[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function submit() {
@@ -66,7 +66,7 @@ export default function OrderChatPanel({
 
     const detection = detectOffPlatformContact(trimmedBody);
     if (detection.blocked) {
-      setRiskWarning(detection.signals.map((signal) => signal.label));
+      setRiskWarning(detection.signals.map((signal) => getOffPlatformSignalKey(signal.code)));
       setError("");
       setNotice("");
       return;
@@ -82,17 +82,20 @@ export default function OrderChatPanel({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ orderId, body: trimmedBody }),
     });
-    const payload = (await response.json().catch(() => null)) as { message?: string } | null;
+    const payload = (await response.json().catch(() => null)) as {
+      message?: string;
+      messageKey?: TranslationKey;
+    } | null;
 
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setError(payload?.message ?? t("chat.sendFailed"));
+      setError(payload?.messageKey ? t(payload.messageKey) : payload?.message ?? t("chat.sendFailed"));
       return;
     }
 
     setBody("");
-    setNotice(payload?.message ?? t("chat.sent"));
+    setNotice(payload?.messageKey ? t(payload.messageKey) : payload?.message ?? t("chat.sent"));
     router.refresh();
   }
 
@@ -207,7 +210,7 @@ export default function OrderChatPanel({
                 const detection = detectOffPlatformContact(nextBody);
                 setRiskWarning(
                   detection.blocked
-                    ? detection.signals.map((signal) => signal.label)
+                    ? detection.signals.map((signal) => getOffPlatformSignalKey(signal.code))
                     : [],
                 );
               }}
@@ -219,9 +222,12 @@ export default function OrderChatPanel({
             />
             {riskWarning.length > 0 ? (
               <div className="mt-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-800">
-                <p className="font-black">외부거래/연락처 교환 의심 문구가 감지되었습니다.</p>
+                <p className="font-black">{t("chat.offPlatformWarningTitle")}</p>
                 <p className="mt-1">
-                  감지 항목: {riskWarning.join(", ")}. GGtem 채팅과 에스크로 안에서만 거래해 주세요.
+                  {t("chat.offPlatformWarningBody").replace(
+                    "{signals}",
+                    riskWarning.map((key) => t(key)).join(", "),
+                  )}
                 </p>
               </div>
             ) : null}
@@ -325,4 +331,17 @@ function getSenderRoleKey(role: string): TranslationKey {
   if (role === "BUYER" || role === "CUSTOMER") return "chat.buyer";
   if (role === "ADMIN" || role === "SUPER_ADMIN") return "chat.admin";
   return "chat.admin";
+}
+
+function getOffPlatformSignalKey(code: string): TranslationKey {
+  const labels: Record<string, TranslationKey> = {
+    EMAIL: "chat.offPlatformSignalEmail",
+    EXTERNAL_URL: "chat.offPlatformSignalExternalUrl",
+    PHONE: "chat.offPlatformSignalPhone",
+    MESSENGER: "chat.offPlatformSignalMessenger",
+    OFF_PLATFORM_TRADE: "chat.offPlatformSignalTrade",
+    CRYPTO_ADDRESS: "chat.offPlatformSignalCryptoAddress",
+  };
+
+  return labels[code] ?? "chat.offPlatformSignalUnknown";
 }

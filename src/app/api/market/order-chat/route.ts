@@ -18,7 +18,10 @@ export async function POST(request: NextRequest) {
 
     if (!body.orderId || !body.body) {
       return NextResponse.json(
-        { message: "주문 정보와 메시지 내용이 필요합니다." },
+        {
+          message: "주문 정보와 메시지 내용이 필요합니다.",
+          messageKey: "chat.orderInfoRequired",
+        },
         { status: 400 },
       );
     }
@@ -28,7 +31,10 @@ export async function POST(request: NextRequest) {
       body: body.body,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey: "chat.sent",
+    });
   } catch (error) {
     return NextResponse.json(
       {
@@ -36,6 +42,7 @@ export async function POST(request: NextRequest) {
           error instanceof Error
             ? error.message
             : "주문 채팅 메시지를 보내지 못했습니다.",
+        messageKey: "chat.sendFailed",
       },
       { status: 400 },
     );
