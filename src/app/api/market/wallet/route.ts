@@ -25,6 +25,7 @@ export async function GET() {
     return NextResponse.json(
       {
         message: error instanceof Error ? error.message : "지갑 정보를 불러오지 못했습니다.",
+        messageKey: "wallet.loadFailed",
       },
       { status: 500 },
     );
@@ -88,7 +89,11 @@ export async function POST(request: NextRequest) {
 
       if (!pinCheck.ok) {
         return NextResponse.json(
-          { code: pinCheck.code, message: pinCheck.message },
+          {
+            code: pinCheck.code,
+            message: pinCheck.message,
+            messageKey: getPaymentPinErrorKey(pinCheck.code),
+          },
           { status: pinCheck.status },
         );
       }
@@ -128,10 +133,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         message: error instanceof Error ? error.message : "지갑 요청을 처리하지 못했습니다.",
+        messageKey: "wallet.requestFailed",
       },
       { status: 400 },
     );
   }
+}
+
+function getPaymentPinErrorKey(code: string) {
+  if (code === "PAYMENT_PIN_REQUIRED") return "tradeSafety.paymentPinMissing";
+  if (code === "PAYMENT_PIN_FORMAT_INVALID") return "tradeSafety.paymentPinInvalid";
+  if (code === "PAYMENT_PIN_INVALID") return "tradeSafety.paymentPinStatusError";
+
+  return "wallet.requestFailed";
 }
 
 function normalizeRequestKey(value: string | null) {
