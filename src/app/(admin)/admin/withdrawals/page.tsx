@@ -50,13 +50,7 @@ export default async function AdminWithdrawalsPage() {
             {state.pendingWithdrawals.map((item) => (
               <WithdrawalReviewCard key={item.requestId} item={item} />
             ))}
-            {!hasPendingWithdrawals ? (
-              <EmptyState
-                title="대기 없음"
-                href="/admin/finance?kind=withdrawal"
-                label="처리 이력"
-              />
-            ) : null}
+            {!hasPendingWithdrawals ? <EmptyState title="대기 없음" href="/admin/finance?kind=withdrawal" label="처리 이력" /> : null}
           </div>
         </section>
       </section>
@@ -123,16 +117,6 @@ function WithdrawalReviewCard({ item }: { item: PendingWithdrawal }) {
         </div>
       ) : null}
 
-      <Checklist
-        title="완료 체크"
-        items={[
-          { label: "받을 주소 확인", done: Boolean(item.destination) },
-          { label: "체인 확인", done: Boolean(item.chain) },
-          { label: "금액/수수료 확인", done: Boolean(item.amount && item.fee) },
-          { label: "실제 송금 후 TXID 입력", done: false },
-        ]}
-      />
-
       <TraceLinks requestId={item.requestId} />
       <FinanceActions
         kind="WITHDRAWAL"
@@ -197,24 +181,6 @@ function InfoRow({ label, value, breakAll = false }: { label: string; value: str
     <div>
       <dt className="text-xs font-black text-slate-500">{label}</dt>
       <dd className={`mt-1 font-bold text-slate-900 ${breakAll ? "break-all" : ""}`}>{value}</dd>
-    </div>
-  );
-}
-
-function Checklist({ title, items }: { title: string; items: Array<{ label: string; done: boolean }> }) {
-  return (
-    <div className="mt-4 rounded-xl border border-amber-200 bg-white p-3 text-slate-950">
-      <p className="text-sm font-black">{title}</p>
-      <div className="mt-3 grid gap-2 md:grid-cols-2">
-        {items.map((item) => (
-          <div key={item.label} className="flex items-center gap-2 text-xs font-bold">
-            <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${item.done ? "bg-emerald-600 text-white" : "bg-amber-100 text-amber-800"}`}>
-              {item.done ? "OK" : "!"}
-            </span>
-            {item.label}
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
