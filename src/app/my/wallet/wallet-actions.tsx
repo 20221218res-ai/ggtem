@@ -132,14 +132,17 @@ export default function WalletActions({
       const result = (await response.json()) as {
         requestId?: string;
         kind?: "DEPOSIT" | "WITHDRAWAL";
+        messageKey?: TranslationKey;
         message?: string;
       };
 
       if (!response.ok) {
-        throw new Error(result.message ?? t("wallet.requestFailed"));
+        throw new Error(
+          result.messageKey ? t(result.messageKey) : result.message ?? t("wallet.requestFailed"),
+        );
       }
 
-      setSuccess(result.message ?? t("wallet.requestReceived"));
+      setSuccess(result.messageKey ? t(result.messageKey) : result.message ?? t("wallet.requestReceived"));
 
       if (result.requestId) {
         const detailPath =

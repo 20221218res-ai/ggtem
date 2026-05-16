@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             message: "취소할 요청 유형과 요청 ID가 필요합니다.",
+            messageKey: "wallet.cancelMissingInfo",
           },
           { status: 400 },
         );
@@ -65,7 +66,13 @@ export async function POST(request: NextRequest) {
         requestId: body.requestId,
       });
 
-      return NextResponse.json(result);
+      return NextResponse.json({
+        ...result,
+        messageKey:
+          result.kind === "WITHDRAWAL"
+            ? "wallet.withdrawCancelReceived"
+            : "wallet.depositCancelReceived",
+      });
     }
 
     if (body.kind === "WITHDRAWAL") {
@@ -91,6 +98,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           message: "요청 유형과 금액을 입력해 주세요.",
+          messageKey: "wallet.requestKindAmountRequired",
         },
         { status: 400 },
       );
@@ -109,7 +117,13 @@ export async function POST(request: NextRequest) {
       deviceKey: normalizeRequestKey(request.headers.get("user-agent")),
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey:
+        result.kind === "WITHDRAWAL"
+          ? "wallet.withdrawRequestReceived"
+          : "wallet.depositRequestReceived",
+    });
   } catch (error) {
     return NextResponse.json(
       {

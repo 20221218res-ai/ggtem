@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import CountryText from "../../country-text";
+import type { TranslationKey } from "../../i18n";
 import useCountryTranslation from "../../use-country-translation";
 
 export default function WalletRequestCancel({
@@ -33,10 +34,12 @@ export default function WalletRequestCancel({
           requestId,
         }),
       });
-      const result = (await response.json()) as { message?: string };
+      const result = (await response.json()) as { message?: string; messageKey?: TranslationKey };
 
       if (!response.ok) {
-        throw new Error(result.message ?? t("wallet.cancelFailed"));
+        throw new Error(
+          result.messageKey ? t(result.messageKey) : result.message ?? t("wallet.cancelFailed"),
+        );
       }
 
       router.refresh();
