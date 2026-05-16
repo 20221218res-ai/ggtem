@@ -224,19 +224,8 @@ export function SoftNotice({
   children: ReactNode;
   tone?: "blue" | "amber" | "red" | "green" | "cyan";
 }) {
-  const classes = {
-    blue: "border-blue-400 bg-blue-100 text-blue-900",
-    amber: "border-amber-400 bg-amber-100 text-amber-900",
-    red: "border-red-400 bg-red-100 text-red-900",
-    green: "border-emerald-400 bg-emerald-100 text-emerald-900",
-    cyan: "border-[color-mix(in_srgb,var(--color-primary)_70%,transparent)] bg-[color-mix(in_srgb,var(--color-primary)_18%,transparent)] text-[var(--color-primary)]",
-  };
-
-  return (
-    <div className={`rounded-lg border-l-4 px-4 py-3 text-sm font-black ${classes[tone]}`}>
-      {children}
-    </div>
-  );
+  void tone;
+  return <div className="sr-only">{children}</div>;
 }
 
 export function StatBar({

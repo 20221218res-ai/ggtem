@@ -96,7 +96,7 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
           <div>
             <p className="text-sm font-black text-[var(--gg-accent)]">REPORT CENTER</p>
             <h1 className="mt-2 text-3xl font-black tracking-tight">운영 데이터 조회</h1>
-            <p className="mt-2 text-sm font-bold text-slate-500">
+            <p className="sr-only">
               거래, 입출금, 분쟁, 유저, 관리자 이력을 한 곳에서 조회하고 다운로드합니다.
             </p>
           </div>
@@ -123,7 +123,7 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
             <SecurityRule label="다운로드" value="감사 로그 기록" />
           </div>
           {!canDownloadCurrentView ? (
-            <p className="mt-4 rounded-md border border-amber-200 bg-white px-3 py-2 text-sm font-bold text-amber-900">
+            <p className="sr-only">
               현재 범위에는 유저 데이터가 포함되어 SUPER 관리자만 다운로드할 수 있습니다.
             </p>
           ) : null}
@@ -415,7 +415,7 @@ function ExportButton({ href, label, disabled, primary = false }: { href: string
 
 function SecurityRule({ label, value }: { label: string; value: string }) {
   return (
-    <span className="rounded-md border border-sky-200 bg-white px-3 py-2 text-xs font-black text-sky-800">
+    <span className="sr-only">
       {label}: {value}
     </span>
   );
@@ -442,20 +442,8 @@ function ReportWorkflow({ canDownloadCurrentView }: { canDownloadCurrentView: bo
     },
   ];
 
-  return (
-    <section className="grid gap-3 md:grid-cols-3">
-      {steps.map((step) => (
-        <Link
-          key={step.title}
-          href={step.href}
-          className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-[var(--color-primary)]"
-        >
-          <p className="text-sm font-black text-slate-950">{step.title}</p>
-          <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{step.body}</p>
-        </Link>
-      ))}
-    </section>
-  );
+  void steps;
+  return null;
 }
 
 function ExportScopeCard({ label, value }: { label: string; value: string }) {

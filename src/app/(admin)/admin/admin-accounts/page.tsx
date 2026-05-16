@@ -216,7 +216,7 @@ export default async function AdminAccountsPage() {
               >
                 <StatusPill tone={role.tone}>{role.role}</StatusPill>
                 <p className="mt-3 text-lg font-black">{role.title}</p>
-                <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
+                <p className="sr-only">
                   {role.description}
                 </p>
                 <p className="mt-3 text-xl font-black">{role.members}명</p>
@@ -236,7 +236,7 @@ export default async function AdminAccountsPage() {
                       <span className="text-xs font-black text-slate-500">{policy.scope}</span>
                     </div>
                     <p className="mt-3 text-lg font-black text-slate-950">{policy.title}</p>
-                    <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
+                    <p className="sr-only">
                       {policy.description}
                     </p>
                     <p className="mt-3 text-sm font-bold text-slate-800">

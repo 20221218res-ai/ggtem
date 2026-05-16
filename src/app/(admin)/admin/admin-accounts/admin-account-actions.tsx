@@ -342,7 +342,7 @@ function FormShell({
     <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-4">
       <div>
         <p className="text-sm font-black text-slate-950">{title}</p>
-        <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">
+        <p className="sr-only">
           {description}
         </p>
       </div>

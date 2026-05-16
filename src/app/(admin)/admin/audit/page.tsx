@@ -76,7 +76,7 @@ export default async function AdminAuditPage({
         <section className="rounded-lg border border-amber-200 bg-amber-50 p-5">
           <p className="text-sm font-black text-amber-800">다음 행동</p>
           <h2 className="mt-2 text-2xl font-black">{nextAction.title}</h2>
-          <p className="mt-2 text-sm font-semibold text-amber-900">
+          <p className="sr-only">
             {nextAction.body}
           </p>
           <Link
@@ -86,8 +86,6 @@ export default async function AdminAuditPage({
             {nextAction.actionLabel}
           </Link>
         </section>
-
-        <AuditWorkflow />
 
         <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
           <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
