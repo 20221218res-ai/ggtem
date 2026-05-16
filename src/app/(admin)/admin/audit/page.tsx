@@ -25,9 +25,7 @@ type AdminAuditPageProps = {
 type AuditState = Awaited<ReturnType<typeof getAdminAuditState>>;
 type AuditLog = AuditState["logs"][number];
 
-export default async function AdminAuditPage({
-  searchParams,
-}: AdminAuditPageProps) {
+export default async function AdminAuditPage({ searchParams }: AdminAuditPageProps) {
   await requirePageRole(ROLE_GROUPS.PLATFORM_ADMINS, {
     signInPath: "/admin/sign-in",
   });
@@ -51,12 +49,8 @@ export default async function AdminAuditPage({
       <section className="mx-auto flex max-w-7xl flex-col gap-6">
         <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-black text-[var(--color-primary)]">
-              AUDIT LOG
-            </p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">
-              감사 로그
-            </h1>
+            <p className="text-sm font-black text-[var(--color-primary)]">AUDIT LOG</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight">감사 로그</h1>
           </div>
           <div className="flex flex-wrap gap-2">
             <HeaderLink href={buildAuditExportHref(state.filters, "csv")} label="CSV" />
@@ -74,7 +68,7 @@ export default async function AdminAuditPage({
         </section>
 
         <section className="rounded-lg border border-amber-200 bg-amber-50 p-5">
-          <p className="text-sm font-black text-amber-800">다음 행동</p>
+          <p className="text-sm font-black text-amber-800">다음 액션</p>
           <h2 className="mt-2 text-2xl font-black">{nextAction.title}</h2>
           <Link
             href={nextAction.href}
@@ -132,17 +126,13 @@ export default async function AdminAuditPage({
                 name="query"
                 defaultValue={state.filters.query}
                 placeholder="주문 ID, 대상 ID, 액션, 사유 검색"
-                className="min-h-11 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-[var(--color-primary)]"
+                className={inputClass}
               />
-              <select
-                name="adminId"
-                defaultValue={state.filters.adminId}
-                className="min-h-11 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-[var(--color-primary)]"
-              >
+              <select name="adminId" defaultValue={state.filters.adminId} className={inputClass}>
                 <option value="">전체 관리자</option>
                 {state.adminOptions.map((admin) => (
                   <option key={admin.userId} value={admin.userId}>
-                    {admin.name} · {admin.role}
+                    {admin.name} / {admin.role}
                   </option>
                 ))}
               </select>
@@ -150,29 +140,19 @@ export default async function AdminAuditPage({
                 name="targetType"
                 defaultValue={state.filters.targetType}
                 placeholder="대상 유형 예: ORDER"
-                className="min-h-11 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-[var(--color-primary)]"
+                className={inputClass}
               />
               <input
                 name="action"
                 defaultValue={state.filters.action}
-                placeholder="액션 예: DISPUTE_RELEASED_TO_SELLER"
-                className="min-h-11 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-[var(--color-primary)]"
+                placeholder="액션 예: BUY_REQUEST_ADMIN_CANCELED"
+                className={inputClass}
               />
               <input type="hidden" name="sensitivity" value={state.filters.sensitivity} />
               <input type="hidden" name="reason" value={state.filters.reason} />
               <input type="hidden" name="followupStatus" value={state.filters.followupStatus} />
-              <input
-                type="date"
-                name="from"
-                defaultValue={state.filters.from}
-                className="min-h-11 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-[var(--color-primary)]"
-              />
-              <input
-                type="date"
-                name="to"
-                defaultValue={state.filters.to}
-                className="min-h-11 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-[var(--color-primary)]"
-              />
+              <input type="date" name="from" defaultValue={state.filters.from} className={inputClass} />
+              <input type="date" name="to" defaultValue={state.filters.to} className={inputClass} />
               <button className="rounded-md bg-[var(--color-primary)] px-5 py-3 text-sm font-black text-slate-950 hover:brightness-105 md:col-span-2">
                 검색
               </button>
@@ -180,16 +160,22 @@ export default async function AdminAuditPage({
           </section>
 
           <section className="grid gap-4">
-            <BreakdownPanel title="액션 Top" items={state.actionBreakdown.map((item) => ({
-              label: actionLabel(item.action),
-              value: `${item.count}건`,
-              href: buildAuditHref({ ...state.filters, action: item.action }),
-            }))} />
-            <BreakdownPanel title="대상 Top" items={state.targetBreakdown.map((item) => ({
-              label: targetTypeLabel(item.targetType),
-              value: `${item.count}건`,
-              href: buildAuditHref({ ...state.filters, targetType: item.targetType }),
-            }))} />
+            <BreakdownPanel
+              title="액션 Top"
+              items={state.actionBreakdown.map((item) => ({
+                label: actionLabel(item.action),
+                value: `${item.count}건`,
+                href: buildAuditHref({ ...state.filters, action: item.action }),
+              }))}
+            />
+            <BreakdownPanel
+              title="대상 Top"
+              items={state.targetBreakdown.map((item) => ({
+                label: targetTypeLabel(item.targetType),
+                value: `${item.count}건`,
+                href: buildAuditHref({ ...state.filters, targetType: item.targetType }),
+              }))}
+            />
           </section>
         </section>
 
@@ -232,26 +218,20 @@ function AuditLogRow({ log }: { log: AuditLog }) {
               {log.followup.isResolved ? "보완 완료" : needsFollowup ? "사유 필요" : "정상"}
             </Badge>
           </div>
-          <p className="mt-3 text-sm font-black text-slate-950">
-            {actionLabel(log.action)}
-          </p>
-          <p className="mt-1 text-xs font-semibold text-slate-500">
-            {log.action}
-          </p>
+          <p className="mt-3 text-sm font-black text-slate-950">{actionLabel(log.action)}</p>
+          <p className="mt-1 text-xs font-semibold text-slate-500">{log.action}</p>
           <p className="mt-3 text-sm font-semibold text-slate-600">
             {log.adminName}
-            {log.adminEmail ? ` · ${log.adminEmail}` : ""}
+            {log.adminEmail ? ` / ${log.adminEmail}` : ""}
           </p>
           <p className="mt-1 text-xs font-semibold text-slate-500">
             {log.createdAt}
-            {log.ipAddress ? ` · IP ${log.ipAddress}` : ""}
+            {log.ipAddress ? ` / IP ${log.ipAddress}` : ""}
           </p>
         </div>
 
         <div>
-          <p className="text-sm font-black text-slate-950">
-            {targetTypeLabel(log.targetType)}
-          </p>
+          <p className="text-sm font-black text-slate-950">{targetTypeLabel(log.targetType)}</p>
           {log.targetId ? (
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <span className="break-all rounded-md bg-slate-100 px-2 py-1 text-xs font-black text-slate-600">
@@ -260,9 +240,7 @@ function AuditLogRow({ log }: { log: AuditLog }) {
               <TargetLink targetType={log.targetType} targetId={log.targetId} />
             </div>
           ) : (
-            <p className="mt-2 text-sm font-semibold text-slate-500">
-              대상 ID 없음
-            </p>
+            <p className="mt-2 text-sm font-semibold text-slate-500">대상 ID 없음</p>
           )}
           <FinanceSummary summary={log.financeSummary} />
           <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">
@@ -279,7 +257,7 @@ function AuditLogRow({ log }: { log: AuditLog }) {
                 {log.followup.reason ?? "보완 완료"}
               </p>
               <p className="mt-2 text-xs font-semibold text-emerald-700">
-                {log.followup.adminName ?? "관리자"} · {log.followup.createdAt}
+                {log.followup.adminName ?? "관리자"} / {log.followup.createdAt}
               </p>
             </div>
           ) : null}
@@ -318,9 +296,7 @@ function FollowupForm({ logId }: { logId: string }) {
 }
 
 function FinanceSummary({ summary }: { summary: AuditLog["financeSummary"] }) {
-  if (summary.kind === "OTHER") {
-    return null;
-  }
+  if (summary.kind === "OTHER") return null;
 
   return (
     <div className="mt-3 rounded-lg border border-sky-100 bg-sky-50 p-3">
@@ -339,17 +315,9 @@ function FinanceSummary({ summary }: { summary: AuditLog["financeSummary"] }) {
   );
 }
 
-function TargetLink({
-  targetType,
-  targetId,
-}: {
-  targetType: string;
-  targetId: string;
-}) {
+function TargetLink({ targetType, targetId }: { targetType: string; targetId: string }) {
   const href = buildTargetHref(targetType, targetId);
-  if (!href) {
-    return null;
-  }
+  if (!href) return null;
 
   return (
     <Link
@@ -383,15 +351,7 @@ function HeaderLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-function MetricCard({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone: "sky" | "slate";
-}) {
+function MetricCard({ label, value, tone }: { label: string; value: string; tone: "sky" | "slate" }) {
   const toneClass = tone === "sky" ? "text-sky-700" : "text-slate-950";
 
   return (
@@ -402,15 +362,7 @@ function MetricCard({
   );
 }
 
-function FilterTab({
-  href,
-  active,
-  label,
-}: {
-  href: string;
-  active: boolean;
-  label: string;
-}) {
+function FilterTab({ href, active, label }: { href: string; active: boolean; label: string }) {
   return (
     <Link
       href={href}
@@ -452,13 +404,7 @@ function BreakdownPanel({
   );
 }
 
-function Badge({
-  children,
-  tone,
-}: {
-  children: ReactNode;
-  tone: "emerald" | "rose" | "amber" | "slate";
-}) {
+function Badge({ children, tone }: { children: ReactNode; tone: "emerald" | "rose" | "amber" | "slate" }) {
   const toneClass = {
     emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
     rose: "border-rose-200 bg-rose-50 text-rose-700",
@@ -466,11 +412,7 @@ function Badge({
     slate: "border-slate-200 bg-white text-slate-700",
   }[tone];
 
-  return (
-    <span className={`rounded-md border px-2 py-1 text-xs font-black ${toneClass}`}>
-      {children}
-    </span>
-  );
+  return <span className={`rounded-md border px-2 py-1 text-xs font-black ${toneClass}`}>{children}</span>;
 }
 
 function EmptyBox({ message }: { message: string }) {
@@ -547,13 +489,12 @@ function actionLabel(action: string) {
     AUDIT_EXPORT_CSV: "감사 CSV 다운로드",
     AUDIT_EXPORT_XLSX: "감사 XLSX 다운로드",
     AUDIT_FOLLOWUP_RESOLVED: "감사 사유 보완",
+    LISTING_HIDDEN: "판매글 숨김",
+    LISTING_REMOVED: "판매글 삭제 처리",
+    LISTING_PAUSED: "판매글 중지",
+    LISTING_ACTIVE: "판매글 복구",
+    BUY_REQUEST_ADMIN_CANCELED: "구매글 취소 및 환불",
   };
-
-  labels.LISTING_HIDDEN = "판매글 숨김";
-  labels.LISTING_REMOVED = "판매글 삭제 처리";
-  labels.LISTING_PAUSED = "판매글 중지";
-  labels.LISTING_ACTIVE = "판매글 복구";
-  labels.BUY_REQUEST_ADMIN_CANCELED = "구매글 취소 및 환불";
 
   return labels[action] ?? action.replaceAll("_", " ");
 }
@@ -570,10 +511,9 @@ function targetTypeLabel(targetType: string) {
     GAME_SERVER: "서버",
     TRUST_REPORT: "신고",
     DISPUTE: "분쟁",
+    LISTING: "판매글",
+    BUY_REQUEST: "구매글",
   };
-
-  labels.LISTING = "판매글";
-  labels.BUY_REQUEST = "구매글";
 
   return labels[targetType] ?? targetType.replaceAll("_", " ");
 }
@@ -602,8 +542,11 @@ function getAuditNextAction(state: AuditState) {
   }
 
   return {
-    title: "감사 로그 추적 상태 양호",
+    title: "감사 로그 추적 상태 정상",
     actionLabel: "민감 작업만 보기",
     href: "/admin/audit?sensitivity=sensitive",
   };
 }
+
+const inputClass =
+  "min-h-11 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-[var(--color-primary)]";
