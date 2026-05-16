@@ -26,14 +26,20 @@ export async function POST(request: NextRequest) {
 
     if (!listingId) {
       return NextResponse.json(
-        { message: "이미지를 등록할 판매글 정보가 필요합니다." },
+        {
+          message: "이미지를 등록할 판매글 정보가 필요합니다.",
+          messageKey: "listingEdit.imageListingRequired",
+        },
         { status: 400 },
       );
     }
 
     if (!(image instanceof File)) {
       return NextResponse.json(
-        { message: "업로드할 이미지 파일을 선택해 주세요." },
+        {
+          message: "업로드할 이미지 파일을 선택해 주세요.",
+          messageKey: "listingEdit.imageRequired",
+        },
         { status: 400 },
       );
     }
@@ -46,7 +52,10 @@ export async function POST(request: NextRequest) {
       altText,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey: "listingEdit.imageSaveSuccess",
+    });
   } catch (error) {
     return NextResponse.json(
       {
@@ -54,6 +63,7 @@ export async function POST(request: NextRequest) {
           error instanceof Error
             ? error.message
             : "판매글 이미지를 업로드하지 못했습니다.",
+        messageKey: "listingForm.imageUploadFailed",
       },
       { status: 400 },
     );
@@ -77,14 +87,20 @@ export async function DELETE(request: NextRequest) {
 
     if (!listingId) {
       return NextResponse.json(
-        { message: "이미지를 삭제할 판매글 정보가 필요합니다." },
+        {
+          message: "이미지를 삭제할 판매글 정보가 필요합니다.",
+          messageKey: "listingEdit.imageListingRequired",
+        },
         { status: 400 },
       );
     }
 
     const result = await removeMarketplaceSellerListingImage({ listingId });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey: "listingEdit.imageRemoveSuccess",
+    });
   } catch (error) {
     return NextResponse.json(
       {
@@ -92,6 +108,7 @@ export async function DELETE(request: NextRequest) {
           error instanceof Error
             ? error.message
             : "판매글 이미지를 삭제하지 못했습니다.",
+        messageKey: "listingEdit.imageRemoveFailed",
       },
       { status: 400 },
     );
