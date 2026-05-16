@@ -211,9 +211,13 @@ export async function getActiveGameCatalog() {
 
 export async function getMarketplaceGameDirectory(filters?: {
   category?: string;
+  mode?: "sell" | "buy";
 }): Promise<MarketplaceGameDirectoryView> {
   const prisma = getPrismaClient();
   const normalizedCategory = filters?.category?.trim() ?? "";
+  const mode = filters?.mode;
+  const shouldLoadSellCounts = mode !== "buy";
+  const shouldLoadBuyCounts = mode !== "sell";
   const games = await getActiveGameCatalog();
   const activeGameIds = games.map((game) => game.id);
 
@@ -225,39 +229,43 @@ export async function getMarketplaceGameDirectory(filters?: {
     ? { category: normalizedCategory as never }
     : {};
   const [listingCounts, buyRequestCounts] = await Promise.all([
-    prisma.listing.groupBy({
-      by: ["gameId"],
-      where: {
-        status: "ACTIVE",
-        gameId: {
-          in: activeGameIds,
-        },
-        inventory: {
-          is: {
-            availableQuantity: {
-              gt: 0,
+    shouldLoadSellCounts
+      ? prisma.listing.groupBy({
+          by: ["gameId"],
+          where: {
+            status: "ACTIVE",
+            gameId: {
+              in: activeGameIds,
             },
+            inventory: {
+              is: {
+                availableQuantity: {
+                  gt: 0,
+                },
+              },
+            },
+            ...categoryWhere,
           },
-        },
-        ...categoryWhere,
-      },
-      _count: {
-        _all: true,
-      },
-    }),
-    prisma.buyRequest.groupBy({
-      by: ["gameId"],
-      where: {
-        status: "ACTIVE",
-        gameId: {
-          in: activeGameIds,
-        },
-        ...categoryWhere,
-      },
-      _count: {
-        _all: true,
-      },
-    }),
+          _count: {
+            _all: true,
+          },
+        })
+      : Promise.resolve([]),
+    shouldLoadBuyCounts
+      ? prisma.buyRequest.groupBy({
+          by: ["gameId"],
+          where: {
+            status: "ACTIVE",
+            gameId: {
+              in: activeGameIds,
+            },
+            ...categoryWhere,
+          },
+          _count: {
+            _all: true,
+          },
+        })
+      : Promise.resolve([]),
   ]);
   const sellCountByGameId = new Map(
     listingCounts.map((count) => [count.gameId, count._count._all]),

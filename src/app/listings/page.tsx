@@ -125,6 +125,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
     ? null
     : await getMarketplaceGameDirectory({
         category: selectedCategory,
+        mode: selectedMode,
       });
   const canonicalSelectedGame = view?.appliedFilters.game || selectedGame;
 
