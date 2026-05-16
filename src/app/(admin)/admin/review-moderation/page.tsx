@@ -25,7 +25,7 @@ export default async function ReviewModerationPage() {
               REVIEW DESK
             </p>
             <h1 className="mt-1 text-2xl font-black">리뷰 모더레이션</h1>
-            <p className="mt-2 text-sm font-semibold text-slate-500">
+            <p className="sr-only">
               신고 리뷰와 AI 감지 리뷰를 한 화면에서 검토하고 공개 상태를 관리합니다.
             </p>
           </div>
@@ -82,7 +82,7 @@ export default async function ReviewModerationPage() {
               ) : (
                 <div className="p-10 text-center">
                   <p className="text-2xl font-black">검토 대기 항목 없음</p>
-                  <p className="mt-2 text-sm font-semibold text-slate-500">
+                  <p className="sr-only">
                     새 신고나 AI 감지 항목이 생기면 여기에 표시됩니다.
                   </p>
                 </div>
@@ -129,7 +129,7 @@ export default async function ReviewModerationPage() {
               </div>
             </section>
 
-            <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <section className="sr-only">
               <p className="text-sm font-black uppercase tracking-wide text-[var(--gg-accent)]">
                 CHECKLIST
               </p>

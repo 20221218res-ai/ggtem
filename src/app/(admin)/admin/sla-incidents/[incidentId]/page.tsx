@@ -10,25 +10,6 @@ type AdminSlaIncidentDetailPageProps = {
   }>;
 };
 
-const resolutionChecks = [
-  {
-    title: "원본 상태 확인",
-    body: "주문, 출금, 신고, 분쟁 등 원본 화면에서 실제 지연 상태가 남아 있는지 먼저 확인합니다.",
-  },
-  {
-    title: "금전 영향 확인",
-    body: "입출금, 에스크로, 정산 관련 알림은 지갑 잔액과 금액을 함께 대조합니다.",
-  },
-  {
-    title: "운영 메모 작성",
-    body: "확인한 원인, 처리 결과, 다음 담당자가 볼 내용을 3자 이상 메모로 남깁니다.",
-  },
-  {
-    title: "감사 로그 대조",
-    body: "수동 처리나 반복 지연 건은 감사 이벤트가 정상 기록됐는지 확인한 뒤 해결 처리합니다.",
-  },
-];
-
 export default async function AdminSlaIncidentDetailPage({
   params,
 }: AdminSlaIncidentDetailPageProps) {
@@ -51,7 +32,7 @@ export default async function AdminSlaIncidentDetailPage({
             <h1 className="mt-3 text-3xl font-semibold tracking-tight">
               {queueLabel(detail.queueKey)}
             </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+            <p className="sr-only">
               {cleanPreview(detail.queueKey, detail.previewLabel)}
             </p>
           </div>
@@ -94,33 +75,6 @@ export default async function AdminSlaIncidentDetailPage({
           <Metric label="경과" value={detail.elapsedTime} />
           <Metric label="해결 시간" value={detail.resolutionTime ?? "진행 중"} />
         </section>
-
-        <details className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <summary className="cursor-pointer text-sm font-black text-slate-800">
-            해결 전 체크 기준 보기
-          </summary>
-          <div className="mt-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h2 className="mt-1 text-xl font-semibold">
-                이 알림을 닫기 전에 확인할 것
-              </h2>
-            </div>
-            <p className="text-sm text-slate-500">
-              상태 {statusLabel(detail.status)} / 유형 {queueLabel(detail.queueKey)}
-            </p>
-          </div>
-          <div className="mt-5 grid gap-3 md:grid-cols-4">
-            {resolutionChecks.map((check) => (
-              <div
-                key={check.title}
-                className="rounded-lg border border-slate-200 bg-slate-50 p-4"
-              >
-                <p className="font-semibold text-slate-950">{check.title}</p>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{check.body}</p>
-              </div>
-            ))}
-          </div>
-        </details>
 
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">

@@ -121,7 +121,7 @@ export default async function AdminSlaIncidentsPage({
                     <p className="text-sm font-semibold text-slate-950">
                       {queueLabel(item.queueKey)}
                     </p>
-                    <p className="mt-2 text-xs text-slate-500">
+                    <p className="sr-only">
                       평균 해결 {item.averageResolutionHours}시간
                     </p>
                   </div>
@@ -171,7 +171,7 @@ export default async function AdminSlaIncidentsPage({
                     {operator.acknowledgedCount}
                   </p>
                 </div>
-                <div className="mt-4 grid gap-1 text-xs text-slate-600">
+                <div className="sr-only">
                   <p>진행 중 확인  {operator.openAcknowledgedCount}</p>
                   <p>해결 확인 {operator.resolvedAcknowledgedCount}</p>
                   <p>최근 확인  {operator.lastAcknowledgedAt}</p>
@@ -296,15 +296,15 @@ export default async function AdminSlaIncidentsPage({
               </div>
 
               <div className="mt-4 grid gap-2 text-xs text-slate-500 md:grid-cols-2 xl:grid-cols-3">
-                <p>최초 감지 {incident.firstDetectedAt}</p>
-                <p>최근 감지 {incident.lastDetectedAt}</p>
+                <p className="sr-only">최초 감지 {incident.firstDetectedAt}</p>
+                <p className="sr-only">최근 감지 {incident.lastDetectedAt}</p>
                 <p>확인 {incident.acknowledgedAt ?? "미확인"}</p>
                 <p>해결 {incident.resolvedAt ?? "미해결"}</p>
                 <p>경과 {incident.elapsedTime}</p>
                 <p>해결 시간 {incident.resolutionTime ?? "진행 중"}</p>
               </div>
 
-              <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div className="sr-only">
                 <div className="flex items-center justify-between gap-4">
                   <p className="text-sm font-semibold text-slate-950">운영 메모</p>
                   <p className="text-xs text-slate-500">최근 {incident.notes.length}개</p>

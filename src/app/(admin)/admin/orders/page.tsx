@@ -416,7 +416,7 @@ function OrderDetail({
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">NEXT ACTION</p>
             <p className="mt-1 text-xl font-black text-slate-950">{selectedAction.title}</p>
-            <p className="mt-1 text-sm font-bold text-slate-600">{selectedAction.body}</p>
+            <p className="sr-only">{selectedAction.body}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <TraceLink href={detail.links.buyerChat} label="구매자 채팅" />
@@ -614,14 +614,14 @@ function getOrderListSummary(orders: AdminOrdersState["orders"]) {
 
 function getOrderNextAction(status: string) {
   const actions: Record<string, { title: string; body: string }> = {
-    REQUESTED: { title: "결제 대기", body: "구매자의 결제 또는 에스크로 잠금을 확인하세요." },
+    REQUESTED: { title: "결제 대기", body: "결제 또는 에스크로" },
     ESCROW_LOCKED: { title: "판매자 응답 대기", body: "판매자가 전달을 시작해야 하는 상태입니다." },
-    SELLER_RESPONSE_PENDING: { title: "판매자 확인 필요", body: "판매자 응답 지연 여부를 확인하세요." },
-    DELIVERY_IN_PROGRESS: { title: "전달 진행", body: "채팅과 전달 증빙을 확인하세요." },
-    DELIVERY_COMPLETED: { title: "인수확정 대기", body: "구매자 확인 또는 자동 완료 조건을 확인하세요." },
+    SELLER_RESPONSE_PENDING: { title: "판매자 확인 필요", body: "응답 지연" },
+    DELIVERY_IN_PROGRESS: { title: "전달 진행", body: "채팅/증빙" },
+    DELIVERY_COMPLETED: { title: "인수확정 대기", body: "구매자 확인" },
     BUYER_CONFIRM_PENDING: { title: "구매자 확정 대기", body: "구매자가 수령 확인을 누르면 정산됩니다." },
     DISPUTED: { title: "분쟁 처리 필요", body: "채팅과 원장을 확인하고 환불 또는 정산으로 종료하세요." },
-    COMPLETED: { title: "거래 완료", body: "추가 조치가 필요 없습니다." },
+    COMPLETED: { title: "거래 완료", body: "완료" },
   };
   return actions[status] ?? null;
 }
@@ -790,7 +790,7 @@ function EmptyState({ title, description }: { title: string; description: string
   return (
     <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-5 text-center">
       <p className="text-sm font-black text-slate-700">{title}</p>
-      <p className="mt-1 text-sm font-bold text-slate-500">{description}</p>
+      <p className="sr-only">{description}</p>
     </div>
   );
 }
