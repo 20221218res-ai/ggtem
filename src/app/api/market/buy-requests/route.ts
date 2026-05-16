@@ -37,7 +37,10 @@ export async function POST(request: NextRequest) {
     if (body.mode === "CANCEL") {
       if (!body.buyRequestId) {
         return NextResponse.json(
-          { message: "취소할 구매요청 정보가 필요합니다." },
+          {
+            message: "취소할 구매요청 정보가 필요합니다.",
+            messageKey: "buyRequestAction.cancelRequired",
+          },
           { status: 400 },
         );
       }
@@ -88,6 +91,7 @@ export async function POST(request: NextRequest) {
       {
         message:
           error instanceof Error ? error.message : "구매요청을 처리하지 못했습니다.",
+        messageKey: "buyRequestAction.processFailed",
       },
       { status: 400 },
     );

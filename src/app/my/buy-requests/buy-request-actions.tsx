@@ -2,7 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { TranslationKey } from "@/app/i18n";
+import useCountryTranslation from "@/app/use-country-translation";
 import { ActionConfirmDialog } from "@/components/action-confirm-dialog";
+
+type BuyRequestActionPayload = {
+  message?: string;
+  messageKey?: TranslationKey;
+};
 
 export default function BuyRequestActions({
   buyRequestId,
@@ -12,6 +19,7 @@ export default function BuyRequestActions({
   status: string;
 }) {
   const router = useRouter();
+  const { t } = useCountryTranslation();
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -26,10 +34,10 @@ export default function BuyRequestActions({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode: "CANCEL", buyRequestId }),
       });
-      const result = (await response.json()) as { message?: string };
+      const result = (await response.json()) as BuyRequestActionPayload;
 
       if (!response.ok) {
-        throw new Error(result.message ?? "구매 등록글 취소에 실패했습니다.");
+        throw new Error(getApiMessage(result, t, "buyRequestAction.cancelFailed"));
       }
 
       setIsConfirmOpen(false);
@@ -38,7 +46,7 @@ export default function BuyRequestActions({
       setError(
         submitError instanceof Error
           ? submitError.message
-          : "구매 등록글 취소에 실패했습니다.",
+          : t("buyRequestAction.cancelFailed"),
       );
     } finally {
       setIsSubmitting(false);
@@ -55,7 +63,7 @@ export default function BuyRequestActions({
         onClick={() => setIsConfirmOpen(true)}
         className="rounded-xl bg-red-50 px-4 py-3 text-xs font-black text-red-700 hover:bg-red-100 disabled:opacity-60"
       >
-        {isSubmitting ? "취소 중..." : "구매 등록글 취소"}
+        {isSubmitting ? t("buyRequestAction.canceling") : t("buyRequestAction.cancel")}
       </button>
 
       {error ? (
@@ -66,20 +74,28 @@ export default function BuyRequestActions({
 
       <ActionConfirmDialog
         isOpen={isConfirmOpen}
-        eyebrow="BUY REQUEST"
-        title="구매 등록글을 취소할까요?"
-        body="취소하면 이 구매요청은 더 이상 노출되지 않고, 잠겨 있던 예치금은 지갑 잔액으로 반환됩니다."
-        confirmLabel="취소 확정"
+        eyebrow={t("buyRequestAction.dialogEyebrow")}
+        title={t("buyRequestAction.cancelTitle")}
+        body={t("buyRequestAction.cancelBody")}
+        confirmLabel={t("buyRequestAction.confirmCancel")}
         tone="danger"
         isSubmitting={isSubmitting}
         onCancel={() => setIsConfirmOpen(false)}
         onConfirm={handleCancel}
       >
         <div className="space-y-2 text-sm font-bold text-[var(--gg-muted)]">
-          <p>진행 중인 주문이 없는 구매요청만 취소할 수 있습니다.</p>
-          <p>취소 후 같은 글을 다시 활성화할 수 없습니다.</p>
+          <p>{t("buyRequestAction.cancelNoteActiveOnly")}</p>
+          <p>{t("buyRequestAction.cancelNoteNoResume")}</p>
         </div>
       </ActionConfirmDialog>
     </div>
   );
+}
+
+function getApiMessage(
+  result: BuyRequestActionPayload,
+  t: (key: TranslationKey) => string,
+  fallbackKey: TranslationKey,
+) {
+  return result.messageKey ? t(result.messageKey) : result.message ?? t(fallbackKey);
 }

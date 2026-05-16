@@ -66,14 +66,20 @@ export async function PATCH(request: NextRequest) {
 
     if (!body.offerId || !body.action) {
       return NextResponse.json(
-        { message: "처리할 판매 제안과 작업 정보가 필요합니다." },
+        {
+          message: "처리할 판매 제안과 작업 정보가 필요합니다.",
+          messageKey: "offerAction.required",
+        },
         { status: 400 },
       );
     }
 
     if (!["ACCEPT", "REJECT"].includes(body.action)) {
       return NextResponse.json(
-        { message: "제안 작업은 수락 또는 거절만 가능합니다." },
+        {
+          message: "제안 작업은 수락 또는 거절만 가능합니다.",
+          messageKey: "offerAction.unsupportedAction",
+        },
         { status: 400 },
       );
     }
@@ -89,6 +95,7 @@ export async function PATCH(request: NextRequest) {
       {
         message:
           error instanceof Error ? error.message : "판매 제안 상태를 변경하지 못했습니다.",
+        messageKey: "offerAction.statusFailed",
       },
       { status: 400 },
     );

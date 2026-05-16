@@ -2,12 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { TranslationKey } from "@/app/i18n";
+import useCountryTranslation from "@/app/use-country-translation";
 import { ActionConfirmDialog } from "@/components/action-confirm-dialog";
 
 type OfferAction = "ACCEPT" | "REJECT";
 
+type OfferActionPayload = {
+  message?: string;
+  messageKey?: TranslationKey;
+};
+
 export default function OfferActions({ offerId }: { offerId: string }) {
   const router = useRouter();
+  const { t } = useCountryTranslation();
   const [pendingAction, setPendingAction] = useState<OfferAction | null>(null);
   const [submittingAction, setSubmittingAction] = useState<OfferAction | null>(null);
   const [error, setError] = useState("");
@@ -25,10 +33,10 @@ export default function OfferActions({ offerId }: { offerId: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ offerId, action }),
       });
-      const result = (await response.json()) as { message?: string };
+      const result = (await response.json()) as OfferActionPayload;
 
       if (!response.ok) {
-        throw new Error(result.message ?? "판매 제안 상태 변경에 실패했습니다.");
+        throw new Error(getApiMessage(result, t, "offerAction.statusFailed"));
       }
 
       setPendingAction(null);
@@ -37,7 +45,7 @@ export default function OfferActions({ offerId }: { offerId: string }) {
       setError(
         submitError instanceof Error
           ? submitError.message
-          : "판매 제안 상태 변경에 실패했습니다.",
+          : t("offerAction.statusFailed"),
       );
     } finally {
       setSubmittingAction(null);
@@ -55,7 +63,7 @@ export default function OfferActions({ offerId }: { offerId: string }) {
         onClick={() => setPendingAction("ACCEPT")}
         className="rounded-lg bg-[var(--gg-accent)] px-3 py-2 text-xs font-black text-[var(--gg-inverse-text)] disabled:opacity-60"
       >
-        {submittingAction === "ACCEPT" ? "수락 중..." : "수락"}
+        {submittingAction === "ACCEPT" ? t("offerAction.accepting") : t("offerAction.accept")}
       </button>
       <button
         type="button"
@@ -63,7 +71,7 @@ export default function OfferActions({ offerId }: { offerId: string }) {
         onClick={() => setPendingAction("REJECT")}
         className="rounded-lg bg-red-50 px-3 py-2 text-xs font-black text-red-700 disabled:opacity-60"
       >
-        {submittingAction === "REJECT" ? "거절 중..." : "거절"}
+        {submittingAction === "REJECT" ? t("offerAction.rejecting") : t("offerAction.reject")}
       </button>
 
       {error ? (
@@ -75,10 +83,10 @@ export default function OfferActions({ offerId }: { offerId: string }) {
       {dialog ? (
         <ActionConfirmDialog
           isOpen
-          eyebrow={dialog.eyebrow}
-          title={dialog.title}
-          body={dialog.body}
-          confirmLabel={dialog.confirmLabel}
+          eyebrow={t(dialog.eyebrowKey)}
+          title={t(dialog.titleKey)}
+          body={t(dialog.bodyKey)}
+          confirmLabel={t(dialog.confirmLabelKey)}
           tone={dialog.tone}
           isSubmitting={isBusy}
           onCancel={() => setPendingAction(null)}
@@ -92,19 +100,35 @@ export default function OfferActions({ offerId }: { offerId: string }) {
 function getOfferDialog(action: OfferAction) {
   if (action === "ACCEPT") {
     return {
-      eyebrow: "OFFER ACCEPT",
-      title: "판매 제안을 수락할까요?",
-      body: "수락하면 해당 제안을 기준으로 거래가 진행됩니다. 금액과 수량을 다시 확인해 주세요.",
-      confirmLabel: "수락 확정",
+      eyebrowKey: "offerAction.acceptEyebrow",
+      titleKey: "offerAction.acceptTitle",
+      bodyKey: "offerAction.acceptBody",
+      confirmLabelKey: "offerAction.acceptConfirm",
       tone: "primary" as const,
-    };
+    } satisfies OfferDialog;
   }
 
   return {
-    eyebrow: "OFFER REJECT",
-    title: "판매 제안을 거절할까요?",
-    body: "거절 후에는 같은 제안을 다시 수락할 수 없습니다.",
-    confirmLabel: "거절 확정",
+    eyebrowKey: "offerAction.rejectEyebrow",
+    titleKey: "offerAction.rejectTitle",
+    bodyKey: "offerAction.rejectBody",
+    confirmLabelKey: "offerAction.rejectConfirm",
     tone: "danger" as const,
-  };
+  } satisfies OfferDialog;
+}
+
+type OfferDialog = {
+  eyebrowKey: TranslationKey;
+  titleKey: TranslationKey;
+  bodyKey: TranslationKey;
+  confirmLabelKey: TranslationKey;
+  tone: "primary" | "danger";
+};
+
+function getApiMessage(
+  result: OfferActionPayload,
+  t: (key: TranslationKey) => string,
+  fallbackKey: TranslationKey,
+) {
+  return result.messageKey ? t(result.messageKey) : result.message ?? t(fallbackKey);
 }

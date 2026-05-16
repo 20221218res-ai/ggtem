@@ -3,8 +3,16 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { TranslationKey } from "@/app/i18n";
+import useCountryTranslation from "@/app/use-country-translation";
 
 type SellerListingStatusAction = "PAUSE" | "RESUME" | "HIDE";
+
+type SellerListingActionPayload = {
+  listingId?: string;
+  message?: string;
+  messageKey?: TranslationKey;
+};
 
 export default function SellerListingActions({
   listingId,
@@ -16,6 +24,7 @@ export default function SellerListingActions({
   availableQuantity: string;
 }) {
   const router = useRouter();
+  const { t } = useCountryTranslation();
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const canOpenPublicDetail =
@@ -36,13 +45,10 @@ export default function SellerListingActions({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode: "DUPLICATE", listingId }),
       });
-      const result = (await response.json()) as {
-        listingId?: string;
-        message?: string;
-      };
+      const result = (await response.json()) as SellerListingActionPayload;
 
       if (!response.ok || !result.listingId) {
-        throw new Error(result.message ?? "판매글 복제에 실패했습니다.");
+        throw new Error(getApiMessage(result, t, "sellerListingAction.duplicateFailed"));
       }
 
       router.push(`/my/listings/${result.listingId}/edit`);
@@ -51,7 +57,7 @@ export default function SellerListingActions({
       setError(
         submitError instanceof Error
           ? submitError.message
-          : "판매글 복제에 실패했습니다.",
+          : t("sellerListingAction.duplicateFailed"),
       );
     } finally {
       setIsSubmitting(false);
@@ -68,10 +74,10 @@ export default function SellerListingActions({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode: "STATUS", listingId, action }),
       });
-      const result = (await response.json()) as { message?: string };
+      const result = (await response.json()) as SellerListingActionPayload;
 
       if (!response.ok) {
-        throw new Error(result.message ?? "판매글 상태 변경에 실패했습니다.");
+        throw new Error(getApiMessage(result, t, "sellerListingAction.statusFailed"));
       }
 
       router.refresh();
@@ -79,7 +85,7 @@ export default function SellerListingActions({
       setError(
         submitError instanceof Error
           ? submitError.message
-          : "판매글 상태 변경에 실패했습니다.",
+          : t("sellerListingAction.statusFailed"),
       );
     } finally {
       setIsSubmitting(false);
@@ -93,14 +99,14 @@ export default function SellerListingActions({
           href={`/listings/${listingId}`}
           className="rounded-lg bg-[var(--gg-accent)] px-3 py-2 text-xs font-black text-[var(--gg-inverse-text)]"
         >
-          보기
+          {t("sellerListingAction.view")}
         </Link>
       ) : null}
       <Link
         href={`/my/listings/${listingId}/edit`}
         className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-xs font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)]"
       >
-        수정
+        {t("sellerListingAction.edit")}
       </Link>
       <button
         type="button"
@@ -108,7 +114,7 @@ export default function SellerListingActions({
         onClick={() => void handleDuplicate()}
         className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-xs font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)] disabled:opacity-60"
       >
-        복제
+        {t("sellerListingAction.duplicate")}
       </button>
       {canPause ? (
         <button
@@ -117,7 +123,7 @@ export default function SellerListingActions({
           onClick={() => void handleStatusAction("PAUSE")}
           className="rounded-lg bg-[#ffefc2] px-3 py-2 text-xs font-black text-[#9a6700] disabled:opacity-60"
         >
-          중지
+          {t("sellerListingAction.pause")}
         </button>
       ) : null}
       {canHide ? (
@@ -127,7 +133,7 @@ export default function SellerListingActions({
           onClick={() => void handleStatusAction("HIDE")}
           className="rounded-lg bg-[var(--gg-control-bg)] px-3 py-2 text-xs font-black text-[var(--gg-muted)] disabled:opacity-60"
         >
-          숨김
+          {t("sellerListingAction.hide")}
         </button>
       ) : null}
       {canResume ? (
@@ -137,7 +143,7 @@ export default function SellerListingActions({
           onClick={() => void handleStatusAction("RESUME")}
           className="rounded-lg bg-[#eaf8ef] px-3 py-2 text-xs font-black text-[#18a84a] disabled:opacity-60"
         >
-          재개
+          {t("sellerListingAction.resume")}
         </button>
       ) : null}
       {error ? (
@@ -147,4 +153,12 @@ export default function SellerListingActions({
       ) : null}
     </div>
   );
+}
+
+function getApiMessage(
+  result: SellerListingActionPayload,
+  t: (key: TranslationKey) => string,
+  fallbackKey: TranslationKey,
+) {
+  return result.messageKey ? t(result.messageKey) : result.message ?? t(fallbackKey);
 }

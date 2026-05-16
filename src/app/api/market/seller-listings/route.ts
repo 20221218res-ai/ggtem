@@ -35,7 +35,10 @@ export async function POST(request: NextRequest) {
     if (body.mode === "STATUS") {
       if (!body.listingId || !body.action) {
         return NextResponse.json(
-          { message: "판매글 정보와 처리 작업이 필요합니다." },
+          {
+            message: "판매글 정보와 처리 작업이 필요합니다.",
+            messageKey: "sellerListingAction.statusRequired",
+          },
           { status: 400 },
         );
       }
@@ -51,7 +54,10 @@ export async function POST(request: NextRequest) {
     if (body.mode === "DUPLICATE") {
       if (!body.listingId) {
         return NextResponse.json(
-          { message: "복사할 판매글 정보가 필요합니다." },
+          {
+            message: "복사할 판매글 정보가 필요합니다.",
+            messageKey: "sellerListingAction.duplicateRequired",
+          },
           { status: 400 },
         );
       }
@@ -95,6 +101,7 @@ export async function POST(request: NextRequest) {
       {
         message:
           error instanceof Error ? error.message : "판매글을 수정하지 못했습니다.",
+        messageKey: "sellerListingAction.updateFailed",
       },
       { status: 400 },
     );
