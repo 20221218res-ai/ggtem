@@ -280,6 +280,21 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
         ) : null}
       </form>
 
+      <section className="rounded-xl bg-transparent px-2 py-3 text-center">
+        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-[10px] border-red-500 bg-white text-5xl font-black tracking-tight text-slate-950">
+          19
+        </div>
+        <p className="mx-auto mt-6 max-w-[520px] text-left text-base font-black leading-7 text-slate-950 sm:text-center">
+          <CountryText id="auth.minorRestrictionNotice" />
+        </p>
+        <a
+          href="https://www.google.com"
+          className="mt-7 inline-flex h-14 w-full items-center justify-center rounded-lg border border-red-500 bg-white px-4 text-lg font-black text-red-500 transition hover:bg-red-50"
+        >
+          <CountryText id="auth.minorExit" />
+        </a>
+      </section>
+
       {verificationNotice ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4">
           <div className="w-full max-w-md rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-6 shadow-2xl">

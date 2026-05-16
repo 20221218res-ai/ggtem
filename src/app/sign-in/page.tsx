@@ -35,9 +35,6 @@ export default async function SignInPage() {
             <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--gg-text)] sm:text-5xl">
               <CountryText id="auth.signInTitle" />
             </h1>
-            <p className="mx-auto mt-4 max-w-md text-sm font-semibold leading-6 text-[var(--gg-muted)]">
-              <CountryText id="auth.signInDescription" />
-            </p>
           </div>
 
           {currentUser ? (
