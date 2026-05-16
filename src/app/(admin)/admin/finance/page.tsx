@@ -817,7 +817,6 @@ function getOperationNextAction({
   if (pendingWithdrawals > 0) {
     return {
       title: `출금 대기 ${pendingWithdrawals}건`,
-      body: `${pendingWithdrawals}건, 총 ${pendingWithdrawalAmount} USDT 출금 요청이 대기 중입니다. 실제 송금 완료 전에 완료 처리하지 마세요.`,
       actionLabel: "출금",
       href: "/admin/withdrawals",
     };
@@ -826,7 +825,6 @@ function getOperationNextAction({
   if (pendingDeposits > 0) {
     return {
       title: `입금 대기 ${pendingDeposits}건`,
-      body: `${pendingDeposits}건, 총 ${pendingDepositAmount} USDT 입금 요청이 대기 중입니다. 코인, 네트워크, 입금 주소, TXID를 대조하세요.`,
       actionLabel: "입금",
       href: "/admin/deposits",
     };
@@ -834,7 +832,6 @@ function getOperationNextAction({
 
   return {
     title: "대기 없음",
-    body: "새 요청이 들어오면 이곳에 우선 처리 카드가 표시됩니다.",
     actionLabel: "이력",
     href: "/admin/finance",
   };

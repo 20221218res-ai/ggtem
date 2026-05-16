@@ -485,7 +485,6 @@ function getLedgerNextAction(state: LedgerState) {
   if (state.summary.shownEntries === 0) {
     return {
       title: "결과 없음",
-      body: "현재 조건에는 표시할 원장 기록이 없습니다. 전체 방향과 전체 영역으로 먼저 확인해 보세요.",
       actionLabel: "전체 보기",
       href: "/admin/finance/ledger",
     };
@@ -494,7 +493,6 @@ function getLedgerNextAction(state: LedgerState) {
   if (state.filters.direction || state.filters.bucket || state.filters.query) {
     return {
       title: "CSV 보관",
-      body: "현재 필터가 적용된 상태입니다. 정산 검토나 분쟁 증빙으로 사용할 수 있도록 같은 조건의 CSV를 내려받을 수 있습니다.",
       actionLabel: "CSV",
       href: buildLedgerExportHref(state.filters),
     };
@@ -502,7 +500,6 @@ function getLedgerNextAction(state: LedgerState) {
 
   return {
     title: "정산 확인",
-    body: "원장 흐름이 맞다면 정산 대조에서 보류 항목, 이상 신호, 최근 마감 리포트를 함께 확인하세요.",
     actionLabel: "정산",
     href: "/admin/finance/reconciliation",
   };

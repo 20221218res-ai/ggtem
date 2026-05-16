@@ -122,19 +122,16 @@ export default async function AdminFinanceReconciliationPage({
           <StatusCard
             label="마감 보류"
             value={`${blockedCount}건`}
-            body="보류"
             status={blockedCount > 0 ? "danger" : "ok"}
           />
           <StatusCard
             label="검토 필요"
             value={`${reviewCount}건`}
-            body="검토"
             status={reviewCount > 0 ? "warn" : "ok"}
           />
           <StatusCard
             label="긴급 이상 신호"
             value={`${criticalCount}건`}
-            body="즉시 확인"
             status={criticalCount > 0 ? "danger" : "info"}
           />
         </section>
@@ -362,12 +359,10 @@ function MetricCard({
 function StatusCard({
   label,
   value,
-  body,
   status,
 }: {
   label: string;
   value: string;
-  body: string;
   status: "ok" | "warn" | "danger" | "info";
 }) {
   const toneClass = {
@@ -381,7 +376,6 @@ function StatusCard({
     <div className={`rounded-lg border p-5 shadow-sm ${toneClass}`}>
       <p className="text-sm font-black">{label}</p>
       <p className="mt-2 text-2xl font-black">{value}</p>
-      <p className="mt-2 text-sm font-semibold leading-6">{body}</p>
     </div>
   );
 }
@@ -563,7 +557,6 @@ function getCloseNextAction({
   if (blockedCount > 0 || criticalCount > 0) {
     return {
       title: `보류 ${blockedCount}건`,
-      body: `마감 보류 ${blockedCount}건, 긴급 이상 신호 ${criticalCount}건이 있습니다. 충전, 출금, 주문 증빙을 먼저 확인하세요.`,
       actionLabel: "입출금",
       href: "/admin/finance",
     };
@@ -572,7 +565,6 @@ function getCloseNextAction({
   if (reviewCount > 0) {
     return {
       title: `검토 ${reviewCount}건`,
-      body: `검토 필요 ${reviewCount}건이 있습니다. 원장과 CSV를 확인한 뒤 마감 리포트 메모에 결과를 남기세요.`,
       actionLabel: "CSV",
       href: buildReconciliationExportHref(range),
     };
@@ -580,7 +572,6 @@ function getCloseNextAction({
 
   return {
     title: "마감 가능",
-    body: "보류와 긴급 신호가 없습니다. CSV를 보관하고 마감 메모를 남겨 운영 기록을 저장하세요.",
     actionLabel: "CSV",
     href: buildReconciliationExportHref(range),
   };
@@ -612,12 +603,12 @@ function checklistTone(status: string): "emerald" | "rose" | "amber" {
 
 function checklistAction(status: string) {
   if (status === "BLOCKED") {
-    return "마감 전에 운영자가 확인해야 합니다.";
+    return "마감 보류";
   }
   if (status === "CHECK") {
-    return "확인 결과를 마감 메모에 남기세요.";
+    return "검토 필요";
   }
-  return "마감 기준을 통과한 항목입니다.";
+  return "정상";
 }
 
 function checklistLabel(label: string) {

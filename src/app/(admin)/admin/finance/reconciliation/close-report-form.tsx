@@ -73,9 +73,6 @@ export default function CloseReportForm({
       <h2 className="mt-2 text-2xl font-black text-slate-950">
         정산 대조 기록 저장
       </h2>
-      <p className="mt-2 text-sm font-semibold leading-6 text-emerald-900">
-        현재 기간의 요약, 체크리스트, 이상 신호를 감사 검토용 기록으로 저장합니다.
-      </p>
 
       <div
         className={`mt-4 rounded-md border p-3 text-sm font-semibold leading-6 ${readinessTone({
@@ -84,7 +81,6 @@ export default function CloseReportForm({
           criticalCount,
         })}`}
       >
-        <p className="font-black">저장 전 상태</p>
         <p className="mt-1">
           마감 보류 {blockedCount}건 / 검토 필요 {reviewCount}건 / 긴급 신호{" "}
           {criticalCount}건
@@ -172,12 +168,12 @@ function getCloseReportReadinessMessage({
   reviewCount: number;
 }) {
   if (blockedCount > 0 || criticalCount > 0) {
-    return "보류 또는 긴급 신호가 남아 있습니다. 먼저 원인을 확인하고 메모에 처리 결과를 남기는 것이 안전합니다.";
+    return "보류 또는 긴급";
   }
 
   if (reviewCount > 0) {
-    return "검토 필요 항목이 있습니다. CSV와 원장을 확인한 뒤 메모에 확인 내용을 남기세요.";
+    return "검토 필요";
   }
 
-  return "현재 마감을 막는 신호가 없습니다. CSV 보관 후 리포트를 저장하면 됩니다.";
+  return "마감 가능";
 }
