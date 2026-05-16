@@ -21,6 +21,8 @@ type DemoAccount = {
   role: string;
 };
 
+const EMAIL_VERIFICATION_POLL_INTERVAL_MS = 5_000;
+
 export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
   const router = useRouter();
   const { t } = useCountryTranslation();
@@ -42,6 +44,10 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
     let isActive = true;
 
     async function checkVerificationStatus() {
+      if (document.visibilityState === "hidden") {
+        return;
+      }
+
       try {
         const response = await fetch("/api/auth/email-verification/status", {
           cache: "no-store",
@@ -73,7 +79,10 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
     }
 
     void checkVerificationStatus();
-    const timer = window.setInterval(() => void checkVerificationStatus(), 3000);
+    const timer = window.setInterval(
+      () => void checkVerificationStatus(),
+      EMAIL_VERIFICATION_POLL_INTERVAL_MS,
+    );
 
     return () => {
       isActive = false;

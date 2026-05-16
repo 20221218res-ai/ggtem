@@ -20,6 +20,10 @@ export function AdminOrderChatsRefresh({
     if (!autoRefresh) return;
 
     const timer = window.setInterval(() => {
+      if (document.visibilityState === "hidden") {
+        return;
+      }
+
       router.refresh();
     }, 15000);
 

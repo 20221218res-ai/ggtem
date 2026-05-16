@@ -17,6 +17,8 @@ import CountryText from "../country-text";
 import useCountryTranslation from "../use-country-translation";
 import { getAuthApiMessage } from "../auth-api-message";
 
+const EMAIL_VERIFICATION_POLL_INTERVAL_MS = 5_000;
+
 export default function SignUpForm() {
   const router = useRouter();
   const { t } = useCountryTranslation();
@@ -39,6 +41,10 @@ export default function SignUpForm() {
     let isActive = true;
 
     async function checkVerificationStatus() {
+      if (document.visibilityState === "hidden") {
+        return;
+      }
+
       try {
         const response = await fetch("/api/auth/email-verification/status", {
           cache: "no-store",
@@ -70,7 +76,10 @@ export default function SignUpForm() {
     }
 
     void checkVerificationStatus();
-    const timer = window.setInterval(() => void checkVerificationStatus(), 3000);
+    const timer = window.setInterval(
+      () => void checkVerificationStatus(),
+      EMAIL_VERIFICATION_POLL_INTERVAL_MS,
+    );
 
     return () => {
       isActive = false;

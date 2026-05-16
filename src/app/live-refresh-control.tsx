@@ -32,6 +32,10 @@ export default function LiveRefreshControl({
     }
 
     const timer = window.setInterval(() => {
+      if (document.visibilityState === "hidden") {
+        return;
+      }
+
       router.refresh();
       setLastRefreshedAt(new Date());
     }, intervalMs);
@@ -49,6 +53,10 @@ export default function LiveRefreshControl({
     const source = new EventSource(streamPath);
 
     source.addEventListener("change", () => {
+      if (document.visibilityState === "hidden") {
+        return;
+      }
+
       router.refresh();
       setLastRefreshedAt(new Date());
     });
