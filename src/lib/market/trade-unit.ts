@@ -165,19 +165,10 @@ export function formatGameMoneyQuantityWithUnit(
     return "0";
   }
 
-  const normalizedPriceUnitQuantity =
-    safeNormalizeGameMoneyPriceUnit(priceUnitQuantity);
-  const displayQuantity = toGameMoneyDisplayQuantity(
-    normalizedActualQuantity,
-    normalizedPriceUnitQuantity,
-  );
-  const priceUnitLabel = getGameMoneyPriceUnitLabel(
-    normalizedPriceUnitQuantity,
-    moneyUnitName,
-    countryCode,
-  );
+  const resolvedCountryCode = countryCode ?? "KR";
+  const unitName = getLocalizedMoneyUnitName(moneyUnitName, resolvedCountryCode);
 
-  return `${formatIntegerQuantity(displayQuantity)} x ${priceUnitLabel}`;
+  return `${formatActualGameMoneyQuantity(normalizedActualQuantity, resolvedCountryCode)} ${unitName}`;
 }
 
 export function safeNormalizeGameMoneyPriceUnit(
@@ -285,6 +276,68 @@ function formatIntegerQuantity(value: string) {
   }
 
   return BigInt(value).toLocaleString("en-US");
+}
+
+function formatActualGameMoneyQuantity(
+  value: string,
+  countryCode: TradeUnitCountryCode,
+) {
+  if (!/^\d+$/.test(value)) {
+    return value;
+  }
+
+  const quantity = BigInt(value);
+
+  if (countryCode === "KR") {
+    return formatKoreanGameMoneyQuantity(quantity);
+  }
+
+  return formatInternationalGameMoneyQuantity(quantity);
+}
+
+function formatKoreanGameMoneyQuantity(quantity: bigint) {
+  if (quantity === 0n) {
+    return "0";
+  }
+
+  const units = [
+    { value: 1_0000_0000_0000n, label: "조" },
+    { value: 1_0000_0000n, label: "억" },
+    { value: 1_0000n, label: "만" },
+  ];
+  let remainder = quantity;
+  const parts: string[] = [];
+
+  for (const unit of units) {
+    const count = remainder / unit.value;
+
+    if (count > 0n) {
+      parts.push(`${count.toLocaleString("ko-KR")}${unit.label}`);
+      remainder %= unit.value;
+    }
+  }
+
+  if (remainder > 0n || parts.length === 0) {
+    parts.push(remainder.toLocaleString("ko-KR"));
+  }
+
+  return parts.join(" ");
+}
+
+function formatInternationalGameMoneyQuantity(quantity: bigint) {
+  const units = [
+    { value: 1_000_000_000n, label: "B" },
+    { value: 1_000_000n, label: "M" },
+    { value: 1_000n, label: "K" },
+  ];
+
+  for (const unit of units) {
+    if (quantity >= unit.value && quantity % unit.value === 0n) {
+      return `${(quantity / unit.value).toLocaleString("en-US")}${unit.label}`;
+    }
+  }
+
+  return quantity.toLocaleString("en-US");
 }
 
 function isBrokenUnitLabel(value: string) {
