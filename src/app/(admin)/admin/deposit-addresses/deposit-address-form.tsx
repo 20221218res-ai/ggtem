@@ -38,7 +38,7 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("saving");
-    setMessage("입금 주소를 저장하는 중입니다...");
+    setMessage("저장 중...");
 
     try {
       const response = await fetch("/api/admin/deposit-addresses", {
@@ -63,18 +63,18 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
 
       if (!response.ok) {
         setStatus("error");
-        setMessage(result?.message ?? "입금 주소 저장에 실패했습니다.");
+        setMessage(result?.message ?? "저장 실패");
         return;
       }
 
       setStatus("success");
-      setMessage(result?.message ?? "입금 주소 설정을 저장했습니다.");
+      setMessage(result?.message ?? "저장 완료");
       setAdminPassword("");
       setReason("");
       router.refresh();
     } catch {
       setStatus("error");
-      setMessage("요청을 보내지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.");
+      setMessage("요청 실패");
     }
   }
 
@@ -104,13 +104,13 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
           onChange={(event) => setIsActive(event.target.checked)}
           className="h-4 w-4 accent-[var(--color-primary)]"
         />
-        유저 충전 화면에 노출
+        유저 충전 화면 노출
       </label>
       <Field
         label="변경 사유"
         value={reason}
         onChange={setReason}
-        placeholder="예: 운영 지갑 주소 교체 또는 보안 주소 변경"
+        placeholder="예: 운영 지갑 주소 교체"
         minLength={10}
         required
       />
@@ -119,7 +119,7 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
         value={adminPassword}
         onChange={setAdminPassword}
         type="password"
-        placeholder="주소 변경을 위해 비밀번호를 다시 입력해 주세요."
+        placeholder="비밀번호 재입력"
         required
       />
       {message ? (
@@ -141,7 +141,7 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
         disabled={status === "saving"}
         className="h-12 rounded-md bg-[var(--color-primary)] px-4 text-sm font-black text-black hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {status === "saving" ? "저장 중..." : `${chain} 주소 저장`}
+        {status === "saving" ? "저장 중..." : `${chain} 저장`}
       </button>
     </form>
   );

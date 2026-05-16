@@ -32,26 +32,26 @@ export default async function AdminDepositAddressesPage({
   return (
     <AdminMockPage
       icon="USDT"
-      title="입금 주소 설정"
-      subtitle="유저 충전 화면에 노출되는 USDT 입금 주소입니다. 최고관리자만 저장할 수 있습니다."
+      title="입금 주소"
+      subtitle=""
       actions={null}
     >
       <MetricGrid
         items={[
           {
-            label: "등록 주소",
+            label: "등록",
             value: `${state.configuredCount}개`,
             hint: "TRC20/BEP20",
             tone: state.configuredCount >= 2 ? "green" : "amber",
           },
           {
-            label: "활성 주소",
+            label: "활성",
             value: `${state.activeCount}개`,
-            hint: "유저 충전 화면 노출",
+            hint: "유저 충전 화면",
             tone: state.activeCount > 0 ? "cyan" : "red",
           },
           {
-            label: "미설정 체인",
+            label: "미설정",
             value: `${state.missingChains.length}개`,
             hint: state.missingChains.join(", ") || "없음",
             tone: state.missingChains.length === 0 ? "green" : "red",
@@ -60,13 +60,11 @@ export default async function AdminDepositAddressesPage({
       />
 
       {params?.error ? <SoftNotice tone="red">{params.error}</SoftNotice> : null}
-      {params?.notice ? (
-        <SoftNotice tone="green">입금 주소 설정을 저장했습니다.</SoftNotice>
-      ) : null}
+      {params?.notice ? <SoftNotice tone="green">저장 완료</SoftNotice> : null}
 
-      <Panel title="현재 운영 주소">
+      <Panel title="현재 주소">
         <DataTable
-          headers={["체인", "네트워크", "주소", "최소 입금", "상태", "수정일"]}
+          headers={["체인", "네트워크", "주소", "최소 입금", "상태", "수정"]}
           rows={
             state.addresses.length
               ? state.addresses.map((address) => [
@@ -87,7 +85,7 @@ export default async function AdminDepositAddressesPage({
                   ),
                   new Date(address.updatedAt).toLocaleString("ko-KR"),
                 ])
-              : [["-", "-", "아직 설정된 입금 주소가 없습니다.", "-", "-", "-"]]
+              : [["-", "-", "주소 없음", "-", "-", "-"]]
           }
         />
       </Panel>
@@ -98,7 +96,7 @@ export default async function AdminDepositAddressesPage({
           const defaults = DEFAULT_DEPOSIT_WALLET_ADDRESSES[chain];
 
           return (
-            <Panel key={chain} title={`${chain} 주소 변경`}>
+            <Panel key={chain} title={`${chain} 주소`}>
               <DepositAddressForm
                 chain={chain}
                 defaults={defaults}
@@ -121,8 +119,7 @@ export default async function AdminDepositAddressesPage({
       </section>
 
       <SoftNotice tone="amber">
-        입금 주소 변경은 최고관리자 전용 작업입니다. 저장 시 비밀번호 재확인과 감사 로그가 남습니다.
-        잘못된 주소가 노출되면 실제 입금 손실이 발생할 수 있으므로 체인, 네트워크, 주소를 반드시 대조하세요.
+        최고관리자 전용 작업입니다. 저장 시 비밀번호 재확인과 감사 로그가 남습니다.
       </SoftNotice>
     </AdminMockPage>
   );
