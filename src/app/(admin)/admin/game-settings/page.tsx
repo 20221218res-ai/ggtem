@@ -60,6 +60,11 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
       game.name,
       game.code,
       game.moneyUnitName,
+      game.moneyUnitNameKo,
+      game.moneyUnitNameCn,
+      game.moneyUnitNameVn,
+      game.moneyUnitNamePh,
+      game.moneyUnitNameTh,
       ...game.servers.flatMap((server) => [server.name, server.code]),
     ]
       .join(" ")
@@ -142,6 +147,11 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
               <Field name="code" label="게임 코드" placeholder="lineage-w" />
               <Field name="moneyUnitName" label="게임머니 단위명" placeholder="아데나" />
               <Field name="sortOrder" label="노출 순서" placeholder="1" />
+              <Field name="moneyUnitNameKo" label="KR 단위명" placeholder="아데나" />
+              <Field name="moneyUnitNameCn" label="CN 단위명" placeholder="Adena" />
+              <Field name="moneyUnitNameVn" label="VN 단위명" placeholder="Adena" />
+              <Field name="moneyUnitNamePh" label="PH 단위명" placeholder="Adena" />
+              <Field name="moneyUnitNameTh" label="TH 단위명" placeholder="Adena" />
               <Field name="nameKo" label="한국어 게임명" placeholder="리니지W" />
               <Field name="nameCn" label="중국어 게임명" placeholder="天堂W" />
               <Field name="nameVn" label="베트남어 게임명" placeholder="Lineage W" />
@@ -288,6 +298,11 @@ function GameCard({ game }: { game: GameRow }) {
             <Field name="code" label="게임 코드" defaultValue={game.code} />
             <Field name="moneyUnitName" label="게임머니 단위명" defaultValue={game.moneyUnitName} />
             <Field name="sortOrder" label="노출 순서" defaultValue={String(game.sortOrder)} />
+            <Field name="moneyUnitNameKo" label="KR 단위명" defaultValue={game.moneyUnitNameKo || game.moneyUnitName} />
+            <Field name="moneyUnitNameCn" label="CN 단위명" defaultValue={game.moneyUnitNameCn || ""} />
+            <Field name="moneyUnitNameVn" label="VN 단위명" defaultValue={game.moneyUnitNameVn || ""} />
+            <Field name="moneyUnitNamePh" label="PH 단위명" defaultValue={game.moneyUnitNamePh || ""} />
+            <Field name="moneyUnitNameTh" label="TH 단위명" defaultValue={game.moneyUnitNameTh || ""} />
             <Field name="nameKo" label="한국어 게임명" defaultValue={game.nameKo || ""} />
             <Field name="nameCn" label="중국어 게임명" defaultValue={game.nameCn || ""} />
             <Field name="nameVn" label="베트남어 게임명" defaultValue={game.nameVn || ""} />

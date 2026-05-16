@@ -491,7 +491,7 @@ function formatBuyRequestQuantity(request: MyBuyRequest, quantity: string) {
     );
   }
 
-  return formatQuantity(quantity, request.category === "GAME_MONEY" ? request.moneyUnitName : "");
+  return formatQuantity(quantity, "");
 }
 
 function getBuyRequestDisplayPrice(request: MyBuyRequest) {

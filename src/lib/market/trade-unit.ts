@@ -10,6 +10,16 @@ export const GAME_MONEY_PRICE_UNIT_OPTIONS = [
 ] as const;
 
 export type GameMoneyTradeMode = "BULK" | "SPLIT";
+export type TradeUnitCountryCode = "KR" | "CN" | "VN" | "PH" | "TH";
+export type LocalizedMoneyUnitNames = {
+  default?: string | null;
+  KR?: string | null;
+  CN?: string | null;
+  VN?: string | null;
+  PH?: string | null;
+  TH?: string | null;
+};
+export type MoneyUnitNameSource = string | LocalizedMoneyUnitNames | null | undefined;
 
 const GAME_MONEY_FIXED_QUANTITY_UNIT =
   BigInt(GAME_MONEY_QUANTITY_UNIT) * FIXED_AMOUNT_SCALE;
@@ -26,10 +36,11 @@ const BROKEN_UNIT_MARKERS = [
 ];
 
 export function getGameMoneyUnitName(
-  value: string | null | undefined,
+  value: MoneyUnitNameSource,
   gameName?: string | null,
+  countryCode: TradeUnitCountryCode = "KR",
 ) {
-  const normalizedValue = value?.trim();
+  const normalizedValue = resolveMoneyUnitName(value, countryCode)?.trim();
 
   if (normalizedValue && !isBrokenUnitLabel(normalizedValue)) {
     return normalizedValue;
@@ -40,11 +51,12 @@ export function getGameMoneyUnitName(
 
 export function getTradeUnitLabel(
   category: string,
-  moneyUnitName: string | null | undefined,
+  moneyUnitName: MoneyUnitNameSource,
   gameName?: string | null,
+  countryCode?: TradeUnitCountryCode,
 ) {
   if (category === "GAME_MONEY") {
-    return getGameMoneyUnitName(moneyUnitName, gameName);
+    return getGameMoneyUnitName(moneyUnitName, gameName, countryCode);
   }
 
   if (category === "GAME_ACCOUNT") {
@@ -89,7 +101,7 @@ export function normalizeGameMoneyPriceUnit(value: string | null | undefined) {
   const normalized = value?.trim() || GAME_MONEY_PRICE_UNIT_OPTIONS[0].value;
 
   if (!GAME_MONEY_PRICE_UNIT_OPTIONS.some((option) => option.value === normalized)) {
-    throw new Error("게임머니 가격 단위를 선택해 주세요.");
+    throw new Error("게임머니 가격 기준 단위를 선택해 주세요.");
   }
 
   return normalized;
@@ -144,7 +156,8 @@ export function toGameMoneyDisplayQuantity(
 export function formatGameMoneyQuantityWithUnit(
   actualQuantity: string | null | undefined,
   priceUnitQuantity: string | null | undefined,
-  moneyUnitName: string | null | undefined,
+  moneyUnitName: MoneyUnitNameSource,
+  countryCode?: TradeUnitCountryCode,
 ) {
   const normalizedActualQuantity = normalizeGameMoneyQuantityText(actualQuantity);
 
@@ -161,6 +174,7 @@ export function formatGameMoneyQuantityWithUnit(
   const priceUnitLabel = getGameMoneyPriceUnitLabel(
     normalizedPriceUnitQuantity,
     moneyUnitName,
+    countryCode,
   );
 
   return `${formatIntegerQuantity(displayQuantity)} x ${priceUnitLabel}`;
@@ -196,14 +210,73 @@ export function normalizeGameMoneyQuantityText(value: string | null | undefined)
 
 export function getGameMoneyPriceUnitLabel(
   value: string,
-  moneyUnitName: string | null | undefined,
+  moneyUnitName: MoneyUnitNameSource,
+  countryCode: TradeUnitCountryCode = "KR",
 ) {
   const option =
     GAME_MONEY_PRICE_UNIT_OPTIONS.find((entry) => entry.value === value) ??
     GAME_MONEY_PRICE_UNIT_OPTIONS[0];
-  const unitName = getGameMoneyUnitName(moneyUnitName);
+  const unitName = getLocalizedMoneyUnitName(moneyUnitName, countryCode);
 
-  return `${option.label} (${option.koreanLabel}) ${unitName}`;
+  if (countryCode === "KR") {
+    return `${option.koreanLabel} ${unitName}`;
+  }
+
+  return `${option.label} ${unitName}`;
+}
+
+export function getLocalizedMoneyUnitName(
+  value: MoneyUnitNameSource,
+  countryCode: TradeUnitCountryCode = "KR",
+) {
+  const unitName = getGameMoneyUnitName(value, null, countryCode);
+
+  if (countryCode === "KR") {
+    return unitName;
+  }
+
+  const normalized = unitName.replace(/\s+/g, "").toLowerCase();
+  const localizedUnitNames: Record<string, string> = {
+    "아데나": "Adena",
+    "게임머니": "Game money",
+    "게임재화": "Game money",
+    "골드": "Gold",
+    "다이아": "Diamond",
+    "다이아몬드": "Diamond",
+    "제니": "Zeny",
+    "메소": "Meso",
+  };
+
+  return localizedUnitNames[normalized] ?? unitName;
+}
+
+export function buildLocalizedMoneyUnitNames(game: {
+  moneyUnitName?: string | null;
+  moneyUnitNameKo?: string | null;
+  moneyUnitNameCn?: string | null;
+  moneyUnitNameVn?: string | null;
+  moneyUnitNamePh?: string | null;
+  moneyUnitNameTh?: string | null;
+}): LocalizedMoneyUnitNames {
+  return {
+    default: game.moneyUnitName ?? null,
+    KR: game.moneyUnitNameKo ?? game.moneyUnitName ?? null,
+    CN: game.moneyUnitNameCn ?? null,
+    VN: game.moneyUnitNameVn ?? null,
+    PH: game.moneyUnitNamePh ?? null,
+    TH: game.moneyUnitNameTh ?? null,
+  };
+}
+
+function resolveMoneyUnitName(
+  value: MoneyUnitNameSource,
+  countryCode: TradeUnitCountryCode,
+) {
+  if (!value || typeof value === "string") {
+    return value ?? null;
+  }
+
+  return value[countryCode] ?? value.KR ?? value.default ?? null;
 }
 
 function formatIntegerQuantity(value: string) {

@@ -7,9 +7,11 @@ import { ensureUserWallet } from "@/lib/market/wallets";
 import { calculateMarketplaceOrderFees } from "@/lib/market/order-fees";
 import {
   assertGameMoneyQuantityUnit,
+  buildLocalizedMoneyUnitNames,
   getGameMoneyUnitName,
   normalizeGameMoneyPriceUnit,
   normalizeGameMoneyTradeMode,
+  type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
 import { assertNoOffPlatformContact } from "@/lib/risk/off-platform-contact";
@@ -51,7 +53,7 @@ export type MarketplaceBuyRequestFormView = {
     gameId: string;
     code: string;
     name: string;
-    moneyUnitName: string | null;
+    moneyUnitName: MoneyUnitNameSource;
     localizedNames: LocalizedGameNames;
     servers: Array<{
       serverId: string;
@@ -75,7 +77,7 @@ export type MarketplaceBuyRequestSummary = {
   gameCode: string;
   gameImageUrl: string | null;
   gameLocalizedNames: LocalizedGameNames;
-  moneyUnitName: string;
+  moneyUnitName: MoneyUnitNameSource;
   serverName: string | null;
   serverDetail: string | null;
   category: string;
@@ -272,6 +274,11 @@ export async function getMarketplaceBuyRequestFormView(): Promise<MarketplaceBuy
         namePh: true,
         nameTh: true,
         moneyUnitName: true,
+        moneyUnitNameKo: true,
+        moneyUnitNameCn: true,
+        moneyUnitNameVn: true,
+        moneyUnitNamePh: true,
+        moneyUnitNameTh: true,
         servers: {
           where: {
             isActive: true,
@@ -311,7 +318,7 @@ export async function getMarketplaceBuyRequestFormView(): Promise<MarketplaceBuy
       gameId: game.id,
       code: game.code,
       name: game.name,
-      moneyUnitName: game.moneyUnitName,
+      moneyUnitName: buildLocalizedMoneyUnitNames(game),
       localizedNames: mapGameLocalizedNames(game),
       servers: game.servers.map((server) => ({
         serverId: server.id,
@@ -629,6 +636,11 @@ export async function getMarketplaceMyBuyRequests(): Promise<MarketplaceMyBuyReq
         code: true,
         imageUrl: true,
         moneyUnitName: true,
+        moneyUnitNameKo: true,
+        moneyUnitNameCn: true,
+        moneyUnitNameVn: true,
+        moneyUnitNamePh: true,
+        moneyUnitNameTh: true,
         nameKo: true,
         nameCn: true,
         nameVn: true,
@@ -1942,6 +1954,11 @@ function mapBuyRequestSummary({
       code: string;
       imageUrl: string | null;
       moneyUnitName?: string | null;
+      moneyUnitNameKo?: string | null;
+      moneyUnitNameCn?: string | null;
+      moneyUnitNameVn?: string | null;
+      moneyUnitNamePh?: string | null;
+      moneyUnitNameTh?: string | null;
       nameKo?: string | null;
       nameCn?: string | null;
       nameVn?: string | null;
@@ -1964,7 +1981,9 @@ function mapBuyRequestSummary({
     gameLocalizedNames: requestGame
       ? mapGameLocalizedNames(requestGame)
       : { KR: null, CN: null, VN: null, PH: null, TH: null },
-    moneyUnitName: getGameMoneyUnitName(requestGame?.moneyUnitName, requestGame?.name),
+    moneyUnitName: requestGame
+      ? buildLocalizedMoneyUnitNames(requestGame)
+      : getGameMoneyUnitName(null),
     serverName: requestServer?.name ?? null,
     serverDetail: request.serverDetail ?? null,
     category: request.category,

@@ -35,35 +35,6 @@ export default function SellerListingActions({
     (status === "PAUSED" || status === "HIDDEN" || status === "SOLD_OUT") &&
     Number(availableQuantity) > 0;
 
-  async function handleDuplicate() {
-    setError("");
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch("/api/market/seller-listings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "DUPLICATE", listingId }),
-      });
-      const result = (await response.json()) as SellerListingActionPayload;
-
-      if (!response.ok || !result.listingId) {
-        throw new Error(getApiMessage(result, t, "sellerListingAction.duplicateFailed"));
-      }
-
-      router.push(`/my/listings/${result.listingId}/edit`);
-      router.refresh();
-    } catch (submitError) {
-      setError(
-        submitError instanceof Error
-          ? submitError.message
-          : t("sellerListingAction.duplicateFailed"),
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
   async function handleStatusAction(action: SellerListingStatusAction) {
     setError("");
     setIsSubmitting(true);
@@ -108,14 +79,6 @@ export default function SellerListingActions({
       >
         {t("sellerListingAction.edit")}
       </Link>
-      <button
-        type="button"
-        disabled={isSubmitting}
-        onClick={() => void handleDuplicate()}
-        className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-xs font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)] disabled:opacity-60"
-      >
-        {t("sellerListingAction.duplicate")}
-      </button>
       {canPause ? (
         <button
           type="button"

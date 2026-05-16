@@ -15,6 +15,7 @@ import { getServerDetailOptionsForGameCode } from "@/lib/market/server-detail-op
 import {
   GAME_MONEY_PRICE_UNIT_OPTIONS,
   getGameMoneyPriceUnitLabel,
+  type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
 
 type ListingCategory = "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
@@ -43,7 +44,7 @@ export default function CreateListingForm({
     gameId: string;
     code: string;
     name: string;
-    moneyUnitName?: string | null;
+    moneyUnitName?: MoneyUnitNameSource;
     localizedNames: LocalizedGameNames;
     servers: Array<{ serverId: string; name: string }>;
   }>;
@@ -106,7 +107,7 @@ export default function CreateListingForm({
     ? multiplyQuantityBySelectedUnit(minimumQuantityInput, priceUnitQuantity)
     : minimumQuantityInput;
   const selectedPriceUnitLabel = isGameMoneyListing
-    ? getGameMoneyPriceUnitLabel(priceUnitQuantity, selectedGame?.moneyUnitName)
+    ? getGameMoneyPriceUnitLabel(priceUnitQuantity, selectedGame?.moneyUnitName, countryCode)
     : "";
   const gameMoneyUnitHelperText = t("listingForm.sellGameMoneyUnitHelper");
   const gameMoneyQuantityPlaceholder = selectedPriceUnitLabel
@@ -517,7 +518,7 @@ export default function CreateListingForm({
                     >
                       {GAME_MONEY_PRICE_UNIT_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
-                          {getGameMoneyPriceUnitLabel(option.value, selectedGame?.moneyUnitName)}
+                          {getGameMoneyPriceUnitLabel(option.value, selectedGame?.moneyUnitName, countryCode)}
                         </option>
                       ))}
                     </select>

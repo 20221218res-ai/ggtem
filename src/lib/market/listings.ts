@@ -8,7 +8,8 @@ import { calculateMarketplaceOrderFees } from "@/lib/market/order-fees";
 import { getCurrentUserEmailForRole } from "@/lib/auth/session";
 import {
   assertGameMoneyQuantityUnit,
-  getGameMoneyUnitName,
+  buildLocalizedMoneyUnitNames,
+  type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
 import { isPremiumActive } from "@/lib/market/premium-promotion";
@@ -35,7 +36,7 @@ export type MarketplaceListingSummary = {
   gameCode: string;
   gameImageUrl: string | null;
   gameLocalizedNames: LocalizedGameNames;
-  moneyUnitName: string;
+  moneyUnitName: MoneyUnitNameSource;
   serverName: string | null;
   serverDetail: string | null;
   category: string;
@@ -150,6 +151,11 @@ type ActiveGameCatalogRow = {
   code: string;
   imageUrl: string | null;
   moneyUnitName: string | null;
+  moneyUnitNameKo: string | null;
+  moneyUnitNameCn: string | null;
+  moneyUnitNameVn: string | null;
+  moneyUnitNamePh: string | null;
+  moneyUnitNameTh: string | null;
   nameKo: string | null;
   nameCn: string | null;
   nameVn: string | null;
@@ -180,6 +186,11 @@ const getCachedActiveGameCatalog = unstable_cache(
         code: true,
         imageUrl: true,
         moneyUnitName: true,
+        moneyUnitNameKo: true,
+        moneyUnitNameCn: true,
+        moneyUnitNameVn: true,
+        moneyUnitNamePh: true,
+        moneyUnitNameTh: true,
         nameKo: true,
         nameCn: true,
         nameVn: true,
@@ -413,6 +424,11 @@ export async function getMarketplaceListings(
             code: true,
             imageUrl: true,
             moneyUnitName: true,
+            moneyUnitNameKo: true,
+            moneyUnitNameCn: true,
+            moneyUnitNameVn: true,
+            moneyUnitNamePh: true,
+            moneyUnitNameTh: true,
             nameKo: true,
             nameCn: true,
             nameVn: true,
@@ -508,7 +524,7 @@ export async function getMarketplaceListings(
       gameCode: listing.game.code,
       gameImageUrl: listing.game.imageUrl,
       gameLocalizedNames: mapGameLocalizedNames(listing.game),
-      moneyUnitName: getGameMoneyUnitName(listing.game.moneyUnitName, listing.game.name),
+      moneyUnitName: buildLocalizedMoneyUnitNames(listing.game),
       serverName: listing.server?.name ?? null,
       serverDetail: listing.serverDetail ?? null,
       category: listing.category,
@@ -707,6 +723,11 @@ export async function getMarketplaceListingDetail(
           code: true,
           imageUrl: true,
           moneyUnitName: true,
+          moneyUnitNameKo: true,
+          moneyUnitNameCn: true,
+          moneyUnitNameVn: true,
+          moneyUnitNamePh: true,
+          moneyUnitNameTh: true,
           isActive: true,
           nameKo: true,
           nameCn: true,
@@ -801,6 +822,11 @@ export async function getMarketplaceListingDetail(
           code: true,
           imageUrl: true,
           moneyUnitName: true,
+          moneyUnitNameKo: true,
+          moneyUnitNameCn: true,
+          moneyUnitNameVn: true,
+          moneyUnitNamePh: true,
+          moneyUnitNameTh: true,
           nameKo: true,
           nameCn: true,
           nameVn: true,
@@ -906,7 +932,7 @@ export async function getMarketplaceListingDetail(
     gameCode: listing.game.code,
     gameImageUrl: listing.game.imageUrl,
     gameLocalizedNames: mapGameLocalizedNames(listing.game),
-    moneyUnitName: getGameMoneyUnitName(listing.game.moneyUnitName, listing.game.name),
+    moneyUnitName: buildLocalizedMoneyUnitNames(listing.game),
     contentImages: listing.images.map((image) => ({
       imageUrl: image.imageUrl,
       altText: image.altText ?? null,
@@ -935,7 +961,7 @@ export async function getMarketplaceListingDetail(
       gameCode: item.game.code,
       gameImageUrl: item.game.imageUrl,
       gameLocalizedNames: mapGameLocalizedNames(item.game),
-      moneyUnitName: getGameMoneyUnitName(item.game.moneyUnitName, item.game.name),
+      moneyUnitName: buildLocalizedMoneyUnitNames(item.game),
       serverName: item.server?.name ?? null,
       serverDetail: item.serverDetail ?? null,
       category: item.category,

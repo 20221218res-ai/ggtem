@@ -18,8 +18,10 @@ import {
 import { validateServerDetail } from "@/lib/market/server-detail-options";
 import {
   assertGameMoneyQuantityUnit,
+  buildLocalizedMoneyUnitNames,
   normalizeGameMoneyPriceUnit,
   normalizeGameMoneyTradeMode,
+  type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
 import { copyFile, mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -52,7 +54,7 @@ export type MarketplaceMyListingsView = {
     unitPrice: string;
     priceUnitQuantity: string;
     tradeMode: string;
-    moneyUnitName: string | null;
+    moneyUnitName: MoneyUnitNameSource;
     currency: string;
     minimumQuantity: string;
     availableQuantity: string;
@@ -86,7 +88,7 @@ export type MarketplaceSellerOrderDetail = {
   tradeCharacterName: string | null;
   buyerGameNickname: string | null;
   sellerGameNickname: string | null;
-  moneyUnitName: string | null;
+  moneyUnitName: MoneyUnitNameSource;
   priceUnitQuantity: string;
   buyerName: string;
   quantity: string;
@@ -126,7 +128,7 @@ export type MarketplaceSellerListingFormView = {
     gameId: string;
     code: string;
     name: string;
-    moneyUnitName: string | null;
+    moneyUnitName: MoneyUnitNameSource;
     localizedNames: LocalizedGameNames;
     servers: Array<{
       serverId: string;
@@ -159,7 +161,7 @@ export type MarketplaceSellerListingEditorView = {
   unitPrice: string;
   priceUnitQuantity: string;
   tradeMode: string;
-  moneyUnitName: string | null;
+  moneyUnitName: MoneyUnitNameSource;
   currency: string;
   totalQuantity: string;
   minimumQuantity: string;
@@ -233,6 +235,11 @@ export async function getMarketplaceMyListings(): Promise<MarketplaceMyListingsV
             select: {
               name: true,
               moneyUnitName: true,
+              moneyUnitNameKo: true,
+              moneyUnitNameCn: true,
+              moneyUnitNameVn: true,
+              moneyUnitNamePh: true,
+              moneyUnitNameTh: true,
             },
           },
           server: {
@@ -350,7 +357,7 @@ export async function getMarketplaceMyListings(): Promise<MarketplaceMyListingsV
       unitPrice: listing.unitPrice.toString(),
       priceUnitQuantity: listing.priceUnitQuantity?.toString() ?? "1",
       tradeMode: listing.tradeMode ?? "SPLIT",
-      moneyUnitName: listing.game.moneyUnitName,
+      moneyUnitName: buildLocalizedMoneyUnitNames(listing.game),
       currency: listing.currency,
       minimumQuantity: listing.inventory?.minimumQuantity?.toString() ?? "1",
       availableQuantity: listing.inventory?.availableQuantity.toString() ?? "0",
@@ -433,7 +440,7 @@ export async function getMarketplaceSellerListingEditorView(
     unitPrice: listing.unitPrice.toString(),
     priceUnitQuantity: listing.priceUnitQuantity?.toString() ?? "1",
     tradeMode: listing.tradeMode ?? "SPLIT",
-    moneyUnitName: listing.game.moneyUnitName,
+    moneyUnitName: buildLocalizedMoneyUnitNames(listing.game),
     currency: listing.currency,
     totalQuantity: listing.inventory.totalQuantity.toString(),
     minimumQuantity: listing.inventory.minimumQuantity?.toString() ?? "1",
@@ -492,7 +499,7 @@ export async function getMarketplaceSellerListingFormView(): Promise<Marketplace
       gameId: game.id,
       code: game.code,
       name: game.name,
-      moneyUnitName: game.moneyUnitName,
+      moneyUnitName: buildLocalizedMoneyUnitNames(game),
       localizedNames: mapGameLocalizedNames(game),
       servers: game.servers.map((server) => ({
         serverId: server.id,
@@ -1371,6 +1378,11 @@ export async function getMarketplaceSellerOrderDetail(
           game: {
             select: {
               moneyUnitName: true,
+              moneyUnitNameKo: true,
+              moneyUnitNameCn: true,
+              moneyUnitNameVn: true,
+              moneyUnitNamePh: true,
+              moneyUnitNameTh: true,
             },
           },
         },
@@ -1401,7 +1413,7 @@ export async function getMarketplaceSellerOrderDetail(
     listingTitle: order.listing.title,
     category: order.listing.category,
     accountTransferType: order.listing.accountTransferType,
-    moneyUnitName: order.listing.game.moneyUnitName,
+    moneyUnitName: buildLocalizedMoneyUnitNames(order.listing.game),
     priceUnitQuantity: order.listing.priceUnitQuantity?.toString() ?? "10000",
     buyerName: order.buyer.displayName,
     quantity: order.quantity.toString(),

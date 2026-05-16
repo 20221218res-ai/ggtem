@@ -14,12 +14,14 @@ import LocalizedInput from "../localized-input";
 import UserContentText, { SourceCountryFlag } from "../user-content-text";
 import type { TranslationKey } from "../i18n";
 import GameNameText from "../game-name-text";
+import { GameMoneyPriceUnitText, GameMoneyQuantityText } from "../game-money-unit-text";
 import type { GameCatalogOption, LocalizedGameNames } from "@/lib/market/game-localization";
 import {
   formatGameMoneyQuantityWithUnit,
   getGameMoneyPriceUnitLabel,
   getTradeUnitLabel,
   normalizeGameMoneyPriceUnit,
+  type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
 import {
   accountTransferTypeOptions,
@@ -821,12 +823,12 @@ function getDisplayUnitPrice({
   category: string;
   unitPrice: string;
   priceUnitQuantity: string;
-  moneyUnitName: string;
+  moneyUnitName: MoneyUnitNameSource;
 }) {
   if (category !== "GAME_MONEY") {
     return {
       price: unitPrice,
-      unitLabel: moneyUnitName,
+      unitLabel: typeof moneyUnitName === "string" ? moneyUnitName : "",
     };
   }
 
@@ -854,7 +856,7 @@ function getDisplayQuantity({
   category: string;
   quantity: string;
   priceUnitQuantity: string;
-  moneyUnitName: string | null;
+  moneyUnitName: MoneyUnitNameSource;
   fallbackUnit: string;
 }) {
   if (category === "GAME_MONEY") {
@@ -961,10 +963,28 @@ function ListingRow({
             <AccountTypeChip value={listing.accountTransferType} />
           ) : null}
           <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
-            <CountryText id="listings.minimum" /> {minimumQuantityLabel}
+            <CountryText id="listings.minimum" />{" "}
+            {listing.category === "GAME_MONEY" ? (
+              <GameMoneyQuantityText
+                quantity={listing.minimumQuantity}
+                priceUnitQuantity={listing.priceUnitQuantity}
+                moneyUnitName={listing.moneyUnitName}
+              />
+            ) : (
+              minimumQuantityLabel
+            )}
           </span>
           <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
-            <CountryText id="listings.stock" /> {availableQuantityLabel}
+            <CountryText id="listings.stock" />{" "}
+            {listing.category === "GAME_MONEY" ? (
+              <GameMoneyQuantityText
+                quantity={listing.availableQuantity}
+                priceUnitQuantity={listing.priceUnitQuantity}
+                moneyUnitName={listing.moneyUnitName}
+              />
+            ) : (
+              availableQuantityLabel
+            )}
           </span>
         </div>
       </div>
@@ -972,7 +992,15 @@ function ListingRow({
       <div className="flex flex-col justify-between gap-4 md:text-right">
         <div>
           <p className="text-sm font-bold text-[var(--gg-muted)]">
-            {priceDisplay.unitLabel} <CountryText id="listings.unitPricePerUnit" />
+            {listing.category === "GAME_MONEY" ? (
+              <GameMoneyPriceUnitText
+                priceUnitQuantity={listing.priceUnitQuantity}
+                moneyUnitName={listing.moneyUnitName}
+              />
+            ) : (
+              priceDisplay.unitLabel
+            )}{" "}
+            <CountryText id="listings.unitPricePerUnit" />
           </p>
           <p className="mt-1 text-2xl font-black text-[var(--gg-accent)]">
             {priceDisplay.price} {listing.currency}
@@ -1063,14 +1091,38 @@ function BuyRequestRow({
             <AccountTypeChip value={request.accountTransferType} />
           ) : null}
           <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
-            <CountryText id="listings.wanted" /> {remainingQuantityLabel} / {quantityLabel}
+            <CountryText id="listings.wanted" />{" "}
+            {request.category === "GAME_MONEY" ? (
+              <GameMoneyQuantityText
+                quantity={request.remainingQuantity}
+                priceUnitQuantity={request.priceUnitQuantity}
+                moneyUnitName={request.moneyUnitName}
+              />
+            ) : (
+              remainingQuantityLabel
+            )}{" "}
+            /{" "}
+            {request.category === "GAME_MONEY" ? (
+              <GameMoneyQuantityText
+                quantity={request.quantity}
+                priceUnitQuantity={request.priceUnitQuantity}
+                moneyUnitName={request.moneyUnitName}
+              />
+            ) : (
+              quantityLabel
+            )}
           </span>
           {request.category === "GAME_MONEY" ? (
             <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
               <CountryText
                 id={request.tradeMode === "BULK" ? "listingForm.bulkBuy" : "listingForm.splitBuy"}
               />{" "}
-              / <CountryText id="listings.minimum" /> {minimumQuantityLabel}
+              / <CountryText id="listings.minimum" />{" "}
+              <GameMoneyQuantityText
+                quantity={request.minimumQuantity}
+                priceUnitQuantity={request.priceUnitQuantity}
+                moneyUnitName={request.moneyUnitName}
+              />
             </span>
           ) : null}
           <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
@@ -1089,7 +1141,15 @@ function BuyRequestRow({
             {request.totalAmount} {request.currency}
           </p>
           <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">
-            <CountryText id="listings.unitPriceShort" /> {priceDisplay.price} {request.currency} / {priceDisplay.unitLabel}
+            <CountryText id="listings.unitPriceShort" /> {priceDisplay.price} {request.currency} /{" "}
+            {request.category === "GAME_MONEY" ? (
+              <GameMoneyPriceUnitText
+                priceUnitQuantity={request.priceUnitQuantity}
+                moneyUnitName={request.moneyUnitName}
+              />
+            ) : (
+              priceDisplay.unitLabel
+            )}
           </p>
         </div>
         <Link

@@ -296,6 +296,11 @@ model Game {
   namePh        String?
   nameTh        String?
   moneyUnitName String          @default("게임머니")
+  moneyUnitNameKo String?
+  moneyUnitNameCn String?
+  moneyUnitNameVn String?
+  moneyUnitNamePh String?
+  moneyUnitNameTh String?
   imageUrl         String?
   imageStoragePath String?
   imageAlt         String?

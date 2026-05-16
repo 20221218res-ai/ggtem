@@ -10,12 +10,9 @@ import LocalizedInput from "./localized-input";
 import UserContentText, { SourceCountryFlag } from "./user-content-text";
 import UserMarketHeader from "./user-market-header";
 import GameNameText from "./game-name-text";
+import { GameMoneyPriceUnitText, GameMoneyQuantityText } from "./game-money-unit-text";
 import OptimizedGameImage from "@/components/optimized-game-image";
 import type { GameCatalogOption } from "@/lib/market/game-localization";
-import {
-  formatGameMoneyQuantityWithUnit,
-  getGameMoneyPriceUnitLabel,
-} from "@/lib/market/trade-unit";
 
 type MarketplaceHomeProps = MarketplaceListingsView;
 
@@ -292,8 +289,14 @@ function LiveTradeBoard({ listings }: { listings: MarketplaceListingSummary[] })
               </p>
               <p className="mt-2 text-sm font-black text-[var(--gg-accent)]">
                 {price.amount} {listing.currency}
-                {price.unitLabel ? (
-                  <span className="text-xs font-bold text-[var(--gg-muted)]"> / {price.unitLabel}</span>
+                {listing.category === "GAME_MONEY" ? (
+                  <span className="text-xs font-bold text-[var(--gg-muted)]">
+                    {" / "}
+                    <GameMoneyPriceUnitText
+                      priceUnitQuantity={listing.priceUnitQuantity}
+                      moneyUnitName={listing.moneyUnitName}
+                    />
+                  </span>
                 ) : null}
               </p>
             </Link>
@@ -426,6 +429,15 @@ export function ListingCard({ listing }: { listing: MarketplaceListingSummary })
             <p className="text-xl font-black text-[var(--gg-accent)]">
               {price.amount} {listing.currency}
             </p>
+            {listing.category === "GAME_MONEY" ? (
+              <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">
+                <GameMoneyPriceUnitText
+                  priceUnitQuantity={listing.priceUnitQuantity}
+                  moneyUnitName={listing.moneyUnitName}
+                />{" "}
+                <CountryText id="listingDetail.unitBasisSuffix" />
+              </p>
+            ) : null}
             {price.unitLabel ? (
               <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">
                 {price.unitLabel} 기준
@@ -443,10 +455,12 @@ export function ListingCard({ listing }: { listing: MarketplaceListingSummary })
 
 function formatLiveListingQuantity(listing: MarketplaceListingSummary) {
   if (listing.category === "GAME_MONEY") {
-    return formatGameMoneyQuantityWithUnit(
-      listing.availableQuantity,
-      listing.priceUnitQuantity,
-      listing.moneyUnitName,
+    return (
+      <GameMoneyQuantityText
+        quantity={listing.availableQuantity}
+        priceUnitQuantity={listing.priceUnitQuantity}
+        moneyUnitName={listing.moneyUnitName}
+      />
     );
   }
 
@@ -478,10 +492,7 @@ function getListingDisplayPrice(listing: MarketplaceListingSummary) {
 
   return {
     amount: formatDisplayNumber(unitPrice * unitQuantity),
-    unitLabel: getGameMoneyPriceUnitLabel(
-      listing.priceUnitQuantity,
-      listing.moneyUnitName,
-    ),
+    unitLabel: null,
   };
 }
 

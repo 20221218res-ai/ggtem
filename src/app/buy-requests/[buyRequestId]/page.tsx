@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import CountryText from "@/app/country-text";
+import { GameMoneyPriceUnitText, GameMoneyQuantityText } from "@/app/game-money-unit-text";
 import { MarketplaceHeader } from "@/app/marketplace-home";
 import UserContentText, { SourceCountryFlag } from "@/app/user-content-text";
 import BuyRequestOfferForm from "@/app/listings/buy-request-offer-form";
@@ -11,6 +12,7 @@ import {
   getGameMoneyPriceUnitLabel,
   getTradeUnitLabel,
   normalizeGameMoneyPriceUnit,
+  type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
 
@@ -130,11 +132,38 @@ export default async function BuyRequestDetailPage({
                 <Metric
                   label={<CountryText id="listings.unitPriceShort" />}
                   value={`${priceDisplay.price} ${request.currency}`}
-                  hint={priceDisplay.unitLabel}
+                  hint={
+                    request.category === "GAME_MONEY" ? (
+                      <GameMoneyPriceUnitText
+                        priceUnitQuantity={request.priceUnitQuantity}
+                        moneyUnitName={request.moneyUnitName}
+                      />
+                    ) : (
+                      priceDisplay.unitLabel
+                    )
+                  }
                 />
                 <Metric
                   label={<CountryText id="listings.wanted" />}
-                  value={`${remainingQuantityLabel} / ${quantityLabel}`}
+                  value={
+                    request.category === "GAME_MONEY" ? (
+                      <>
+                        <GameMoneyQuantityText
+                          quantity={request.remainingQuantity}
+                          priceUnitQuantity={request.priceUnitQuantity}
+                          moneyUnitName={request.moneyUnitName}
+                        />{" "}
+                        /{" "}
+                        <GameMoneyQuantityText
+                          quantity={request.quantity}
+                          priceUnitQuantity={request.priceUnitQuantity}
+                          moneyUnitName={request.moneyUnitName}
+                        />
+                      </>
+                    ) : (
+                      `${remainingQuantityLabel} / ${quantityLabel}`
+                    )
+                  }
                 />
               </div>
             </section>
@@ -149,7 +178,20 @@ export default async function BuyRequestDetailPage({
 
               <div className="mt-5 grid gap-3 md:grid-cols-2">
                 <InfoTile label={<CountryText id="listingForm.buyMode" />} value={request.tradeMode === "BULK" ? <CountryText id="listingForm.bulkBuy" /> : <CountryText id="listingForm.splitBuy" />} />
-                <InfoTile label={<CountryText id="listings.minimum" />} value={minimumQuantityLabel} />
+                <InfoTile
+                  label={<CountryText id="listings.minimum" />}
+                  value={
+                    request.category === "GAME_MONEY" ? (
+                      <GameMoneyQuantityText
+                        quantity={request.minimumQuantity}
+                        priceUnitQuantity={request.priceUnitQuantity}
+                        moneyUnitName={request.moneyUnitName}
+                      />
+                    ) : (
+                      minimumQuantityLabel
+                    )
+                  }
+                />
                 <InfoTile label={<CountryText id="listings.offerCountPrefix" />} value={`${request.offerCount}`} />
                 {accountTransferTypeLabel ? (
                   <InfoTile label={<CountryText id="listings.accountType" />} value={<AccountTransferTypeText value={accountTransferTypeLabel} />} />
@@ -209,7 +251,17 @@ export default async function BuyRequestDetailPage({
                 <p className="text-xs font-black text-sky-700">
                   <CountryText id="listingForm.summaryActualStoredQuantity" />
                 </p>
-                <p className="mt-1 text-lg font-black text-sky-900">{remainingQuantityLabel}</p>
+                <p className="mt-1 text-lg font-black text-sky-900">
+                  {request.category === "GAME_MONEY" ? (
+                    <GameMoneyQuantityText
+                      quantity={request.remainingQuantity}
+                      priceUnitQuantity={request.priceUnitQuantity}
+                      moneyUnitName={request.moneyUnitName}
+                    />
+                  ) : (
+                    remainingQuantityLabel
+                  )}
+                </p>
               </div>
               <BuyRequestOfferForm
                 buyRequestId={request.buyRequestId}
@@ -249,12 +301,12 @@ function getDisplayUnitPrice({
   category: string;
   unitPrice: string;
   priceUnitQuantity: string;
-  moneyUnitName: string;
+  moneyUnitName: MoneyUnitNameSource;
 }) {
   if (category !== "GAME_MONEY") {
     return {
       price: unitPrice,
-      unitLabel: moneyUnitName,
+      unitLabel: typeof moneyUnitName === "string" ? moneyUnitName : "",
     };
   }
 
@@ -282,7 +334,7 @@ function getDisplayQuantity({
   category: string;
   quantity: string;
   priceUnitQuantity: string;
-  moneyUnitName: string | null;
+  moneyUnitName: MoneyUnitNameSource;
   fallbackUnit: string;
 }) {
   if (category === "GAME_MONEY") {
@@ -337,7 +389,7 @@ function Metric({
   strong,
 }: {
   label: ReactNode;
-  value: string;
+  value: ReactNode;
   hint?: ReactNode;
   strong?: boolean;
 }) {

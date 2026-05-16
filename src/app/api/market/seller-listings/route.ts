@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAccountCapability, requireApiRole } from "@/lib/auth/guards";
 import {
-  duplicateMarketplaceSellerListing,
   updateMarketplaceSellerListing,
   updateMarketplaceSellerListingStatus,
 } from "@/lib/market/my-listings";
@@ -19,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json()) as {
-      mode?: "UPDATE" | "STATUS" | "DUPLICATE";
+      mode?: "UPDATE" | "STATUS";
       listingId?: string;
       title?: string;
       description?: string;
@@ -51,27 +50,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         ...result,
         messageKey: "sellerListingAction.statusSuccess",
-      });
-    }
-
-    if (body.mode === "DUPLICATE") {
-      if (!body.listingId) {
-        return NextResponse.json(
-          {
-            message: "복사할 판매글 정보가 필요합니다.",
-            messageKey: "sellerListingAction.duplicateRequired",
-          },
-          { status: 400 },
-        );
-      }
-
-      const result = await duplicateMarketplaceSellerListing({
-        listingId: body.listingId,
-      });
-
-      return NextResponse.json({
-        ...result,
-        messageKey: "sellerListingAction.duplicateSuccess",
       });
     }
 

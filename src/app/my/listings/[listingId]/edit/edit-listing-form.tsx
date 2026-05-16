@@ -6,6 +6,7 @@ import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import type { TranslationKey } from "@/app/i18n";
 import useCountryTranslation from "@/app/use-country-translation";
+import { COUNTRY_CHANGE_EVENT, getCurrentCountryCode } from "@/app/country-text";
 import {
   GAME_MONEY_PRICE_UNIT_OPTIONS,
   getGameMoneyPriceUnitLabel,
@@ -13,6 +14,7 @@ import {
   normalizeGameMoneyPriceUnit,
   toGameMoneyActualQuantity,
   toGameMoneyDisplayQuantity,
+  type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
 
 const LISTING_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
@@ -56,7 +58,7 @@ export default function EditListingForm({
   initialUnitPrice: string;
   initialPriceUnitQuantity: string;
   initialTradeMode: string;
-  moneyUnitName: string | null;
+  moneyUnitName: MoneyUnitNameSource;
   initialTotalQuantity: string;
   initialMinimumQuantity: string;
   initialImages: ListingContentImage[];
@@ -108,6 +110,7 @@ export default function EditListingForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isRemovingImage, setIsRemovingImage] = useState(false);
+  const [countryCode, setCountryCode] = useState(() => getCurrentCountryCode());
 
   const effectiveMinimumQuantity =
     isGameMoneyListing && tradeMode === "BULK" ? totalQuantity : minimumQuantity;
@@ -124,11 +127,23 @@ export default function EditListingForm({
   const priceUnitLabel = getGameMoneyPriceUnitLabel(
     priceUnitQuantity,
     moneyUnitName,
+    countryCode,
   );
   const selectedUnitPlaceholder = t("listingEdit.selectedUnitPlaceholder").replace(
     "{unit}",
     priceUnitLabel,
   );
+
+  useEffect(() => {
+    const handleCountryChange = () => setCountryCode(getCurrentCountryCode());
+    window.addEventListener(COUNTRY_CHANGE_EVENT, handleCountryChange);
+    window.addEventListener("storage", handleCountryChange);
+
+    return () => {
+      window.removeEventListener(COUNTRY_CHANGE_EVENT, handleCountryChange);
+      window.removeEventListener("storage", handleCountryChange);
+    };
+  }, []);
 
   useEffect(() => {
     if (isGameMoneyListing && tradeMode === "BULK") {
@@ -406,7 +421,7 @@ export default function EditListingForm({
               >
                 {GAME_MONEY_PRICE_UNIT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {getGameMoneyPriceUnitLabel(option.value, moneyUnitName)}
+                    {getGameMoneyPriceUnitLabel(option.value, moneyUnitName, countryCode)}
                   </option>
                 ))}
               </select>

@@ -5,6 +5,7 @@ import type { MarketplaceListingSummary } from "@/lib/market/listings";
 import { getMarketplaceListingDetail } from "@/lib/market/listings";
 import { MarketplaceHeader } from "../../marketplace-home";
 import CountryText from "../../country-text";
+import { GameMoneyPriceUnitText, GameMoneyQuantityText } from "../../game-money-unit-text";
 import UserContentText, { SourceCountryFlag } from "../../user-content-text";
 import { PurchasePreviewPanel } from "./purchase-preview-panel";
 import {
@@ -12,6 +13,7 @@ import {
   getGameMoneyPriceUnitLabel,
   getTradeUnitLabel,
   normalizeGameMoneyPriceUnit,
+  type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
 
@@ -112,9 +114,13 @@ export default async function ListingDetailPage({
                       label={<CountryText id="listingDetail.unitPrice" />}
                       value={`${priceDisplay.price} ${listing.currency}`}
                       hint={
-                        priceDisplay.unitLabel ? (
+                        listing.category === "GAME_MONEY" ? (
                           <>
-                            {priceDisplay.unitLabel} <CountryText id="listingDetail.unitBasisSuffix" />
+                            <GameMoneyPriceUnitText
+                              priceUnitQuantity={listing.priceUnitQuantity}
+                              moneyUnitName={listing.moneyUnitName}
+                            />{" "}
+                            <CountryText id="listingDetail.unitBasisSuffix" />
                           </>
                         ) : (
                           <CountryText id="listingDetail.eachBasis" />
@@ -122,8 +128,34 @@ export default async function ListingDetailPage({
                       }
                       strong
                     />
-                    <Metric label={<CountryText id="listingDetail.minimumQuantity" />} value={minimumQuantityLabel} />
-                    <Metric label={<CountryText id="listingDetail.availableQuantity" />} value={availableQuantityLabel} />
+                    <Metric
+                      label={<CountryText id="listingDetail.minimumQuantity" />}
+                      value={
+                        listing.category === "GAME_MONEY" ? (
+                          <GameMoneyQuantityText
+                            quantity={listing.minimumQuantity}
+                            priceUnitQuantity={listing.priceUnitQuantity}
+                            moneyUnitName={listing.moneyUnitName}
+                          />
+                        ) : (
+                          minimumQuantityLabel
+                        )
+                      }
+                    />
+                    <Metric
+                      label={<CountryText id="listingDetail.availableQuantity" />}
+                      value={
+                        listing.category === "GAME_MONEY" ? (
+                          <GameMoneyQuantityText
+                            quantity={listing.availableQuantity}
+                            priceUnitQuantity={listing.priceUnitQuantity}
+                            moneyUnitName={listing.moneyUnitName}
+                          />
+                        ) : (
+                          availableQuantityLabel
+                        )
+                      }
+                    />
                   </div>
               </div>
             </section>
@@ -302,7 +334,7 @@ function getListingPriceDisplay({
   category: string;
   unitPrice: string;
   priceUnitQuantity: string;
-  moneyUnitName: string;
+  moneyUnitName: MoneyUnitNameSource;
 }) {
   if (category !== "GAME_MONEY") {
     return {
@@ -338,7 +370,7 @@ function Metric({
   strong,
 }: {
   label: React.ReactNode;
-  value: string;
+  value: React.ReactNode;
   hint?: React.ReactNode;
   strong?: boolean;
 }) {
