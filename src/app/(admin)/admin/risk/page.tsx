@@ -389,7 +389,7 @@ function OffPlatformReportPanel({ report }: { report: RiskReport }) {
           <Badge tone="red">연락처/외부거래 의심</Badge>
         )}
       </div>
-      <p className="mt-3 font-semibold leading-6">
+      <p className="sr-only">
         외부거래 의심 신호입니다. 채팅 원문과 감사 로그를 확인하세요.
       </p>
       <div className="mt-3 grid gap-2 md:grid-cols-3">
@@ -453,7 +453,7 @@ function RiskSignalBox({ title, body, tone }: { title: string; body: string; ton
   return (
     <div className={`mt-3 rounded-lg border p-3 ${toneClasses(tone)}`}>
       <p className="text-sm font-black">{title}</p>
-      <p className="mt-1 text-xs font-semibold leading-5">{body}</p>
+      <p className="sr-only">{body}</p>
     </div>
   );
 }

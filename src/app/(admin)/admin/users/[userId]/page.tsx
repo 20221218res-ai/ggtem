@@ -131,7 +131,7 @@ export default async function AdminUserDetailPage({
             body={
               latestAdminNote
                 ? `${latestAdminNote.createdAt} / ${latestAdminNote.body}`
-                : "운영 판단 근거가 있다면 메모를 남겨 주세요."
+                : ""
             }
             href="#admin-notes"
             tone={latestAdminNote ? "cyan" : "slate"}
