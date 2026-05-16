@@ -319,11 +319,11 @@ export default function AdminOrdersPage() {
 
             <div className="mt-4 space-y-3">
               {isLoading ? (
-                <EmptyState title="불러오는 중" description="주문 목록을 확인하고 있습니다." />
+                <EmptyState title="불러오는 중" />
               ) : null}
 
               {!isLoading && state.orders.length === 0 ? (
-                <EmptyState title="주문 없음" description="현재 조건에 맞는 주문이 없습니다." />
+                <EmptyState title="주문 없음" />
               ) : null}
 
               {state.orders.map((order) => (
@@ -372,7 +372,7 @@ export default function AdminOrdersPage() {
                 onResolveDispute={resolveDispute}
               />
             ) : (
-              <EmptyState title="주문 선택" description="왼쪽 목록에서 주문을 선택하세요." />
+              <EmptyState title="주문 선택" />
             )}
           </div>
         </section>
@@ -391,7 +391,7 @@ function OrderDetail({
   onResolveDispute,
 }: {
   detail: AdminOrderDetail;
-  selectedAction: { title: string; body: string } | null;
+  selectedAction: { title: string } | null;
   disputeDecisionNote: string | null;
   disputeNote: string;
   setDisputeNote: (value: string) => void;
@@ -416,7 +416,6 @@ function OrderDetail({
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">NEXT ACTION</p>
             <p className="mt-1 text-xl font-black text-slate-950">{selectedAction.title}</p>
-            <p className="sr-only">{selectedAction.body}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <TraceLink href={detail.links.buyerChat} label="구매자 채팅" />
@@ -573,7 +572,7 @@ function LedgerSection({ entries }: { entries: AdminOrderDetail["ledgerEntries"]
           </div>
         ))}
         {entries.length === 0 ? (
-          <EmptyState title="원장 없음" description="이 주문의 원장 기록이 없습니다." />
+          <EmptyState title="원장 없음" />
         ) : null}
       </div>
     </section>
@@ -613,15 +612,15 @@ function getOrderListSummary(orders: AdminOrdersState["orders"]) {
 }
 
 function getOrderNextAction(status: string) {
-  const actions: Record<string, { title: string; body: string }> = {
-    REQUESTED: { title: "결제 대기", body: "결제 또는 에스크로" },
-    ESCROW_LOCKED: { title: "판매자 응답 대기", body: "판매자가 전달을 시작해야 하는 상태입니다." },
-    SELLER_RESPONSE_PENDING: { title: "판매자 확인 필요", body: "응답 지연" },
-    DELIVERY_IN_PROGRESS: { title: "전달 진행", body: "채팅/증빙" },
-    DELIVERY_COMPLETED: { title: "인수확정 대기", body: "구매자 확인" },
-    BUYER_CONFIRM_PENDING: { title: "구매자 확정 대기", body: "구매자가 수령 확인을 누르면 정산됩니다." },
-    DISPUTED: { title: "분쟁 처리 필요", body: "채팅과 원장을 확인하고 환불 또는 정산으로 종료하세요." },
-    COMPLETED: { title: "거래 완료", body: "완료" },
+  const actions: Record<string, { title: string }> = {
+    REQUESTED: { title: "결제 대기" },
+    ESCROW_LOCKED: { title: "판매자 응답 대기" },
+    SELLER_RESPONSE_PENDING: { title: "판매자 확인 필요" },
+    DELIVERY_IN_PROGRESS: { title: "전달 진행" },
+    DELIVERY_COMPLETED: { title: "인수확정 대기" },
+    BUYER_CONFIRM_PENDING: { title: "구매자 확정 대기" },
+    DISPUTED: { title: "분쟁 처리 필요" },
+    COMPLETED: { title: "거래 완료" },
   };
   return actions[status] ?? null;
 }
@@ -786,11 +785,10 @@ function ActionLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-function EmptyState({ title, description }: { title: string; description: string }) {
+function EmptyState({ title }: { title: string }) {
   return (
     <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-5 text-center">
       <p className="text-sm font-black text-slate-700">{title}</p>
-      <p className="sr-only">{description}</p>
     </div>
   );
 }

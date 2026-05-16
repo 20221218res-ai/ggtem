@@ -281,7 +281,7 @@ export default function AdminDisputesPage() {
         ) : null}
         {success ? (
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
-            {success} 주문 이벤트, 원장, 감사 로그를 다시 확인하세요.
+            {success}
           </div>
         ) : null}
 
@@ -709,11 +709,10 @@ function ReviewCheckItem({ label }: { label: string }) {
   );
 }
 
-function EmptyState({ title, description }: { title: string; description?: string }) {
+function EmptyState({ title }: { title: string; description?: string }) {
   return (
     <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
       <p className="font-bold text-slate-700">{title}</p>
-      {description ? <p className="mt-1 text-sm text-slate-500">{description}</p> : null}
     </div>
   );
 }

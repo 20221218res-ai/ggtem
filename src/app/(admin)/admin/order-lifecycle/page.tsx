@@ -26,7 +26,7 @@ export default async function OrderLifecyclePage() {
     <AdminMockPage
       icon="FLOW"
       title="주문 라이프사이클"
-      subtitle="주문 상태 흐름"
+      subtitle=" "
       actions={
         <>
           <LinkLike href="/admin/orders">주문</LinkLike>
