@@ -21,6 +21,7 @@ import {
   buildLocalizedMoneyUnitNames,
   normalizeGameMoneyPriceUnit,
   normalizeGameMoneyTradeMode,
+  safeNormalizeGameMoneyPriceUnit,
   type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
 import { copyFile, mkdir, unlink, writeFile } from "node:fs/promises";
@@ -355,7 +356,10 @@ export async function getMarketplaceMyListings(): Promise<MarketplaceMyListingsV
       category: listing.category,
       accountTransferType: listing.accountTransferType ?? null,
       unitPrice: listing.unitPrice.toString(),
-      priceUnitQuantity: listing.priceUnitQuantity?.toString() ?? "1",
+      priceUnitQuantity: formatListingPriceUnitQuantity(
+        listing.category,
+        listing.priceUnitQuantity,
+      ),
       tradeMode: listing.tradeMode ?? "SPLIT",
       moneyUnitName: buildLocalizedMoneyUnitNames(listing.game),
       currency: listing.currency,
@@ -438,7 +442,10 @@ export async function getMarketplaceSellerListingEditorView(
     category: listing.category,
     accountTransferType: listing.accountTransferType ?? null,
     unitPrice: listing.unitPrice.toString(),
-    priceUnitQuantity: listing.priceUnitQuantity?.toString() ?? "1",
+    priceUnitQuantity: formatListingPriceUnitQuantity(
+      listing.category,
+      listing.priceUnitQuantity,
+    ),
     tradeMode: listing.tradeMode ?? "SPLIT",
     moneyUnitName: buildLocalizedMoneyUnitNames(listing.game),
     currency: listing.currency,
@@ -1628,6 +1635,19 @@ function getSellerOrderTransition(
 function normalizeGameNickname(value?: string) {
   const nextValue = value?.trim();
   return nextValue ? nextValue.slice(0, 80) : null;
+}
+
+function formatListingPriceUnitQuantity(
+  category: string,
+  value: { toString(): string } | null | undefined,
+) {
+  const normalizedValue = value?.toString();
+
+  if (category !== "GAME_MONEY") {
+    return normalizedValue ?? "1";
+  }
+
+  return safeNormalizeGameMoneyPriceUnit(normalizedValue);
 }
 
 function formatKoreanDate(date: Date) {

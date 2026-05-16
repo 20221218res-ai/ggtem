@@ -9,7 +9,7 @@ import { calculateMarketplacePurchaseAmount } from "@/lib/market/purchase-calcul
 import {
   formatGameMoneyQuantityWithUnit,
   isGameMoneyDisplayQuantity,
-  normalizeGameMoneyPriceUnit,
+  safeNormalizeGameMoneyPriceUnit,
   toGameMoneyActualQuantity,
   toGameMoneyDisplayQuantity,
 } from "@/lib/market/trade-unit";
@@ -75,7 +75,7 @@ export function PurchasePreviewPanel({
   const safetyServerLabel = serverLabel || t("listingDetail.allServers");
   const isBulkMode = tradeMode === "BULK";
   const normalizedPriceUnitQuantity = isGameMoneyListing
-    ? normalizeGameMoneyPriceUnit(priceUnitQuantity)
+    ? safeNormalizeGameMoneyPriceUnit(priceUnitQuantity)
     : "1";
   const displayMinimumQuantity = isGameMoneyListing
     ? toGameMoneyDisplayQuantity(minimumQuantity, normalizedPriceUnitQuantity)

@@ -12,7 +12,7 @@ import {
   formatGameMoneyQuantityWithUnit,
   getGameMoneyPriceUnitLabel,
   getTradeUnitLabel,
-  normalizeGameMoneyPriceUnit,
+  safeNormalizeGameMoneyPriceUnit,
   type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
@@ -343,7 +343,8 @@ function getListingPriceDisplay({
     };
   }
 
-  const normalizedPriceUnitQuantity = normalizeGameMoneyPriceUnit(priceUnitQuantity);
+  const normalizedPriceUnitQuantity =
+    safeNormalizeGameMoneyPriceUnit(priceUnitQuantity);
   const quantity = Number(normalizedPriceUnitQuantity);
   const price = Number(unitPrice) * quantity;
 

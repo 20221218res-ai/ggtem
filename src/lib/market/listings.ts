@@ -9,6 +9,7 @@ import { getCurrentUserEmailForRole } from "@/lib/auth/session";
 import {
   assertGameMoneyQuantityUnit,
   buildLocalizedMoneyUnitNames,
+  safeNormalizeGameMoneyPriceUnit,
   type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
 import { normalizeAccountTransferType } from "@/lib/market/account-transfer-types";
@@ -532,7 +533,10 @@ export async function getMarketplaceListings(
       categoryLabel: getCategoryLabel(listing.category),
       settlementLabel: getSettlementLabel(listing.category),
       tradeMode: listing.tradeMode ?? "SPLIT",
-      priceUnitQuantity: listing.priceUnitQuantity?.toString() ?? "1",
+      priceUnitQuantity: formatListingPriceUnitQuantity(
+        listing.category,
+        listing.priceUnitQuantity,
+      ),
       minimumQuantity: listing.inventory?.minimumQuantity?.toString() ?? "1",
       availableQuantity: listing.inventory?.availableQuantity?.toString() ?? "0",
       lockedQuantity: listing.inventory?.lockedQuantity?.toString() ?? "0",
@@ -913,7 +917,10 @@ export async function getMarketplaceListingDetail(
     categoryLabel: getCategoryLabel(listing.category),
     settlementLabel: getSettlementLabel(listing.category),
     tradeMode: listing.tradeMode ?? "SPLIT",
-    priceUnitQuantity: listing.priceUnitQuantity?.toString() ?? "1",
+    priceUnitQuantity: formatListingPriceUnitQuantity(
+      listing.category,
+      listing.priceUnitQuantity,
+    ),
     totalQuantity: listing.inventory.totalQuantity.toString(),
     minimumQuantity: listing.inventory.minimumQuantity?.toString() ?? "1",
     availableQuantity: listing.inventory.availableQuantity.toString(),
@@ -969,7 +976,10 @@ export async function getMarketplaceListingDetail(
       categoryLabel: getCategoryLabel(item.category),
       settlementLabel: getSettlementLabel(item.category),
       tradeMode: item.tradeMode ?? "SPLIT",
-      priceUnitQuantity: item.priceUnitQuantity?.toString() ?? "1",
+      priceUnitQuantity: formatListingPriceUnitQuantity(
+        item.category,
+        item.priceUnitQuantity,
+      ),
       minimumQuantity: item.inventory?.minimumQuantity?.toString() ?? "1",
       availableQuantity: item.inventory?.availableQuantity?.toString() ?? "0",
       lockedQuantity: item.inventory?.lockedQuantity?.toString() ?? "0",
@@ -1343,6 +1353,19 @@ function getSettlementLabel(category: string) {
   }
 
   return "에스크로 후 채팅 전달";
+}
+
+function formatListingPriceUnitQuantity(
+  category: string,
+  value: { toString(): string } | null | undefined,
+) {
+  const normalizedValue = value?.toString();
+
+  if (category !== "GAME_MONEY") {
+    return normalizedValue ?? "1";
+  }
+
+  return safeNormalizeGameMoneyPriceUnit(normalizedValue);
 }
 
 async function getSellerReviewSummaries(
