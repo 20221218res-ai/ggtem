@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { getAdminMarketListingsState } from "@/lib/admin/market-listings";
 import { ROLE_GROUPS, requirePageRole } from "@/lib/auth/guards";
 import { FormSubmitButton } from "../form-submit-button";
-import { moderateSellerListingAction } from "./actions";
+import { cancelBuyRequestByAdminAction, moderateSellerListingAction } from "./actions";
 
 type AdminMarketListingsPageProps = {
   searchParams?: Promise<{
@@ -50,6 +50,9 @@ export default async function AdminMarketListingsPage({
 
         {params.notice === "moderated" ? (
           <Banner tone="success">거래글 조치가 완료되었습니다.</Banner>
+        ) : null}
+        {params.notice === "buy-request-canceled" ? (
+          <Banner tone="success">구매글 취소와 예약금 환불이 완료되었습니다.</Banner>
         ) : null}
         {params.error ? <Banner tone="error">{params.error}</Banner> : null}
 
@@ -190,10 +193,19 @@ function BuyRequestCard({ request }: { request: BuyRequestRow }) {
             request.isPremium ? "프리미엄" : "",
           ]}
         />
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-800">
-          구매글 삭제/취소는 잠긴 금액 환불과 연결됩니다. 이 묶음에서는 조회만 제공하고,
-          환불 흐름 포함 조치는 별도 계획으로 처리합니다.
-        </div>
+        {request.actionLocked ? (
+          <form action={cancelBuyRequestByAdminAction} className="grid gap-2">
+            <input type="hidden" name="buyRequestId" value={request.id} />
+            <input name="reason" className={inputClass} placeholder="취소/환불 사유" />
+            <FormSubmitButton className="rounded-lg bg-red-600 px-4 py-3 text-sm font-black text-white">
+              구매글 취소 + 환불
+            </FormSubmitButton>
+          </form>
+        ) : (
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-600">
+            ACTIVE 상태이며 잠금 금액이 있는 구매글만 여기서 취소/환불할 수 있습니다.
+          </div>
+        )}
       </div>
     </article>
   );

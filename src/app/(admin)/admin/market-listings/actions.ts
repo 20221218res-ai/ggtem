@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import type { Prisma } from "@/generated/prisma/client";
 import { ROLE_GROUPS, requirePageRole } from "@/lib/auth/guards";
 import { getPrismaClient } from "@/lib/prisma";
+import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit";
 
 const ALLOWED_NEXT_STATUSES = new Set(["HIDDEN", "REMOVED", "PAUSED", "ACTIVE"]);
 
@@ -94,6 +95,161 @@ export async function moderateSellerListingAction(formData: FormData) {
 
   revalidatePath("/admin/market-listings");
   redirect("/admin/market-listings?notice=moderated");
+}
+
+export async function cancelBuyRequestByAdminAction(formData: FormData) {
+  const admin = await requirePageRole(ROLE_GROUPS.ORDER_OPERATORS, {
+    signInPath: "/admin/sign-in",
+    forbiddenPath: "/admin",
+  });
+  const buyRequestId = getText(formData, "buyRequestId");
+  const reason = getText(formData, "reason");
+
+  if (!buyRequestId) {
+    redirectWithError("처리할 구매글을 확인해 주세요.");
+  }
+
+  if (!reason || reason.length < 4) {
+    redirectWithError("조치 사유를 4자 이상 입력해 주세요.");
+  }
+
+  const prisma = getPrismaClient();
+
+  await prisma.$transaction(async (tx) => {
+    const request = await tx.buyRequest.findUnique({
+      where: { id: buyRequestId },
+      include: {
+        buyer: {
+          include: {
+            wallet: true,
+          },
+        },
+      },
+    });
+
+    if (!request) {
+      throw new Error("구매글을 찾을 수 없습니다.");
+    }
+
+    if (request.status !== "ACTIVE") {
+      throw new Error("모집 중인 구매글만 어드민 취소할 수 있습니다.");
+    }
+
+    if (!request.buyer.wallet) {
+      throw new Error("구매자 지갑을 찾을 수 없습니다.");
+    }
+
+    const buyerWallet = request.buyer.wallet;
+    const lockAmount = parseFixedAmount(request.lockAmount.toString());
+    const buyerAvailable = parseFixedAmount(buyerWallet.availableBalance.toString());
+    const buyerWithdrawable = parseFixedAmount(buyerWallet.withdrawableBalance.toString());
+    const buyerBuyRequestLocked = parseFixedAmount(buyerWallet.buyRequestLocked.toString());
+
+    if (buyerBuyRequestLocked < lockAmount) {
+      throw new Error("구매글 예약금 상태가 지갑 잠금액과 일치하지 않습니다.");
+    }
+
+    const updated = await tx.buyRequest.update({
+      where: { id: request.id },
+      data: {
+        status: "CANCELED",
+        lockAmount: "0",
+      },
+      select: {
+        id: true,
+        status: true,
+        buyerId: true,
+        lockAmount: true,
+      },
+    });
+
+    if (lockAmount > 0n) {
+      await tx.wallet.update({
+        where: { id: buyerWallet.id },
+        data: {
+          availableBalance: formatFixedAmount(buyerAvailable + lockAmount),
+          withdrawableBalance: formatFixedAmount(buyerWithdrawable + lockAmount),
+          buyRequestLocked: formatFixedAmount(buyerBuyRequestLocked - lockAmount),
+        },
+      });
+
+      await tx.walletLedgerEntry.createMany({
+        data: [
+          {
+            walletId: buyerWallet.id,
+            userId: request.buyerId,
+            type: "BUY_REQUEST_RELEASED",
+            direction: "DEBIT",
+            bucket: "BUY_REQUEST_LOCKED",
+            amount: formatFixedAmount(lockAmount),
+            currency: request.currency,
+            referenceType: "BUY_REQUEST",
+            referenceId: request.id,
+            memo: `어드민 구매글 취소: ${reason}`,
+          },
+          {
+            walletId: buyerWallet.id,
+            userId: request.buyerId,
+            type: "BUY_REQUEST_RELEASED",
+            direction: "CREDIT",
+            bucket: "AVAILABLE",
+            amount: formatFixedAmount(lockAmount),
+            currency: request.currency,
+            referenceType: "BUY_REQUEST",
+            referenceId: request.id,
+            memo: `어드민 구매글 취소 환불: ${reason}`,
+          },
+          {
+            walletId: buyerWallet.id,
+            userId: request.buyerId,
+            type: "BUY_REQUEST_RELEASED",
+            direction: "CREDIT",
+            bucket: "WITHDRAWABLE",
+            amount: formatFixedAmount(lockAmount),
+            currency: request.currency,
+            referenceType: "BUY_REQUEST",
+            referenceId: request.id,
+            memo: `어드민 구매글 취소 출금가능 환불: ${reason}`,
+          },
+        ],
+      });
+    }
+
+    await tx.adminAuditLog.create({
+      data: {
+        adminId: admin.userId,
+        action: "BUY_REQUEST_ADMIN_CANCELED",
+        targetType: "BUY_REQUEST",
+        targetId: request.id,
+        reason,
+        before: toJson({
+          status: request.status,
+          buyerId: request.buyerId,
+          category: request.category,
+          lockAmount: request.lockAmount.toString(),
+          wallet: {
+            availableBalance: buyerWallet.availableBalance.toString(),
+            withdrawableBalance: buyerWallet.withdrawableBalance.toString(),
+            buyRequestLocked: buyerWallet.buyRequestLocked.toString(),
+          },
+        }),
+        after: toJson({
+          status: updated.status,
+          buyerId: updated.buyerId,
+          lockAmount: updated.lockAmount.toString(),
+          releasedAmount: formatFixedAmount(lockAmount),
+          wallet: {
+            availableBalance: formatFixedAmount(buyerAvailable + lockAmount),
+            withdrawableBalance: formatFixedAmount(buyerWithdrawable + lockAmount),
+            buyRequestLocked: formatFixedAmount(buyerBuyRequestLocked - lockAmount),
+          },
+        }),
+      },
+    });
+  });
+
+  revalidatePath("/admin/market-listings");
+  redirect("/admin/market-listings?notice=buy-request-canceled");
 }
 
 function getText(formData: FormData, key: string) {
