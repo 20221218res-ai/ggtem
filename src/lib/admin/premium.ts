@@ -44,6 +44,18 @@ export type AdminPremiumState = {
 };
 
 export async function getAdminPremiumState(): Promise<AdminPremiumState> {
+  try {
+    return await getAdminPremiumStateUnsafe();
+  } catch (error) {
+    if (isMissingPremiumSchemaError(error)) {
+      return getEmptyAdminPremiumState();
+    }
+
+    throw error;
+  }
+}
+
+async function getAdminPremiumStateUnsafe(): Promise<AdminPremiumState> {
   const prisma = getPrismaClient();
   const now = new Date();
   const soon = new Date(now.getTime() + 6 * 60 * 60 * 1000);
@@ -224,6 +236,37 @@ export async function getAdminPremiumState(): Promise<AdminPremiumState> {
       createdAt: formatKoreanDate(entry.createdAt),
     })),
   };
+}
+
+function getEmptyAdminPremiumState(): AdminPremiumState {
+  return {
+    summary: {
+      activeCount: 0,
+      expiringSoonCount: 0,
+      expiredVisibleCount: 0,
+      revenueTotal: "0",
+    },
+    activeItems: [],
+    expiredItems: [],
+    recentLedgerEntries: [],
+  };
+}
+
+function isMissingPremiumSchemaError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+
+  const code = "code" in error ? String(error.code) : "";
+  const message = "message" in error ? String(error.message) : "";
+  const meta = "meta" in error ? error.meta : null;
+  const metaText = meta ? JSON.stringify(meta) : "";
+
+  return (
+    code === "P2022" &&
+    (message.includes("premium") ||
+      metaText.includes("premium") ||
+      message.includes("column") ||
+      metaText.includes("ColumnNotFound"))
+  );
 }
 
 function mapListingPremiumItem(
