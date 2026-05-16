@@ -1078,6 +1078,22 @@ function BuyRequestRow({
             <CountryText id="listings.offerCountSuffix" />
           </span>
         </div>
+        {request.contentImages.length > 0 ? (
+          <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            {request.contentImages.slice(0, 3).map((image, index) => (
+              <div
+                key={`${image.imageUrl}-${index}`}
+                className="overflow-hidden rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)]"
+              >
+                <img
+                  src={image.imageUrl}
+                  alt={image.altText || request.title || "Buy request image"}
+                  className="h-28 w-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <div className="flex flex-col justify-between gap-4 md:text-right">

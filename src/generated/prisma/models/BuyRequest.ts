@@ -434,6 +434,7 @@ export type BuyRequestWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"BuyRequest"> | Date | string
   buyer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   offers?: Prisma.BuyRequestOfferListRelationFilter
+  images?: Prisma.BuyRequestImageListRelationFilter
 }
 
 export type BuyRequestOrderByWithRelationInput = {
@@ -467,6 +468,7 @@ export type BuyRequestOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   buyer?: Prisma.UserOrderByWithRelationInput
   offers?: Prisma.BuyRequestOfferOrderByRelationAggregateInput
+  images?: Prisma.BuyRequestImageOrderByRelationAggregateInput
 }
 
 export type BuyRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -503,6 +505,7 @@ export type BuyRequestWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"BuyRequest"> | Date | string
   buyer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   offers?: Prisma.BuyRequestOfferListRelationFilter
+  images?: Prisma.BuyRequestImageListRelationFilter
 }, "id">
 
 export type BuyRequestOrderByWithAggregationInput = {
@@ -605,6 +608,7 @@ export type BuyRequestCreateInput = {
   updatedAt?: Date | string
   buyer: Prisma.UserCreateNestedOneWithoutBuyRequestsInput
   offers?: Prisma.BuyRequestOfferCreateNestedManyWithoutBuyRequestInput
+  images?: Prisma.BuyRequestImageCreateNestedManyWithoutBuyRequestInput
 }
 
 export type BuyRequestUncheckedCreateInput = {
@@ -637,6 +641,7 @@ export type BuyRequestUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   offers?: Prisma.BuyRequestOfferUncheckedCreateNestedManyWithoutBuyRequestInput
+  images?: Prisma.BuyRequestImageUncheckedCreateNestedManyWithoutBuyRequestInput
 }
 
 export type BuyRequestUpdateInput = {
@@ -669,6 +674,7 @@ export type BuyRequestUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyRequestsNestedInput
   offers?: Prisma.BuyRequestOfferUpdateManyWithoutBuyRequestNestedInput
+  images?: Prisma.BuyRequestImageUpdateManyWithoutBuyRequestNestedInput
 }
 
 export type BuyRequestUncheckedUpdateInput = {
@@ -701,6 +707,7 @@ export type BuyRequestUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   offers?: Prisma.BuyRequestOfferUncheckedUpdateManyWithoutBuyRequestNestedInput
+  images?: Prisma.BuyRequestImageUncheckedUpdateManyWithoutBuyRequestNestedInput
 }
 
 export type BuyRequestCreateManyInput = {
@@ -973,6 +980,20 @@ export type EnumBuyRequestStatusFieldUpdateOperationsInput = {
   set?: $Enums.BuyRequestStatus
 }
 
+export type BuyRequestCreateNestedOneWithoutImagesInput = {
+  create?: Prisma.XOR<Prisma.BuyRequestCreateWithoutImagesInput, Prisma.BuyRequestUncheckedCreateWithoutImagesInput>
+  connectOrCreate?: Prisma.BuyRequestCreateOrConnectWithoutImagesInput
+  connect?: Prisma.BuyRequestWhereUniqueInput
+}
+
+export type BuyRequestUpdateOneRequiredWithoutImagesNestedInput = {
+  create?: Prisma.XOR<Prisma.BuyRequestCreateWithoutImagesInput, Prisma.BuyRequestUncheckedCreateWithoutImagesInput>
+  connectOrCreate?: Prisma.BuyRequestCreateOrConnectWithoutImagesInput
+  upsert?: Prisma.BuyRequestUpsertWithoutImagesInput
+  connect?: Prisma.BuyRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BuyRequestUpdateToOneWithWhereWithoutImagesInput, Prisma.BuyRequestUpdateWithoutImagesInput>, Prisma.BuyRequestUncheckedUpdateWithoutImagesInput>
+}
+
 export type BuyRequestCreateNestedOneWithoutOffersInput = {
   create?: Prisma.XOR<Prisma.BuyRequestCreateWithoutOffersInput, Prisma.BuyRequestUncheckedCreateWithoutOffersInput>
   connectOrCreate?: Prisma.BuyRequestCreateOrConnectWithoutOffersInput
@@ -1016,6 +1037,7 @@ export type BuyRequestCreateWithoutBuyerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   offers?: Prisma.BuyRequestOfferCreateNestedManyWithoutBuyRequestInput
+  images?: Prisma.BuyRequestImageCreateNestedManyWithoutBuyRequestInput
 }
 
 export type BuyRequestUncheckedCreateWithoutBuyerInput = {
@@ -1047,6 +1069,7 @@ export type BuyRequestUncheckedCreateWithoutBuyerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   offers?: Prisma.BuyRequestOfferUncheckedCreateNestedManyWithoutBuyRequestInput
+  images?: Prisma.BuyRequestImageUncheckedCreateNestedManyWithoutBuyRequestInput
 }
 
 export type BuyRequestCreateOrConnectWithoutBuyerInput = {
@@ -1109,6 +1132,150 @@ export type BuyRequestScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"BuyRequest"> | Date | string
 }
 
+export type BuyRequestCreateWithoutImagesInput = {
+  id?: string
+  gameId: string
+  serverId?: string | null
+  serverDetail?: string | null
+  category: $Enums.ListingCategory
+  title?: string | null
+  description?: string | null
+  buyerGameNickname?: string | null
+  accountTransferType?: string | null
+  accountRank?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  lockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  status?: $Enums.BuyRequestStatus
+  expiresAt?: Date | string | null
+  premiumStartedAt?: Date | string | null
+  premiumEndsAt?: Date | string | null
+  premiumDurationHours?: number | null
+  premiumFeeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  buyer: Prisma.UserCreateNestedOneWithoutBuyRequestsInput
+  offers?: Prisma.BuyRequestOfferCreateNestedManyWithoutBuyRequestInput
+}
+
+export type BuyRequestUncheckedCreateWithoutImagesInput = {
+  id?: string
+  buyerId: string
+  gameId: string
+  serverId?: string | null
+  serverDetail?: string | null
+  category: $Enums.ListingCategory
+  title?: string | null
+  description?: string | null
+  buyerGameNickname?: string | null
+  accountTransferType?: string | null
+  accountRank?: string | null
+  tradeMode?: string
+  priceUnitQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  lockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  status?: $Enums.BuyRequestStatus
+  expiresAt?: Date | string | null
+  premiumStartedAt?: Date | string | null
+  premiumEndsAt?: Date | string | null
+  premiumDurationHours?: number | null
+  premiumFeeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  offers?: Prisma.BuyRequestOfferUncheckedCreateNestedManyWithoutBuyRequestInput
+}
+
+export type BuyRequestCreateOrConnectWithoutImagesInput = {
+  where: Prisma.BuyRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.BuyRequestCreateWithoutImagesInput, Prisma.BuyRequestUncheckedCreateWithoutImagesInput>
+}
+
+export type BuyRequestUpsertWithoutImagesInput = {
+  update: Prisma.XOR<Prisma.BuyRequestUpdateWithoutImagesInput, Prisma.BuyRequestUncheckedUpdateWithoutImagesInput>
+  create: Prisma.XOR<Prisma.BuyRequestCreateWithoutImagesInput, Prisma.BuyRequestUncheckedCreateWithoutImagesInput>
+  where?: Prisma.BuyRequestWhereInput
+}
+
+export type BuyRequestUpdateToOneWithWhereWithoutImagesInput = {
+  where?: Prisma.BuyRequestWhereInput
+  data: Prisma.XOR<Prisma.BuyRequestUpdateWithoutImagesInput, Prisma.BuyRequestUncheckedUpdateWithoutImagesInput>
+}
+
+export type BuyRequestUpdateWithoutImagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  gameId?: Prisma.StringFieldUpdateOperationsInput | string
+  serverId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  lockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumBuyRequestStatusFieldUpdateOperationsInput | $Enums.BuyRequestStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumDurationHours?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  premiumFeeAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  buyer?: Prisma.UserUpdateOneRequiredWithoutBuyRequestsNestedInput
+  offers?: Prisma.BuyRequestOfferUpdateManyWithoutBuyRequestNestedInput
+}
+
+export type BuyRequestUncheckedUpdateWithoutImagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerId?: Prisma.StringFieldUpdateOperationsInput | string
+  gameId?: Prisma.StringFieldUpdateOperationsInput | string
+  serverId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnitQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  minimumQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  remainingQuantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  lockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumBuyRequestStatusFieldUpdateOperationsInput | $Enums.BuyRequestStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumDurationHours?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  premiumFeeAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  offers?: Prisma.BuyRequestOfferUncheckedUpdateManyWithoutBuyRequestNestedInput
+}
+
 export type BuyRequestCreateWithoutOffersInput = {
   id?: string
   gameId: string
@@ -1138,6 +1305,7 @@ export type BuyRequestCreateWithoutOffersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   buyer: Prisma.UserCreateNestedOneWithoutBuyRequestsInput
+  images?: Prisma.BuyRequestImageCreateNestedManyWithoutBuyRequestInput
 }
 
 export type BuyRequestUncheckedCreateWithoutOffersInput = {
@@ -1169,6 +1337,7 @@ export type BuyRequestUncheckedCreateWithoutOffersInput = {
   premiumFeeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  images?: Prisma.BuyRequestImageUncheckedCreateNestedManyWithoutBuyRequestInput
 }
 
 export type BuyRequestCreateOrConnectWithoutOffersInput = {
@@ -1216,6 +1385,7 @@ export type BuyRequestUpdateWithoutOffersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyRequestsNestedInput
+  images?: Prisma.BuyRequestImageUpdateManyWithoutBuyRequestNestedInput
 }
 
 export type BuyRequestUncheckedUpdateWithoutOffersInput = {
@@ -1247,6 +1417,7 @@ export type BuyRequestUncheckedUpdateWithoutOffersInput = {
   premiumFeeAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  images?: Prisma.BuyRequestImageUncheckedUpdateManyWithoutBuyRequestNestedInput
 }
 
 export type BuyRequestCreateManyBuyerInput = {
@@ -1308,6 +1479,7 @@ export type BuyRequestUpdateWithoutBuyerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   offers?: Prisma.BuyRequestOfferUpdateManyWithoutBuyRequestNestedInput
+  images?: Prisma.BuyRequestImageUpdateManyWithoutBuyRequestNestedInput
 }
 
 export type BuyRequestUncheckedUpdateWithoutBuyerInput = {
@@ -1339,6 +1511,7 @@ export type BuyRequestUncheckedUpdateWithoutBuyerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   offers?: Prisma.BuyRequestOfferUncheckedUpdateManyWithoutBuyRequestNestedInput
+  images?: Prisma.BuyRequestImageUncheckedUpdateManyWithoutBuyRequestNestedInput
 }
 
 export type BuyRequestUncheckedUpdateManyWithoutBuyerInput = {
@@ -1378,10 +1551,12 @@ export type BuyRequestUncheckedUpdateManyWithoutBuyerInput = {
 
 export type BuyRequestCountOutputType = {
   offers: number
+  images: number
 }
 
 export type BuyRequestCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   offers?: boolean | BuyRequestCountOutputTypeCountOffersArgs
+  images?: boolean | BuyRequestCountOutputTypeCountImagesArgs
 }
 
 /**
@@ -1399,6 +1574,13 @@ export type BuyRequestCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.E
  */
 export type BuyRequestCountOutputTypeCountOffersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.BuyRequestOfferWhereInput
+}
+
+/**
+ * BuyRequestCountOutputType without action
+ */
+export type BuyRequestCountOutputTypeCountImagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BuyRequestImageWhereInput
 }
 
 
@@ -1433,6 +1615,7 @@ export type BuyRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   updatedAt?: boolean
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   offers?: boolean | Prisma.BuyRequest$offersArgs<ExtArgs>
+  images?: boolean | Prisma.BuyRequest$imagesArgs<ExtArgs>
   _count?: boolean | Prisma.BuyRequestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["buyRequest"]>
 
@@ -1535,6 +1718,7 @@ export type BuyRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type BuyRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   offers?: boolean | Prisma.BuyRequest$offersArgs<ExtArgs>
+  images?: boolean | Prisma.BuyRequest$imagesArgs<ExtArgs>
   _count?: boolean | Prisma.BuyRequestCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BuyRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1549,6 +1733,7 @@ export type $BuyRequestPayload<ExtArgs extends runtime.Types.Extensions.Internal
   objects: {
     buyer: Prisma.$UserPayload<ExtArgs>
     offers: Prisma.$BuyRequestOfferPayload<ExtArgs>[]
+    images: Prisma.$BuyRequestImagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1975,6 +2160,7 @@ export interface Prisma__BuyRequestClient<T, Null = never, ExtArgs extends runti
   readonly [Symbol.toStringTag]: "PrismaPromise"
   buyer<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   offers<T extends Prisma.BuyRequest$offersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BuyRequest$offersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BuyRequestOfferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  images<T extends Prisma.BuyRequest$imagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BuyRequest$imagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BuyRequestImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2454,6 +2640,30 @@ export type BuyRequest$offersArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.BuyRequestOfferScalarFieldEnum | Prisma.BuyRequestOfferScalarFieldEnum[]
+}
+
+/**
+ * BuyRequest.images
+ */
+export type BuyRequest$imagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BuyRequestImage
+   */
+  select?: Prisma.BuyRequestImageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BuyRequestImage
+   */
+  omit?: Prisma.BuyRequestImageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BuyRequestImageInclude<ExtArgs> | null
+  where?: Prisma.BuyRequestImageWhereInput
+  orderBy?: Prisma.BuyRequestImageOrderByWithRelationInput | Prisma.BuyRequestImageOrderByWithRelationInput[]
+  cursor?: Prisma.BuyRequestImageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BuyRequestImageScalarFieldEnum | Prisma.BuyRequestImageScalarFieldEnum[]
 }
 
 /**

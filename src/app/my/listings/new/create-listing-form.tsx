@@ -64,7 +64,7 @@ export default function CreateListingForm({
   const [sellerGameNickname, setSellerGameNickname] = useState("");
   const [premiumDurationHours, setPremiumDurationHours] = useState("0");
   const [imageAlt, setImageAlt] = useState("");
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [createdListingId, setCreatedListingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -91,10 +91,10 @@ export default function CreateListingForm({
     [availableServers, serverId],
   );
   const hasSelectableCatalog = games.length > 0 && availableServers.length > 0;
-  const imagePreviewUrl = useMemo(() => {
-    if (!selectedImage) return null;
-    return URL.createObjectURL(selectedImage);
-  }, [selectedImage]);
+  const imagePreviewUrls = useMemo(
+    () => selectedImages.map((file) => URL.createObjectURL(file)),
+    [selectedImages],
+  );
   const isGameMoneyListing = category === "GAME_MONEY";
   const quantityInput = isAccountListing ? "1" : quantity;
   const minimumQuantityInput = isAccountListing ? "1" : minimumQuantity;
@@ -148,30 +148,36 @@ export default function CreateListingForm({
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [imagePreviewUrls]);
+
   function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
     setError("");
-    const file = event.target.files?.[0] ?? null;
+    const files = Array.from(event.target.files ?? []);
 
-    if (!file) {
-      setSelectedImage(null);
+    if (files.length === 0) {
+      setSelectedImages([]);
       return;
     }
 
-    if (!LISTING_IMAGE_ALLOWED_TYPES.includes(file.type)) {
-      setSelectedImage(null);
+    if (files.some((file) => !LISTING_IMAGE_ALLOWED_TYPES.includes(file.type))) {
+      setSelectedImages([]);
       event.target.value = "";
       setError(t("listingForm.imageTypeError"));
       return;
     }
 
-    if (file.size > LISTING_IMAGE_MAX_BYTES) {
-      setSelectedImage(null);
+    if (files.some((file) => file.size > LISTING_IMAGE_MAX_BYTES)) {
+      setSelectedImages([]);
       event.target.value = "";
       setError(t("listingForm.imageSizeError"));
       return;
     }
 
-    setSelectedImage(file);
+    setSelectedImages(files);
   }
 
   function handleCategoryChange(nextCategory: ListingCategory) {
@@ -324,7 +330,7 @@ export default function CreateListingForm({
       if (result.listingId) {
         setCreatedListingId(result.listingId);
 
-        if (selectedImage) {
+        for (const selectedImage of selectedImages) {
           const formData = new FormData();
           formData.set("listingId", result.listingId);
           formData.set("altText", imageAlt);
@@ -618,14 +624,19 @@ export default function CreateListingForm({
               <summary className="cursor-pointer text-xl font-black">{t("listingForm.imageSection")}</summary>
               <div className="mt-4 grid gap-3 md:grid-cols-[160px_1fr]">
                 <div className="flex h-40 items-center justify-center overflow-hidden rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)]">
-                  {imagePreviewUrl ? (
-                    <Image
-                      src={imagePreviewUrl}
-                      alt={imageAlt || t("listingForm.imageSection")}
-                      width={320}
-                      height={320}
-                      className="h-full w-full object-cover"
-                    />
+                  {imagePreviewUrls.length > 0 ? (
+                    <div className="grid h-full w-full grid-cols-2 gap-1 p-1">
+                      {imagePreviewUrls.slice(0, 4).map((url, index) => (
+                        <Image
+                          key={url}
+                          src={url}
+                          alt={imageAlt || `${t("listingForm.imageSection")} ${index + 1}`}
+                          width={160}
+                          height={160}
+                          className="h-full w-full rounded-xl object-cover"
+                        />
+                      ))}
+                    </div>
                   ) : (
                     <span className="text-sm font-black text-[#9ca3af]">{t("listingForm.noImage")}</span>
                   )}
@@ -633,10 +644,16 @@ export default function CreateListingForm({
                 <div className="space-y-3">
                   <input
                     type="file"
+                    multiple
                     accept="image/png,image/jpeg,image/webp"
                     onChange={handleImageChange}
                     className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-sm font-bold file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--gg-accent)] file:px-3 file:py-2 file:text-sm file:font-black file:text-[var(--gg-inverse-text)]"
                   />
+                  {selectedImages.length > 0 ? (
+                    <p className="text-xs font-black text-[var(--gg-muted)]">
+                      {selectedImages.map((file) => file.name).join(", ")}
+                    </p>
+                  ) : null}
                   <input
                     value={imageAlt}
                     onChange={(event) => setImageAlt(event.target.value)}

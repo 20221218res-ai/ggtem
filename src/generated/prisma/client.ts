@@ -117,6 +117,11 @@ export type ListingInventory = Prisma.ListingInventoryModel
  */
 export type BuyRequest = Prisma.BuyRequestModel
 /**
+ * Model BuyRequestImage
+ * 
+ */
+export type BuyRequestImage = Prisma.BuyRequestImageModel
+/**
  * Model BuyRequestOffer
  * 
  */

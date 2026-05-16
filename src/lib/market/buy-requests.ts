@@ -82,6 +82,10 @@ export type MarketplaceBuyRequestSummary = {
   categoryLabel: string;
   title: string | null;
   description: string | null;
+  contentImages: Array<{
+    imageUrl: string;
+    altText: string | null;
+  }>;
   accountTransferType: string | null;
   accountRank: string | null;
   tradeMode: string;
@@ -217,6 +221,10 @@ type BuyRequestRow = {
       id: string;
       title: string;
     } | null;
+  }>;
+  images?: Array<{
+    imageUrl: string;
+    altText: string | null;
   }>;
   _count?: {
     offers: number;
@@ -422,6 +430,15 @@ export async function getMarketplaceBuyRequests(
           displayName: true,
         },
       },
+      images: {
+        select: {
+          imageUrl: true,
+          altText: true,
+        },
+        orderBy: {
+          sortOrder: "asc",
+        },
+      },
       _count: {
         select: {
           offers: true,
@@ -574,6 +591,15 @@ export async function getMarketplaceMyBuyRequests(): Promise<MarketplaceMyBuyReq
             createdAt: "desc",
           },
           take: 10,
+        },
+        images: {
+          select: {
+            imageUrl: true,
+            altText: true,
+          },
+          orderBy: {
+            sortOrder: "asc",
+          },
         },
         _count: {
           select: {
@@ -1767,6 +1793,11 @@ function mapBuyRequestSummary({
     categoryLabel: getCategoryLabel(request.category),
     title: request.title,
     description: request.description,
+    contentImages:
+      request.images?.map((image) => ({
+        imageUrl: image.imageUrl,
+        altText: image.altText ?? null,
+      })) ?? [],
     accountTransferType: request.accountTransferType,
     accountRank: request.accountRank,
     tradeMode: request.tradeMode ?? "BULK",

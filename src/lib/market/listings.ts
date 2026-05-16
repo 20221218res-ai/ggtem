@@ -63,7 +63,10 @@ export type MarketplaceListingDetail = MarketplaceListingSummary & {
   status: string;
   gameName: string;
   sellerId: string;
-  primaryImageAlt: string | null;
+  contentImages: Array<{
+    imageUrl: string;
+    altText: string | null;
+  }>;
   sellerRecentReviews: SellerRecentReview[];
   relatedListings: MarketplaceListingSummary[];
 };
@@ -495,7 +498,7 @@ export async function getMarketplaceListings(
       listingId: listing.id,
       sellerId: listing.sellerId,
       title: listing.title,
-      primaryImageUrl: listing.images[0]?.imageUrl ?? null,
+      primaryImageUrl: null,
       sellerName: listing.seller.displayName,
       sellerReviewSummary: getSellerReviewSummary(
         sellerReviewSummaries,
@@ -726,7 +729,6 @@ export async function getMarketplaceListingDetail(
         orderBy: {
           sortOrder: "asc",
         },
-        take: 1,
       },
     },
   });
@@ -873,7 +875,7 @@ export async function getMarketplaceListingDetail(
   return {
     listingId: listing.id,
     title: listing.title,
-    primaryImageUrl: listing.images[0]?.imageUrl ?? null,
+    primaryImageUrl: null,
     sellerName: listing.seller.displayName,
     sellerReviewSummary: getSellerReviewSummary(
       sellerReviewSummaries,
@@ -905,7 +907,10 @@ export async function getMarketplaceListingDetail(
     gameImageUrl: listing.game.imageUrl,
     gameLocalizedNames: mapGameLocalizedNames(listing.game),
     moneyUnitName: getGameMoneyUnitName(listing.game.moneyUnitName, listing.game.name),
-    primaryImageAlt: listing.images[0]?.altText ?? null,
+    contentImages: listing.images.map((image) => ({
+      imageUrl: image.imageUrl,
+      altText: image.altText ?? null,
+    })),
     serverName: listing.server?.name ?? null,
     serverDetail: listing.serverDetail ?? null,
     sellerRecentReviews: sellerRecentReviews.map((review) => ({
@@ -920,7 +925,7 @@ export async function getMarketplaceListingDetail(
       listingId: item.id,
       sellerId: item.sellerId,
       title: item.title,
-      primaryImageUrl: item.images[0]?.imageUrl ?? null,
+      primaryImageUrl: null,
       sellerName: item.seller.displayName,
       sellerReviewSummary: getSellerReviewSummary(
         sellerReviewSummaries,

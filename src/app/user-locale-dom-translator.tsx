@@ -101,7 +101,7 @@ const phraseMap: Record<string, PhraseMap> = {
   "등록한 글 보기": { CN: "查看已发布", VN: "Xem bai da dang", PH: "View post", TH: "ดูโพสต์" },
   "판매글 수정": { CN: "编辑出售", VN: "Sua bai ban", PH: "Edit sell post", TH: "แก้ไขโพสต์ขาย" },
   "변경사항 저장": { CN: "保存修改", VN: "Luu thay doi", PH: "Save changes", TH: "บันทึก" },
-  "대표 이미지": { CN: "代表图片", VN: "Anh dai dien", PH: "Main image", TH: "รูปหลัก" },
+  "본문 이미지": { CN: "正文图片", VN: "Anh noi dung", PH: "Content images", TH: "รูปภาพเนื้อหา" },
   "이미지 저장": { CN: "保存图片", VN: "Luu anh", PH: "Save image", TH: "บันทึกรูป" },
   "이미지 삭제": { CN: "删除图片", VN: "Xoa anh", PH: "Delete image", TH: "ลบรูป" },
   "제목": { CN: "标题", VN: "Tieu de", PH: "Title", TH: "ชื่อเรื่อง" },

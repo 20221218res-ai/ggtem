@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { FormEvent, ReactNode } from "react";
+import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import type { TranslationKey } from "@/app/i18n";
 import useCountryTranslation from "@/app/use-country-translation";
@@ -18,6 +19,9 @@ import {
 
 type ListingCategory = "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
 type TFunction = (key: TranslationKey) => string;
+
+const BUY_REQUEST_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+const BUY_REQUEST_IMAGE_ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 export default function CreateBuyRequestForm({
   currency,
@@ -61,6 +65,8 @@ export default function CreateBuyRequestForm({
   const [accountMemo, setAccountMemo] = useState("");
   const [buyerGameNickname, setBuyerGameNickname] = useState("");
   const [premiumDurationHours, setPremiumDurationHours] = useState("0");
+  const [imageAlt, setImageAlt] = useState("");
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [createdBuyRequestId, setCreatedBuyRequestId] = useState<string | null>(null);
@@ -87,6 +93,10 @@ export default function CreateBuyRequestForm({
     [availableServers, serverId],
   );
   const hasSelectableCatalog = games.length > 0 && availableServers.length > 0;
+  const imagePreviewUrls = useMemo(
+    () => selectedImages.map((file) => URL.createObjectURL(file)),
+    [selectedImages],
+  );
   const isGameMoneyRequest = category === "GAME_MONEY";
   const quantityInput = isAccountRequest ? "1" : quantity;
   const minimumQuantityInput = isAccountRequest ? "1" : minimumQuantity;
@@ -156,6 +166,38 @@ export default function CreateBuyRequestForm({
       window.removeEventListener("storage", handleCountryChange);
     };
   }, []);
+
+  useEffect(() => {
+    return () => {
+      imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [imagePreviewUrls]);
+
+  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    setError("");
+    const files = Array.from(event.target.files ?? []);
+
+    if (files.length === 0) {
+      setSelectedImages([]);
+      return;
+    }
+
+    if (files.some((file) => !BUY_REQUEST_IMAGE_ALLOWED_TYPES.includes(file.type))) {
+      setSelectedImages([]);
+      event.target.value = "";
+      setError(t("listingForm.imageTypeError"));
+      return;
+    }
+
+    if (files.some((file) => file.size > BUY_REQUEST_IMAGE_MAX_BYTES)) {
+      setSelectedImages([]);
+      event.target.value = "";
+      setError(t("listingForm.imageSizeError"));
+      return;
+    }
+
+    setSelectedImages(files);
+  }
 
   function handleCategoryChange(nextCategory: ListingCategory) {
     setCategory(nextCategory);
@@ -324,6 +366,28 @@ export default function CreateBuyRequestForm({
 
       if (!response.ok) {
         throw new Error(getApiMessage(result, t, "listingForm.buyFailed"));
+      }
+
+      if (result.buyRequestId) {
+        for (const selectedImage of selectedImages) {
+          const formData = new FormData();
+          formData.set("buyRequestId", result.buyRequestId);
+          formData.set("altText", imageAlt);
+          formData.set("image", selectedImage);
+
+          const imageResponse = await fetch("/api/market/buy-request-images", {
+            method: "POST",
+            body: formData,
+          });
+          const imageResult = (await imageResponse.json()) as {
+            message?: string;
+            messageKey?: TranslationKey;
+          };
+
+          if (!imageResponse.ok) {
+            throw new Error(getApiMessage(imageResult, t, "listingForm.imageUploadFailed"));
+          }
+        }
       }
 
       setCreatedBuyRequestId(result.buyRequestId ?? null);
@@ -556,6 +620,50 @@ export default function CreateBuyRequestForm({
                 </select>
               </FieldLabel>
             </FormBlock>
+
+            <details className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5">
+              <summary className="cursor-pointer text-xl font-black">{t("listingForm.imageSection")}</summary>
+              <div className="mt-4 grid gap-3 md:grid-cols-[160px_1fr]">
+                <div className="flex h-40 items-center justify-center overflow-hidden rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)]">
+                  {imagePreviewUrls.length > 0 ? (
+                    <div className="grid h-full w-full grid-cols-2 gap-1 p-1">
+                      {imagePreviewUrls.slice(0, 4).map((url, index) => (
+                        <Image
+                          key={url}
+                          src={url}
+                          alt={imageAlt || `${t("listingForm.imageSection")} ${index + 1}`}
+                          width={160}
+                          height={160}
+                          className="h-full w-full rounded-xl object-cover"
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-sm font-black text-[#9ca3af]">{t("listingForm.noImage")}</span>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={handleImageChange}
+                    className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-sm font-bold file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--gg-accent)] file:px-3 file:py-2 file:text-sm file:font-black file:text-[var(--gg-inverse-text)]"
+                  />
+                  {selectedImages.length > 0 ? (
+                    <p className="text-xs font-black text-[var(--gg-muted)]">
+                      {selectedImages.map((file) => file.name).join(", ")}
+                    </p>
+                  ) : null}
+                  <input
+                    value={imageAlt}
+                    onChange={(event) => setImageAlt(event.target.value)}
+                    placeholder={t("listingForm.imageAltPlaceholder")}
+                    className="w-full rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                  />
+                </div>
+              </div>
+            </details>
 
             <div className="flex justify-end">
               <button

@@ -66,6 +66,7 @@ export const ModelName = {
   ListingImage: 'ListingImage',
   ListingInventory: 'ListingInventory',
   BuyRequest: 'BuyRequest',
+  BuyRequestImage: 'BuyRequestImage',
   BuyRequestOffer: 'BuyRequestOffer',
   Order: 'Order',
   OrderAccountCredential: 'OrderAccountCredential',
@@ -358,6 +359,20 @@ export const BuyRequestScalarFieldEnum = {
 } as const
 
 export type BuyRequestScalarFieldEnum = (typeof BuyRequestScalarFieldEnum)[keyof typeof BuyRequestScalarFieldEnum]
+
+
+export const BuyRequestImageScalarFieldEnum = {
+  id: 'id',
+  buyRequestId: 'buyRequestId',
+  imageUrl: 'imageUrl',
+  storagePath: 'storagePath',
+  altText: 'altText',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BuyRequestImageScalarFieldEnum = (typeof BuyRequestImageScalarFieldEnum)[keyof typeof BuyRequestImageScalarFieldEnum]
 
 
 export const BuyRequestOfferScalarFieldEnum = {

@@ -338,7 +338,7 @@ export async function getMarketplaceMyListings(): Promise<MarketplaceMyListingsV
       listingId: listing.id,
       title: listing.title,
       status: listing.status,
-      primaryImageUrl: listing.images[0]?.imageUrl ?? null,
+      primaryImageUrl: null,
       gameName: listing.game.name,
       serverName: listing.server?.name ?? null,
       category: listing.category,
@@ -1211,13 +1211,8 @@ export async function uploadMarketplaceSellerListingImage(input: {
     const publicImageUrl = `/uploads/listings/${nextFileName}`;
     await writeFile(absoluteStoragePath, input.bytes);
 
-    const previousImages = listing.images;
-
-    await tx.listingImage.deleteMany({
-      where: {
-        listingId: listing.id,
-      },
-    });
+    const nextSortOrder =
+      listing.images.reduce((max, image) => Math.max(max, image.sortOrder), -1) + 1;
 
     await tx.listingImage.create({
       data: {
@@ -1225,25 +1220,15 @@ export async function uploadMarketplaceSellerListingImage(input: {
         imageUrl: publicImageUrl,
         storagePath: absoluteStoragePath,
         altText: trimmedAltText,
-        sortOrder: 0,
+        sortOrder: nextSortOrder,
       },
     });
-
-    await Promise.all(
-      previousImages.map(async (image) => {
-        try {
-          await unlink(image.storagePath);
-        } catch {
-          return;
-        }
-      }),
-    );
 
     return {
       listingId: listing.id,
       imageUrl: publicImageUrl,
       altText: trimmedAltText,
-      message: "판매글 이미지가 수정되었습니다.",
+      message: "본문 이미지가 추가되었습니다.",
     };
   });
 }

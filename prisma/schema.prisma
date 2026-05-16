@@ -420,6 +420,7 @@ model BuyRequest {
   updatedAt           DateTime         @updatedAt
   buyer               User             @relation("BuyerBuyRequests", fields: [buyerId], references: [id])
   offers              BuyRequestOffer[]
+  images              BuyRequestImage[]
 
   @@index([buyerId, status])
   @@index([gameId, serverId, category, status])
@@ -430,6 +431,20 @@ model BuyRequest {
   @@index([status, category, createdAt], map: "BuyRequest_status_category_created_idx")
   @@index([status, gameId, serverId, category, createdAt], map: "BuyRequest_active_filter_created_idx")
   @@index([premiumEndsAt])
+}
+
+model BuyRequestImage {
+  id           String     @id @default(cuid())
+  buyRequestId String
+  imageUrl     String
+  storagePath  String
+  altText      String?
+  sortOrder    Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  buyRequest   BuyRequest @relation(fields: [buyRequestId], references: [id], onDelete: Cascade)
+
+  @@index([buyRequestId, sortOrder])
 }
 
 model BuyRequestOffer {

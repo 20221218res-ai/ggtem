@@ -85,24 +85,7 @@ export default async function ListingDetailPage({
         <section className="grid gap-5 xl:grid-cols-[1fr_390px]">
           <div className="grid gap-5">
             <section className="overflow-hidden rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] shadow-sm shadow-[var(--gg-shadow)]">
-              <div className="grid gap-0 lg:grid-cols-[300px_1fr]">
-                <div className="min-h-[260px] border-b border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)] lg:border-b-0 lg:border-r">
-                  {listing.primaryImageUrl ? (
-                    <Image
-                      src={listing.primaryImageUrl}
-                      alt={listing.primaryImageAlt || listing.title}
-                      width={640}
-                      height={640}
-                      className="h-full min-h-[260px] w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full min-h-[260px] items-center justify-center text-5xl font-black text-[var(--gg-subtle)]">
-                      GG
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-6">
+              <div className="p-6">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge>
                       <CategoryName category={listing.category} />
@@ -142,7 +125,6 @@ export default async function ListingDetailPage({
                     <Metric label={<CountryText id="listingDetail.minimumQuantity" />} value={minimumQuantityLabel} />
                     <Metric label={<CountryText id="listingDetail.availableQuantity" />} value={availableQuantityLabel} />
                   </div>
-                </div>
               </div>
             </section>
 
@@ -219,6 +201,24 @@ export default async function ListingDetailPage({
                   <CountryText id="listingDetail.defaultDescription" />
                 )}
               </div>
+              {listing.contentImages.length > 0 ? (
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  {listing.contentImages.map((image, index) => (
+                    <div
+                      key={`${image.imageUrl}-${index}`}
+                      className="overflow-hidden rounded-2xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)]"
+                    >
+                      <Image
+                        src={image.imageUrl}
+                        alt={image.altText || listing.title}
+                        width={960}
+                        height={640}
+                        className="h-auto w-full object-contain"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </section>
 
             <details className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-6">

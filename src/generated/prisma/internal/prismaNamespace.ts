@@ -399,6 +399,7 @@ export const ModelName = {
   ListingImage: 'ListingImage',
   ListingInventory: 'ListingInventory',
   BuyRequest: 'BuyRequest',
+  BuyRequestImage: 'BuyRequestImage',
   BuyRequestOffer: 'BuyRequestOffer',
   Order: 'Order',
   OrderAccountCredential: 'OrderAccountCredential',
@@ -437,7 +438,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "loginAttempt" | "passwordResetToken" | "emailVerificationToken" | "emailVerificationLoginToken" | "adminInviteToken" | "wallet" | "walletLedgerEntry" | "game" | "gameServer" | "listing" | "listingImage" | "listingInventory" | "buyRequest" | "buyRequestOffer" | "order" | "orderAccountCredential" | "chatRoom" | "chatMessage" | "orderEvent" | "orderReview" | "orderReviewModeration" | "depositRequest" | "depositWalletAddress" | "withdrawalRequest" | "withdrawalLog" | "adminAuditLog" | "cmsDocument" | "cmsDocumentVersion" | "supportInquiry" | "adminSlaIncident" | "adminSlaIncidentNote" | "adminFinanceCloseReport" | "trustReport" | "adminUserNote" | "adminGameNote" | "notification"
+    modelProps: "user" | "session" | "loginAttempt" | "passwordResetToken" | "emailVerificationToken" | "emailVerificationLoginToken" | "adminInviteToken" | "wallet" | "walletLedgerEntry" | "game" | "gameServer" | "listing" | "listingImage" | "listingInventory" | "buyRequest" | "buyRequestImage" | "buyRequestOffer" | "order" | "orderAccountCredential" | "chatRoom" | "chatMessage" | "orderEvent" | "orderReview" | "orderReviewModeration" | "depositRequest" | "depositWalletAddress" | "withdrawalRequest" | "withdrawalLog" | "adminAuditLog" | "cmsDocument" | "cmsDocumentVersion" | "supportInquiry" | "adminSlaIncident" | "adminSlaIncidentNote" | "adminFinanceCloseReport" | "trustReport" | "adminUserNote" | "adminGameNote" | "notification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1548,6 +1549,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.BuyRequestCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.BuyRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    BuyRequestImage: {
+      payload: Prisma.$BuyRequestImagePayload<ExtArgs>
+      fields: Prisma.BuyRequestImageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BuyRequestImageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BuyRequestImagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BuyRequestImageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BuyRequestImagePayload>
+        }
+        findFirst: {
+          args: Prisma.BuyRequestImageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BuyRequestImagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BuyRequestImageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BuyRequestImagePayload>
+        }
+        findMany: {
+          args: Prisma.BuyRequestImageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BuyRequestImagePayload>[]
+        }
+        create: {
+          args: Prisma.BuyRequestImageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BuyRequestImagePayload>
+        }
+        createMany: {
+          args: Prisma.BuyRequestImageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BuyRequestImageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BuyRequestImagePayload>[]
+        }
+        delete: {
+          args: Prisma.BuyRequestImageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BuyRequestImagePayload>
+        }
+        update: {
+          args: Prisma.BuyRequestImageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BuyRequestImagePayload>
+        }
+        deleteMany: {
+          args: Prisma.BuyRequestImageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BuyRequestImageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BuyRequestImageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BuyRequestImagePayload>[]
+        }
+        upsert: {
+          args: Prisma.BuyRequestImageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BuyRequestImagePayload>
+        }
+        aggregate: {
+          args: Prisma.BuyRequestImageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBuyRequestImage>
+        }
+        groupBy: {
+          args: Prisma.BuyRequestImageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BuyRequestImageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BuyRequestImageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BuyRequestImageCountAggregateOutputType> | number
         }
       }
     }
@@ -3545,6 +3620,20 @@ export const BuyRequestScalarFieldEnum = {
 export type BuyRequestScalarFieldEnum = (typeof BuyRequestScalarFieldEnum)[keyof typeof BuyRequestScalarFieldEnum]
 
 
+export const BuyRequestImageScalarFieldEnum = {
+  id: 'id',
+  buyRequestId: 'buyRequestId',
+  imageUrl: 'imageUrl',
+  storagePath: 'storagePath',
+  altText: 'altText',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BuyRequestImageScalarFieldEnum = (typeof BuyRequestImageScalarFieldEnum)[keyof typeof BuyRequestImageScalarFieldEnum]
+
+
 export const BuyRequestOfferScalarFieldEnum = {
   id: 'id',
   buyRequestId: 'buyRequestId',
@@ -4380,6 +4469,7 @@ export type GlobalOmitConfig = {
   listingImage?: Prisma.ListingImageOmit
   listingInventory?: Prisma.ListingInventoryOmit
   buyRequest?: Prisma.BuyRequestOmit
+  buyRequestImage?: Prisma.BuyRequestImageOmit
   buyRequestOffer?: Prisma.BuyRequestOfferOmit
   order?: Prisma.OrderOmit
   orderAccountCredential?: Prisma.OrderAccountCredentialOmit

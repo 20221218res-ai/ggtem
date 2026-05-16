@@ -269,7 +269,7 @@ function BuyRequestRow({ request }: { request: MyBuyRequest }) {
             <CountryText id="manage.viewConditionsOffers" />
           </summary>
 
-          {request.description || accountTransferTypeLabel || request.accountRank ? (
+          {request.description || accountTransferTypeLabel || request.accountRank || request.contentImages.length > 0 ? (
             <div className="mt-4 rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)] p-4 text-sm font-bold leading-6 text-[var(--gg-muted)]">
               {accountTransferTypeLabel ? (
                 <p>
@@ -287,6 +287,22 @@ function BuyRequestRow({ request }: { request: MyBuyRequest }) {
                   multiline
                   className="mt-2 whitespace-pre-wrap"
                 />
+              ) : null}
+              {request.contentImages.length > 0 ? (
+                <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                  {request.contentImages.map((image, index) => (
+                    <div
+                      key={`${image.imageUrl}-${index}`}
+                      className="overflow-hidden rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-card-bg)]"
+                    >
+                      <img
+                        src={image.imageUrl}
+                        alt={image.altText || request.title || "Buy request image"}
+                        className="h-28 w-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
               ) : null}
             </div>
           ) : null}
@@ -376,9 +392,10 @@ function BuyRequestTitle({ request }: { request: MyBuyRequest }) {
 
 function hasMoreDetail(request: MyBuyRequest) {
   return Boolean(
-    request.description ||
+      request.description ||
       request.accountTransferType ||
       request.accountRank ||
+      request.contentImages.length > 0 ||
       (request.offers && request.offers.length > 0),
   );
 }
