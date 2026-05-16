@@ -10,6 +10,7 @@ import CountryText from "../country-text";
 import LocalizedInput from "../localized-input";
 import SignOutButton from "../sign-out-button";
 import type { TranslationKey } from "../i18n";
+import { getDefaultHeaderCounts, loadHeaderCounts, type HeaderCounts } from "../header-counts-client";
 
 export type MyNavigationLink = {
   href: string;
@@ -17,11 +18,6 @@ export type MyNavigationLink = {
   descriptionKey: TranslationKey;
   groupKey: TranslationKey;
   badgeCount?: number;
-};
-
-type NavigationCounts = {
-  unreadChatCount: number;
-  unreadNotificationCount: number;
 };
 
 const categoryLinks: Array<{ href: string; labelKey: TranslationKey }> = [
@@ -34,48 +30,32 @@ const categoryLinks: Array<{ href: string; labelKey: TranslationKey }> = [
 export default function MyNavigation({
   links,
   displayName,
+  userKey,
 }: {
   links: MyNavigationLink[];
   displayName: string;
+  userKey: string;
 }) {
   const pathname = usePathname();
-  const [counts, setCounts] = useState<NavigationCounts>({
-    unreadChatCount: 0,
-    unreadNotificationCount: 0,
-  });
+  const [counts, setCounts] = useState<HeaderCounts>(() => getDefaultHeaderCounts());
 
   useEffect(() => {
     let isActive = true;
 
-    async function loadNavigationCounts() {
-      try {
-        const response = await fetch("/api/user/header-counts", {
-          cache: "no-store",
-        });
+    async function refreshNavigationCounts() {
+      const data = await loadHeaderCounts(userKey);
 
-        if (!response.ok) {
-          return;
-        }
-
-        const data = (await response.json()) as NavigationCounts;
-
-        if (isActive) {
-          setCounts({
-            unreadChatCount: data.unreadChatCount ?? 0,
-            unreadNotificationCount: data.unreadNotificationCount ?? 0,
-          });
-        }
-      } catch {
-        // Navigation badges should never block the my-page shell.
+      if (isActive) {
+        setCounts(data);
       }
     }
 
-    void loadNavigationCounts();
+    void refreshNavigationCounts();
 
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [userKey]);
 
   return (
     <header className="sticky top-0 z-40 overflow-x-clip border-b border-[var(--gg-border-soft)] bg-white/95 shadow-sm shadow-[var(--gg-shadow)] backdrop-blur">

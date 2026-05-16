@@ -9,6 +9,11 @@ import MarketplaceAccountMenu from "./marketplace-account-menu";
 import SignOutButton from "./sign-out-button";
 import useCountryTranslation from "./use-country-translation";
 import type { TranslationKey } from "./i18n";
+import {
+  getDefaultHeaderCounts,
+  loadHeaderCounts,
+  type HeaderCounts,
+} from "./header-counts-client";
 
 const categories = [
   { href: "/listings?category=GAME_MONEY", labelKey: "common.gameMoney" },
@@ -24,63 +29,30 @@ type UserMarketHeaderClientProps = {
   } | null;
 };
 
-type HeaderCounts = {
-  unreadChatCount: number;
-  unreadNotificationCount: number;
-  walletAvailableBalance: string;
-  walletCurrency: string;
-};
-
 export default function UserMarketHeaderClient({
   currentUser,
 }: UserMarketHeaderClientProps) {
   const { t } = useCountryTranslation();
-  const [counts, setCounts] = useState<HeaderCounts>({
-    unreadChatCount: 0,
-    unreadNotificationCount: 0,
-    walletAvailableBalance: "0",
-    walletCurrency: "USDT",
-  });
+  const [counts, setCounts] = useState<HeaderCounts>(() => getDefaultHeaderCounts());
 
   useEffect(() => {
     if (!currentUser) {
-      setCounts({
-        unreadChatCount: 0,
-        unreadNotificationCount: 0,
-        walletAvailableBalance: "0",
-        walletCurrency: "USDT",
-      });
+      setCounts(getDefaultHeaderCounts());
       return;
     }
 
     let isActive = true;
+    const userEmail = currentUser.email;
 
-    async function loadHeaderCounts() {
-      try {
-        const response = await fetch("/api/user/header-counts", {
-          cache: "no-store",
-        });
+    async function refreshHeaderCounts() {
+      const data = await loadHeaderCounts(userEmail);
 
-        if (!response.ok) {
-          return;
-        }
-
-        const data = (await response.json()) as HeaderCounts;
-
-        if (isActive) {
-          setCounts({
-            unreadChatCount: data.unreadChatCount ?? 0,
-            unreadNotificationCount: data.unreadNotificationCount ?? 0,
-            walletAvailableBalance: data.walletAvailableBalance ?? "0",
-            walletCurrency: data.walletCurrency ?? "USDT",
-          });
-        }
-      } catch {
-        // Counts are non-critical; the header should never block page navigation.
+      if (isActive) {
+        setCounts(data);
       }
     }
 
-    void loadHeaderCounts();
+    void refreshHeaderCounts();
 
     return () => {
       isActive = false;

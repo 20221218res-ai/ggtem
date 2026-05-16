@@ -97,7 +97,7 @@ export default async function MyLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[var(--gg-page-bg)] text-[var(--gg-text)] transition-colors">
-      <MyNavigation links={visibleLinks} displayName={currentUser.displayName} />
+      <MyNavigation links={visibleLinks} displayName={currentUser.displayName} userKey={currentUser.email} />
       {children}
     </div>
   );

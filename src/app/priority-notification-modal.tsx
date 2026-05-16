@@ -18,6 +18,7 @@ type NotificationsResponse = {
 };
 
 const DISMISSED_STORAGE_KEY = "ggtem-dismissed-priority-notification";
+const INITIAL_CHECK_DELAY_MS = 6_000;
 const ACTIVE_CHECK_INTERVAL_MS = 45_000;
 const DISMISSED_CHECK_INTERVAL_MS = 90_000;
 
@@ -92,7 +93,7 @@ export default function PriorityNotificationModal() {
       }
     }
 
-    void loadPriorityNotification();
+    scheduleNextCheck(INITIAL_CHECK_DELAY_MS);
 
     return () => {
       isActive = false;
