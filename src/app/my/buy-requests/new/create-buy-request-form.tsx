@@ -67,6 +67,7 @@ export default function CreateBuyRequestForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [countryCode, setCountryCode] = useState(() => getCurrentCountryCode());
   const [flowStep, setFlowStep] = useState(1);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
 
   const isAccountRequest = category === "GAME_ACCOUNT";
   const selectedGame = useMemo(
@@ -131,6 +132,19 @@ export default function CreateBuyRequestForm({
   const selectedGameName = selectedGame
     ? getLocalizedGameName(selectedGame.name, selectedGame.localizedNames, countryCode)
     : "GGtem";
+  const finalSummaryRows: Array<[string, string]> = [
+    [t("listingForm.summaryCategory"), categoryLabel(category, t)],
+    [t("listingForm.summaryGameServer"), `${selectedGameName} / ${formatServerLabel(selectedServer?.name ?? "-", serverDetail)}`],
+    [t("listingForm.summaryTradeMode"), category === "GAME_MONEY" ? (tradeMode === "BULK" ? t("listingForm.bulkBuy") : t("listingForm.splitBuy")) : categoryLabel(category, t)],
+    [t("listingForm.summarySelectedUnit"), selectedPriceUnitLabel || "-"],
+    [t("listingForm.summaryInputQuantity"), category === "GAME_MONEY" ? `${quantityInput} x ${selectedPriceUnitLabel}` : quantityInput],
+    [t("listingForm.summaryActualStoredQuantity"), requestQuantity || "-"],
+    [t("listingForm.summaryMinimumQuantity"), category === "GAME_MONEY" ? (tradeMode === "BULK" ? requestQuantity : requestMinimumQuantity) : requestQuantity],
+    [t("listingForm.summaryUnitPrice"), `${unitPrice} ${currency}`],
+    [t("listingForm.reserveAmount"), `${totalAmount} ${currency}`],
+    [t("listingForm.summaryPremium"), premiumFee > 0 ? `${premiumDurationHours}${t("listingForm.hoursSuffix")} / ${premiumFee} ${currency}` : t("listingForm.premiumDisabled")],
+    [t("listingForm.totalDebitExpected"), `${requiredBalance} ${currency}`],
+  ];
 
   useEffect(() => {
     const handleCountryChange = () => setCountryCode(getCurrentCountryCode());
@@ -151,6 +165,7 @@ export default function CreateBuyRequestForm({
     setError("");
     setSuccess("");
     setCreatedBuyRequestId(null);
+    setIsReviewOpen(false);
 
     if (nextCategory === "GAME_ACCOUNT") {
       setAccountTransferType("GOOGLE");
@@ -235,11 +250,26 @@ export default function CreateBuyRequestForm({
     return "";
   }
 
+  function openFinalReview() {
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      setSuccess("");
+      return;
+    }
+
+    setError("");
+    setSuccess("");
+    setFlowStep(4);
+    setIsReviewOpen(true);
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setSuccess("");
     setCreatedBuyRequestId(null);
+    setIsReviewOpen(false);
 
     const validationError = validateForm();
     if (validationError) {
@@ -606,7 +636,7 @@ export default function CreateBuyRequestForm({
             <div className="flex justify-end">
               <button
                 type="button"
-                onClick={() => setFlowStep(5)}
+                onClick={openFinalReview}
                 className="rounded-2xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
               >
                 {t("listingForm.nextFinalReview")}
@@ -614,28 +644,6 @@ export default function CreateBuyRequestForm({
             </div>
           </div>
         </Panel>
-        ) : null}
-
-        {flowStep < 5 ? <LockedStepHint step={5} title={t("listingForm.finalReviewLockedTitle")} t={t} /> : null}
-
-        {flowStep >= 5 ? (
-          <Panel step={5} title={t("listingForm.finalReviewTitle")} description={t("listingForm.buyFinalReviewDescription")}>
-            <FinalSummary
-              rows={[
-                [t("listingForm.summaryCategory"), categoryLabel(category, t)],
-                [t("listingForm.summaryGameServer"), `${selectedGameName} / ${formatServerLabel(selectedServer?.name ?? "-", serverDetail)}`],
-                [t("listingForm.summaryTradeMode"), category === "GAME_MONEY" ? (tradeMode === "BULK" ? t("listingForm.bulkBuy") : t("listingForm.splitBuy")) : categoryLabel(category, t)],
-                [t("listingForm.summarySelectedUnit"), selectedPriceUnitLabel || "-"],
-                [t("listingForm.summaryInputQuantity"), category === "GAME_MONEY" ? `${quantityInput} x ${selectedPriceUnitLabel}` : quantityInput],
-                [t("listingForm.summaryActualStoredQuantity"), requestQuantity || "-"],
-                [t("listingForm.summaryMinimumQuantity"), category === "GAME_MONEY" ? (tradeMode === "BULK" ? requestQuantity : requestMinimumQuantity) : requestQuantity],
-                [t("listingForm.summaryUnitPrice"), `${unitPrice} ${currency}`],
-                [t("listingForm.reserveAmount"), `${totalAmount} ${currency}`],
-                [t("listingForm.summaryPremium"), premiumFee > 0 ? `${premiumDurationHours}${t("listingForm.hoursSuffix")} / ${premiumFee} ${currency}` : t("listingForm.premiumDisabled")],
-                [t("listingForm.totalDebitExpected"), `${requiredBalance} ${currency}`],
-              ]}
-            />
-          </Panel>
         ) : null}
       </section>
 
@@ -671,11 +679,12 @@ export default function CreateBuyRequestForm({
 
         <div className="grid gap-2">
           <button
-            type="submit"
-            disabled={isSubmitting || !canReserveBalance || !hasSelectableCatalog || flowStep < 5}
+            type="button"
+            onClick={openFinalReview}
+            disabled={isSubmitting || !canReserveBalance || !hasSelectableCatalog || flowStep < 4}
             className="rounded-2xl bg-[var(--gg-accent)] px-5 py-4 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:bg-[#c7d2fe]"
           >
-            {isSubmitting ? t("listingForm.creating") : t("listingForm.createBuy")}
+            {t("listingForm.nextFinalReview")}
           </button>
           <button
             type="button"
@@ -694,6 +703,16 @@ export default function CreateBuyRequestForm({
           ) : null}
         </div>
       </aside>
+      <FinalReviewModal
+        isOpen={isReviewOpen}
+        title={t("listingForm.finalReviewTitle")}
+        description={t("listingForm.buyFinalReviewDescription")}
+        rows={finalSummaryRows}
+        confirmLabel={isSubmitting ? t("listingForm.creating") : t("listingForm.createBuy")}
+        cancelLabel={t("common.cancel")}
+        isSubmitting={isSubmitting}
+        onClose={() => setIsReviewOpen(false)}
+      />
     </form>
   );
 }
@@ -769,12 +788,11 @@ function StepFlowGuide({ currentStep }: { currentStep: number }) {
     t("listingForm.stepGameServer"),
     t("listingForm.stepTradeQuantity"),
     t("listingForm.stepContentPremium"),
-    t("listingForm.stepFinalReview"),
   ];
 
   return (
     <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 shadow-sm shadow-[var(--gg-shadow)]">
-      <div className="grid gap-3 sm:grid-cols-5">
+      <div className="grid gap-3 sm:grid-cols-4">
         {steps.map((step, index) => {
           const stepNumber = index + 1;
           const isActive = stepNumber <= currentStep;
@@ -838,6 +856,68 @@ function FinalSummary({ rows }: { rows: Array<[string, string]> }) {
           <p className="break-words text-sm font-black text-[var(--gg-text)]">{value}</p>
         </div>
       ))}
+    </div>
+  );
+}
+
+function FinalReviewModal({
+  isOpen,
+  title,
+  description,
+  rows,
+  confirmLabel,
+  cancelLabel,
+  isSubmitting,
+  onClose,
+}: {
+  isOpen: boolean;
+  title: string;
+  description: string;
+  rows: Array<[string, string]>;
+  confirmLabel: string;
+  cancelLabel: string;
+  isSubmitting: boolean;
+  onClose: () => void;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 px-4 py-6">
+      <div className="max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-2xl">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-black text-[var(--gg-text)]">{title}</h2>
+            <p className="mt-1 text-sm font-bold text-[var(--gg-muted)]">{description}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full border border-[var(--gg-border)] px-3 py-1 text-sm font-black"
+          >
+            ×
+          </button>
+        </div>
+        <div className="mt-5">
+          <FinalSummary rows={rows} />
+        </div>
+        <div className="mt-5 grid gap-2 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSubmitting}
+            className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-5 py-4 text-sm font-black hover:bg-[var(--gg-control-bg)] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {cancelLabel}
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="rounded-2xl bg-[var(--gg-accent)] px-5 py-4 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:bg-[#c7d2fe]"
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
