@@ -19,7 +19,11 @@ export async function POST(request: NextRequest) {
 
     if (!body.email || !body.password) {
       return NextResponse.json(
-        { code: "AUTH_EMAIL_PASSWORD_REQUIRED", message: "이메일과 비밀번호를 입력해 주세요." },
+        {
+          code: "AUTH_EMAIL_PASSWORD_REQUIRED",
+          message: "이메일과 비밀번호를 입력해 주세요.",
+          messageKey: "auth.emailPasswordRequired",
+        },
         { status: 400 },
       );
     }
@@ -35,6 +39,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       code: "AUTH_SIGN_IN_SUCCESS",
       message: "로그인되었습니다.",
+      messageKey: "auth.signInSuccess",
       role: user.role,
       redirectPath: getSignedInRedirectPath(user),
     });
@@ -44,6 +49,7 @@ export async function POST(request: NextRequest) {
         {
           code: error.code,
           message: error.message,
+          messageKey: "auth.emailVerificationRequiredTitle",
           email: error.email,
           verificationUrl: error.verificationUrl,
         },
@@ -55,6 +61,7 @@ export async function POST(request: NextRequest) {
       {
         code: getSignInErrorCode(error),
         message: error instanceof Error ? error.message : "로그인에 실패했습니다.",
+        messageKey: getSignInErrorMessageKey(error),
       },
       { status: 400 },
     );
@@ -99,4 +106,14 @@ function getSignInErrorCode(error: unknown) {
   }
 
   return "AUTH_SIGN_IN_FAILED";
+}
+
+function getSignInErrorMessageKey(error: unknown) {
+  const code = getSignInErrorCode(error);
+
+  if (code === "AUTH_ADMIN_NOT_ALLOWED_ON_MARKET") return "auth.adminNotAllowedOnMarket";
+  if (code === "AUTH_USER_NOT_ALLOWED_ON_ADMIN") return "auth.userNotAllowedOnAdmin";
+  if (code === "AUTH_ACCOUNT_UNAVAILABLE") return "auth.accountUnavailable";
+
+  return "auth.signInFailed";
 }

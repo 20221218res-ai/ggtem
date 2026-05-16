@@ -5,6 +5,7 @@ type TFunction = (key: TranslationKey) => string;
 type AuthApiResult = {
   code?: string;
   message?: string;
+  messageKey?: TranslationKey;
 };
 
 const authApiCodeToTranslationKey: Partial<Record<string, TranslationKey>> = {
@@ -36,6 +37,10 @@ export function getAuthApiMessage(
   t: TFunction,
   fallbackKey: TranslationKey,
 ) {
+  if (result.messageKey) {
+    return t(result.messageKey);
+  }
+
   const translationKey = result.code ? authApiCodeToTranslationKey[result.code] : undefined;
 
   if (translationKey) {
