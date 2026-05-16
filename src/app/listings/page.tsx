@@ -1087,7 +1087,7 @@ function BuyRequestRow({
               >
                 <img
                   src={image.imageUrl}
-                  alt={image.altText || request.title || "Buy request image"}
+                  alt={image.altText || request.title || request.gameName}
                   className="h-28 w-full object-cover"
                 />
               </div>
@@ -1108,6 +1108,12 @@ function BuyRequestRow({
             <CountryText id="listings.unitPriceShort" /> {priceDisplay.price} {request.currency} / {priceDisplay.unitLabel}
           </p>
         </div>
+        <Link
+          href={`/buy-requests/${request.buyRequestId}`}
+          className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-4 py-3 text-center text-sm font-black hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)]"
+        >
+          <CountryText id="orderManage.detail" />
+        </Link>
         <BuyRequestOfferForm
           buyRequestId={request.buyRequestId}
           category={request.category}

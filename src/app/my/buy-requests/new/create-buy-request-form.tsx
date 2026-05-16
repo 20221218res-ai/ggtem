@@ -21,6 +21,7 @@ type ListingCategory = "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
 type TFunction = (key: TranslationKey) => string;
 
 const BUY_REQUEST_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+const BUY_REQUEST_IMAGE_MAX_COUNT = 8;
 const BUY_REQUEST_IMAGE_ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 export default function CreateBuyRequestForm({
@@ -182,21 +183,36 @@ export default function CreateBuyRequestForm({
       return;
     }
 
-    if (files.some((file) => !BUY_REQUEST_IMAGE_ALLOWED_TYPES.includes(file.type))) {
+    if (files.length > BUY_REQUEST_IMAGE_MAX_COUNT) {
       setSelectedImages([]);
       event.target.value = "";
-      setError(t("listingForm.imageTypeError"));
+      setError(t("listingForm.imageMaxCountError").replace("{count}", String(BUY_REQUEST_IMAGE_MAX_COUNT)));
       return;
     }
 
-    if (files.some((file) => file.size > BUY_REQUEST_IMAGE_MAX_BYTES)) {
+    const invalidTypeFile = files.find((file) => !BUY_REQUEST_IMAGE_ALLOWED_TYPES.includes(file.type));
+    if (invalidTypeFile) {
       setSelectedImages([]);
       event.target.value = "";
-      setError(t("listingForm.imageSizeError"));
+      setError(`${invalidTypeFile.name}: ${t("listingForm.imageTypeError")}`);
+      return;
+    }
+
+    const oversizedFile = files.find((file) => file.size > BUY_REQUEST_IMAGE_MAX_BYTES);
+    if (oversizedFile) {
+      setSelectedImages([]);
+      event.target.value = "";
+      setError(`${oversizedFile.name}: ${t("listingForm.imageSizeError")}`);
       return;
     }
 
     setSelectedImages(files);
+  }
+
+  function removeSelectedImage(indexToRemove: number) {
+    setSelectedImages((currentImages) =>
+      currentImages.filter((_, index) => index !== indexToRemove),
+    );
   }
 
   function handleCategoryChange(nextCategory: ListingCategory) {
@@ -385,7 +401,9 @@ export default function CreateBuyRequestForm({
           };
 
           if (!imageResponse.ok) {
-            throw new Error(getApiMessage(imageResult, t, "listingForm.imageUploadFailed"));
+            throw new Error(
+              `${selectedImage.name}: ${getApiMessage(imageResult, t, "listingForm.imageUploadFailed")}`,
+            );
           }
         }
       }
@@ -651,9 +669,23 @@ export default function CreateBuyRequestForm({
                     className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-sm font-bold file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--gg-accent)] file:px-3 file:py-2 file:text-sm file:font-black file:text-[var(--gg-inverse-text)]"
                   />
                   {selectedImages.length > 0 ? (
-                    <p className="text-xs font-black text-[var(--gg-muted)]">
-                      {selectedImages.map((file) => file.name).join(", ")}
-                    </p>
+                    <div className="grid gap-2">
+                      {selectedImages.map((file, index) => (
+                        <div
+                          key={`${file.name}-${file.lastModified}-${index}`}
+                          className="flex items-center justify-between gap-2 rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] px-3 py-2 text-xs font-black text-[var(--gg-muted)]"
+                        >
+                          <span className="truncate">{file.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeSelectedImage(index)}
+                            className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-2 py-1 text-[var(--gg-text)]"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   ) : null}
                   <input
                     value={imageAlt}

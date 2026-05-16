@@ -109,8 +109,7 @@ export default async function EditListingPage({
           moneyUnitName={listing.moneyUnitName}
           initialTotalQuantity={listing.totalQuantity}
           initialMinimumQuantity={listing.minimumQuantity}
-          initialImageUrl={listing.primaryImageUrl}
-          initialImageAlt={listing.primaryImageAlt ?? ""}
+          initialImages={listing.contentImages}
         />
       </section>
     </main>

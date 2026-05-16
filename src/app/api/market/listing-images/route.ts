@@ -84,6 +84,7 @@ export async function DELETE(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams;
     const listingId = String(searchParams.get("listingId") ?? "").trim();
+    const imageId = String(searchParams.get("imageId") ?? "").trim();
 
     if (!listingId) {
       return NextResponse.json(
@@ -95,7 +96,10 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const result = await removeMarketplaceSellerListingImage({ listingId });
+    const result = await removeMarketplaceSellerListingImage({
+      listingId,
+      imageId: imageId || undefined,
+    });
 
     return NextResponse.json({
       ...result,

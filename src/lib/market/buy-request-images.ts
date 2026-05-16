@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { getCurrentSessionUser } from "@/lib/auth/session";
 import { getPrismaClient } from "@/lib/prisma";
@@ -7,6 +7,7 @@ const BUY_REQUEST_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 
 export type MarketplaceBuyRequestImageMutationResult = {
   buyRequestId: string;
+  imageId: string | null;
   imageUrl: string | null;
   altText: string | null;
   message: string;
@@ -79,7 +80,7 @@ export async function uploadMarketplaceBuyRequestImage(input: {
     const nextSortOrder =
       buyRequest.images.reduce((max, image) => Math.max(max, image.sortOrder), -1) + 1;
 
-    await tx.buyRequestImage.create({
+    const createdImage = await tx.buyRequestImage.create({
       data: {
         buyRequestId: buyRequest.id,
         imageUrl: publicImageUrl,
@@ -91,9 +92,65 @@ export async function uploadMarketplaceBuyRequestImage(input: {
 
     return {
       buyRequestId: buyRequest.id,
+      imageId: createdImage.id,
       imageUrl: publicImageUrl,
       altText: trimmedAltText,
       message: "본문 이미지가 추가되었습니다.",
+    };
+  });
+}
+
+export async function removeMarketplaceBuyRequestImage(input: {
+  buyRequestId: string;
+  imageId: string;
+}): Promise<MarketplaceBuyRequestImageMutationResult> {
+  const prisma = getPrismaClient();
+  const sessionUser = await getCurrentSessionUser();
+
+  if (!sessionUser) {
+    throw new Error("濡쒓렇?몄씠 ?꾩슂?⑸땲??");
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const buyRequest = await tx.buyRequest.findFirst({
+      where: {
+        id: input.buyRequestId,
+        buyerId: sessionUser.userId,
+        status: "ACTIVE",
+      },
+      include: {
+        images: true,
+      },
+    });
+
+    if (!buyRequest) {
+      throw new Error("援щℓ湲??李얠쓣 ???놁뒿?덈떎.");
+    }
+
+    const imageToDelete = buyRequest.images.find((image) => image.id === input.imageId);
+
+    if (!imageToDelete) {
+      throw new Error("??젣??蹂몃Ц ?대?吏瑜?李얠쓣 ???놁뒿?덈떎.");
+    }
+
+    await tx.buyRequestImage.delete({
+      where: {
+        id: imageToDelete.id,
+      },
+    });
+
+    try {
+      await unlink(imageToDelete.storagePath);
+    } catch {
+      // The database row is the source of truth; missing local files should not block cleanup.
+    }
+
+    return {
+      buyRequestId: buyRequest.id,
+      imageId: imageToDelete.id,
+      imageUrl: null,
+      altText: null,
+      message: "蹂몃Ц ?대?吏媛 ??젣?섏뿀?듬땲??",
     };
   });
 }

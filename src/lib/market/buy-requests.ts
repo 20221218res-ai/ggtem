@@ -83,6 +83,7 @@ export type MarketplaceBuyRequestSummary = {
   title: string | null;
   description: string | null;
   contentImages: Array<{
+    imageId: string;
     imageUrl: string;
     altText: string | null;
   }>;
@@ -176,6 +177,8 @@ export type MarketplaceBuyRequestFilters = {
   includeCategories?: boolean;
 };
 
+export type MarketplaceBuyRequestDetail = MarketplaceBuyRequestSummary;
+
 type BuyRequestRow = {
   id: string;
   buyerId: string;
@@ -223,6 +226,7 @@ type BuyRequestRow = {
     } | null;
   }>;
   images?: Array<{
+    id: string;
     imageUrl: string;
     altText: string | null;
   }>;
@@ -432,6 +436,7 @@ export async function getMarketplaceBuyRequests(
       },
       images: {
         select: {
+          id: true,
           imageUrl: true,
           altText: true,
         },
@@ -594,6 +599,7 @@ export async function getMarketplaceMyBuyRequests(): Promise<MarketplaceMyBuyReq
         },
         images: {
           select: {
+            id: true,
             imageUrl: true,
             altText: true,
           },
@@ -665,6 +671,85 @@ export async function getMarketplaceMyBuyRequests(): Promise<MarketplaceMyBuyReq
       }),
     ),
   };
+}
+
+export async function getMarketplaceBuyRequestDetail(
+  buyRequestId: string,
+): Promise<MarketplaceBuyRequestDetail | null> {
+  const prisma = getPrismaClient();
+  const [request, games] = await Promise.all([
+    prisma.buyRequest.findFirst({
+      where: {
+        id: buyRequestId,
+        status: "ACTIVE",
+      },
+      select: {
+        id: true,
+        buyerId: true,
+        gameId: true,
+        serverId: true,
+        serverDetail: true,
+        category: true,
+        title: true,
+        description: true,
+        accountTransferType: true,
+        accountRank: true,
+        tradeMode: true,
+        priceUnitQuantity: true,
+        quantity: true,
+        minimumQuantity: true,
+        remainingQuantity: true,
+        unitPrice: true,
+        totalAmount: true,
+        lockAmount: true,
+        currency: true,
+        status: true,
+        expiresAt: true,
+        premiumEndsAt: true,
+        premiumDurationHours: true,
+        premiumFeeAmount: true,
+        createdAt: true,
+        buyer: {
+          select: {
+            displayName: true,
+          },
+        },
+        images: {
+          select: {
+            id: true,
+            imageUrl: true,
+            altText: true,
+          },
+          orderBy: {
+            sortOrder: "asc",
+          },
+        },
+        _count: {
+          select: {
+            offers: true,
+          },
+        },
+      },
+    }),
+    getActiveGameCatalog(),
+  ]);
+
+  if (!request) {
+    return null;
+  }
+
+  const gameById = new Map(games.map((game) => [game.id, game]));
+  const serverById = new Map(
+    games.flatMap((game) =>
+      game.servers.map((server) => [server.id, server] as const),
+    ),
+  );
+
+  return mapBuyRequestSummary({
+    request,
+    gameById,
+    serverById,
+  });
 }
 
 export async function createMarketplaceBuyRequest(input: {
@@ -1780,7 +1865,7 @@ function mapBuyRequestSummary({
     buyRequestId: request.id,
     buyerId: request.buyerId,
     buyerName: request.buyer.displayName,
-    gameName: requestGame?.name ?? "Unknown Game",
+    gameName: requestGame?.name ?? "GGtem",
     gameCode: requestGame?.code ?? "unknown",
     gameImageUrl: requestGame?.imageUrl ?? null,
     gameLocalizedNames: requestGame
@@ -1795,6 +1880,7 @@ function mapBuyRequestSummary({
     description: request.description,
     contentImages:
       request.images?.map((image) => ({
+        imageId: image.id,
         imageUrl: image.imageUrl,
         altText: image.altText ?? null,
       })) ?? [],

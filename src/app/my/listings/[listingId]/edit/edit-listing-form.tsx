@@ -16,6 +16,7 @@ import {
 } from "@/lib/market/trade-unit";
 
 const LISTING_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+const LISTING_IMAGE_MAX_COUNT = 8;
 const LISTING_IMAGE_ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 type TradeMode = "BULK" | "SPLIT";
@@ -24,6 +25,13 @@ type ApiResult = {
   message?: string;
   messageKey?: TranslationKey;
   imageUrl?: string;
+  imageId?: string;
+};
+
+type ListingContentImage = {
+  imageId: string;
+  imageUrl: string;
+  altText: string | null;
 };
 
 export default function EditListingForm({
@@ -38,8 +46,7 @@ export default function EditListingForm({
   moneyUnitName,
   initialTotalQuantity,
   initialMinimumQuantity,
-  initialImageUrl,
-  initialImageAlt,
+  initialImages,
 }: {
   listingId: string;
   currency: string;
@@ -52,8 +59,7 @@ export default function EditListingForm({
   moneyUnitName: string | null;
   initialTotalQuantity: string;
   initialMinimumQuantity: string;
-  initialImageUrl: string | null;
-  initialImageAlt: string;
+  initialImages: ListingContentImage[];
 }) {
   const router = useRouter();
   const { t } = useCountryTranslation();
@@ -92,9 +98,9 @@ export default function EditListingForm({
   const [minimumQuantity, setMinimumQuantity] = useState(
     initialDisplayMinimumQuantity,
   );
-  const [imageAlt, setImageAlt] = useState(initialImageAlt);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState(initialImageUrl);
+  const [imageAlt, setImageAlt] = useState(initialImages[0]?.altText ?? "");
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [contentImages, setContentImages] = useState<ListingContentImage[]>(initialImages);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [imageError, setImageError] = useState("");
@@ -144,18 +150,16 @@ export default function EditListingForm({
       : null,
   ].filter(Boolean);
 
-  const imagePreviewUrl = useMemo(() => {
-    if (!selectedImage) return null;
-    return URL.createObjectURL(selectedImage);
-  }, [selectedImage]);
+  const imagePreviewUrls = useMemo(
+    () => selectedImages.map((file) => URL.createObjectURL(file)),
+    [selectedImages],
+  );
 
   useEffect(() => {
     return () => {
-      if (imagePreviewUrl) {
-        URL.revokeObjectURL(imagePreviewUrl);
-      }
+      imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [imagePreviewUrl]);
+  }, [imagePreviewUrls]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -235,28 +239,43 @@ export default function EditListingForm({
   function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
     setImageError("");
     setImageSuccess("");
-    const file = event.target.files?.[0] ?? null;
+    const files = Array.from(event.target.files ?? []);
 
-    if (!file) {
-      setSelectedImage(null);
+    if (files.length === 0) {
+      setSelectedImages([]);
       return;
     }
 
-    if (!LISTING_IMAGE_ALLOWED_TYPES.includes(file.type)) {
-      setSelectedImage(null);
+    if (contentImages.length + files.length > LISTING_IMAGE_MAX_COUNT) {
+      setSelectedImages([]);
       event.target.value = "";
-      setImageError(t("listingForm.imageTypeError"));
+      setImageError(t("listingEdit.imageMaxCountError").replace("{count}", String(LISTING_IMAGE_MAX_COUNT)));
       return;
     }
 
-    if (file.size > LISTING_IMAGE_MAX_BYTES) {
-      setSelectedImage(null);
+    const invalidTypeFile = files.find((file) => !LISTING_IMAGE_ALLOWED_TYPES.includes(file.type));
+    if (invalidTypeFile) {
+      setSelectedImages([]);
       event.target.value = "";
-      setImageError(t("listingForm.imageSizeError"));
+      setImageError(`${invalidTypeFile.name}: ${t("listingForm.imageTypeError")}`);
       return;
     }
 
-    setSelectedImage(file);
+    const oversizedFile = files.find((file) => file.size > LISTING_IMAGE_MAX_BYTES);
+    if (oversizedFile) {
+      setSelectedImages([]);
+      event.target.value = "";
+      setImageError(`${oversizedFile.name}: ${t("listingForm.imageSizeError")}`);
+      return;
+    }
+
+    setSelectedImages(files);
+  }
+
+  function removeSelectedImage(indexToRemove: number) {
+    setSelectedImages((currentImages) =>
+      currentImages.filter((_, index) => index !== indexToRemove),
+    );
   }
 
   async function handleImageUpload(event: FormEvent<HTMLFormElement>) {
@@ -264,7 +283,7 @@ export default function EditListingForm({
     setImageError("");
     setImageSuccess("");
 
-    if (!selectedImage) {
+    if (selectedImages.length === 0) {
       setImageError(t("listingEdit.imageRequired"));
       return;
     }
@@ -272,24 +291,38 @@ export default function EditListingForm({
     setIsUploadingImage(true);
 
     try {
-      const formData = new FormData();
-      formData.set("listingId", listingId);
-      formData.set("altText", imageAlt);
-      formData.set("image", selectedImage);
+      const uploadedImages: ListingContentImage[] = [];
 
-      const response = await fetch("/api/market/listing-images", {
-        method: "POST",
-        body: formData,
-      });
-      const result = (await response.json()) as ApiResult;
+      for (const selectedImage of selectedImages) {
+        const formData = new FormData();
+        formData.set("listingId", listingId);
+        formData.set("altText", imageAlt);
+        formData.set("image", selectedImage);
 
-      if (!response.ok) {
-        throw new Error(getApiMessage(result, t, "listingForm.imageUploadFailed"));
+        const response = await fetch("/api/market/listing-images", {
+          method: "POST",
+          body: formData,
+        });
+        const result = (await response.json()) as ApiResult;
+
+        if (!response.ok) {
+          throw new Error(
+            `${selectedImage.name}: ${getApiMessage(result, t, "listingForm.imageUploadFailed")}`,
+          );
+        }
+
+        if (result.imageUrl) {
+          uploadedImages.push({
+            imageId: result.imageId ?? result.imageUrl,
+            imageUrl: result.imageUrl,
+            altText: imageAlt || null,
+          });
+        }
       }
 
-      setImageUrl(result.imageUrl ?? imageUrl);
-      setImageSuccess(getApiMessage(result, t, "listingEdit.imageSaveSuccess"));
-      setSelectedImage(null);
+      setContentImages((currentImages) => [...currentImages, ...uploadedImages]);
+      setImageSuccess(t("listingEdit.imageSaveSuccess"));
+      setSelectedImages([]);
       router.refresh();
     } catch (uploadError) {
       setImageError(
@@ -302,14 +335,14 @@ export default function EditListingForm({
     }
   }
 
-  async function handleImageRemove() {
+  async function handleImageRemove(imageId: string) {
     setImageError("");
     setImageSuccess("");
     setIsRemovingImage(true);
 
     try {
       const response = await fetch(
-        `/api/market/listing-images?listingId=${encodeURIComponent(listingId)}`,
+        `/api/market/listing-images?listingId=${encodeURIComponent(listingId)}&imageId=${encodeURIComponent(imageId)}`,
         {
           method: "DELETE",
         },
@@ -320,9 +353,10 @@ export default function EditListingForm({
         throw new Error(getApiMessage(result, t, "listingEdit.imageRemoveFailed"));
       }
 
-      setImageUrl(null);
-      setImageAlt("");
-      setSelectedImage(null);
+      setContentImages((currentImages) =>
+        currentImages.filter((image) => image.imageId !== imageId),
+      );
+      setSelectedImages([]);
       setImageSuccess(getApiMessage(result, t, "listingEdit.imageRemoveSuccess"));
       router.refresh();
     } catch (removeError) {
@@ -342,7 +376,7 @@ export default function EditListingForm({
         onSubmit={handleSubmit}
         className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-lg shadow-[var(--gg-shadow)]"
       >
-        <p className="text-sm font-black text-[var(--gg-accent)]">SELL</p>
+        <p className="text-sm font-black text-[var(--gg-accent)]">{t("common.sellModeShort")}</p>
         <h2 className="mt-1 text-2xl font-black">{t("listingEdit.formTitle")}</h2>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -506,32 +540,60 @@ export default function EditListingForm({
         onSubmit={handleImageUpload}
         className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-lg shadow-[var(--gg-shadow)]"
       >
-        <p className="text-sm font-black text-[var(--gg-accent)]">IMAGE</p>
+        <p className="text-sm font-black text-[var(--gg-accent)]">{t("listingForm.imageSection")}</p>
         <h2 className="mt-1 text-2xl font-black">{t("listingForm.imageSection")}</h2>
 
-        <div className="mt-5 overflow-hidden rounded-2xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)]">
-          {imagePreviewUrl ? (
-            <Image
-              src={imagePreviewUrl}
-              alt={imageAlt || title}
-              width={960}
-              height={720}
-              unoptimized
-              className="aspect-[4/3] w-full object-cover"
-            />
-          ) : imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={imageAlt || title}
-              width={960}
-              height={720}
-              className="aspect-[4/3] w-full object-cover"
-            />
+        <div className="mt-5 grid gap-3">
+          {contentImages.length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {contentImages.map((image) => (
+                <div
+                  key={image.imageId}
+                  className="overflow-hidden rounded-2xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)]"
+                >
+                  <Image
+                    src={image.imageUrl}
+                    alt={image.altText || title}
+                    width={640}
+                    height={480}
+                    className="aspect-[4/3] w-full object-cover"
+                  />
+                  <div className="flex items-center justify-between gap-2 border-t border-[var(--gg-border-soft)] bg-[var(--gg-card-bg)] p-3">
+                    <p className="truncate text-xs font-bold text-[var(--gg-muted)]">
+                      {image.altText || t("listingForm.imageSection")}
+                    </p>
+                    <button
+                      type="button"
+                      disabled={isRemovingImage}
+                      onClick={() => void handleImageRemove(image.imageId)}
+                      className="rounded-lg border border-red-400/40 bg-red-400/10 px-3 py-2 text-xs font-black text-red-600 hover:bg-red-400/20 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      {isRemovingImage ? t("listingEdit.removing") : t("listingEdit.imageRemove")}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
-            <div className="flex aspect-[4/3] items-center justify-center px-6 text-center text-sm font-bold text-[var(--gg-subtle)]">
+            <div className="flex aspect-[4/3] items-center justify-center rounded-2xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)] px-6 text-center text-sm font-bold text-[var(--gg-subtle)]">
               {t("listingForm.noImage")}
             </div>
           )}
+          {imagePreviewUrls.length > 0 ? (
+            <div className="grid gap-2 rounded-2xl border border-dashed border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 sm:grid-cols-3">
+              {imagePreviewUrls.map((url, index) => (
+                <Image
+                  key={url}
+                  src={url}
+                  alt={`${t("listingForm.imageSection")} ${index + 1}`}
+                  width={240}
+                  height={180}
+                  unoptimized
+                  className="aspect-[4/3] w-full rounded-xl object-cover"
+                />
+              ))}
+            </div>
+          ) : null}
         </div>
 
         <div className="mt-4 grid gap-4">
@@ -549,6 +611,7 @@ export default function EditListingForm({
             {t("listingEdit.imageFile")}
             <input
               type="file"
+              multiple
               accept="image/png,image/jpeg,image/webp"
               onChange={handleImageChange}
               className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-2 text-sm text-[var(--gg-muted)] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--gg-accent)] file:px-3 file:py-2 file:text-sm file:font-black file:text-[var(--gg-inverse-text)] hover:file:bg-[var(--gg-accent-hover)]"
@@ -556,10 +619,26 @@ export default function EditListingForm({
           </label>
         </div>
 
-        {selectedImage ? (
-          <p className="mt-3 text-xs text-[var(--gg-muted)]">
-            {t("listingEdit.selectedImage").replace("{name}", selectedImage.name)}
-          </p>
+        {selectedImages.length > 0 ? (
+          <div className="mt-3 grid gap-2">
+            {selectedImages.map((image, index) => (
+              <div
+                key={`${image.name}-${image.lastModified}-${index}`}
+                className="flex items-center justify-between gap-2 rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] px-3 py-2 text-xs font-black text-[var(--gg-muted)]"
+              >
+                <span className="truncate">
+                  {t("listingEdit.selectedImage").replace("{name}", image.name)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeSelectedImage(index)}
+                  className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-2 py-1 text-[var(--gg-text)]"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
         ) : null}
 
         <div className="mt-5 flex flex-wrap gap-3">
@@ -569,14 +648,6 @@ export default function EditListingForm({
             className="rounded-xl bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isUploadingImage ? t("listingEdit.uploading") : t("listingEdit.imageSave")}
-          </button>
-          <button
-            type="button"
-            disabled={isRemovingImage || !imageUrl}
-            onClick={() => void handleImageRemove()}
-            className="rounded-xl border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm font-black text-red-600 hover:bg-red-400/20 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {isRemovingImage ? t("listingEdit.removing") : t("listingEdit.imageRemove")}
           </button>
         </div>
 

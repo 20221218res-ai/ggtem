@@ -10,6 +10,7 @@ import {
   getGameMoneyPriceUnitLabel,
 } from "@/lib/market/trade-unit";
 import BuyRequestActions from "./buy-request-actions";
+import BuyRequestImageActions from "./buy-request-image-actions";
 import OfferActions from "./offer-actions";
 
 export const dynamic = "force-dynamic";
@@ -252,6 +253,14 @@ function BuyRequestRow({ request }: { request: MyBuyRequest }) {
             </p>
           </div>
           <BuyRequestActions buyRequestId={request.buyRequestId} status={request.status} />
+          {request.status === "ACTIVE" ? (
+            <Link
+              href={`/buy-requests/${request.buyRequestId}`}
+              className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-xs font-black hover:bg-[var(--gg-control-bg)]"
+            >
+              <CountryText id="orderManage.detail" />
+            </Link>
+          ) : null}
           {request.status !== "ACTIVE" ? (
             <Link
               href="/my/orders"
@@ -292,14 +301,20 @@ function BuyRequestRow({ request }: { request: MyBuyRequest }) {
                 <div className="mt-4 grid gap-2 sm:grid-cols-3">
                   {request.contentImages.map((image, index) => (
                     <div
-                      key={`${image.imageUrl}-${index}`}
-                      className="overflow-hidden rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-card-bg)]"
+                      key={image.imageId}
+                      className="relative overflow-hidden rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-card-bg)]"
                     >
                       <img
                         src={image.imageUrl}
-                        alt={image.altText || request.title || "Buy request image"}
+                        alt={image.altText || request.title || request.gameName}
                         className="h-28 w-full object-cover"
                       />
+                      {request.status === "ACTIVE" ? (
+                        <BuyRequestImageActions
+                          buyRequestId={request.buyRequestId}
+                          imageId={image.imageId}
+                        />
+                      ) : null}
                     </div>
                   ))}
                 </div>

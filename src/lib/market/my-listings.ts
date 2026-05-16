@@ -147,8 +147,11 @@ export type MarketplaceSellerListingEditorView = {
   title: string;
   description: string | null;
   status: string;
-  primaryImageUrl: string | null;
-  primaryImageAlt: string | null;
+  contentImages: Array<{
+    imageId: string;
+    imageUrl: string;
+    altText: string | null;
+  }>;
   gameName: string;
   serverName: string | null;
   category: string;
@@ -173,6 +176,7 @@ export type MarketplaceSellerListingMutationResult = {
 
 export type MarketplaceSellerListingImageMutationResult = {
   listingId: string;
+  imageId?: string | null;
   imageUrl: string | null;
   altText: string | null;
   message: string;
@@ -404,7 +408,6 @@ export async function getMarketplaceSellerListingEditorView(
         orderBy: {
           sortOrder: "asc",
         },
-        take: 1,
       },
     },
   });
@@ -418,8 +421,11 @@ export async function getMarketplaceSellerListingEditorView(
     title: listing.title,
     description: listing.description,
     status: listing.status,
-    primaryImageUrl: listing.images[0]?.imageUrl ?? null,
-    primaryImageAlt: listing.images[0]?.altText ?? null,
+    contentImages: listing.images.map((image) => ({
+      imageId: image.id,
+      imageUrl: image.imageUrl,
+      altText: image.altText ?? null,
+    })),
     gameName: listing.game.name,
     serverName: listing.server?.name ?? null,
     category: listing.category,
@@ -1214,7 +1220,7 @@ export async function uploadMarketplaceSellerListingImage(input: {
     const nextSortOrder =
       listing.images.reduce((max, image) => Math.max(max, image.sortOrder), -1) + 1;
 
-    await tx.listingImage.create({
+    const createdImage = await tx.listingImage.create({
       data: {
         listingId: listing.id,
         imageUrl: publicImageUrl,
@@ -1226,6 +1232,7 @@ export async function uploadMarketplaceSellerListingImage(input: {
 
     return {
       listingId: listing.id,
+      imageId: createdImage.id,
       imageUrl: publicImageUrl,
       altText: trimmedAltText,
       message: "본문 이미지가 추가되었습니다.",
@@ -1235,6 +1242,7 @@ export async function uploadMarketplaceSellerListingImage(input: {
 
 export async function removeMarketplaceSellerListingImage(input: {
   listingId: string;
+  imageId?: string;
 }): Promise<MarketplaceSellerListingImageMutationResult> {
   const prisma = getPrismaClient();
   const sellerEmail = await getCurrentUserEmailForRole({
@@ -1273,11 +1281,18 @@ export async function removeMarketplaceSellerListingImage(input: {
       throw new Error("삭제할 판매글 이미지가 없습니다.");
     }
 
-    const imagesToDelete = listing.images;
+    const imagesToDelete = input.imageId
+      ? listing.images.filter((image) => image.id === input.imageId)
+      : listing.images;
+
+    if (imagesToDelete.length === 0) {
+      throw new Error("삭제할 본문 이미지를 찾을 수 없습니다.");
+    }
 
     await tx.listingImage.deleteMany({
       where: {
         listingId: listing.id,
+        ...(input.imageId ? { id: input.imageId } : {}),
       },
     });
 
@@ -1293,9 +1308,10 @@ export async function removeMarketplaceSellerListingImage(input: {
 
     return {
       listingId: listing.id,
+      imageId: input.imageId ?? null,
       imageUrl: null,
       altText: null,
-      message: "판매글 이미지가 삭제되었습니다.",
+      message: "본문 이미지가 삭제되었습니다.",
     };
   });
 }
