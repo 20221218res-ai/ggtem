@@ -30,6 +30,12 @@ const inquiryCategories = [
   { value: "OTHER", labelKey: "support.otherCategory" },
 ] satisfies Array<{ value: string; labelKey: TranslationKey }>;
 
+const gameRequestKinds = [
+  { value: "NEW_GAME", labelKey: "support.newGameRequest", adminLabel: "신규 게임 신청" },
+  { value: "NEW_SERVER", labelKey: "support.newServerRequest", adminLabel: "신규 서버 신청" },
+  { value: "GAME_INFO_EDIT", labelKey: "support.gameInfoEdit", adminLabel: "게임 정보 수정" },
+] satisfies Array<{ value: string; labelKey: TranslationKey; adminLabel: string }>;
+
 type InquirySummary = {
   id: string;
   category: string;
@@ -345,15 +351,22 @@ function GameRequestPanel({
         <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
           <CountryText id="support.gameRequestDescription" />
         </p>
-        <SupportNotice submitted={submitted} error={error} successKey="support.gameRequestSubmitted" />
+        <SupportNotice
+          submitted={submitted}
+          error={error}
+          successKey="support.gameRequestSubmitted"
+          errorKey="support.gameRequestInvalidInput"
+        />
         {isSignedIn ? (
           <form action={createGameServerRequestAction} className="mt-6 grid gap-4">
             <label className="grid gap-2 text-sm font-black">
               <CountryText id="support.requestKind" />
               <select name="requestKind" className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold">
-                <option value="신규 게임 신청"><CountryText id="support.newGameRequest" /></option>
-                <option value="신규 서버 신청"><CountryText id="support.newServerRequest" /></option>
-                <option value="게임 정보 수정"><CountryText id="support.gameInfoEdit" /></option>
+                {gameRequestKinds.map((kind) => (
+                  <option key={kind.value} value={kind.value}>
+                    <CountryText id={kind.labelKey} />
+                  </option>
+                ))}
               </select>
             </label>
             <div className="grid gap-4 md:grid-cols-2">
@@ -416,10 +429,12 @@ function SupportNotice({
   submitted,
   error,
   successKey,
+  errorKey = "support.invalidInput",
 }: {
   submitted: boolean;
   error: boolean;
   successKey: TranslationKey;
+  errorKey?: TranslationKey;
 }) {
   if (submitted) {
     return (
@@ -432,7 +447,7 @@ function SupportNotice({
   if (error) {
     return (
       <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-black text-red-700">
-        <CountryText id="support.invalidInput" />
+        <CountryText id={errorKey} />
       </div>
     );
   }
@@ -565,7 +580,9 @@ async function createGameServerRequestAction(formData: FormData) {
     redirect("/sign-in?next=/support?tab=game-request");
   }
 
-  const requestKind = String(formData.get("requestKind") ?? "신규 게임 신청").trim();
+  const requestKindValue = String(formData.get("requestKind") ?? "NEW_GAME").trim();
+  const requestKind =
+    gameRequestKinds.find((kind) => kind.value === requestKindValue) ?? gameRequestKinds[0];
   const gameName = String(formData.get("gameName") ?? "").trim();
   const serverName = String(formData.get("serverName") ?? "").trim();
   const referenceUrl = String(formData.get("referenceUrl") ?? "").trim();
@@ -575,9 +592,9 @@ async function createGameServerRequestAction(formData: FormData) {
     redirect("/support?tab=game-request&error=invalid");
   }
 
-  const title = `[${requestKind.slice(0, 30)}] ${gameName}${serverName ? ` / ${serverName}` : ""}`;
+  const title = `[${requestKind.adminLabel}] ${gameName}${serverName ? ` / ${serverName}` : ""}`;
   const detailLines = [
-    `신청 종류: ${requestKind}`,
+    `신청 종류: ${requestKind.adminLabel}`,
     `게임명: ${gameName}`,
     serverName ? `서버명: ${serverName}` : null,
     referenceUrl ? `참고 링크: ${referenceUrl}` : null,
