@@ -285,10 +285,13 @@ export default function CreateListingForm({
       });
       const result = (await response.json()) as {
         message?: string;
+        messageKey?: TranslationKey;
         listingId?: string;
       };
 
-      if (!response.ok) throw new Error(result.message ?? t("listingForm.sellFailed"));
+      if (!response.ok) {
+        throw new Error(getApiMessage(result, t, "listingForm.sellFailed"));
+      }
 
       if (result.listingId) {
         setCreatedListingId(result.listingId);
@@ -303,20 +306,23 @@ export default function CreateListingForm({
             method: "POST",
             body: formData,
           });
-          const imageResult = (await imageResponse.json()) as { message?: string };
+          const imageResult = (await imageResponse.json()) as {
+            message?: string;
+            messageKey?: TranslationKey;
+          };
 
           if (!imageResponse.ok) {
-            throw new Error(imageResult.message ?? t("listingForm.imageUploadFailed"));
+            throw new Error(getApiMessage(imageResult, t, "listingForm.imageUploadFailed"));
           }
         }
 
-        setSuccess(result.message ?? t("listingForm.sellSuccess"));
+        setSuccess(getApiMessage(result, t, "listingForm.sellSuccess"));
         router.push(`/listings/${result.listingId}`);
         router.refresh();
         return;
       }
 
-      setSuccess(result.message ?? t("listingForm.sellSuccess"));
+      setSuccess(getApiMessage(result, t, "listingForm.sellSuccess"));
       router.refresh();
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : t("listingForm.sellFailed"));
@@ -754,6 +760,14 @@ function FormBlock({ title, children }: { title: string; children: ReactNode }) 
       {children}
     </div>
   );
+}
+
+function getApiMessage(
+  result: { message?: string; messageKey?: TranslationKey },
+  t: TFunction,
+  fallbackKey: TranslationKey,
+) {
+  return result.messageKey ? t(result.messageKey) : result.message ?? t(fallbackKey);
 }
 
 function StepFlowGuide({ currentStep }: { currentStep: number }) {

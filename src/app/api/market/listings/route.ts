@@ -41,7 +41,10 @@ export async function POST(request: NextRequest) {
       !body.quantity
     ) {
       return NextResponse.json(
-        { message: "게임, 서버, 품목 유형, 제목, 단가, 수량을 모두 입력해 주세요." },
+        {
+          message: "게임, 서버, 품목 유형, 제목, 단가, 수량을 모두 입력해 주세요.",
+          messageKey: "listingForm.sellRequired",
+        },
         { status: 400 },
       );
     }
@@ -64,12 +67,16 @@ export async function POST(request: NextRequest) {
       premiumDurationHours: body.premiumDurationHours,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey: "listingForm.sellSuccess",
+    });
   } catch (error) {
     return NextResponse.json(
       {
         message:
           error instanceof Error ? error.message : "판매글을 등록하지 못했습니다.",
+        messageKey: "listingForm.sellFailed",
       },
       { status: 400 },
     );
