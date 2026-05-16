@@ -3,7 +3,6 @@ import {
   DataTable,
   LinkLike,
   Panel,
-  SoftNotice,
   StatusPill,
 } from "../admin-prototype-ui";
 import {
@@ -34,7 +33,7 @@ export default async function AdminAccountsPage() {
     <AdminMockPage
       icon="권한"
       title="관리자 계정 / 권한 관리"
-      subtitle="최고관리자가 운영진 계정을 만들고, 역할별 접근 범위와 최근 작업을 확인하는 화면입니다."
+      subtitle=""
       actions={
         <>
           <LinkLike href="/admin/audit?targetType=ADMIN_ACCOUNT">감사 로그</LinkLike>
@@ -45,10 +44,6 @@ export default async function AdminAccountsPage() {
         </>
       }
     >
-      <SoftNotice tone="amber">
-        관리자 계정 생성, 권한 변경, 초대 링크 발급은 모두 감사 로그에 기록됩니다.
-      </SoftNotice>
-
       <section className="grid gap-4 md:grid-cols-4">
         <SummaryCard label="전체 관리자" value={`${state.summary.totalAdmins}명`} />
         <SummaryCard label="활성 관리자" value={`${state.summary.activeAdmins}명`} />
@@ -216,9 +211,6 @@ export default async function AdminAccountsPage() {
               >
                 <StatusPill tone={role.tone}>{role.role}</StatusPill>
                 <p className="mt-3 text-lg font-black">{role.title}</p>
-                <p className="sr-only">
-                  {role.description}
-                </p>
                 <p className="mt-3 text-xl font-black">{role.members}명</p>
               </div>
             ))}
@@ -236,9 +228,6 @@ export default async function AdminAccountsPage() {
                       <span className="text-xs font-black text-slate-500">{policy.scope}</span>
                     </div>
                     <p className="mt-3 text-lg font-black text-slate-950">{policy.title}</p>
-                    <p className="sr-only">
-                      {policy.description}
-                    </p>
                     <p className="mt-3 text-sm font-bold text-slate-800">
                       {policy.menuScope.join(" · ")}
                     </p>

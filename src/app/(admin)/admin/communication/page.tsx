@@ -26,7 +26,7 @@ export default async function AdminCommunicationPage() {
     <AdminMockPage
       icon="MSG"
       title="커뮤니케이션"
-      subtitle="운영 알림 채널 상태"
+      subtitle=""
       actions={
         <>
           <LinkLike href="/admin/cms">공지/FAQ</LinkLike>

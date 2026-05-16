@@ -18,17 +18,6 @@ import {
   getAdminCmsState,
 } from "@/lib/admin/cms";
 
-const cmsTemplateHints: Record<string, string> = {
-  NOTICE: "예: 안전거래 이용 안내",
-  FAQ: "예: 충전/출금 처리 안내",
-  POLICY: "예: 외부거래 제한 안내",
-  PAID_SERVICE: "예: 프리미엄 노출 안내",
-  GAME_SERVER_REQUEST: "예: 신규 게임/서버 신청",
-  TERMS: "예: 이용약관 개정",
-  PRIVACY: "예: 개인정보 처리방침",
-  GUIDE: "예: 계정 거래 가이드",
-};
-
 export default async function AdminCmsPage({
   searchParams,
 }: {
@@ -89,13 +78,6 @@ export default async function AdminCmsPage({
                 className="h-11 rounded-md border border-slate-200 px-3 font-bold"
               />
             </label>
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs font-bold leading-6 text-slate-600">
-              {CMS_TYPES.map((type) => (
-                <p key={type}>
-                  {cmsTypeLabel(type)}: {cmsTemplateHints[type]}
-                </p>
-              ))}
-            </div>
             <label className="grid gap-2 text-sm font-black">
               본문
               <textarea

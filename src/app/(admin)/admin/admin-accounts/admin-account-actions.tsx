@@ -65,10 +65,7 @@ export function AdminAccountCreateForm() {
   }
 
   return (
-    <FormShell
-      title="새 관리자 계정 준비"
-      description="실제 로그인은 초대 링크를 발급한 뒤 활성화됩니다."
-    >
+    <FormShell title="새 관리자 계정 준비">
       <div className="grid gap-3 md:grid-cols-2">
         <InputField label="이메일" value={email} onChange={setEmail} placeholder="admin@example.com" />
         <InputField label="이름" value={displayName} onChange={setDisplayName} placeholder="홍길동" />
@@ -161,10 +158,7 @@ export function AdminAccountAccessForm({
   }
 
   return (
-    <FormShell
-      title="권한/상태 변경"
-      description="변경 사유는 감사 로그에 남고, 대상 관리자의 세션은 만료됩니다."
-    >
+    <FormShell title="권한/상태 변경">
       <label className="flex flex-col gap-1 text-xs font-bold text-slate-600">
         대상 관리자
         <select
@@ -249,10 +243,7 @@ export function AdminAccountInviteForm({
   }
 
   return (
-    <FormShell
-      title="초대 링크 발급"
-      description="비밀번호가 없는 준비 계정에만 초대 링크를 발급합니다."
-    >
+    <FormShell title="초대 링크 발급">
       <label className="flex flex-col gap-1 text-xs font-bold text-slate-600">
         초대 대상
         <select
@@ -331,20 +322,15 @@ export function AdminInviteRevokeButton({
 
 function FormShell({
   title,
-  description,
   children,
 }: {
   title: string;
-  description: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-4">
       <div>
         <p className="text-sm font-black text-slate-950">{title}</p>
-        <p className="sr-only">
-          {description}
-        </p>
       </div>
       {children}
     </div>
