@@ -846,7 +846,7 @@ export async function createMarketplaceBuyRequest(input: {
   }
 
   if (!buyerGameNickname) {
-    throw new Error("구매자 게임 아이디를 입력해 주세요.");
+    throw new Error("거래에 사용할 구매자 게임 ID를 입력해 주세요.");
   }
 
   if (quantity <= 0n) {
@@ -1210,7 +1210,7 @@ export async function cancelMarketplaceBuyRequest(input: {
   return {
     buyRequestId: updated.id,
     status: updated.status,
-    message: "구매요청이 취소되었습니다.",
+    message: "구매요청을 취소했습니다.",
   };
 }
 
@@ -1232,7 +1232,7 @@ export async function updateMarketplaceBuyRequestContent(input: {
   const sessionUser = await getCurrentSessionUser();
 
   if (!sessionUser) {
-    throw new Error("濡쒓렇?몄씠 ?꾩슂?⑸땲??");
+    throw new Error("로그인이 필요합니다.");
   }
 
   const trimmedTitle = input.title?.trim() || null;
@@ -1241,11 +1241,11 @@ export async function updateMarketplaceBuyRequestContent(input: {
   const buyerGameNickname = normalizeTradeCharacterName(input.buyerGameNickname);
 
   if (!trimmedTitle || trimmedTitle.length < 4) {
-    throw new Error("援щℓ湲 ?쒕ぉ? 4???댁긽 ?낅젰??二쇱꽭??");
+    throw new Error("구매글 제목은 4자 이상 입력해 주세요.");
   }
 
   if (!buyerGameNickname) {
-    throw new Error("嫄곕옒???ъ슜??援щℓ???寃뚯엫 ID瑜??낅젰??二쇱꽭??");
+    throw new Error("거래에 사용할 구매자 게임 ID를 입력해 주세요.");
   }
 
   const existingRequest = await prisma.buyRequest.findFirst({

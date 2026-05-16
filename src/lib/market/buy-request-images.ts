@@ -108,7 +108,7 @@ export async function removeMarketplaceBuyRequestImage(input: {
   const sessionUser = await getCurrentSessionUser();
 
   if (!sessionUser) {
-    throw new Error("濡쒓렇?몄씠 ?꾩슂?⑸땲??");
+    throw new Error("로그인이 필요합니다.");
   }
 
   return prisma.$transaction(async (tx) => {
@@ -124,13 +124,13 @@ export async function removeMarketplaceBuyRequestImage(input: {
     });
 
     if (!buyRequest) {
-      throw new Error("援щℓ湲??李얠쓣 ???놁뒿?덈떎.");
+      throw new Error("구매글을 찾을 수 없습니다.");
     }
 
     const imageToDelete = buyRequest.images.find((image) => image.id === input.imageId);
 
     if (!imageToDelete) {
-      throw new Error("??젣??蹂몃Ц ?대?吏瑜?李얠쓣 ???놁뒿?덈떎.");
+      throw new Error("삭제할 본문 이미지를 찾을 수 없습니다.");
     }
 
     await tx.buyRequestImage.delete({
@@ -150,7 +150,7 @@ export async function removeMarketplaceBuyRequestImage(input: {
       imageId: imageToDelete.id,
       imageUrl: null,
       altText: null,
-      message: "蹂몃Ц ?대?吏媛 ??젣?섏뿀?듬땲??",
+      message: "본문 이미지가 삭제되었습니다.",
     };
   });
 }

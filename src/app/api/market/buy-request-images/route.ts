@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     if (!buyRequestId) {
       return NextResponse.json(
         {
-          message: "이미지를 등록할 구매글 정보가 필요합니다.",
+          message: "이미지를 추가할 구매글 정보가 필요합니다.",
           messageKey: "listingEdit.imageListingRequired",
         },
         { status: 400 },
@@ -79,7 +79,7 @@ export async function DELETE(request: NextRequest) {
     if (!buyRequestId || !imageId) {
       return NextResponse.json(
         {
-          message: "?대?吏瑜???젣??援щℓ湲怨??대?吏 ?뺣낫媛 ?꾩슂?⑸땲??",
+          message: "이미지를 삭제할 구매글과 이미지 정보가 필요합니다.",
           messageKey: "listingEdit.imageListingRequired",
         },
         { status: 400 },
@@ -101,7 +101,7 @@ export async function DELETE(request: NextRequest) {
         message:
           error instanceof Error
             ? error.message
-            : "援щℓ湲 ?대?吏瑜???젣?섏? 紐삵뻽?듬땲??",
+            : "구매글 이미지를 삭제하지 못했습니다.",
         messageKey: "listingEdit.imageRemoveFailed",
       },
       { status: 400 },
