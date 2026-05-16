@@ -33,7 +33,9 @@ export default async function EditListingPage({
     <main className="mx-auto w-full max-w-6xl px-4 py-8 text-[var(--gg-text)]">
       <header className="flex flex-col gap-4 border-b border-[var(--gg-border)] pb-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="text-sm font-black text-[var(--gg-accent)]">EDIT</p>
+          <p className="text-sm font-black text-[var(--gg-accent)]">
+            <CountryText id="listingEdit.formTitle" />
+          </p>
           <h1 className="mt-2 text-3xl font-black">{listing.title}</h1>
         </div>
         <div className="flex flex-wrap gap-2">

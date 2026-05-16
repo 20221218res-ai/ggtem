@@ -224,6 +224,9 @@ function BuyRequestRow({ request }: { request: MyBuyRequest }) {
           <div className="mt-3 flex flex-wrap gap-2 text-xs font-black text-[var(--gg-muted)]">
             <InfoChip label={<CountryText id="manage.buyQuantity" />} value={requestQuantityLabel} />
             <InfoChip label={<CountryText id="manage.unitPrice" />} value={`${price.amount} ${request.currency}${price.unitLabel ? ` / ${price.unitLabel}` : ""}`} />
+            {request.buyerGameNickname ? (
+              <InfoChip label={<CountryText id="listingForm.buyerGameNickname" />} value={request.buyerGameNickname} />
+            ) : null}
             {request.category === "GAME_MONEY" ? (
               <>
                 <InfoChip
@@ -254,12 +257,20 @@ function BuyRequestRow({ request }: { request: MyBuyRequest }) {
           </div>
           <BuyRequestActions buyRequestId={request.buyRequestId} status={request.status} />
           {request.status === "ACTIVE" ? (
-            <Link
-              href={`/buy-requests/${request.buyRequestId}`}
-              className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-xs font-black hover:bg-[var(--gg-control-bg)]"
-            >
-              <CountryText id="orderManage.detail" />
-            </Link>
+            <div className="flex flex-wrap gap-2 lg:justify-end">
+              <Link
+                href={`/my/buy-requests/${request.buyRequestId}/edit`}
+                className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-xs font-black hover:bg-[var(--gg-control-bg)]"
+              >
+                <CountryText id="buyRequestAction.edit" />
+              </Link>
+              <Link
+                href={`/buy-requests/${request.buyRequestId}`}
+                className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-xs font-black hover:bg-[var(--gg-control-bg)]"
+              >
+                <CountryText id="orderManage.detail" />
+              </Link>
+            </div>
           ) : null}
           {request.status !== "ACTIVE" ? (
             <Link
@@ -307,6 +318,7 @@ function BuyRequestRow({ request }: { request: MyBuyRequest }) {
                       <img
                         src={image.imageUrl}
                         alt={image.altText || request.title || request.gameName}
+                        loading="lazy"
                         className="h-28 w-full object-cover"
                       />
                       {request.status === "ACTIVE" ? (

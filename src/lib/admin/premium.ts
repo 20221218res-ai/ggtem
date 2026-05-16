@@ -70,65 +70,37 @@ async function getAdminPremiumStateUnsafe(): Promise<AdminPremiumState> {
     recentLedgerEntries,
   ] = await Promise.all([
     prisma.listing.findMany({
-      where: {
-        premiumEndsAt: {
-          gt: now,
-        },
-      },
+      where: { premiumEndsAt: { gt: now } },
       include: {
         seller: true,
         game: true,
         server: true,
         inventory: true,
       },
-      orderBy: {
-        premiumEndsAt: "asc",
-      },
+      orderBy: { premiumEndsAt: "asc" },
       take: 50,
     }),
     prisma.listing.findMany({
-      where: {
-        premiumEndsAt: {
-          lte: now,
-        },
-      },
+      where: { premiumEndsAt: { lte: now } },
       include: {
         seller: true,
         game: true,
         server: true,
         inventory: true,
       },
-      orderBy: {
-        premiumEndsAt: "desc",
-      },
+      orderBy: { premiumEndsAt: "desc" },
       take: 20,
     }),
     prisma.buyRequest.findMany({
-      where: {
-        premiumEndsAt: {
-          gt: now,
-        },
-      },
-      include: {
-        buyer: true,
-      },
-      orderBy: {
-        premiumEndsAt: "asc",
-      },
+      where: { premiumEndsAt: { gt: now } },
+      include: { buyer: true },
+      orderBy: { premiumEndsAt: "asc" },
       take: 50,
     }),
     prisma.buyRequest.findMany({
-      where: {
-        premiumEndsAt: {
-          lte: now,
-        },
-      },
-      include: {
-        buyer: true,
-      },
-      orderBy: {
-        premiumEndsAt: "desc",
-      },
+      where: { premiumEndsAt: { lte: now } },
+      include: { buyer: true },
+      orderBy: { premiumEndsAt: "desc" },
       take: 20,
     }),
     prisma.walletLedgerEntry.aggregate({
@@ -137,9 +109,7 @@ async function getAdminPremiumStateUnsafe(): Promise<AdminPremiumState> {
         direction: "CREDIT",
         bucket: "PLATFORM_REVENUE",
       },
-      _sum: {
-        amount: true,
-      },
+      _sum: { amount: true },
     }),
     prisma.walletLedgerEntry.findMany({
       where: {
@@ -149,14 +119,10 @@ async function getAdminPremiumStateUnsafe(): Promise<AdminPremiumState> {
       },
       include: {
         wallet: {
-          include: {
-            user: true,
-          },
+          include: { user: true },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
       take: 10,
     }),
   ]);
@@ -170,14 +136,11 @@ async function getAdminPremiumStateUnsafe(): Promise<AdminPremiumState> {
         .filter((serverId): serverId is string => Boolean(serverId)),
     ),
   ];
+
   const [games, servers] = await Promise.all([
     gameIds.length > 0
       ? prisma.game.findMany({
-          where: {
-            id: {
-              in: gameIds,
-            },
-          },
+          where: { id: { in: gameIds } },
           select: {
             id: true,
             name: true,
@@ -187,11 +150,7 @@ async function getAdminPremiumStateUnsafe(): Promise<AdminPremiumState> {
       : [],
     serverIds.length > 0
       ? prisma.gameServer.findMany({
-          where: {
-            id: {
-              in: serverIds,
-            },
-          },
+          where: { id: { in: serverIds } },
           select: {
             id: true,
             name: true,
@@ -199,9 +158,9 @@ async function getAdminPremiumStateUnsafe(): Promise<AdminPremiumState> {
         })
       : [],
   ]);
+
   const gameById = new Map(games.map((game) => [game.id, game]));
   const serverNameById = new Map(servers.map((server) => [server.id, server.name]));
-
   const activeItems = [
     ...activeListings.map((listing) => mapListingPremiumItem(listing, now)),
     ...activeBuyRequests.map((request) =>
@@ -219,10 +178,9 @@ async function getAdminPremiumStateUnsafe(): Promise<AdminPremiumState> {
     schemaWarning: null,
     summary: {
       activeCount: activeItems.length,
-      expiringSoonCount: activeItems.filter((item) => {
-        const endsAt = new Date(item.premiumEndsAt).getTime();
-        return endsAt <= soon.getTime();
-      }).length,
+      expiringSoonCount: activeItems.filter(
+        (item) => new Date(item.premiumEndsAt).getTime() <= soon.getTime(),
+      ).length,
       expiredVisibleCount: expiredItems.length,
       revenueTotal: formatDecimal(revenueAggregate._sum.amount?.toString() ?? "0"),
     },
@@ -383,7 +341,7 @@ function mapBuyRequestPremiumItem(
     remainingLabel: formatRemaining(request.premiumEndsAt, now),
     durationHours: request.premiumDurationHours ?? 0,
     feeAmount: formatDecimal(String(request.premiumFeeAmount ?? "0")),
-    href: `/listings?mode=buy&category=${request.category}&game=${encodeURIComponent(gameName)}`,
+    href: `/buy-requests/${request.id}`,
   };
 }
 

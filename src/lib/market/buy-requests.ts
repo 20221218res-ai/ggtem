@@ -89,6 +89,7 @@ export type MarketplaceBuyRequestSummary = {
   }>;
   accountTransferType: string | null;
   accountRank: string | null;
+  buyerGameNickname: string | null;
   tradeMode: string;
   priceUnitQuantity: string;
   quantity: string;
@@ -190,6 +191,7 @@ type BuyRequestRow = {
   description: string | null;
   accountTransferType: string | null;
   accountRank: string | null;
+  buyerGameNickname: string | null;
   tradeMode?: string;
   priceUnitQuantity?: { toString(): string };
   quantity: { toString(): string };
@@ -414,6 +416,7 @@ export async function getMarketplaceBuyRequests(
       description: true,
       accountTransferType: true,
       accountRank: true,
+      buyerGameNickname: true,
       tradeMode: true,
       priceUnitQuantity: true,
       quantity: true,
@@ -550,6 +553,7 @@ export async function getMarketplaceMyBuyRequests(): Promise<MarketplaceMyBuyReq
         description: true,
         accountTransferType: true,
         accountRank: true,
+        buyerGameNickname: true,
         tradeMode: true,
         priceUnitQuantity: true,
         quantity: true,
@@ -694,6 +698,7 @@ export async function getMarketplaceBuyRequestDetail(
         description: true,
         accountTransferType: true,
         accountRank: true,
+        buyerGameNickname: true,
         tradeMode: true,
         priceUnitQuantity: true,
         quantity: true,
@@ -1194,6 +1199,94 @@ export async function cancelMarketplaceBuyRequest(input: {
     buyRequestId: updated.id,
     status: updated.status,
     message: "구매요청이 취소되었습니다.",
+  };
+}
+
+export async function getMarketplaceMyBuyRequestEditorView(
+  buyRequestId: string,
+): Promise<MarketplaceBuyRequestSummary | null> {
+  const view = await getMarketplaceMyBuyRequests();
+  return view.buyRequests.find((request) => request.buyRequestId === buyRequestId) ?? null;
+}
+
+export async function updateMarketplaceBuyRequestContent(input: {
+  buyRequestId: string;
+  title?: string;
+  description?: string;
+  accountRank?: string;
+  buyerGameNickname?: string;
+}): Promise<MarketplaceBuyRequestCreateResult> {
+  const prisma = getPrismaClient();
+  const sessionUser = await getCurrentSessionUser();
+
+  if (!sessionUser) {
+    throw new Error("濡쒓렇?몄씠 ?꾩슂?⑸땲??");
+  }
+
+  const trimmedTitle = input.title?.trim() || null;
+  const trimmedDescription = input.description?.trim() || null;
+  const trimmedAccountRank = input.accountRank?.trim() || null;
+  const buyerGameNickname = normalizeTradeCharacterName(input.buyerGameNickname);
+
+  if (!trimmedTitle || trimmedTitle.length < 4) {
+    throw new Error("援щℓ湲 ?쒕ぉ? 4???댁긽 ?낅젰??二쇱꽭??");
+  }
+
+  if (!buyerGameNickname) {
+    throw new Error("嫄곕옒???ъ슜??援щℓ???寃뚯엫 ID瑜??낅젰??二쇱꽭??");
+  }
+
+  const existingRequest = await prisma.buyRequest.findFirst({
+    where: {
+      id: input.buyRequestId,
+      buyerId: sessionUser.userId,
+      status: "ACTIVE",
+    },
+    select: {
+      id: true,
+      category: true,
+      totalAmount: true,
+    },
+  });
+
+  if (!existingRequest) {
+    throw new Error("수정 가능한 구매글을 찾을 수 없습니다.");
+  }
+
+  if (existingRequest.category === "GAME_ACCOUNT") {
+    if (!trimmedAccountRank || trimmedAccountRank.length < 2) {
+      throw new Error("계정 구매 조건을 입력해 주세요.");
+    }
+
+    if (!trimmedDescription || trimmedDescription.length < 10) {
+      throw new Error("계정 구매 상세 조건을 10자 이상 입력해 주세요.");
+    }
+  } else if (!trimmedDescription || trimmedDescription.length < 6) {
+    throw new Error("구매 조건을 6자 이상 입력해 주세요.");
+  }
+
+  const updated = await prisma.buyRequest.update({
+    where: {
+      id: existingRequest.id,
+    },
+    data: {
+      title: trimmedTitle,
+      description: trimmedDescription,
+      accountRank: existingRequest.category === "GAME_ACCOUNT" ? trimmedAccountRank : null,
+      buyerGameNickname,
+    },
+    select: {
+      id: true,
+      status: true,
+      totalAmount: true,
+    },
+  });
+
+  return {
+    buyRequestId: updated.id,
+    status: updated.status,
+    totalAmount: updated.totalAmount.toString(),
+    message: "구매글을 수정했습니다.",
   };
 }
 
@@ -1886,6 +1979,7 @@ function mapBuyRequestSummary({
       })) ?? [],
     accountTransferType: request.accountTransferType,
     accountRank: request.accountRank,
+    buyerGameNickname: request.buyerGameNickname,
     tradeMode: request.tradeMode ?? "BULK",
     priceUnitQuantity: request.priceUnitQuantity?.toString() ?? "1",
     quantity: request.quantity.toString(),

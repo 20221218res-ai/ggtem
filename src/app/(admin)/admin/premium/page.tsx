@@ -16,7 +16,7 @@ export default async function AdminPremiumPage() {
         <header className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-wide text-[var(--color-primary)]">
-              Premium Exposure
+              PREMIUM
             </p>
             <h1 className="mt-2 text-3xl font-black tracking-tight">프리미엄 노출</h1>
           </div>
@@ -24,7 +24,7 @@ export default async function AdminPremiumPage() {
             href="/admin/finance/ledger?type=PREMIUM_PROMOTION_PURCHASED"
             className="inline-flex rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-700 shadow-sm hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
           >
-            원장
+            수익 원장
           </Link>
         </header>
 

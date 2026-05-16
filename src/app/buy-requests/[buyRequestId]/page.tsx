@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
 import CountryText from "@/app/country-text";
 import { MarketplaceHeader } from "@/app/marketplace-home";
 import UserContentText, { SourceCountryFlag } from "@/app/user-content-text";
@@ -116,7 +117,7 @@ export default async function BuyRequestDetailPage({
               </div>
 
               <h1 className="mt-5 text-3xl font-black leading-tight lg:text-4xl">
-                <SourceCountryFlag text={request.title || request.description || "Buy request"} />
+                <SourceCountryFlag text={request.title || request.description || request.gameName} />
                 <UserContentText text={request.title || buildFallbackTitle(request)} showSourceFlag={false} />
               </h1>
 
@@ -172,12 +173,13 @@ export default async function BuyRequestDetailPage({
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {request.contentImages.map((image, index) => (
                     <div
-                      key={`${image.imageUrl}-${index}`}
+                      key={image.imageId}
                       className="overflow-hidden rounded-2xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)]"
                     >
                       <img
                         src={image.imageUrl}
                         alt={image.altText || request.title || request.gameName}
+                        loading="lazy"
                         className="h-auto w-full object-contain"
                       />
                     </div>
@@ -203,6 +205,12 @@ export default async function BuyRequestDetailPage({
             </section>
 
             <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5">
+              <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 p-4">
+                <p className="text-xs font-black text-sky-700">
+                  <CountryText id="listingForm.summaryActualStoredQuantity" />
+                </p>
+                <p className="mt-1 text-lg font-black text-sky-900">{remainingQuantityLabel}</p>
+              </div>
               <BuyRequestOfferForm
                 buyRequestId={request.buyRequestId}
                 category={request.category}
@@ -310,11 +318,11 @@ function formatServerLabel(serverName?: string | null, serverDetail?: string | n
   return serverDetail ? `${serverName} ${serverDetail}` : serverName;
 }
 
-function buildFallbackTitle(request: { gameName: string; serverName: string | null; category: string }) {
-  return `${request.gameName} ${request.serverName ?? ""} ${request.category}`.trim();
+function buildFallbackTitle(request: { gameName: string; serverName: string | null }) {
+  return `${request.gameName} ${request.serverName ?? ""}`.trim();
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
+function Badge({ children }: { children: ReactNode }) {
   return (
     <span className="rounded-full bg-[var(--gg-card-soft-bg)] px-3 py-1 text-xs font-black text-[var(--gg-muted)]">
       {children}
@@ -328,9 +336,9 @@ function Metric({
   hint,
   strong,
 }: {
-  label: React.ReactNode;
+  label: ReactNode;
   value: string;
-  hint?: React.ReactNode;
+  hint?: ReactNode;
   strong?: boolean;
 }) {
   return (
@@ -344,7 +352,7 @@ function Metric({
   );
 }
 
-function InfoTile({ label, value }: { label: React.ReactNode; value: React.ReactNode }) {
+function InfoTile({ label, value }: { label: ReactNode; value: ReactNode }) {
   return (
     <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4">
       <p className="text-xs font-bold text-[var(--gg-subtle)]">{label}</p>

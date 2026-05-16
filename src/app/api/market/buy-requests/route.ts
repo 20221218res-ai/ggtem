@@ -3,6 +3,7 @@ import { requireApiRole } from "@/lib/auth/guards";
 import {
   cancelMarketplaceBuyRequest,
   createMarketplaceBuyRequest,
+  updateMarketplaceBuyRequestContent,
 } from "@/lib/market/buy-requests";
 
 export async function POST(request: NextRequest) {
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json()) as {
-      mode?: "CREATE" | "CANCEL";
+      mode?: "CREATE" | "CANCEL" | "UPDATE_CONTENT";
       buyRequestId?: string;
       gameId?: string;
       serverId?: string;
@@ -52,6 +53,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         ...result,
         messageKey: "buyRequestAction.cancelSuccess",
+      });
+    }
+
+    if (body.mode === "UPDATE_CONTENT") {
+      if (!body.buyRequestId) {
+        return NextResponse.json(
+          {
+            message: "수정할 구매글 정보가 필요합니다.",
+            messageKey: "buyRequestAction.updateRequired",
+          },
+          { status: 400 },
+        );
+      }
+
+      const result = await updateMarketplaceBuyRequestContent({
+        buyRequestId: body.buyRequestId,
+        title: body.title,
+        description: body.description,
+        accountRank: body.accountRank,
+        buyerGameNickname: body.buyerGameNickname,
+      });
+
+      return NextResponse.json({
+        ...result,
+        messageKey: "buyRequestAction.updateSuccess",
       });
     }
 
