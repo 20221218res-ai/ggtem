@@ -281,15 +281,12 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
       </form>
 
       <section className="rounded-xl bg-transparent px-2 py-3 text-center">
-        <div
+        <img
+          src="/brand/minor-19.png"
+          alt=""
           aria-hidden="true"
-          className="relative mx-auto flex h-28 w-28 items-center justify-center rounded-full border-[11px] border-red-500 bg-white shadow-sm"
-        >
-          <span className="relative z-10 text-[52px] font-black leading-none tracking-tight text-slate-950">
-            19
-          </span>
-          <span className="absolute left-1/2 top-1/2 h-[12px] w-[118px] -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-full bg-red-500" />
-        </div>
+          className="mx-auto h-28 w-28 rounded-full object-cover"
+        />
         <p className="mx-auto mt-6 max-w-[520px] text-left text-base font-black leading-7 text-slate-950 sm:text-center">
           <CountryText id="auth.minorRestrictionNotice" />
         </p>
