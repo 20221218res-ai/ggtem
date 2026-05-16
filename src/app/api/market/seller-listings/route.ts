@@ -48,7 +48,10 @@ export async function POST(request: NextRequest) {
         action: body.action,
       });
 
-      return NextResponse.json(result);
+      return NextResponse.json({
+        ...result,
+        messageKey: "sellerListingAction.statusSuccess",
+      });
     }
 
     if (body.mode === "DUPLICATE") {
@@ -66,7 +69,10 @@ export async function POST(request: NextRequest) {
         listingId: body.listingId,
       });
 
-      return NextResponse.json(result);
+      return NextResponse.json({
+        ...result,
+        messageKey: "sellerListingAction.duplicateSuccess",
+      });
     }
 
     if (
@@ -78,6 +84,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           message: "판매글, 제목, 금액, 총 수량을 모두 입력해 주세요.",
+          messageKey: "sellerListingAction.updateRequired",
         },
         { status: 400 },
       );
@@ -95,7 +102,10 @@ export async function POST(request: NextRequest) {
       totalQuantity: body.totalQuantity,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey: "listingEdit.updateSuccess",
+    });
   } catch (error) {
     return NextResponse.json(
       {
