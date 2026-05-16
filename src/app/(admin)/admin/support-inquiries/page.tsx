@@ -94,24 +94,18 @@ export default async function AdminSupportInquiriesPage({
   const totalCount = Array.from(statusCounts.values()).reduce((sum, count) => sum + count, 0);
 
   return (
-    <AdminMockPage
-      icon="문의"
-      title="1:1 문의"
-      subtitle="유저 고객센터에서 접수된 문의와 신규 게임/서버 요청을 확인하고 답변합니다."
-    >
+    <AdminMockPage icon="문의" title="1:1 문의" subtitle="">
       <MetricGrid
         items={[
-          { label: "전체 문의", value: String(totalCount), hint: "상태별 전체 합계", tone: "blue" },
-          { label: "접수", value: String(statusCounts.get("OPEN") ?? 0), hint: "확인 필요", tone: "amber" },
-          { label: "확인 중", value: String(statusCounts.get("IN_PROGRESS") ?? 0), hint: "처리 중", tone: "cyan" },
-          { label: "답변 완료", value: String(statusCounts.get("ANSWERED") ?? 0), hint: "유저 화면 노출", tone: "green" },
+          { label: "전체", value: String(totalCount), hint: "", tone: "blue" },
+          { label: "접수", value: String(statusCounts.get("OPEN") ?? 0), hint: "답변 대기", tone: "amber" },
+          { label: "확인 중", value: String(statusCounts.get("IN_PROGRESS") ?? 0), hint: "", tone: "cyan" },
+          { label: "답변 완료", value: String(statusCounts.get("ANSWERED") ?? 0), hint: "", tone: "green" },
         ]}
       />
 
       {params.notice === "updated" ? (
-        <InlineBanner tone="success">
-          문의 답변과 상태를 저장했습니다. 답변 완료로 바꾼 문의는 유저 알림에도 반영됩니다.
-        </InlineBanner>
+        <InlineBanner tone="success">저장 완료</InlineBanner>
       ) : null}
       {params.error ? <InlineBanner tone="error">{params.error}</InlineBanner> : null}
 
@@ -140,7 +134,7 @@ export default async function AdminSupportInquiriesPage({
             ))}
           </select>
           <button type="submit" className="rounded-md bg-slate-950 px-4 py-2 text-sm font-black text-white">
-            필터 적용
+            필터
           </button>
           <Link
             href="/admin/support-inquiries"
@@ -151,20 +145,20 @@ export default async function AdminSupportInquiriesPage({
         </form>
 
         <p className="mb-3 text-sm font-bold text-slate-500">
-          현재 조건에 맞는 문의 {inquiries.length}건을 표시합니다.
+          표시 {inquiries.length.toLocaleString("ko-KR")}건
         </p>
 
         {inquiries.length === 0 ? (
           <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-bold text-slate-500">
-            표시할 문의가 없습니다. 상태 또는 종류 필터를 다시 확인해 주세요.
+            문의 없음
           </div>
         ) : (
           <DataTable
-            headers={["종류", "회원", "문의 내용", "상태", "접수일"]}
+            headers={["종류", "회원", "문의", "상태", "접수"]}
             rows={inquiries.map((inquiry) => [
               inquiryCategoryLabel(inquiry.category),
               <div key={`${inquiry.id}-user`}>
-                <p className="font-black">{inquiry.user?.displayName ?? "탈퇴/미확인"}</p>
+                <p className="font-black">{inquiry.user?.displayName ?? "미확인"}</p>
                 <p className="mt-1 text-xs text-slate-500">{inquiry.user?.email ?? "-"}</p>
               </div>,
               <details key={`${inquiry.id}-body`} className="max-w-2xl">
@@ -190,7 +184,7 @@ export default async function AdminSupportInquiriesPage({
                     name="adminNote"
                     defaultValue={inquiry.adminNote ?? ""}
                     rows={4}
-                    placeholder="유저에게 보여줄 답변을 입력하세요."
+                    placeholder="유저에게 보일 답변"
                     className="rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold leading-6"
                   />
                   <FormSubmitButton className="rounded-md bg-slate-950 px-3 py-2 text-xs font-black text-white">
@@ -233,7 +227,7 @@ async function updateSupportInquiryAction(formData: FormData) {
   if ((safeStatus === "ANSWERED" || safeStatus === "CLOSED") && adminNote.length < 5) {
     redirect(
       "/admin/support-inquiries?error=" +
-        encodeURIComponent("답변 완료 또는 종료 처리에는 유저에게 보여줄 답변을 5자 이상 입력해야 합니다."),
+        encodeURIComponent("답변 완료 또는 종료 처리에는 5자 이상의 답변이 필요합니다."),
     );
   }
 

@@ -19,14 +19,14 @@ import {
 } from "@/lib/admin/cms";
 
 const cmsTemplateHints: Record<string, string> = {
-  NOTICE: "예: GGtem 안전거래 이용 안내",
-  FAQ: "예: 충전과 출금은 어떻게 처리되나요?",
-  POLICY: "예: 1인 1계정 및 외부거래 제한 안내",
-  PAID_SERVICE: "예: 프리미엄 글 노출 안내",
-  GAME_SERVER_REQUEST: "예: 신규 게임/서버 신청 방법",
-  TERMS: "예: 이용약관 개정 안내",
-  PRIVACY: "예: 개인정보 처리방침 안내",
-  GUIDE: "예: 계정 거래 진행 가이드",
+  NOTICE: "예: 안전거래 이용 안내",
+  FAQ: "예: 충전/출금 처리 안내",
+  POLICY: "예: 외부거래 제한 안내",
+  PAID_SERVICE: "예: 프리미엄 노출 안내",
+  GAME_SERVER_REQUEST: "예: 신규 게임/서버 신청",
+  TERMS: "예: 이용약관 개정",
+  PRIVACY: "예: 개인정보 처리방침",
+  GUIDE: "예: 계정 거래 가이드",
 };
 
 export default async function AdminCmsPage({
@@ -43,33 +43,26 @@ export default async function AdminCmsPage({
   const state = await getAdminCmsState();
 
   return (
-    <AdminMockPage
-      icon="문서"
-      title="콘텐츠 관리"
-      subtitle="고객센터 공지, FAQ, 정책, 가이드 문서를 운영합니다."
-    >
+    <AdminMockPage icon="문서" title="콘텐츠 관리" subtitle="">
       <MetricGrid
         items={[
-          { label: "전체 문서", value: String(state.summary.totalDocuments), hint: "CMS 문서", tone: "blue" },
-          { label: "게시중", value: String(state.summary.publishedDocuments), hint: "유저에게 노출", tone: "green" },
-          { label: "초안", value: String(state.summary.draftDocuments), hint: "작성 중", tone: "amber" },
-          { label: "검토요청", value: String(state.summary.reviewRequestedDocuments), hint: "승인 필요", tone: "cyan" },
-          { label: "보관", value: String(state.summary.archivedDocuments), hint: "미노출", tone: "slate" },
-          { label: "버전", value: String(state.summary.totalVersions), hint: "전체 버전", tone: "blue" },
+          { label: "전체", value: String(state.summary.totalDocuments), hint: "", tone: "blue" },
+          { label: "게시", value: String(state.summary.publishedDocuments), hint: "", tone: "green" },
+          { label: "초안", value: String(state.summary.draftDocuments), hint: "", tone: "amber" },
+          { label: "검토", value: String(state.summary.reviewRequestedDocuments), hint: "", tone: "cyan" },
+          { label: "보관", value: String(state.summary.archivedDocuments), hint: "", tone: "slate" },
+          { label: "버전", value: String(state.summary.totalVersions), hint: "", tone: "blue" },
         ]}
       />
 
-      {params.notice === "saved" ? <SoftNotice tone="green">콘텐츠가 저장되었습니다. 유저 고객센터에 반영됩니다.</SoftNotice> : null}
+      {params.notice === "saved" ? <SoftNotice tone="green">저장 완료</SoftNotice> : null}
       {params.error ? <SoftNotice tone="red">{params.error}</SoftNotice> : null}
 
       <section className="grid gap-5 xl:grid-cols-[420px_1fr]">
-        <Panel title="고객센터 문서 작성">
-          <SoftNotice tone="cyan">
-            공지사항, FAQ, 회원정책, 유료 서비스, 게임/서버 신청 안내는 게시중으로 저장하면 유저 고객센터에 바로 반영됩니다.
-          </SoftNotice>
-          <form action={saveCmsDocumentAction} className="mt-5 grid gap-4">
+        <Panel title="문서 작성">
+          <form action={saveCmsDocumentAction} className="grid gap-4">
             <label className="grid gap-2 text-sm font-black">
-              문서 종류
+              종류
               <select name="type" className="h-11 rounded-md border border-slate-200 px-3 font-bold">
                 {CMS_TYPES.map((type) => (
                   <option key={type} value={type}>
@@ -92,7 +85,7 @@ export default async function AdminCmsPage({
               <input
                 name="title"
                 required
-                placeholder="고객센터에 표시할 제목"
+                placeholder="고객센터 표시 제목"
                 className="h-11 rounded-md border border-slate-200 px-3 font-bold"
               />
             </label>
@@ -109,16 +102,16 @@ export default async function AdminCmsPage({
                 name="body"
                 required
                 rows={8}
-                placeholder="유저에게 안내할 내용을 입력하세요."
+                placeholder="유저에게 보일 내용"
                 className="rounded-md border border-slate-200 px-3 py-3 font-bold leading-6"
               />
             </label>
             <label className="grid gap-2 text-sm font-black">
               상태
               <select name="status" defaultValue="PUBLISHED" className="h-11 rounded-md border border-slate-200 px-3 font-bold">
-                <option value="PUBLISHED">게시중</option>
+                <option value="PUBLISHED">게시</option>
                 <option value="DRAFT">초안</option>
-                <option value="REVIEW_REQUESTED">검토요청</option>
+                <option value="REVIEW_REQUESTED">검토</option>
                 <option value="ARCHIVED">보관</option>
               </select>
             </label>
@@ -126,7 +119,7 @@ export default async function AdminCmsPage({
               변경 메모
               <input
                 name="changeNote"
-                placeholder="예: 고객센터 운영 문구 수정"
+                placeholder="예: 고객센터 문구 수정"
                 className="h-11 rounded-md border border-slate-200 px-3 font-bold"
               />
             </label>
@@ -134,14 +127,14 @@ export default async function AdminCmsPage({
               type="submit"
               className="h-11 rounded-md border border-[var(--color-primary)] bg-[var(--color-primary)] text-sm font-black text-black shadow-sm hover:bg-[var(--color-primary-hover)]"
             >
-              저장하고 반영
+              저장
             </button>
           </form>
         </Panel>
 
-        <Panel title="게시 문서 목록">
+        <Panel title="문서 목록">
           <DataTable
-            headers={["종류", "제목", "상태", "버전", "언어", "수정일"]}
+            headers={["종류", "제목", "상태", "버전", "언어", "수정"]}
             rows={state.documents.map((document) => [
               document.typeLabel,
               <div key={document.documentId}>
@@ -195,7 +188,7 @@ export default async function AdminCmsPage({
           ))}
           {state.documents.length === 0 ? (
             <p className="rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm font-bold text-slate-600">
-              아직 등록된 CMS 문서가 없습니다. 왼쪽 작성 폼으로 첫 공지나 FAQ를 등록하세요.
+              문서 없음
             </p>
           ) : null}
         </div>
