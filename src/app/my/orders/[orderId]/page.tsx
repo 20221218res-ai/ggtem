@@ -8,6 +8,7 @@ import OrderReviewForm from "@/app/order-review-form";
 import TrustReportForm from "@/app/trust-report-form";
 import UserContentText from "@/app/user-content-text";
 import { getMarketplaceMyOrderDetail } from "@/lib/market/my-orders";
+import { formatGameMoneyQuantityWithUnit } from "@/lib/market/trade-unit";
 import { BuyerOrderActions } from "./buyer-order-actions";
 
 type MyOrderDetailPageProps = {
@@ -29,6 +30,8 @@ export default async function MyOrderDetailPage({ params }: MyOrderDetailPagePro
   const accountType =
     order.category === "GAME_ACCOUNT" ? getAccountTransferTypeLabelNode(order.accountTransferType) : null;
   const gameMeta = [order.gameName, order.serverName].filter(Boolean).join(" / ");
+  const buyerGameNickname = order.buyerGameNickname ?? order.tradeCharacterName;
+  const sellerGameNickname = order.sellerGameNickname;
 
   return (
     <main className="min-h-screen bg-[var(--gg-page-bg)] px-4 py-6 text-[var(--gg-text)] lg:px-8">
@@ -68,7 +71,8 @@ export default async function MyOrderDetailPage({ params }: MyOrderDetailPagePro
             <Metric label={<CountryText id="orderManage.gameServer" />} value={gameMeta || <CountryText id="orderManage.gameInfoMissing" />} />
             <Metric label={<CountryText id="orderManage.quantity" />} value={<QuantityValue order={order} />} />
             <Metric label={<CountryText id="orderManage.expectedSettlement" />} value={`${order.sellerReceivableAmount} ${order.currency}`} />
-            {order.tradeCharacterName ? <Metric label="거래 캐릭터명" value={order.tradeCharacterName} /> : null}
+            {buyerGameNickname ? <Metric label={<CountryText id="listingForm.buyerGameNickname" />} value={buyerGameNickname} /> : null}
+            {sellerGameNickname ? <Metric label={<CountryText id="listingForm.sellerGameNickname" />} value={sellerGameNickname} /> : null}
           </section>
 
           <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)]">
@@ -87,6 +91,8 @@ export default async function MyOrderDetailPage({ params }: MyOrderDetailPagePro
             </div>
             <OrderSteps status={order.status} sellerMode={false} />
           </section>
+
+          <TradeSafetyNotice />
 
           <details className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)]">
             <summary className="cursor-pointer text-lg font-black">
@@ -170,6 +176,17 @@ function MetaChip({ children }: { children: ReactNode }) {
   );
 }
 
+function TradeSafetyNotice() {
+  return (
+    <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm font-black leading-6 text-amber-800">
+      <p><CountryText id="tradeSafety.gameIdNoticeA" /></p>
+      <p className="mt-1">
+        <CountryText id="tradeSafety.gameIdNoticeB" />
+      </p>
+    </section>
+  );
+}
+
 function OrderSteps({ status, sellerMode }: { status: string; sellerMode: boolean }) {
   const steps: TranslationKey[] = sellerMode
     ? ["orderStatus.requested", "orderStatus.escrowLocked", "orderStatus.deliveryInProgress", "orderStatus.completed"]
@@ -186,13 +203,29 @@ function OrderSteps({ status, sellerMode }: { status: string; sellerMode: boolea
   );
 }
 
-function QuantityValue({ order }: { order: Pick<BuyerOrderDetail, "quantity" | "category" | "moneyUnitName"> }) {
-  const moneyUnit = order.moneyUnitName?.trim();
+function QuantityValue({
+  order,
+}: {
+  order: Pick<
+    BuyerOrderDetail,
+    "quantity" | "category" | "moneyUnitName" | "priceUnitQuantity"
+  >;
+}) {
+  if (order.category === "GAME_MONEY") {
+    return (
+      <>
+        {formatGameMoneyQuantityWithUnit(
+          order.quantity,
+          order.priceUnitQuantity,
+          order.moneyUnitName,
+        )}
+      </>
+    );
+  }
 
   return (
     <>
-      {order.quantity}{" "}
-      {order.category === "GAME_MONEY" && moneyUnit ? moneyUnit : <CountryText id={getCategoryKey(order.category)} />}
+      {order.quantity} <CountryText id={getCategoryKey(order.category)} />
     </>
   );
 }

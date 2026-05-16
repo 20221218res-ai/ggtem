@@ -1,6 +1,6 @@
 "use client";
 
-import type { InputHTMLAttributes } from "react";
+import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { useEffect, useState } from "react";
 import { COUNTRY_CHANGE_EVENT } from "./country-text";
 import {
@@ -41,4 +41,28 @@ export default function LocalizedInput({
   }, []);
 
   return <input {...props} placeholder={translate(placeholderKey, countryCode)} />;
+}
+
+export function LocalizedTextarea({
+  placeholderKey,
+  ...props
+}: TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  placeholderKey: TranslationKey;
+}) {
+  const [countryCode, setCountryCode] = useState<CountryCode>("KR");
+
+  useEffect(() => {
+    const syncCountry = () => setCountryCode(getStoredCountry());
+
+    syncCountry();
+    window.addEventListener(COUNTRY_CHANGE_EVENT, syncCountry);
+    window.addEventListener("storage", syncCountry);
+
+    return () => {
+      window.removeEventListener(COUNTRY_CHANGE_EVENT, syncCountry);
+      window.removeEventListener("storage", syncCountry);
+    };
+  }, []);
+
+  return <textarea {...props} placeholder={translate(placeholderKey, countryCode)} />;
 }

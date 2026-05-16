@@ -4,11 +4,16 @@ import { getPendingEmailVerificationStatus } from "@/lib/auth/session";
 export async function GET() {
   try {
     const status = await getPendingEmailVerificationStatus();
-    return NextResponse.json(status);
+    return NextResponse.json(
+      status.status === "blocked"
+        ? { code: "AUTH_ACCOUNT_UNAVAILABLE", ...status }
+        : status,
+    );
   } catch (error) {
     return NextResponse.json(
       {
         status: "error",
+        code: "AUTH_EMAIL_VERIFICATION_STATUS_FAILED",
         message:
           error instanceof Error
             ? error.message

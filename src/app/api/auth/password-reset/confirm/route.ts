@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     if (!body.token || !body.password) {
       return NextResponse.json(
-        { message: "Token and new password are required." },
+        { code: "AUTH_PASSWORD_RESET_FIELDS_REQUIRED", message: "토큰과 새 비밀번호가 필요합니다." },
         { status: 400 },
       );
     }
@@ -20,11 +20,15 @@ export async function POST(request: NextRequest) {
       password: body.password,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      code: "AUTH_PASSWORD_CHANGED",
+      ...result,
+    });
   } catch (error) {
     return NextResponse.json(
       {
-        message: error instanceof Error ? error.message : "Could not reset the password.",
+        code: "AUTH_PASSWORD_RESET_CONFIRM_FAILED",
+        message: error instanceof Error ? error.message : "비밀번호를 재설정하지 못했습니다.",
       },
       { status: 400 },
     );

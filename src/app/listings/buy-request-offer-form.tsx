@@ -73,6 +73,15 @@ export default function BuyRequestOfferForm({
   const actualQuantity = isGameMoneyRequest && isGameMoneyDisplayQuantity(quantity)
     ? toGameMoneyActualQuantity(quantity, normalizedPriceUnitQuantity)
     : quantity;
+  const actualQuantityLabel = isGameMoneyRequest
+    ? `${quantity} x ${priceUnitLabel}`
+    : actualQuantity;
+  const displayDefaultQuantityLabel = isGameMoneyRequest
+    ? `${displayDefaultQuantity} x ${priceUnitLabel}`
+    : defaultQuantity;
+  const displayMinimumQuantityLabel = isGameMoneyRequest
+    ? `${displayMinimumQuantity} x ${priceUnitLabel}`
+    : minimumQuantity;
 
   useEffect(() => {
     if (isBulkMode) {
@@ -85,7 +94,7 @@ export default function BuyRequestOfferForm({
       if (isGameMoneyRequest && !isGameMoneyDisplayQuantity(quantity)) {
         return {
           isValid: false,
-          message: "게임머니 판매 수량은 선택한 단위 기준 숫자로 입력해 주세요.",
+          message: t("listingForm.selectedUnitQuantityInvalid"),
         };
       }
 
@@ -94,39 +103,41 @@ export default function BuyRequestOfferForm({
       const normalizedDefault = parseFixedAmount(defaultQuantity);
 
       if (normalizedQuantity <= 0n) {
-        return { isValid: false, message: "판매 수량은 0보다 커야 합니다." };
+        return { isValid: false, message: t("sale.quantityPositive") };
       }
 
       if (isBulkMode && normalizedQuantity !== normalizedDefault) {
         return {
           isValid: false,
-          message: "일괄구매 요청에는 남은 전체 수량만 즉시판매할 수 있습니다.",
+          message: t("sale.bulkOnlyFullQuantity"),
         };
       }
 
       if (normalizedQuantity < normalizedMinimum) {
         return {
           isValid: false,
-          message: `판매 수량은 최소 ${displayMinimumQuantity} 이상이어야 합니다.`,
+          message: formatMessage(t("sale.minimumQuantityMessage"), { quantity: displayMinimumQuantityLabel }),
         };
       }
 
       if (normalizedQuantity > normalizedDefault) {
         return {
           isValid: false,
-          message: `판매 수량은 남은 구매 수량 ${displayDefaultQuantity} 이하로 입력해 주세요.`,
+          message: formatMessage(t("sale.availableQuantityMessage"), { quantity: displayDefaultQuantityLabel }),
         };
       }
 
-      return { isValid: true, message: "판매 가능한 수량입니다." };
+      return { isValid: true, message: t("sale.quantityValid") };
     } catch {
-      return { isValid: false, message: "수량은 숫자로 입력해 주세요." };
+      return { isValid: false, message: t("purchase.numberOnly") };
     }
   }, [
     actualQuantity,
     defaultQuantity,
     displayDefaultQuantity,
+    displayDefaultQuantityLabel,
     displayMinimumQuantity,
+    displayMinimumQuantityLabel,
     isBulkMode,
     isGameMoneyRequest,
     minimumQuantity,
@@ -200,7 +211,7 @@ export default function BuyRequestOfferForm({
                   onChange={(event) => setQuantity(event.target.value)}
                   inputMode="numeric"
                   step={isGameMoneyRequest ? 1 : undefined}
-                  placeholder={isGameMoneyRequest ? `예: 1 = ${priceUnitLabel}` : undefined}
+                  placeholder={isGameMoneyRequest ? `${t("listingForm.exampleUnitQuantity")} = ${priceUnitLabel}` : undefined}
                   className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-sm font-black text-[var(--gg-text)] outline-none focus:border-[var(--gg-accent)]"
                 />
                 <span className={quantityStatus.isValid ? "text-[var(--gg-accent)]" : "text-rose-500"}>
@@ -208,14 +219,14 @@ export default function BuyRequestOfferForm({
                 </span>
               </label>
             ) : (
-              <SummaryRow label={t("sale.quantity")} value={isGameMoneyRequest ? displayDefaultQuantity : defaultQuantity} />
+              <SummaryRow label={t("sale.quantity")} value={displayDefaultQuantityLabel} />
             )}
             {isBulkMode ? (
               <p className="text-xs font-bold leading-5 text-[var(--gg-muted)]">
-                일괄구매 요청은 남은 전체 수량만 한 번에 즉시판매할 수 있습니다.
+                {t("sale.bulkOnlyFullQuantity")}
               </p>
             ) : null}
-            <SummaryRow label="최소 판매 수량" value={isGameMoneyRequest ? displayMinimumQuantity : minimumQuantity} />
+            <SummaryRow label={t("listingForm.minimumSellQuantity")} value={displayMinimumQuantityLabel} />
             <SummaryRow label={t("sale.unitPrice")} value={`${defaultUnitPrice} ${currency} / ${priceUnitLabel}`} />
             <div className="flex items-center justify-between gap-3 border-t border-[var(--gg-border-soft)] pt-2">
               <span className="font-bold text-[var(--gg-muted)]">{t("sale.expectedTotal")}</span>
@@ -280,15 +291,17 @@ export default function BuyRequestOfferForm({
       <TradeSafetyConfirmDialog
         isOpen={isConfirmOpen}
         eyebrow="SAFE ESCROW"
-        title="안전 거래 판매확인"
-        body="구매요청 조건과 일치하는 판매 주문을 생성합니다. 서버와 거래 정보를 마지막으로 확인해 주세요."
-        confirmLabel="판매 주문 생성"
+        title={t("sale.confirmTitle")}
+        body={t("sale.confirmBody")}
+        confirmLabel={t("sale.confirmLabel")}
         cancelLabel={t("common.cancel")}
         isSubmitting={isSubmitting}
         serverLabel={serverLabel}
         requireCharacterName
+        characterNameLabel={t("listingForm.sellerGameNickname")}
+        characterNamePlaceholder={t("listingForm.sellerGameNicknamePlaceholder")}
         summaryRows={[
-          { label: String(t("sale.quantity")), value: actualQuantity },
+          { label: String(t("sale.quantity")), value: actualQuantityLabel },
           { label: String(t("sale.unitPrice")), value: `${defaultUnitPrice} ${currency} / ${priceUnitLabel}` },
           { label: String(t("sale.expectedTotal")), value: `${effectiveTotalAmount} ${currency}` },
         ]}
@@ -332,4 +345,11 @@ function getInstantSaleStatusLabel(status?: string) {
 function TranslatedStatus({ labelKey }: { labelKey: TranslationKey }) {
   const { t } = useCountryTranslation();
   return <>{t(labelKey)}</>;
+}
+
+function formatMessage(template: string, values: Record<string, string>) {
+  return Object.entries(values).reduce(
+    (result, [key, value]) => result.replaceAll(`{${key}}`, value),
+    template,
+  );
 }

@@ -16,6 +16,7 @@ import type { TranslationKey } from "../i18n";
 import GameNameText from "../game-name-text";
 import type { GameCatalogOption, LocalizedGameNames } from "@/lib/market/game-localization";
 import {
+  formatGameMoneyQuantityWithUnit,
   getGameMoneyPriceUnitLabel,
   getTradeUnitLabel,
   normalizeGameMoneyPriceUnit,
@@ -48,7 +49,7 @@ type MarketFeedItem =
   | { type: "listing"; item: MarketplaceListingSummary }
   | { type: "buyRequest"; item: MarketplaceBuyRequestSummary };
 
-type ListingSectionTone = "lowest" | "premium" | "regular";
+type ListingSectionTone = "lowest" | "highest" | "premium" | "regular";
 
 type GameCard = {
   name: string;
@@ -782,6 +783,8 @@ function ListingSection({
       ? "rounded-2xl border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_9%,white)] p-4 shadow-lg shadow-[color-mix(in_srgb,var(--gg-accent)_24%,transparent)]"
       : tone === "lowest"
         ? "rounded-2xl border border-[#10b981] bg-[#ecfdf5] p-4 shadow-sm shadow-[#10b9812e]"
+        : tone === "highest"
+          ? "rounded-2xl border border-[#22c55e] bg-[#f0fdf4] p-4 shadow-sm shadow-[#22c55e2e]"
         : "rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4";
 
   return (
@@ -838,6 +841,26 @@ function getDisplayUnitPrice({
   };
 }
 
+function getDisplayQuantity({
+  category,
+  quantity,
+  priceUnitQuantity,
+  moneyUnitName,
+  fallbackUnit,
+}: {
+  category: string;
+  quantity: string;
+  priceUnitQuantity: string;
+  moneyUnitName: string | null;
+  fallbackUnit: string;
+}) {
+  if (category === "GAME_MONEY") {
+    return formatGameMoneyQuantityWithUnit(quantity, priceUnitQuantity, moneyUnitName);
+  }
+
+  return `${quantity} ${fallbackUnit}`.trim();
+}
+
 function calculateDisplayTotalAmount(quantity: string, unitPrice: string) {
   const nextQuantity = Number(quantity);
   const nextUnitPrice = Number(unitPrice);
@@ -877,6 +900,20 @@ function ListingRow({
     priceUnitQuantity: listing.priceUnitQuantity,
     moneyUnitName: listing.moneyUnitName,
   });
+  const minimumQuantityLabel = getDisplayQuantity({
+    category: listing.category,
+    quantity: listing.minimumQuantity,
+    priceUnitQuantity: listing.priceUnitQuantity,
+    moneyUnitName: listing.moneyUnitName,
+    fallbackUnit: moneyUnit,
+  });
+  const availableQuantityLabel = getDisplayQuantity({
+    category: listing.category,
+    quantity: listing.availableQuantity,
+    priceUnitQuantity: listing.priceUnitQuantity,
+    moneyUnitName: listing.moneyUnitName,
+    fallbackUnit: moneyUnit,
+  });
   const rowClass = getListingRowClass(tone);
 
   return (
@@ -892,6 +929,11 @@ function ListingRow({
           {tone === "lowest" ? (
             <span className="rounded-full bg-[#10b981] px-3 py-1 text-xs font-black text-white">
               최저가 TOP
+            </span>
+          ) : null}
+          {tone === "highest" ? (
+            <span className="rounded-full bg-[#22c55e] px-3 py-1 text-xs font-black text-white">
+              최고가 TOP
             </span>
           ) : null}
           {listing.isPremium ? (
@@ -916,10 +958,10 @@ function ListingRow({
             <AccountTypeChip value={listing.accountTransferType} />
           ) : null}
           <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
-            <CountryText id="listings.minimum" /> {listing.minimumQuantity} {moneyUnit}
+            <CountryText id="listings.minimum" /> {minimumQuantityLabel}
           </span>
           <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
-            <CountryText id="listings.stock" /> {listing.availableQuantity} {moneyUnit}
+            <CountryText id="listings.stock" /> {availableQuantityLabel}
           </span>
         </div>
       </div>
@@ -961,6 +1003,27 @@ function BuyRequestRow({
   });
   const offerQuantity = request.remainingQuantity || request.quantity;
   const offerTotalAmount = calculateDisplayTotalAmount(offerQuantity, request.unitPrice);
+  const remainingQuantityLabel = getDisplayQuantity({
+    category: request.category,
+    quantity: request.remainingQuantity,
+    priceUnitQuantity: request.priceUnitQuantity,
+    moneyUnitName: request.moneyUnitName,
+    fallbackUnit: moneyUnit,
+  });
+  const quantityLabel = getDisplayQuantity({
+    category: request.category,
+    quantity: request.quantity,
+    priceUnitQuantity: request.priceUnitQuantity,
+    moneyUnitName: request.moneyUnitName,
+    fallbackUnit: moneyUnit,
+  });
+  const minimumQuantityLabel = getDisplayQuantity({
+    category: request.category,
+    quantity: request.minimumQuantity,
+    priceUnitQuantity: request.priceUnitQuantity,
+    moneyUnitName: request.moneyUnitName,
+    fallbackUnit: moneyUnit,
+  });
   const rowClass = getListingRowClass(tone);
 
   return (
@@ -970,6 +1033,11 @@ function BuyRequestRow({
           <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-700">
             <CountryText id="listings.buyRequestChip" />
           </span>
+          {tone === "highest" ? (
+            <span className="rounded-full bg-[#22c55e] px-3 py-1 text-xs font-black text-white">
+              최고가 TOP
+            </span>
+          ) : null}
           {request.isPremium ? (
             <span className="rounded-full border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_16%,white)] px-3 py-1 text-xs font-black text-[var(--gg-accent)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_18%,transparent)]">
               프리미엄
@@ -992,11 +1060,11 @@ function BuyRequestRow({
             <AccountTypeChip value={request.accountTransferType} />
           ) : null}
           <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
-            <CountryText id="listings.wanted" /> {request.remainingQuantity} / {request.quantity} {moneyUnit}
+            <CountryText id="listings.wanted" /> {remainingQuantityLabel} / {quantityLabel}
           </span>
           {request.category === "GAME_MONEY" ? (
             <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
-              {request.tradeMode === "BULK" ? "일괄구매" : "분할구매"} / 최소 {request.minimumQuantity} {moneyUnit}
+              {request.tradeMode === "BULK" ? "일괄구매" : "분할구매"} / 최소 {minimumQuantityLabel}
             </span>
           ) : null}
           <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
@@ -1099,7 +1167,7 @@ function buildListingSections(
     sections.push({
       key: "highest-buy",
       title: "최고가 구매글",
-      tone: "lowest",
+      tone: "highest",
       items: highestBuyItems,
     });
   }
@@ -1147,6 +1215,10 @@ function getListingRowClass(tone: ListingSectionTone) {
 
   if (tone === "lowest") {
     return "border-[#10b981] shadow-sm shadow-[#10b9812e]";
+  }
+
+  if (tone === "highest") {
+    return "border-[#22c55e] shadow-sm shadow-[#22c55e2e]";
   }
 
   return "border-[var(--gg-border)]";

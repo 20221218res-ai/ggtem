@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { requirePageRole, ROLE_GROUPS } from "@/lib/auth/guards";
 import { getAdminFinanceState } from "@/lib/admin/finance";
+import { requirePageRole, ROLE_GROUPS } from "@/lib/auth/guards";
 import FinanceActions from "../finance/finance-actions";
 
 type FinanceState = Awaited<ReturnType<typeof getAdminFinanceState>>;
@@ -19,7 +19,7 @@ export default async function AdminDepositsPage() {
         <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-black text-[var(--color-primary)]">DEPOSIT DESK</p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">입금 처리</h1>
+            <h1 className="mt-2 text-3xl font-black tracking-tight">충전 승인</h1>
             <p className="mt-2 text-sm font-semibold text-slate-600">
               TXID, 체인, 입금 주소, 금액을 대조한 뒤 승인 또는 반려합니다.
             </p>
@@ -82,10 +82,7 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
               label={hasRiskFlags ? `위험 신호 ${item.riskFlags.length}개` : "위험 신호 없음"}
               tone={hasRiskFlags ? "red" : "emerald"}
             />
-            <StatusBadge
-              label={hasValidTxId ? "TXID 제출됨" : "TXID 필요"}
-              tone={hasValidTxId ? "emerald" : "red"}
-            />
+            <StatusBadge label={hasValidTxId ? "TXID 제출됨" : "TXID 필요"} tone={hasValidTxId ? "emerald" : "red"} />
           </div>
           <p className="mt-3 text-lg font-black text-slate-950">{item.userName}</p>
           <p className="mt-1 text-xs font-semibold text-slate-500">{item.userEmail}</p>
@@ -105,7 +102,7 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
           <InfoRow label="입금 주소" value={item.evidence.depositAddress ?? "미입력"} breakAll />
           <InfoRow
             label="TXID"
-            value={item.evidence.txHash ?? "아직 제출하지 않음"}
+            value={item.evidence.txHash ?? "아직 제출되지 않음"}
             breakAll
             tone={item.evidence.isTxHashPending ? "text-amber-700" : "text-emerald-700"}
           />

@@ -69,7 +69,7 @@ export function assertGameMoneyQuantityUnit(
 }
 
 export function isGameMoneyQuantityUnit(value: string) {
-  const normalized = value.trim();
+  const normalized = normalizeGameMoneyQuantityText(value);
 
   if (!/^\d+$/.test(normalized)) {
     return false;
@@ -96,7 +96,7 @@ export function normalizeGameMoneyPriceUnit(value: string | null | undefined) {
 }
 
 export function isGameMoneyDisplayQuantity(value: string) {
-  const normalized = value.trim();
+  const normalized = normalizeGameMoneyQuantityText(value);
 
   return /^\d+$/.test(normalized) && BigInt(normalized) > 0n;
 }
@@ -121,14 +121,14 @@ export function toGameMoneyDisplayQuantity(
   actualQuantity: string | null | undefined,
   priceUnitQuantity: string | null | undefined,
 ) {
-  const normalizedActualQuantity = actualQuantity?.trim();
+  const normalizedActualQuantity = normalizeGameMoneyQuantityText(actualQuantity);
 
   if (!normalizedActualQuantity || !/^\d+$/.test(normalizedActualQuantity)) {
     return "1";
   }
 
   const actual = BigInt(normalizedActualQuantity);
-  const unit = BigInt(normalizeGameMoneyPriceUnit(priceUnitQuantity));
+  const unit = BigInt(safeNormalizeGameMoneyPriceUnit(priceUnitQuantity));
 
   if (actual <= 0n || unit <= 0n) {
     return "1";
@@ -141,6 +141,59 @@ export function toGameMoneyDisplayQuantity(
   return (actual / unit).toString();
 }
 
+export function formatGameMoneyQuantityWithUnit(
+  actualQuantity: string | null | undefined,
+  priceUnitQuantity: string | null | undefined,
+  moneyUnitName: string | null | undefined,
+) {
+  const normalizedActualQuantity = normalizeGameMoneyQuantityText(actualQuantity);
+
+  if (!normalizedActualQuantity || !/^\d+$/.test(normalizedActualQuantity)) {
+    return "0";
+  }
+
+  const normalizedPriceUnitQuantity =
+    safeNormalizeGameMoneyPriceUnit(priceUnitQuantity);
+  const displayQuantity = toGameMoneyDisplayQuantity(
+    normalizedActualQuantity,
+    normalizedPriceUnitQuantity,
+  );
+  const priceUnitLabel = getGameMoneyPriceUnitLabel(
+    normalizedPriceUnitQuantity,
+    moneyUnitName,
+  );
+
+  return `${formatIntegerQuantity(displayQuantity)} x ${priceUnitLabel}`;
+}
+
+export function safeNormalizeGameMoneyPriceUnit(
+  value: string | null | undefined,
+) {
+  try {
+    return normalizeGameMoneyPriceUnit(value);
+  } catch {
+    return GAME_MONEY_PRICE_UNIT_OPTIONS[0].value;
+  }
+}
+
+export function normalizeGameMoneyQuantityText(value: string | null | undefined) {
+  const normalized = value?.trim() ?? "";
+
+  if (!normalized) {
+    return "";
+  }
+
+  if (/^\d+$/.test(normalized)) {
+    return normalized;
+  }
+
+  if (/^\d+\.0+$/.test(normalized)) {
+    return normalized.replace(/\.0+$/, "");
+  }
+
+  return normalized;
+}
+
 export function getGameMoneyPriceUnitLabel(
   value: string,
   moneyUnitName: string | null | undefined,
@@ -151,6 +204,14 @@ export function getGameMoneyPriceUnitLabel(
   const unitName = getGameMoneyUnitName(moneyUnitName);
 
   return `${option.label} (${option.koreanLabel}) ${unitName}`;
+}
+
+function formatIntegerQuantity(value: string) {
+  if (!/^\d+$/.test(value)) {
+    return value;
+  }
+
+  return BigInt(value).toLocaleString("en-US");
 }
 
 function isBrokenUnitLabel(value: string) {

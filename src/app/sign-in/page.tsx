@@ -3,7 +3,6 @@ import {
   Alert,
   ButtonLink,
   PageContainer,
-  PageHeader,
   PageShell,
 } from "@/components/ui";
 import CountrySelector from "../country-selector";
@@ -20,31 +19,37 @@ export default async function SignInPage() {
 
   return (
     <PageShell>
-      <PageContainer className="max-w-5xl">
-        <PageHeader
-          eyebrow={<CountryText id="auth.account" />}
-          title={<CountryText id="auth.signInTitle" />}
-          description={<CountryText id="auth.signInDescription" />}
-          actions={
-            <>
-              <CountrySelector />
-              <ButtonLink href="/sign-up" tone="primary">
-                <CountryText id="common.signUp" />
-              </ButtonLink>
-              <ButtonLink href="/" tone="secondary">
-                <CountryText id="common.backHome" />
-              </ButtonLink>
-            </>
-          }
-        />
+      <PageContainer className="max-w-4xl">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <CountrySelector />
+          <ButtonLink href="/" tone="secondary">
+            <CountryText id="common.backHome" />
+          </ButtonLink>
+        </div>
 
-        {currentUser ? (
-          <Alert tone="success">
-            <CountryText id="auth.currentlySignedIn" />: {currentUser.displayName}
-          </Alert>
-        ) : null}
+        <section className="mx-auto w-full max-w-[560px] pt-2 sm:pt-8">
+          <div className="mb-8 text-center">
+            <p className="text-sm font-black text-[var(--gg-accent)]">
+              <CountryText id="auth.account" />
+            </p>
+            <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--gg-text)] sm:text-5xl">
+              <CountryText id="auth.signInTitle" />
+            </h1>
+            <p className="mx-auto mt-4 max-w-md text-sm font-semibold leading-6 text-[var(--gg-muted)]">
+              <CountryText id="auth.signInDescription" />
+            </p>
+          </div>
 
-        <SignInForm accounts={demoAccounts} />
+          {currentUser ? (
+            <div className="mb-4">
+              <Alert tone="success">
+                <CountryText id="auth.currentlySignedIn" />: {currentUser.displayName}
+              </Alert>
+            </div>
+          ) : null}
+
+          <SignInForm accounts={demoAccounts} />
+        </section>
       </PageContainer>
     </PageShell>
   );

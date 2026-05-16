@@ -1,10 +1,13 @@
+import type { ReactNode } from "react";
+import CountryText from "@/app/country-text";
+
 type PageLoadingProps = {
-  label?: string;
+  label?: ReactNode;
   variant?: "market" | "admin" | "compact";
 };
 
 export default function PageLoading({
-  label = "Loading GGtem",
+  label,
   variant = "market",
 }: PageLoadingProps) {
   const isAdmin = variant === "admin";
@@ -28,9 +31,11 @@ export default function PageLoading({
             </div>
             <div>
               <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--gg-accent)]">
-                {isAdmin ? "Admin Console" : "GGtem"}
+                {isAdmin ? <CountryText id="common.adminConsole" /> : "GGtem"}
               </p>
-              <h1 className="mt-1 text-xl font-black">{label}</h1>
+              <h1 className="mt-1 text-xl font-black">
+                {label ?? <CountryText id="common.loading" />}
+              </h1>
             </div>
           </div>
           <div className="mt-6 grid gap-3 md:grid-cols-3">

@@ -122,8 +122,12 @@ export default function UserMarketHeaderClient({
         <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
           {currentUser ? (
             <>
-              <QuickTextLink href="/my/wallet?action=deposit" tone="primary">{t("common.deposit")}</QuickTextLink>
-              <QuickTextLink href="/my/wallet?action=withdraw">{t("common.withdraw")}</QuickTextLink>
+              <QuickTextLink href="/my/wallet?action=deposit" tone="primary">
+                {t("common.deposit")}
+              </QuickTextLink>
+              <QuickTextLink href="/my/wallet?action=withdraw">
+                {t("common.withdraw")}
+              </QuickTextLink>
             </>
           ) : (
             null
@@ -198,6 +202,10 @@ export default function UserMarketHeaderClient({
         <div className="flex shrink-0 items-center gap-2 sm:ml-auto">
           {currentUser ? (
             <>
+              <HeaderBalancePill
+                balance={counts.walletAvailableBalance}
+                currency={counts.walletCurrency}
+              />
               <TextIconLink
                 href="/my/wallet"
                 label={t("common.wallet")}
@@ -229,16 +237,37 @@ function QuickTextLink({
 }) {
   const className =
     tone === "primary"
-      ? "border-[var(--gg-accent)] bg-[var(--gg-accent)] text-[var(--gg-inverse-text)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_25%,transparent)] hover:bg-[var(--gg-accent-hover)]"
-      : "border-[var(--gg-border)] bg-white text-[var(--gg-text)] hover:border-[var(--gg-accent)] hover:bg-[color-mix(in_srgb,var(--gg-accent)_8%,white)] hover:text-[var(--gg-accent)]";
+      ? "border-[var(--gg-accent)] bg-[var(--gg-accent)] text-[var(--gg-inverse-text)] shadow-md shadow-[color-mix(in_srgb,var(--gg-accent)_28%,transparent)] ring-2 ring-[color-mix(in_srgb,var(--gg-accent)_18%,white)] hover:bg-[var(--gg-accent-hover)]"
+      : "border-[color-mix(in_srgb,var(--gg-accent)_34%,var(--gg-border))] bg-white text-[var(--gg-accent)] shadow-sm hover:border-[var(--gg-accent)] hover:bg-[color-mix(in_srgb,var(--gg-accent)_8%,white)]";
 
   return (
     <Link
       href={href}
       prefetch={false}
-      className={`inline-flex h-9 items-center justify-center rounded-full border px-3 text-xs font-black transition ${className}`}
+      className={`inline-flex h-10 items-center justify-center rounded-xl border px-4 text-xs font-black transition ${className}`}
     >
       {children}
+    </Link>
+  );
+}
+
+function HeaderBalancePill({
+  balance,
+  currency,
+}: {
+  balance: string;
+  currency: string;
+}) {
+  return (
+    <Link
+      href="/my/wallet"
+      prefetch={false}
+      className="hidden min-h-10 flex-col justify-center rounded-2xl border border-[color-mix(in_srgb,var(--gg-accent)_28%,var(--gg-border))] bg-[color-mix(in_srgb,var(--gg-accent)_7%,white)] px-4 text-xs font-black text-[var(--gg-text)] shadow-sm hover:border-[var(--gg-accent)] hover:bg-white md:flex"
+    >
+      <span className="text-[10px] text-[var(--gg-muted)]">보유 잔액</span>
+      <span className="mt-0.5 text-[var(--gg-accent)]">
+        {formatHeaderBalance(balance)} {currency}
+      </span>
     </Link>
   );
 }

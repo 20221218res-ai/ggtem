@@ -26,6 +26,7 @@ export default function PriorityNotificationModal() {
   const pathname = usePathname();
   const [notification, setNotification] = useState<NotificationItem | null>(null);
   const [dismissedId, setDismissedId] = useState<string | null>(null);
+  const [isOpening, setIsOpening] = useState(false);
   const shouldCheck = useMemo(() => {
     if (!pathname) return false;
     if (pathname.startsWith("/admin")) return false;
@@ -102,12 +103,13 @@ export default function PriorityNotificationModal() {
   }, [dismissedId, shouldCheck]);
 
   async function openNotification() {
-    if (!notification) {
+    if (!notification || isOpening) {
       return;
     }
 
     const nextNotification = notification;
     const targetHref = nextNotification.href ?? "/my/notifications";
+    setIsOpening(true);
     window.sessionStorage.setItem(DISMISSED_STORAGE_KEY, nextNotification.notificationId);
     setDismissedId(nextNotification.notificationId);
     setNotification(null);
@@ -130,7 +132,7 @@ export default function PriorityNotificationModal() {
   }
 
   function dismissNotification() {
-    if (!notification) {
+    if (!notification || isOpening) {
       return;
     }
 
@@ -139,7 +141,7 @@ export default function PriorityNotificationModal() {
     setNotification(null);
   }
 
-  if (!notification) {
+  if (!notification || isOpening) {
     return null;
   }
 
@@ -158,6 +160,7 @@ export default function PriorityNotificationModal() {
           <button
             type="button"
             onClick={dismissNotification}
+            disabled={isOpening}
             className="rounded-lg border border-[var(--gg-border)] px-3 py-2 text-sm font-black text-[var(--gg-muted)] hover:text-[var(--gg-text)]"
           >
             닫기
@@ -166,6 +169,7 @@ export default function PriorityNotificationModal() {
         <button
           type="button"
           onClick={() => void openNotification()}
+          disabled={isOpening}
           className="mt-4 w-full rounded-xl border border-[color-mix(in_srgb,var(--gg-accent)_45%,transparent)] bg-[color-mix(in_srgb,var(--gg-accent)_10%,white)] p-4 text-left transition hover:border-[var(--gg-accent)]"
         >
           <p className="font-black text-[var(--gg-text)]">{notification.title}</p>
@@ -179,6 +183,7 @@ export default function PriorityNotificationModal() {
         <button
           type="button"
           onClick={() => void openNotification()}
+          disabled={isOpening}
           className="mt-4 w-full rounded-xl bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-white hover:brightness-105"
         >
           바로 확인하기

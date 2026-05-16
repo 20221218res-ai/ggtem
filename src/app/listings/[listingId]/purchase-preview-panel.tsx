@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { TradeSafetyConfirmDialog } from "@/components/trade-safety-confirm-dialog";
 import { calculateMarketplacePurchaseAmount } from "@/lib/market/purchase-calculation";
 import {
+  formatGameMoneyQuantityWithUnit,
   isGameMoneyDisplayQuantity,
   normalizeGameMoneyPriceUnit,
   toGameMoneyActualQuantity,
@@ -80,23 +81,28 @@ export function PurchasePreviewPanel({
   const displayAvailableQuantity = isGameMoneyListing
     ? toGameMoneyDisplayQuantity(availableQuantity, normalizedPriceUnitQuantity)
     : availableQuantity;
-  const [quantity, setQuantity] = useState(displayMinimumQuantity);
+  const minimumQuantityLabel = isGameMoneyListing
+    ? formatGameMoneyQuantityWithUnit(minimumQuantity, normalizedPriceUnitQuantity, tradeUnitLabel)
+    : formatTradeQuantity(minimumQuantity, tradeUnitLabel);
+  const availableQuantityLabel = isGameMoneyListing
+    ? formatGameMoneyQuantityWithUnit(availableQuantity, normalizedPriceUnitQuantity, tradeUnitLabel)
+    : formatTradeQuantity(availableQuantity, tradeUnitLabel);
+  const [quantity, setQuantity] = useState(
+    isBulkMode ? displayAvailableQuantity : displayMinimumQuantity,
+  );
   const actualQuantity = isGameMoneyListing && isGameMoneyDisplayQuantity(quantity)
     ? toGameMoneyActualQuantity(quantity, normalizedPriceUnitQuantity)
     : quantity;
+  const actualQuantityLabel = isGameMoneyListing
+    ? formatGameMoneyQuantityWithUnit(actualQuantity, normalizedPriceUnitQuantity, tradeUnitLabel)
+    : formatTradeQuantity(actualQuantity, tradeUnitLabel);
 
-  useEffect(() => {
-    if (isBulkMode) {
-      setQuantity(displayAvailableQuantity);
-    }
-  }, [displayAvailableQuantity, isBulkMode]);
-
-  const quantityStatus = useMemo(() => {
+  const quantityStatus = (() => {
     try {
       if (isGameMoneyListing && !isGameMoneyDisplayQuantity(quantity)) {
         return {
           isValid: false,
-          message: "게임머니 구매 수량은 선택한 단위 기준 숫자로 입력해 주세요.",
+          message: t("listingForm.selectedUnitQuantityInvalid"),
         };
       }
 
@@ -111,7 +117,7 @@ export function PurchasePreviewPanel({
       if (isBulkMode && normalizedQuantity !== normalizedAvailable) {
         return {
           isValid: false,
-          message: "일괄판매 매물은 전체 수량만 즉시구매할 수 있습니다.",
+          message: t("purchase.bulkOnlyFullQuantity"),
         };
       }
 
@@ -119,7 +125,7 @@ export function PurchasePreviewPanel({
         return {
           isValid: false,
           message: formatMessage(t("purchase.minimumQuantityMessage"), {
-            quantity: displayMinimumQuantity,
+            quantity: minimumQuantityLabel,
           }),
         };
       }
@@ -128,7 +134,7 @@ export function PurchasePreviewPanel({
         return {
           isValid: false,
           message: formatMessage(t("purchase.availableStockMessage"), {
-            quantity: displayAvailableQuantity,
+            quantity: availableQuantityLabel,
           }),
         };
       }
@@ -137,19 +143,9 @@ export function PurchasePreviewPanel({
     } catch {
       return { isValid: false, message: t("purchase.numberOnly") };
     }
-  }, [
-    actualQuantity,
-    availableQuantity,
-    displayAvailableQuantity,
-    displayMinimumQuantity,
-    isBulkMode,
-    isGameMoneyListing,
-    minimumQuantity,
-    quantity,
-    t,
-  ]);
+  })();
 
-  const expectedAmount = useMemo(() => {
+  const expectedAmount = (() => {
     try {
       if (!quantityStatus.isValid) {
         return "0";
@@ -159,7 +155,7 @@ export function PurchasePreviewPanel({
     } catch {
       return "0";
     }
-  }, [actualQuantity, quantityStatus.isValid, unitPrice]);
+  })();
 
   const quickQuantitySeeds = isBulkMode
     ? [displayAvailableQuantity]
@@ -263,14 +259,14 @@ export function PurchasePreviewPanel({
           onChange={(event) => setQuantity(event.target.value)}
           inputMode={isGameMoneyListing ? "numeric" : "decimal"}
           step={isGameMoneyListing ? 1 : undefined}
-          placeholder={isGameMoneyListing ? `예: 1 = ${priceUnitLabel}` : undefined}
+          placeholder={isGameMoneyListing ? `${t("listingForm.exampleUnitQuantity")} = ${priceUnitLabel}` : undefined}
           disabled={isBulkMode}
           className="mt-2 h-12 w-full rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-4 text-sm font-black outline-none focus:border-[var(--gg-accent)] disabled:cursor-not-allowed disabled:opacity-70"
         />
       </label>
       {isBulkMode ? (
         <p className="mt-2 text-xs font-bold text-[var(--gg-muted)]">
-          일괄판매 매물은 등록된 전체 수량만 한 번에 즉시구매할 수 있습니다.
+          {t("purchase.bulkOnlyFullQuantity")}
         </p>
       ) : null}
       <p
@@ -302,8 +298,8 @@ export function PurchasePreviewPanel({
 
       <div className="mt-5 grid gap-3">
         <PreviewRow label={t("purchase.unitPrice")} value={`${displayUnitPrice} ${currency} / ${priceUnitLabel}`} />
-        <PreviewRow label={t("purchase.minimumQuantity")} value={formatTradeQuantity(minimumQuantity, tradeUnitLabel)} />
-        <PreviewRow label={t("purchase.availableStock")} value={formatTradeQuantity(availableQuantity, tradeUnitLabel)} />
+        <PreviewRow label={t("purchase.minimumQuantity")} value={minimumQuantityLabel} />
+        <PreviewRow label={t("purchase.availableStock")} value={availableQuantityLabel} />
         <PreviewRow
           label={t("purchase.expectedPayment")}
           value={`${expectedAmount} ${currency}`}
@@ -350,7 +346,16 @@ export function PurchasePreviewPanel({
             <span>
               {t("purchase.purchaseAmount")}: {result.amount} {currency}
             </span>
-            <span>{t("purchase.remainingStock")}: {formatTradeQuantity(result.inventory.availableQuantity, tradeUnitLabel)}</span>
+            <span>
+              {t("purchase.remainingStock")}:{" "}
+              {isGameMoneyListing
+                ? formatGameMoneyQuantityWithUnit(
+                    result.inventory.availableQuantity,
+                    normalizedPriceUnitQuantity,
+                    tradeUnitLabel,
+                  )
+                : formatTradeQuantity(result.inventory.availableQuantity, tradeUnitLabel)}
+            </span>
             <span>{t("purchase.escrowLocked")}: {result.buyerWallet.escrowBalance}</span>
           </div>
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -373,15 +378,17 @@ export function PurchasePreviewPanel({
       <TradeSafetyConfirmDialog
         isOpen={isConfirmOpen}
         eyebrow="SAFE ESCROW"
-        title="안전 거래 결제확인"
-        body="구매 금액이 에스크로로 잠기고 주문 채팅이 생성됩니다. 서버와 거래 정보를 마지막으로 확인해 주세요."
-        confirmLabel="결제"
+        title={t("purchase.confirmTitle")}
+        body={t("purchase.confirmBody")}
+        confirmLabel={t("purchase.confirmLabel")}
         cancelLabel={t("common.cancel")}
         isSubmitting={isSubmitting}
         serverLabel={serverLabel}
         requireCharacterName
+        characterNameLabel={t("listingForm.buyerGameNickname")}
+        characterNamePlaceholder={t("listingForm.buyerGameNicknamePlaceholder")}
         summaryRows={[
-          { label: String(t("purchase.quantity")), value: formatTradeQuantity(actualQuantity, tradeUnitLabel) },
+          { label: String(t("purchase.quantity")), value: actualQuantityLabel },
           { label: String(t("purchase.unitPrice")), value: `${displayUnitPrice} ${currency} / ${priceUnitLabel}` },
           { label: String(t("purchase.expectedPayment")), value: `${expectedAmount} ${currency}` },
         ]}

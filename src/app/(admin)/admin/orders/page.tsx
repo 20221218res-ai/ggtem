@@ -39,6 +39,8 @@ type AdminOrderDetail = {
   escrowAmount: string;
   currency: string;
   tradeCharacterName: string | null;
+  buyerGameNickname: string | null;
+  sellerGameNickname: string | null;
   createdAt: string;
   completedAt: string | null;
   canceledAt: string | null;
@@ -440,7 +442,8 @@ function OrderDetail({
         <summary className="cursor-pointer text-base font-black">상세 정보 / 바로가기</summary>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <DetailRow label="수량" value={detail.quantity} />
-          <DetailRow label="거래 캐릭터명" value={detail.tradeCharacterName ?? "-"} />
+          <DetailRow label="구매자 게임 아이디" value={detail.buyerGameNickname ?? detail.tradeCharacterName ?? "-"} />
+          <DetailRow label="판매자 게임 아이디" value={detail.sellerGameNickname ?? detail.tradeCharacterName ?? "-"} />
           <DetailRow label="생성일" value={detail.createdAt} />
           <DetailRow label="완료일" value={detail.completedAt ?? "-"} />
           <DetailRow label="취소일" value={detail.canceledAt ?? "-"} />

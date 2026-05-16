@@ -31,9 +31,9 @@ export default async function AdminDepositAddressesPage({
 
   return (
     <AdminMockPage
-      icon=""
+      icon="USDT"
       title="입금 주소 설정"
-      subtitle="유저에게 노출되는 USDT 입금 주소는 최고관리자만 변경할 수 있습니다."
+      subtitle="유저 충전 화면에 노출되는 USDT 입금 주소입니다. 최고관리자만 저장할 수 있습니다."
       actions={null}
     >
       <MetricGrid
@@ -60,7 +60,9 @@ export default async function AdminDepositAddressesPage({
       />
 
       {params?.error ? <SoftNotice tone="red">{params.error}</SoftNotice> : null}
-      {params?.notice ? <SoftNotice tone="green">입금 주소 설정이 저장되었습니다.</SoftNotice> : null}
+      {params?.notice ? (
+        <SoftNotice tone="green">입금 주소 설정을 저장했습니다.</SoftNotice>
+      ) : null}
 
       <Panel title="현재 운영 주소">
         <DataTable
@@ -75,9 +77,13 @@ export default async function AdminDepositAddressesPage({
                   </span>,
                   `${address.minimumAmount} ${address.asset}`,
                   address.isActive ? (
-                    <StatusPill key="active" tone="green">활성</StatusPill>
+                    <StatusPill key="active" tone="green">
+                      활성
+                    </StatusPill>
                   ) : (
-                    <StatusPill key="inactive" tone="slate">비활성</StatusPill>
+                    <StatusPill key="inactive" tone="slate">
+                      비활성
+                    </StatusPill>
                   ),
                   new Date(address.updatedAt).toLocaleString("ko-KR"),
                 ])
@@ -115,8 +121,8 @@ export default async function AdminDepositAddressesPage({
       </section>
 
       <SoftNotice tone="amber">
-        입금 주소 변경은 최고관리자만 가능하며 저장할 때마다 비밀번호 재확인과 감사 로그가 남습니다.
-        잘못된 주소가 노출되면 실제 입금 손실이 발생할 수 있으므로 체인과 주소를 반드시 대조하세요.
+        입금 주소 변경은 최고관리자 전용 작업입니다. 저장 시 비밀번호 재확인과 감사 로그가 남습니다.
+        잘못된 주소가 노출되면 실제 입금 손실이 발생할 수 있으므로 체인, 네트워크, 주소를 반드시 대조하세요.
       </SoftNotice>
     </AdminMockPage>
   );

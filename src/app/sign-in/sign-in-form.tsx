@@ -6,14 +6,13 @@ import { useRouter } from "next/navigation";
 import {
   Alert,
   Button,
-  Card,
-  CardHeading,
   Field,
   TextInput,
 } from "@/components/ui";
 import PasswordVisibilityInput from "@/components/password-visibility-input";
 import CountryText from "../country-text";
 import useCountryTranslation from "../use-country-translation";
+import { getAuthApiMessage } from "../auth-api-message";
 
 type DemoAccount = {
   email: string;
@@ -38,9 +37,7 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
   const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
-    if (!verificationNotice) {
-      return;
-    }
+    if (!verificationNotice) return;
 
     let isActive = true;
 
@@ -50,25 +47,24 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
           cache: "no-store",
         });
         const result = (await response.json()) as {
+          code?: string;
           status?: string;
           redirectPath?: string;
           message?: string;
         };
 
-        if (!isActive) {
-          return;
-        }
+        if (!isActive) return;
 
         if (result.status === "verified") {
-          setResendMessage("이메일 인증이 완료되었습니다. 로그인 중입니다.");
+          setResendMessage(t("auth.emailVerificationCompletedSignIn"));
           setVerificationNotice(null);
           router.replace(result.redirectPath ?? "/my");
           router.refresh();
         } else if (result.status === "blocked") {
-          setError(result.message ?? "현재 사용할 수 없는 계정입니다.");
+          setError(getAuthApiMessage(result, t, "auth.accountUnavailable"));
           setVerificationNotice(null);
         } else if (result.status === "expired") {
-          setResendError("인증 대기 시간이 만료되었습니다. 다시 로그인하거나 인증 메일을 재발송해 주세요.");
+          setResendError(t("auth.emailVerificationExpired"));
           setVerificationNotice(null);
         }
       } catch {
@@ -86,9 +82,7 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
   }, [router, verificationNotice]);
 
   async function resendVerificationEmail() {
-    if (!verificationNotice) {
-      return;
-    }
+    if (!verificationNotice) return;
 
     setResendMessage("");
     setResendError("");
@@ -105,15 +99,16 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
         }),
       });
       const result = (await response.json()) as {
+        code?: string;
         message?: string;
         verificationUrl?: string | null;
       };
 
       if (!response.ok) {
-        throw new Error(result.message ?? "인증 메일을 다시 보내지 못했습니다.");
+        throw new Error(getAuthApiMessage(result, t, "auth.resendVerificationFailed"));
       }
 
-      setResendMessage(result.message ?? "인증 메일을 다시 발송했습니다.");
+      setResendMessage(getAuthApiMessage(result, t, "auth.resendVerificationSent"));
       setVerificationNotice({
         email: verificationNotice.email,
         verificationUrl: result.verificationUrl ?? null,
@@ -122,7 +117,7 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
       setResendError(
         submitError instanceof Error
           ? submitError.message
-          : "인증 메일을 다시 보내지 못했습니다.",
+          : t("auth.resendVerificationFailed"),
       );
     } finally {
       setIsResending(false);
@@ -162,7 +157,7 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
         return;
       }
 
-      throw new Error(result.message ?? t("auth.signInFailed"));
+      throw new Error(getAuthApiMessage(result, t, "auth.signInFailed"));
     }
 
     router.push(redirectPath ?? result.redirectPath ?? "/");
@@ -216,45 +211,59 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+    <div className="grid gap-5">
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-6 shadow-lg shadow-[var(--gg-shadow)]"
+        className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-6 shadow-xl shadow-[var(--gg-shadow)] sm:p-8"
       >
-        <CardHeading
-          eyebrow={<CountryText id="auth.emailLoginEyebrow" />}
-          title={<CountryText id="auth.emailLogin" />}
-          description={<CountryText id="auth.emailLoginDescription" />}
-        />
+        <div className="text-center">
+          <p className="text-sm font-black text-[var(--gg-accent)]">
+            <CountryText id="auth.emailLoginEyebrow" />
+          </p>
+          <h2 className="mt-2 text-2xl font-black text-[var(--gg-text)]">
+            <CountryText id="auth.emailLogin" />
+          </h2>
+        </div>
 
-        <div className="mt-5 grid gap-4">
-          <Field label={<CountryText id="auth.email" />}>
+        <div className="mt-7 grid gap-4">
+          <Field label={<span className="sr-only"><CountryText id="auth.email" /></span>}>
             <TextInput
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               autoComplete="email"
+              placeholder={t("auth.email")}
+              className="h-14 px-5 text-base font-bold"
             />
           </Field>
 
-          <Field label={<CountryText id="auth.password" />}>
+          <Field label={<span className="sr-only"><CountryText id="auth.password" /></span>}>
             <PasswordVisibilityInput
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="current-password"
+              placeholder={t("auth.password")}
+              className="h-14 px-5 text-base font-bold"
             />
           </Field>
         </div>
 
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Button type="submit" disabled={isSubmitting}>
+        <div className="mt-6 grid gap-3">
+          <Button type="submit" disabled={isSubmitting} className="h-14 w-full text-lg font-black">
             {isSubmitting ? <CountryText id="auth.signingIn" /> : <CountryText id="common.signIn" />}
           </Button>
-          <div className="flex flex-wrap gap-3 text-sm font-semibold text-[var(--gg-accent)]">
-            <Link href="/password-reset" className="hover:opacity-80">
-              <CountryText id="auth.forgotPassword" />
+          <Link
+            href="/sign-up"
+            className="inline-flex h-14 w-full items-center justify-center rounded-lg border border-[var(--gg-accent)] bg-white px-4 text-lg font-black text-[var(--gg-accent)] transition hover:bg-[color-mix(in_srgb,var(--gg-accent)_7%,white)]"
+          >
+            <CountryText id="common.signUp" />
+          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 pt-1 text-sm font-black text-[var(--gg-text)]">
+            <Link href="/email-recovery" className="hover:text-[var(--gg-accent)]">
+              <CountryText id="auth.emailRecoveryTitle" />
             </Link>
-            <Link href="/email-recovery" className="hover:opacity-80">
-              이메일 찾기
+            <span className="text-[var(--gg-border)]">|</span>
+            <Link href="/password-reset" className="hover:text-[var(--gg-accent)]">
+              <CountryText id="auth.forgotPassword" />
             </Link>
           </div>
         </div>
@@ -275,17 +284,19 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4">
           <div className="w-full max-w-md rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-6 shadow-2xl">
             <p className="text-xs font-black uppercase text-[var(--gg-accent)]">
-              Email verification
+              <CountryText id="auth.emailVerification" />
             </p>
             <h2 className="mt-2 text-2xl font-black text-[var(--gg-text)]">
-              이메일 인증이 필요합니다
+              <CountryText id="auth.emailVerificationRequiredTitle" />
             </h2>
             <p className="mt-3 text-sm leading-6 text-[var(--gg-muted)]">
-              {verificationNotice.email} 주소로 인증 링크를 발송했습니다. 휴대폰에서
-              인증해도 이 PC 화면에서 자동으로 로그인 완료를 확인합니다.
+              <CountryText
+                id="auth.emailVerificationSentDescription"
+                values={{ email: verificationNotice.email }}
+              />
             </p>
             <div className="mt-5 rounded-xl bg-[var(--gg-card-soft-bg)] p-4 text-sm font-semibold text-[var(--gg-text)]">
-              인증 완료 여부를 확인하는 중입니다...
+              <CountryText id="auth.verificationChecking" />
             </div>
             {resendMessage ? (
               <div className="mt-4">
@@ -304,14 +315,18 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
                 disabled={isResending}
                 onClick={() => void resendVerificationEmail()}
               >
-                {isResending ? "재발송 중" : "인증 메일 다시 보내기"}
+                {isResending ? (
+                  <CountryText id="auth.resendingVerification" />
+                ) : (
+                  <CountryText id="auth.resendVerificationEmail" />
+                )}
               </Button>
               {verificationNotice.verificationUrl ? (
                 <Link
                   href={verificationNotice.verificationUrl}
                   className="inline-flex items-center justify-center rounded-lg border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-4 py-2 text-sm font-semibold text-[var(--gg-text)] transition hover:border-[var(--gg-accent)]"
                 >
-                  인증 링크 열기
+                  <CountryText id="auth.openVerificationLink" />
                 </Link>
               ) : null}
             </div>
@@ -320,12 +335,10 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
       ) : null}
 
       {accounts.length > 0 ? (
-        <Card>
-          <CardHeading
-            eyebrow={<CountryText id="auth.testAccount" />}
-            title={<CountryText id="auth.quickLogin" />}
-            description={<CountryText id="auth.quickLoginDescription" />}
-          />
+        <details className="rounded-xl border border-dashed border-[var(--gg-border)] bg-white p-4">
+          <summary className="cursor-pointer text-sm font-black text-[var(--gg-muted)]">
+            <CountryText id="auth.quickLogin" />
+          </summary>
 
           <div className="mt-5 grid gap-3">
             <button
@@ -385,7 +398,7 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
               </button>
             ))}
           </div>
-        </Card>
+        </details>
       ) : null}
     </div>
   );

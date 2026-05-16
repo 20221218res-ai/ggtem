@@ -28,6 +28,7 @@ export type MarketplaceMyOrderSummary = {
   gameName: string;
   serverName: string | null;
   moneyUnitName: string;
+  priceUnitQuantity: string;
   accountTransferType: string | null;
   sellerName: string;
   quantity: string;
@@ -61,8 +62,11 @@ export type MarketplaceMyOrderDetail = {
   gameName: string;
   serverName: string | null;
   moneyUnitName: string;
+  priceUnitQuantity: string;
   accountTransferType: string | null;
   tradeCharacterName: string | null;
+  buyerGameNickname: string | null;
+  sellerGameNickname: string | null;
   sellerName: string;
   quantity: string;
   grossAmount: string;
@@ -123,6 +127,7 @@ export async function getMarketplaceMyOrders(): Promise<MarketplaceMyOrdersView>
             select: {
               title: true,
               category: true,
+              priceUnitQuantity: true,
               accountTransferType: true,
               game: {
                 select: {
@@ -189,6 +194,7 @@ export async function getMarketplaceMyOrders(): Promise<MarketplaceMyOrdersView>
       gameName: order.listing.game.name,
       serverName: order.listing.server?.name ?? null,
       moneyUnitName: order.listing.game.moneyUnitName,
+      priceUnitQuantity: order.listing.priceUnitQuantity?.toString() ?? "1",
       accountTransferType: order.listing.accountTransferType,
       sellerName: order.seller.displayName,
       quantity: order.quantity.toString(),
@@ -242,6 +248,8 @@ export async function getMarketplaceMyOrderDetail(
       sellerReceivableAmount: true,
       currency: true,
       tradeCharacterName: true,
+      buyerGameNickname: true,
+      sellerGameNickname: true,
       createdAt: true,
       completedAt: true,
       canceledAt: true,
@@ -249,6 +257,7 @@ export async function getMarketplaceMyOrderDetail(
         select: {
           title: true,
           category: true,
+          priceUnitQuantity: true,
           accountTransferType: true,
           game: {
             select: {
@@ -303,6 +312,7 @@ export async function getMarketplaceMyOrderDetail(
     gameName: order.listing.game.name,
     serverName: order.listing.server?.name ?? null,
     moneyUnitName: order.listing.game.moneyUnitName,
+    priceUnitQuantity: order.listing.priceUnitQuantity?.toString() ?? "1",
     accountTransferType: order.listing.accountTransferType,
     sellerName: order.seller.displayName,
     quantity: order.quantity.toString(),
@@ -310,6 +320,8 @@ export async function getMarketplaceMyOrderDetail(
     sellerReceivableAmount: order.sellerReceivableAmount.toString(),
     currency: order.currency,
     tradeCharacterName: order.tradeCharacterName,
+    buyerGameNickname: order.buyerGameNickname,
+    sellerGameNickname: order.sellerGameNickname,
     createdAt: formatKoreanDate(order.createdAt),
     completedAt: order.completedAt ? formatKoreanDate(order.completedAt) : null,
     canceledAt: order.canceledAt ? formatKoreanDate(order.canceledAt) : null,

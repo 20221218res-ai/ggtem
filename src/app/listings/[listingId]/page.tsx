@@ -8,6 +8,7 @@ import CountryText from "../../country-text";
 import UserContentText, { SourceCountryFlag } from "../../user-content-text";
 import { PurchasePreviewPanel } from "./purchase-preview-panel";
 import {
+  formatGameMoneyQuantityWithUnit,
   getGameMoneyPriceUnitLabel,
   getTradeUnitLabel,
   normalizeGameMoneyPriceUnit,
@@ -49,6 +50,10 @@ export default async function ListingDetailPage({
     priceUnitQuantity: listing.priceUnitQuantity,
     moneyUnitName: listing.moneyUnitName,
   });
+  const minimumQuantityLabel = getListingQuantityLabel(listing, listing.minimumQuantity, moneyUnit);
+  const availableQuantityLabel = getListingQuantityLabel(listing, listing.availableQuantity, moneyUnit);
+  const lockedQuantityLabel = getListingQuantityLabel(listing, listing.lockedQuantity, moneyUnit);
+  const soldQuantityLabel = getListingQuantityLabel(listing, listing.soldQuantity, moneyUnit);
   const accountTransferTypeLabel =
     listing.category === "GAME_ACCOUNT"
       ? normalizeAccountTransferType(listing.accountTransferType)
@@ -126,8 +131,8 @@ export default async function ListingDetailPage({
                       hint={`${priceDisplay.unitLabel} 기준`}
                       strong
                     />
-                    <Metric label={<CountryText id="listingDetail.minimumQuantity" />} value={formatTradeQuantity(listing.minimumQuantity, moneyUnit)} />
-                    <Metric label={<CountryText id="listingDetail.availableQuantity" />} value={formatTradeQuantity(listing.availableQuantity, moneyUnit)} />
+                    <Metric label={<CountryText id="listingDetail.minimumQuantity" />} value={minimumQuantityLabel} />
+                    <Metric label={<CountryText id="listingDetail.availableQuantity" />} value={availableQuantityLabel} />
                   </div>
                 </div>
               </div>
@@ -187,8 +192,8 @@ export default async function ListingDetailPage({
                       value={<AccountTransferTypeText value={accountTransferTypeLabel} />}
                     />
                   ) : null}
-                  <InfoTile label={<CountryText id="listingDetail.lockedQuantity" />} value={listing.lockedQuantity} />
-                  <InfoTile label={<CountryText id="listingDetail.soldQuantity" />} value={listing.soldQuantity} />
+                  <InfoTile label={<CountryText id="listingDetail.lockedQuantity" />} value={lockedQuantityLabel} />
+                  <InfoTile label={<CountryText id="listingDetail.soldQuantity" />} value={soldQuantityLabel} />
                   <InfoTile label={<CountryText id="listingDetail.status" />} value={<CountryText id="listingDetail.activeStatus" />} />
                 </div>
               </div>
@@ -461,6 +466,25 @@ function formatTradeQuantity(quantity: string, unitLabel: string) {
     ? quantity.replace(/(\.\d*?[1-9])0+$/, "$1").replace(/\.0+$/, "")
     : quantity;
   return unitLabel ? `${formattedQuantity} ${unitLabel}` : formattedQuantity;
+}
+
+function getListingQuantityLabel(
+  listing: Pick<
+    MarketplaceListingSummary,
+    "category" | "priceUnitQuantity" | "moneyUnitName"
+  >,
+  quantity: string,
+  fallbackUnit: string,
+) {
+  if (listing.category === "GAME_MONEY") {
+    return formatGameMoneyQuantityWithUnit(
+      quantity,
+      listing.priceUnitQuantity,
+      listing.moneyUnitName,
+    );
+  }
+
+  return formatTradeQuantity(quantity, fallbackUnit);
 }
 
 function getSellerGrade(reviewCount: number) {

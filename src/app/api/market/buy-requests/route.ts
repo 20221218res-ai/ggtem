@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
       description?: string;
       accountTransferType?: string;
       accountRank?: string;
+      buyerGameNickname?: string;
       quantity?: string;
       unitPrice?: string;
       pricePerUnit?: string;
@@ -70,6 +71,7 @@ export async function POST(request: NextRequest) {
       description: body.description,
       accountTransferType: body.accountTransferType,
       accountRank: body.accountRank,
+      buyerGameNickname: body.buyerGameNickname,
       quantity: body.quantity,
       unitPrice: body.unitPrice,
       pricePerUnit: body.pricePerUnit,

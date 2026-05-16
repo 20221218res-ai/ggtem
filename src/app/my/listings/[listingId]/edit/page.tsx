@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMarketplaceSellerListingEditorView } from "@/lib/market/my-listings";
+import { formatGameMoneyQuantityWithUnit } from "@/lib/market/trade-unit";
 import SellerListingActions from "../../seller-listing-actions";
 import EditListingForm from "./edit-listing-form";
+
+type SellerListingEditorView = NonNullable<
+  Awaited<ReturnType<typeof getMarketplaceSellerListingEditorView>>
+>;
 
 export default async function EditListingPage({
   params,
@@ -19,6 +24,7 @@ export default async function EditListingPage({
   const isPubliclyVisible =
     listing.status === "ACTIVE" && Number(listing.availableQuantity) > 0;
   const statusGuide = getStatusGuide(listing.status, listing.availableQuantity);
+  const inventorySummary = formatInventorySummary(listing);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 text-[var(--gg-text)]">
@@ -52,10 +58,7 @@ export default async function EditListingPage({
           value={`${listing.gameName} / ${listing.serverName ?? "서버 없음"}`}
         />
         <SummaryCard label="카테고리" value={formatCategory(listing.category)} />
-        <SummaryCard
-          label="재고"
-          value={`${listing.availableQuantity} / ${listing.lockedQuantity} / ${listing.soldQuantity}`}
-        />
+        <SummaryCard label="재고" value={inventorySummary} />
       </section>
 
       <section className={`mt-6 rounded-2xl border p-5 ${statusGuide.className}`}>
@@ -143,7 +146,7 @@ function getStatusGuide(status: string, availableQuantity: string) {
   if (status === "SOLD_OUT") {
     return {
       eyebrow: "판매완료",
-      title: "더 이상 공개 판매하지 않는 글입니다.",
+      title: "더 이상 공개 판매되지 않는 글입니다.",
       className: "border-sky-200 bg-sky-50 text-sky-800",
     };
   }
@@ -174,4 +177,26 @@ function formatCategory(category: string) {
   };
 
   return labels[category] ?? category;
+}
+
+function formatInventorySummary(listing: SellerListingEditorView) {
+  const quantities = [
+    listing.availableQuantity,
+    listing.lockedQuantity,
+    listing.soldQuantity,
+  ];
+
+  if (listing.category !== "GAME_MONEY") {
+    return quantities.join(" / ");
+  }
+
+  return quantities
+    .map((quantity) =>
+      formatGameMoneyQuantityWithUnit(
+        quantity,
+        listing.priceUnitQuantity,
+        listing.moneyUnitName,
+      ),
+    )
+    .join(" / ");
 }

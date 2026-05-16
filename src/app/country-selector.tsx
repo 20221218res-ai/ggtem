@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { COUNTRY_CHANGE_EVENT } from "./country-text";
+import { COUNTRY_CHANGE_EVENT, getCurrentCountryCode } from "./country-text";
 import {
   COUNTRY_STORAGE_KEY,
   countries,
@@ -12,29 +12,32 @@ import useCountryTranslation from "./use-country-translation";
 
 export default function CountrySelector() {
   const [countryCode, setCountryCode] = useState<CountryCode>("KR");
-  const [mounted, setMounted] = useState(false);
   const country = getCountry(countryCode);
   const { t } = useCountryTranslation();
 
   useEffect(() => {
-    const savedCountry = window.localStorage.getItem(COUNTRY_STORAGE_KEY);
-    const nextCountry = getCountry(savedCountry);
-
-    setCountryCode(nextCountry.code);
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) {
-      return;
+    function syncCountry() {
+      setCountryCode(getCurrentCountryCode());
     }
 
-    const nextCountry = getCountry(countryCode);
+    syncCountry();
+    window.addEventListener(COUNTRY_CHANGE_EVENT, syncCountry);
+    window.addEventListener("storage", syncCountry);
+
+    return () => {
+      window.removeEventListener(COUNTRY_CHANGE_EVENT, syncCountry);
+      window.removeEventListener("storage", syncCountry);
+    };
+  }, []);
+
+  function selectCountry(nextCode: CountryCode) {
+    const nextCountry = getCountry(nextCode);
+    setCountryCode(nextCountry.code);
     document.documentElement.dataset.country = nextCountry.code;
     document.documentElement.lang = nextCountry.htmlLang;
     window.localStorage.setItem(COUNTRY_STORAGE_KEY, nextCountry.code);
     window.dispatchEvent(new CustomEvent(COUNTRY_CHANGE_EVENT));
-  }, [countryCode, mounted]);
+  }
 
   return (
     <div className="inline-flex max-w-full flex-wrap items-center gap-1 rounded-lg border border-[var(--gg-border)] bg-[var(--gg-control-bg)] p-1 text-sm font-bold text-[var(--gg-text)]">
@@ -45,7 +48,7 @@ export default function CountrySelector() {
           type="button"
           title={`${item.label} / ${item.language} / ${item.currency}`}
           aria-label={`${item.label} ${t("country.selectAriaSuffix")}`}
-          onClick={() => setCountryCode(item.code)}
+          onClick={() => selectCountry(item.code)}
           className={
             countryCode === item.code
               ? "rounded-md bg-[var(--gg-accent)] px-2.5 py-1.5 text-xs font-black text-[var(--gg-inverse-text)] shadow-sm shadow-[var(--gg-shadow)]"

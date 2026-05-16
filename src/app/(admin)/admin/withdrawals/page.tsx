@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { requirePageRole, ROLE_GROUPS } from "@/lib/auth/guards";
 import { getAdminFinanceState } from "@/lib/admin/finance";
+import { requirePageRole, ROLE_GROUPS } from "@/lib/auth/guards";
 import FinanceActions from "../finance/finance-actions";
 
 type FinanceState = Awaited<ReturnType<typeof getAdminFinanceState>>;
@@ -25,7 +25,7 @@ export default async function AdminWithdrawalsPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <HeaderLink href="/admin/deposits" label="입금 처리" />
+            <HeaderLink href="/admin/deposits" label="충전 승인" />
             <HeaderLink href="/admin/finance/ledger?q=WITHDRAWAL" label="출금 원장" />
             <HeaderLink href="/admin/audit?targetType=WITHDRAWAL_REQUEST" label="출금 감사 로그" />
           </div>
@@ -143,7 +143,7 @@ function WithdrawalReviewCard({ item }: { item: PendingWithdrawal }) {
         primaryAction="COMPLETE_WITHDRAWAL"
         primaryLabel="출금 완료 처리"
         secondaryAction="REJECT_WITHDRAWAL"
-        secondaryLabel="출금 거절"
+        secondaryLabel="출금 반려"
         completionPhrase="출금완료"
         completionPhraseLabel="출금 완료 확인 문구"
         confirmationSummary={`금액: ${item.amount} ${item.currency}\n수수료: ${item.fee} ${item.currency}\n실수령: ${item.netAmount} ${item.currency}\n유저: ${item.userName} <${item.userEmail}>\n받을 주소: ${item.destination}\n메모: ${item.memo ?? "없음"}`}

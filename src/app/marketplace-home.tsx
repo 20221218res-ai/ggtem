@@ -13,7 +13,10 @@ import UserMarketHeader from "./user-market-header";
 import GameNameText from "./game-name-text";
 import OptimizedGameImage from "@/components/optimized-game-image";
 import type { GameCatalogOption } from "@/lib/market/game-localization";
-import { getGameMoneyPriceUnitLabel } from "@/lib/market/trade-unit";
+import {
+  formatGameMoneyQuantityWithUnit,
+  getGameMoneyPriceUnitLabel,
+} from "@/lib/market/trade-unit";
 
 type MarketplaceHomeProps = MarketplaceListingsView;
 
@@ -448,12 +451,24 @@ export function ListingCard({ listing }: { listing: MarketplaceListingSummary })
             ) : null}
           </div>
           <p className="rounded-lg border border-[var(--gg-border)] px-3 py-2 text-xs font-bold text-[var(--gg-muted)]">
-            <CountryText id="home.stock" /> {listing.availableQuantity}
+            <CountryText id="home.stock" /> {formatLiveListingQuantity(listing)}
           </p>
         </div>
       </div>
     </Link>
   );
+}
+
+function formatLiveListingQuantity(listing: MarketplaceListingSummary) {
+  if (listing.category === "GAME_MONEY") {
+    return formatGameMoneyQuantityWithUnit(
+      listing.availableQuantity,
+      listing.priceUnitQuantity,
+      listing.moneyUnitName,
+    );
+  }
+
+  return listing.availableQuantity;
 }
 
 function CategoryName({ category }: { category: string }) {

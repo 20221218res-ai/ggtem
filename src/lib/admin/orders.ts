@@ -36,6 +36,8 @@ export type AdminOrderDetail = {
   escrowAmount: string;
   currency: string;
   tradeCharacterName: string | null;
+  buyerGameNickname: string | null;
+  sellerGameNickname: string | null;
   createdAt: string;
   completedAt: string | null;
   canceledAt: string | null;
@@ -807,6 +809,8 @@ async function buildOrderDetail(orderId: string): Promise<AdminOrderDetail | nul
     escrowAmount: order.grossAmount.toString(),
     currency: order.currency,
     tradeCharacterName: order.tradeCharacterName,
+    buyerGameNickname: order.buyerGameNickname,
+    sellerGameNickname: order.sellerGameNickname,
     createdAt: formatKoreanDate(order.createdAt),
     completedAt: order.completedAt ? formatKoreanDate(order.completedAt) : null,
     canceledAt: order.canceledAt ? formatKoreanDate(order.canceledAt) : null,

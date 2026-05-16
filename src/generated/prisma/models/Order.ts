@@ -56,6 +56,8 @@ export type OrderMinAggregateOutputType = {
   sellerReceivableAmount: runtime.Decimal | null
   currency: string | null
   tradeCharacterName: string | null
+  buyerGameNickname: string | null
+  sellerGameNickname: string | null
   autoConfirmAt: Date | null
   completedAt: Date | null
   canceledAt: Date | null
@@ -77,6 +79,8 @@ export type OrderMaxAggregateOutputType = {
   sellerReceivableAmount: runtime.Decimal | null
   currency: string | null
   tradeCharacterName: string | null
+  buyerGameNickname: string | null
+  sellerGameNickname: string | null
   autoConfirmAt: Date | null
   completedAt: Date | null
   canceledAt: Date | null
@@ -98,6 +102,8 @@ export type OrderCountAggregateOutputType = {
   sellerReceivableAmount: number
   currency: number
   tradeCharacterName: number
+  buyerGameNickname: number
+  sellerGameNickname: number
   autoConfirmAt: number
   completedAt: number
   canceledAt: number
@@ -137,6 +143,8 @@ export type OrderMinAggregateInputType = {
   sellerReceivableAmount?: true
   currency?: true
   tradeCharacterName?: true
+  buyerGameNickname?: true
+  sellerGameNickname?: true
   autoConfirmAt?: true
   completedAt?: true
   canceledAt?: true
@@ -158,6 +166,8 @@ export type OrderMaxAggregateInputType = {
   sellerReceivableAmount?: true
   currency?: true
   tradeCharacterName?: true
+  buyerGameNickname?: true
+  sellerGameNickname?: true
   autoConfirmAt?: true
   completedAt?: true
   canceledAt?: true
@@ -179,6 +189,8 @@ export type OrderCountAggregateInputType = {
   sellerReceivableAmount?: true
   currency?: true
   tradeCharacterName?: true
+  buyerGameNickname?: true
+  sellerGameNickname?: true
   autoConfirmAt?: true
   completedAt?: true
   canceledAt?: true
@@ -287,6 +299,8 @@ export type OrderGroupByOutputType = {
   sellerReceivableAmount: runtime.Decimal
   currency: string
   tradeCharacterName: string | null
+  buyerGameNickname: string | null
+  sellerGameNickname: string | null
   autoConfirmAt: Date | null
   completedAt: Date | null
   canceledAt: Date | null
@@ -331,6 +345,8 @@ export type OrderWhereInput = {
   sellerReceivableAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"Order"> | string
   tradeCharacterName?: Prisma.StringNullableFilter<"Order"> | string | null
+  buyerGameNickname?: Prisma.StringNullableFilter<"Order"> | string | null
+  sellerGameNickname?: Prisma.StringNullableFilter<"Order"> | string | null
   autoConfirmAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
   canceledAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
@@ -360,6 +376,8 @@ export type OrderOrderByWithRelationInput = {
   sellerReceivableAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   tradeCharacterName?: Prisma.SortOrderInput | Prisma.SortOrder
+  buyerGameNickname?: Prisma.SortOrderInput | Prisma.SortOrder
+  sellerGameNickname?: Prisma.SortOrderInput | Prisma.SortOrder
   autoConfirmAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   canceledAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -392,6 +410,8 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   sellerReceivableAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"Order"> | string
   tradeCharacterName?: Prisma.StringNullableFilter<"Order"> | string | null
+  buyerGameNickname?: Prisma.StringNullableFilter<"Order"> | string | null
+  sellerGameNickname?: Prisma.StringNullableFilter<"Order"> | string | null
   autoConfirmAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
   canceledAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
@@ -421,6 +441,8 @@ export type OrderOrderByWithAggregationInput = {
   sellerReceivableAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   tradeCharacterName?: Prisma.SortOrderInput | Prisma.SortOrder
+  buyerGameNickname?: Prisma.SortOrderInput | Prisma.SortOrder
+  sellerGameNickname?: Prisma.SortOrderInput | Prisma.SortOrder
   autoConfirmAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   canceledAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -450,6 +472,8 @@ export type OrderScalarWhereWithAggregatesInput = {
   sellerReceivableAmount?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringWithAggregatesFilter<"Order"> | string
   tradeCharacterName?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
+  buyerGameNickname?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
+  sellerGameNickname?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   autoConfirmAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
   canceledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
@@ -468,6 +492,8 @@ export type OrderCreateInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -497,6 +523,8 @@ export type OrderUncheckedCreateInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -520,6 +548,8 @@ export type OrderUpdateInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -549,6 +579,8 @@ export type OrderUncheckedUpdateInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -575,6 +607,8 @@ export type OrderCreateManyInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -593,6 +627,8 @@ export type OrderUpdateManyMutationInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -614,6 +650,8 @@ export type OrderUncheckedUpdateManyInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -645,6 +683,8 @@ export type OrderCountOrderByAggregateInput = {
   sellerReceivableAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   tradeCharacterName?: Prisma.SortOrder
+  buyerGameNickname?: Prisma.SortOrder
+  sellerGameNickname?: Prisma.SortOrder
   autoConfirmAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   canceledAt?: Prisma.SortOrder
@@ -674,6 +714,8 @@ export type OrderMaxOrderByAggregateInput = {
   sellerReceivableAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   tradeCharacterName?: Prisma.SortOrder
+  buyerGameNickname?: Prisma.SortOrder
+  sellerGameNickname?: Prisma.SortOrder
   autoConfirmAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   canceledAt?: Prisma.SortOrder
@@ -695,6 +737,8 @@ export type OrderMinOrderByAggregateInput = {
   sellerReceivableAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   tradeCharacterName?: Prisma.SortOrder
+  buyerGameNickname?: Prisma.SortOrder
+  sellerGameNickname?: Prisma.SortOrder
   autoConfirmAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   canceledAt?: Prisma.SortOrder
@@ -933,6 +977,8 @@ export type OrderCreateWithoutBuyerInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -960,6 +1006,8 @@ export type OrderUncheckedCreateWithoutBuyerInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -993,6 +1041,8 @@ export type OrderCreateWithoutSellerInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1020,6 +1070,8 @@ export type OrderUncheckedCreateWithoutSellerInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1075,6 +1127,8 @@ export type OrderScalarWhereInput = {
   sellerReceivableAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"Order"> | string
   tradeCharacterName?: Prisma.StringNullableFilter<"Order"> | string | null
+  buyerGameNickname?: Prisma.StringNullableFilter<"Order"> | string | null
+  sellerGameNickname?: Prisma.StringNullableFilter<"Order"> | string | null
   autoConfirmAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
   canceledAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
@@ -1109,6 +1163,8 @@ export type OrderCreateWithoutListingInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1136,6 +1192,8 @@ export type OrderUncheckedCreateWithoutListingInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1185,6 +1243,8 @@ export type OrderCreateWithoutAccountCredentialInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1213,6 +1273,8 @@ export type OrderUncheckedCreateWithoutAccountCredentialInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1251,6 +1313,8 @@ export type OrderUpdateWithoutAccountCredentialInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1279,6 +1343,8 @@ export type OrderUncheckedUpdateWithoutAccountCredentialInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1301,6 +1367,8 @@ export type OrderCreateWithoutChatRoomInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1329,6 +1397,8 @@ export type OrderUncheckedCreateWithoutChatRoomInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1367,6 +1437,8 @@ export type OrderUpdateWithoutChatRoomInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1395,6 +1467,8 @@ export type OrderUncheckedUpdateWithoutChatRoomInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1417,6 +1491,8 @@ export type OrderCreateWithoutEventsInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1445,6 +1521,8 @@ export type OrderUncheckedCreateWithoutEventsInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1483,6 +1561,8 @@ export type OrderUpdateWithoutEventsInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1511,6 +1591,8 @@ export type OrderUncheckedUpdateWithoutEventsInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1533,6 +1615,8 @@ export type OrderCreateWithoutReviewInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1561,6 +1645,8 @@ export type OrderUncheckedCreateWithoutReviewInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1599,6 +1685,8 @@ export type OrderUpdateWithoutReviewInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1627,6 +1715,8 @@ export type OrderUncheckedUpdateWithoutReviewInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1649,6 +1739,8 @@ export type OrderCreateWithoutTrustReportsInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1677,6 +1769,8 @@ export type OrderUncheckedCreateWithoutTrustReportsInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1715,6 +1809,8 @@ export type OrderUpdateWithoutTrustReportsInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1743,6 +1839,8 @@ export type OrderUncheckedUpdateWithoutTrustReportsInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1767,6 +1865,8 @@ export type OrderCreateManyBuyerInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1787,6 +1887,8 @@ export type OrderCreateManySellerInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1805,6 +1907,8 @@ export type OrderUpdateWithoutBuyerInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1832,6 +1936,8 @@ export type OrderUncheckedUpdateWithoutBuyerInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1857,6 +1963,8 @@ export type OrderUncheckedUpdateManyWithoutBuyerInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1875,6 +1983,8 @@ export type OrderUpdateWithoutSellerInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1902,6 +2012,8 @@ export type OrderUncheckedUpdateWithoutSellerInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1927,6 +2039,8 @@ export type OrderUncheckedUpdateManyWithoutSellerInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1947,6 +2061,8 @@ export type OrderCreateManyListingInput = {
   sellerReceivableAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   tradeCharacterName?: string | null
+  buyerGameNickname?: string | null
+  sellerGameNickname?: string | null
   autoConfirmAt?: Date | string | null
   completedAt?: Date | string | null
   canceledAt?: Date | string | null
@@ -1965,6 +2081,8 @@ export type OrderUpdateWithoutListingInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1992,6 +2110,8 @@ export type OrderUncheckedUpdateWithoutListingInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2017,6 +2137,8 @@ export type OrderUncheckedUpdateManyWithoutListingInput = {
   sellerReceivableAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   tradeCharacterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   autoConfirmAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2078,6 +2200,8 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sellerReceivableAmount?: boolean
   currency?: boolean
   tradeCharacterName?: boolean
+  buyerGameNickname?: boolean
+  sellerGameNickname?: boolean
   autoConfirmAt?: boolean
   completedAt?: boolean
   canceledAt?: boolean
@@ -2108,6 +2232,8 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   sellerReceivableAmount?: boolean
   currency?: boolean
   tradeCharacterName?: boolean
+  buyerGameNickname?: boolean
+  sellerGameNickname?: boolean
   autoConfirmAt?: boolean
   completedAt?: boolean
   canceledAt?: boolean
@@ -2132,6 +2258,8 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   sellerReceivableAmount?: boolean
   currency?: boolean
   tradeCharacterName?: boolean
+  buyerGameNickname?: boolean
+  sellerGameNickname?: boolean
   autoConfirmAt?: boolean
   completedAt?: boolean
   canceledAt?: boolean
@@ -2156,6 +2284,8 @@ export type OrderSelectScalar = {
   sellerReceivableAmount?: boolean
   currency?: boolean
   tradeCharacterName?: boolean
+  buyerGameNickname?: boolean
+  sellerGameNickname?: boolean
   autoConfirmAt?: boolean
   completedAt?: boolean
   canceledAt?: boolean
@@ -2163,7 +2293,7 @@ export type OrderSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "buyerId" | "sellerId" | "listingId" | "status" | "quantity" | "unitPrice" | "grossAmount" | "platformFeeAmount" | "sellerReceivableAmount" | "currency" | "tradeCharacterName" | "autoConfirmAt" | "completedAt" | "canceledAt" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "buyerId" | "sellerId" | "listingId" | "status" | "quantity" | "unitPrice" | "grossAmount" | "platformFeeAmount" | "sellerReceivableAmount" | "currency" | "tradeCharacterName" | "buyerGameNickname" | "sellerGameNickname" | "autoConfirmAt" | "completedAt" | "canceledAt" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2212,6 +2342,8 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     sellerReceivableAmount: runtime.Decimal
     currency: string
     tradeCharacterName: string | null
+    buyerGameNickname: string | null
+    sellerGameNickname: string | null
     autoConfirmAt: Date | null
     completedAt: Date | null
     canceledAt: Date | null
@@ -2661,6 +2793,8 @@ export interface OrderFieldRefs {
   readonly sellerReceivableAmount: Prisma.FieldRef<"Order", 'Decimal'>
   readonly currency: Prisma.FieldRef<"Order", 'String'>
   readonly tradeCharacterName: Prisma.FieldRef<"Order", 'String'>
+  readonly buyerGameNickname: Prisma.FieldRef<"Order", 'String'>
+  readonly sellerGameNickname: Prisma.FieldRef<"Order", 'String'>
   readonly autoConfirmAt: Prisma.FieldRef<"Order", 'DateTime'>
   readonly completedAt: Prisma.FieldRef<"Order", 'DateTime'>
   readonly canceledAt: Prisma.FieldRef<"Order", 'DateTime'>

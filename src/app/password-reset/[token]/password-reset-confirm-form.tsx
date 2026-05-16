@@ -6,6 +6,7 @@ import { Alert, Button, CardHeading, Field } from "@/components/ui";
 import PasswordVisibilityInput from "@/components/password-visibility-input";
 import CountryText from "../../country-text";
 import useCountryTranslation from "../../use-country-translation";
+import { getAuthApiMessage } from "../../auth-api-message";
 
 export default function PasswordResetConfirmForm({ token }: { token: string }) {
   const { t } = useCountryTranslation();
@@ -21,7 +22,7 @@ export default function PasswordResetConfirmForm({ token }: { token: string }) {
     setError("");
 
     if (password !== passwordConfirm) {
-      setError("비밀번호가 서로 일치하지 않습니다.");
+      setError(t("auth.passwordMismatch"));
       return;
     }
 
@@ -35,13 +36,13 @@ export default function PasswordResetConfirmForm({ token }: { token: string }) {
         },
         body: JSON.stringify({ token, password }),
       });
-      const result = (await response.json()) as { message?: string };
+      const result = (await response.json()) as { code?: string; message?: string };
 
       if (!response.ok) {
-        throw new Error(result.message ?? t("auth.passwordChangeFailed"));
+        throw new Error(getAuthApiMessage(result, t, "auth.passwordChangeFailed"));
       }
 
-      setMessage(result.message ?? t("auth.passwordChanged"));
+      setMessage(getAuthApiMessage(result, t, "auth.passwordChanged"));
       setPassword("");
       setPasswordConfirm("");
     } catch (submitError) {
@@ -70,7 +71,7 @@ export default function PasswordResetConfirmForm({ token }: { token: string }) {
           />
         </Field>
         <div className="mt-4">
-          <Field label="새 비밀번호 확인">
+          <Field label={<CountryText id="auth.passwordConfirm" />}>
             <PasswordVisibilityInput
               value={passwordConfirm}
               onChange={(event) => setPasswordConfirm(event.target.value)}

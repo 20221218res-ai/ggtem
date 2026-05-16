@@ -5,7 +5,10 @@ import CountryText from "@/app/country-text";
 import type { TranslationKey } from "@/app/i18n";
 import LocalizedInput from "@/app/localized-input";
 import UserContentText from "@/app/user-content-text";
-import { getGameMoneyPriceUnitLabel } from "@/lib/market/trade-unit";
+import {
+  formatGameMoneyQuantityWithUnit,
+  getGameMoneyPriceUnitLabel,
+} from "@/lib/market/trade-unit";
 import { getMarketplaceMyListings } from "@/lib/market/my-listings";
 import SellerListingActions from "./seller-listing-actions";
 
@@ -178,6 +181,9 @@ function ListingRow({ listing }: { listing: MyListing }) {
       : listing.unitPrice;
   const accountTransferTypeLabel =
     listing.category === "GAME_ACCOUNT" ? getAccountTransferTypeLabelNode(listing.accountTransferType) : null;
+  const availableQuantityLabel = formatListingQuantity(listing, listing.availableQuantity);
+  const minimumQuantityLabel = formatListingQuantity(listing, listing.minimumQuantity);
+  const soldQuantityLabel = formatListingQuantity(listing, listing.soldQuantity);
 
   return (
     <article className="grid gap-4 border-b border-[var(--gg-border-soft)] p-5 transition last:border-b-0 hover:bg-[var(--gg-card-soft-bg)] lg:grid-cols-[90px_1fr_190px]">
@@ -224,9 +230,9 @@ function ListingRow({ listing }: { listing: MyListing }) {
           {listing.serverName ? ` / ${listing.serverName}` : ""}
         </p>
         <div className="mt-3 flex flex-wrap gap-2 text-xs font-black text-[var(--gg-muted)]">
-          <InfoChip label={<CountryText id="manage.availableToSell" />} value={listing.availableQuantity} />
-          <InfoChip label={<CountryText id="manage.minimumQuantity" />} value={listing.minimumQuantity} />
-          <InfoChip label={<CountryText id="manage.soldQuantity" />} value={listing.soldQuantity} />
+          <InfoChip label={<CountryText id="manage.availableToSell" />} value={availableQuantityLabel} />
+          <InfoChip label={<CountryText id="manage.minimumQuantity" />} value={minimumQuantityLabel} />
+          <InfoChip label={<CountryText id="manage.soldQuantity" />} value={soldQuantityLabel} />
           {listing.category === "GAME_MONEY" ? (
             <InfoChip
               label="거래 방식"
@@ -470,6 +476,21 @@ function getAccountTransferTypeLabelNode(value: string | null) {
   if (value === "GOOGLE") return <CountryText id="account.google" />;
   if (value === "GAME_COMPANY") return <CountryText id="account.gameCompany" />;
   return null;
+}
+
+function formatListingQuantity(
+  listing: Pick<MyListing, "category" | "priceUnitQuantity" | "moneyUnitName">,
+  quantity: string,
+) {
+  if (listing.category === "GAME_MONEY") {
+    return formatGameMoneyQuantityWithUnit(
+      quantity,
+      listing.priceUnitQuantity,
+      listing.moneyUnitName,
+    );
+  }
+
+  return quantity;
 }
 
 function buildHref({ inventory, game }: { inventory: string; game: string }) {

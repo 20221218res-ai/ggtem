@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
       serverDetail?: string;
       category?: "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
       accountTransferType?: string;
+      sellerGameNickname?: string;
       title?: string;
       description?: string;
       unitPrice?: string;
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest) {
       serverDetail: body.serverDetail,
       category: body.category,
       accountTransferType: body.accountTransferType,
+      sellerGameNickname: body.sellerGameNickname,
       title: body.title,
       description: body.description,
       unitPrice: body.unitPrice,

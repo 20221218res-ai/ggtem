@@ -1,6 +1,7 @@
 "use client";
 
 import { InputHTMLAttributes, useState } from "react";
+import useCountryTranslation from "@/app/use-country-translation";
 import { TextInput } from "@/components/ui";
 
 type PasswordVisibilityInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type">;
@@ -9,6 +10,7 @@ export default function PasswordVisibilityInput({
   className,
   ...props
 }: PasswordVisibilityInputProps) {
+  const { t } = useCountryTranslation();
   const [isVisible, setIsVisible] = useState(false);
 
   return (
@@ -20,7 +22,7 @@ export default function PasswordVisibilityInput({
       />
       <button
         type="button"
-        aria-label={isVisible ? "비밀번호 숨기기" : "비밀번호 표시"}
+        aria-label={isVisible ? t("auth.passwordHide") : t("auth.passwordShow")}
         aria-pressed={isVisible}
         onClick={() => setIsVisible((current) => !current)}
         className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-[var(--gg-muted)] transition hover:bg-[var(--gg-card-soft-bg)] hover:text-[var(--gg-text)]"

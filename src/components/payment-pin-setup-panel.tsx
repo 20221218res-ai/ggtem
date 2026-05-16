@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useCountryTranslation from "@/app/use-country-translation";
 
 type PaymentPinStatus = {
   hasPaymentPin: boolean;
@@ -12,6 +13,7 @@ function cleanPin(value: string) {
 }
 
 export default function PaymentPinSetupPanel() {
+  const { t } = useCountryTranslation();
   const [status, setStatus] = useState<PaymentPinStatus | null>(null);
   const [currentPin, setCurrentPin] = useState("");
   const [newPin, setNewPin] = useState("");
@@ -27,7 +29,7 @@ export default function PaymentPinSetupPanel() {
     fetch("/api/user/payment-pin", { cache: "no-store" })
       .then(async (response) => {
         if (!response.ok) {
-          throw new Error("결제 PIN 상태를 확인하지 못했습니다.");
+          throw new Error(t("paymentPin.statusFailed"));
         }
         return (await response.json()) as PaymentPinStatus;
       })
@@ -37,7 +39,7 @@ export default function PaymentPinSetupPanel() {
       })
       .catch((statusError) => {
         if (!isMounted) return;
-        setError(statusError instanceof Error ? statusError.message : "결제 PIN 상태를 확인하지 못했습니다.");
+        setError(statusError instanceof Error ? statusError.message : t("paymentPin.statusFailed"));
       })
       .finally(() => {
         if (!isMounted) return;
@@ -54,17 +56,17 @@ export default function PaymentPinSetupPanel() {
     setError("");
 
     if (!/^\d{4,6}$/.test(newPin)) {
-      setError("새 결제 PIN은 숫자 4~6자리로 입력해 주세요.");
+      setError(t("paymentPin.newPinInvalid"));
       return;
     }
 
     if (newPin !== confirmPin) {
-      setError("새 결제 PIN 확인값이 일치하지 않습니다.");
+      setError(t("paymentPin.confirmMismatch"));
       return;
     }
 
     if (status?.hasPaymentPin && !/^\d{4,6}$/.test(currentPin)) {
-      setError("현재 결제 PIN을 숫자 4~6자리로 입력해 주세요.");
+      setError(t("paymentPin.currentPinInvalid"));
       return;
     }
 
@@ -86,7 +88,7 @@ export default function PaymentPinSetupPanel() {
       };
 
       if (!response.ok) {
-        throw new Error(result.message ?? "결제 PIN을 저장하지 못했습니다.");
+        throw new Error(result.message ?? t("paymentPin.saveFailed"));
       }
 
       setStatus({
@@ -96,9 +98,9 @@ export default function PaymentPinSetupPanel() {
       setCurrentPin("");
       setNewPin("");
       setConfirmPin("");
-      setMessage(result.message ?? "결제 PIN을 저장했습니다.");
+      setMessage(result.message ?? (status?.hasPaymentPin ? t("paymentPin.changed") : t("paymentPin.saved")));
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "결제 PIN을 저장하지 못했습니다.");
+      setError(submitError instanceof Error ? submitError.message : t("paymentPin.saveFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -111,22 +113,21 @@ export default function PaymentPinSetupPanel() {
     >
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-sm font-black text-[var(--gg-accent)]">SECURITY PIN</p>
-          <h2 className="mt-1 text-2xl font-black text-[var(--gg-text)]">결제 PIN 설정</h2>
+          <p className="text-sm font-black text-[var(--gg-accent)]">{t("paymentPin.eyebrow")}</p>
+          <h2 className="mt-1 text-2xl font-black text-[var(--gg-text)]">{t("paymentPin.title")}</h2>
           <p className="mt-2 max-w-2xl text-sm font-bold leading-6 text-[var(--gg-muted)]">
-            구매, 즉시판매, 인수확정, 출금 요청에 사용하는 4~6자리 숫자 PIN입니다.
-            로그인 비밀번호와 별도로 보관되며 운영자는 원문을 확인할 수 없습니다.
+            {t("paymentPin.description")}
           </p>
         </div>
         <span className="w-fit rounded-full border border-[var(--gg-border)] bg-white px-3 py-1 text-xs font-black text-[var(--gg-muted)]">
-          {isLoading ? "확인 중" : status?.hasPaymentPin ? "설정됨" : "미설정"}
+          {isLoading ? t("paymentPin.statusChecking") : status?.hasPaymentPin ? t("paymentPin.statusSet") : t("paymentPin.statusMissing")}
         </span>
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-3">
         {status?.hasPaymentPin ? (
           <label className="grid gap-2 text-sm font-black text-[var(--gg-text)]">
-            현재 PIN
+            {t("paymentPin.currentPin")}
             <input
               type="password"
               inputMode="numeric"
@@ -138,12 +139,12 @@ export default function PaymentPinSetupPanel() {
               }}
               autoComplete="one-time-code"
               className="h-12 rounded-xl border border-[var(--gg-border)] bg-white px-4 font-bold outline-none focus:border-[var(--gg-accent)]"
-              placeholder="현재 PIN"
+              placeholder={t("paymentPin.currentPin")}
             />
           </label>
         ) : null}
         <label className="grid gap-2 text-sm font-black text-[var(--gg-text)]">
-          새 PIN
+          {t("paymentPin.newPin")}
           <input
             type="password"
             inputMode="numeric"
@@ -155,11 +156,11 @@ export default function PaymentPinSetupPanel() {
             }}
             autoComplete="new-password"
             className="h-12 rounded-xl border border-[var(--gg-border)] bg-white px-4 font-bold outline-none focus:border-[var(--gg-accent)]"
-            placeholder="4~6자리 숫자"
+            placeholder={t("paymentPin.pinDigitsPlaceholder")}
           />
         </label>
         <label className="grid gap-2 text-sm font-black text-[var(--gg-text)]">
-          새 PIN 확인
+          {t("paymentPin.confirmPin")}
           <input
             type="password"
             inputMode="numeric"
@@ -171,7 +172,7 @@ export default function PaymentPinSetupPanel() {
             }}
             autoComplete="new-password"
             className="h-12 rounded-xl border border-[var(--gg-border)] bg-white px-4 font-bold outline-none focus:border-[var(--gg-accent)]"
-            placeholder="한 번 더 입력"
+            placeholder={t("paymentPin.confirmPlaceholder")}
           />
         </label>
       </div>
@@ -183,10 +184,10 @@ export default function PaymentPinSetupPanel() {
           disabled={isLoading || isSubmitting}
           className="h-12 rounded-xl bg-[var(--gg-accent)] px-6 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:bg-slate-300"
         >
-          {isSubmitting ? "저장 중..." : status?.hasPaymentPin ? "결제 PIN 변경" : "결제 PIN 설정"}
+          {isSubmitting ? t("paymentPin.saving") : status?.hasPaymentPin ? t("paymentPin.change") : t("paymentPin.set")}
         </button>
         <p className="text-xs font-bold text-[var(--gg-muted)]">
-          PIN을 잊어버린 경우 고객센터 또는 관리자 초기화가 필요합니다.
+          {t("paymentPin.forgotNotice")}
         </p>
       </div>
 

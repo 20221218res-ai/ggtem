@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: "입금 주소 설정이 저장되었습니다.",
+      message: "입금 주소 설정을 저장했습니다.",
       address: updated,
     });
   } catch (error) {

@@ -5,6 +5,10 @@ import {
 } from "@/lib/auth/session";
 import { getSignedInRedirectPath, ROLE_GROUPS } from "@/lib/auth/guards";
 
+const MARKET_FORBIDDEN_MESSAGE = "관리자 계정은 유저 로그인 페이지에서 로그인할 수 없습니다. 관리자 페이지를 이용해 주세요.";
+const ADMIN_FORBIDDEN_MESSAGE = "유저 계정은 관리자 로그인 페이지에서 로그인할 수 없습니다. 일반 로그인 페이지를 이용해 주세요.";
+const ACCOUNT_UNAVAILABLE_MESSAGE = "현재 사용할 수 없는 계정입니다.";
+
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as {
@@ -15,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     if (!body.email || !body.password) {
       return NextResponse.json(
-        { message: "이메일과 비밀번호를 입력해 주세요." },
+        { code: "AUTH_EMAIL_PASSWORD_REQUIRED", message: "이메일과 비밀번호를 입력해 주세요." },
         { status: 400 },
       );
     }
@@ -29,6 +33,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
+      code: "AUTH_SIGN_IN_SUCCESS",
       message: "로그인되었습니다.",
       role: user.role,
       redirectPath: getSignedInRedirectPath(user),
@@ -48,6 +53,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
+        code: getSignInErrorCode(error),
         message: error instanceof Error ? error.message : "로그인에 실패했습니다.",
       },
       { status: 400 },
@@ -69,12 +75,28 @@ function getAllowedRolesForSurface(surface?: "market" | "admin") {
 
 function getForbiddenMessageForSurface(surface?: "market" | "admin") {
   if (surface === "market") {
-    return "관리자 계정은 유저 로그인 페이지에서 로그인할 수 없습니다. 관리자 페이지를 이용해 주세요.";
+    return MARKET_FORBIDDEN_MESSAGE;
   }
 
   if (surface === "admin") {
-    return "유저 계정은 관리자 로그인 페이지에서 로그인할 수 없습니다. 일반 로그인 페이지를 이용해 주세요.";
+    return ADMIN_FORBIDDEN_MESSAGE;
   }
 
   return undefined;
+}
+
+function getSignInErrorCode(error: unknown) {
+  if (error instanceof Error && error.message === MARKET_FORBIDDEN_MESSAGE) {
+    return "AUTH_ADMIN_NOT_ALLOWED_ON_MARKET";
+  }
+
+  if (error instanceof Error && error.message === ADMIN_FORBIDDEN_MESSAGE) {
+    return "AUTH_USER_NOT_ALLOWED_ON_ADMIN";
+  }
+
+  if (error instanceof Error && error.message === ACCOUNT_UNAVAILABLE_MESSAGE) {
+    return "AUTH_ACCOUNT_UNAVAILABLE";
+  }
+
+  return "AUTH_SIGN_IN_FAILED";
 }

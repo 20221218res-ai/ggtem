@@ -1,11 +1,17 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import AccountCredentialPanel from "@/app/account-credential-panel";
 import CountryText from "@/app/country-text";
 import type { TranslationKey } from "@/app/i18n";
 import OrderChatPanel from "@/app/order-chat-panel";
 import UserContentText from "@/app/user-content-text";
 import { getOrderChatView } from "@/lib/chat/order-chat";
+import {
+  formatGameMoneyQuantityWithUnit,
+  getGameMoneyPriceUnitLabel,
+  safeNormalizeGameMoneyPriceUnit,
+} from "@/lib/market/trade-unit";
 import { SellerOrderActions } from "../seller-order-actions";
 
 export default async function SellerOrderChatPage({
@@ -25,8 +31,12 @@ export default async function SellerOrderChatPage({
   }
 
   const accountType =
-    view.category === "GAME_ACCOUNT" ? getAccountTransferTypeLabelNode(view.accountTransferType) : null;
+    view.category === "GAME_ACCOUNT"
+      ? getAccountTransferTypeLabelNode(view.accountTransferType)
+      : null;
   const gameMeta = [view.gameName, view.serverName].filter(Boolean).join(" / ");
+  const buyerGameNickname = view.buyerGameNickname;
+  const sellerGameNickname = view.sellerGameNickname ?? view.tradeCharacterName;
 
   return (
     <main className="min-h-screen bg-[var(--gg-page-bg)] px-4 py-6 text-[var(--gg-text)] lg:px-8">
@@ -60,6 +70,10 @@ export default async function SellerOrderChatPage({
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
           <SellerOrderActions orderId={view.orderId} status={view.orderStatus} />
 
+          {view.category === "GAME_ACCOUNT" ? (
+            <AccountCredentialPanel orderId={view.orderId} mode="seller" />
+          ) : null}
+
           <SideCard>
             <div className="grid gap-2">
               <Link
@@ -82,19 +96,53 @@ export default async function SellerOrderChatPage({
               <CountryText id="chat.tradeInfo" />
             </summary>
             <div className="mt-4 space-y-3 text-sm font-bold">
-              <InfoRow label={<CountryText id="orderManage.gameServer" />} value={gameMeta || <CountryText id="orderManage.gameInfoMissing" />} />
-              {accountType ? <InfoRow label={<CountryText id="listingForm.accountType" />} value={accountType} /> : null}
-              <InfoRow label={<CountryText id="orderManage.quantity" />} value={<QuantityValue quantity={view.quantity} category={view.category} moneyUnitName={view.moneyUnitName} />} />
-              {view.tradeCharacterName ? <InfoRow label="거래 캐릭터명" value={view.tradeCharacterName} /> : null}
-              <InfoRow label={<CountryText id="manage.unitPrice" />} value={<UnitPriceValue view={view} />} />
-              <InfoRow label={<CountryText id="orderManage.orderAmount" />} value={`${view.grossAmount} ${view.currency}`} />
-              <InfoRow label={<CountryText id="orderManage.expectedSettlement" />} value={`${view.sellerReceivableAmount} ${view.currency}`} />
+              <InfoRow
+                label={<CountryText id="orderManage.gameServer" />}
+                value={gameMeta || <CountryText id="orderManage.gameInfoMissing" />}
+              />
+              {accountType ? (
+                <InfoRow
+                  label={<CountryText id="listingForm.accountType" />}
+                  value={accountType}
+                />
+              ) : null}
+              <InfoRow
+                label={<CountryText id="orderManage.quantity" />}
+                value={
+                  <QuantityValue
+                    quantity={view.quantity}
+                    category={view.category}
+                    moneyUnitName={view.moneyUnitName}
+                    priceUnitQuantity={view.priceUnitQuantity}
+                  />
+                }
+              />
+              {buyerGameNickname ? (
+                <InfoRow label={<CountryText id="listingForm.buyerGameNickname" />} value={buyerGameNickname} />
+              ) : null}
+              {sellerGameNickname ? (
+                <InfoRow label={<CountryText id="listingForm.sellerGameNickname" />} value={sellerGameNickname} />
+              ) : null}
+              <InfoRow
+                label={<CountryText id="manage.unitPrice" />}
+                value={<UnitPriceValue view={view} />}
+              />
+              <InfoRow
+                label={<CountryText id="orderManage.orderAmount" />}
+                value={`${view.grossAmount} ${view.currency}`}
+              />
+              <InfoRow
+                label={<CountryText id="orderManage.expectedSettlement" />}
+                value={`${view.sellerReceivableAmount} ${view.currency}`}
+              />
             </div>
           </details>
 
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-black text-amber-800">
-            <p>반드시 판매자 및 구매자의 게임 아이디를 확인 후 거래하시기 바랍니다.</p>
-            <p className="mt-1">게임 아이디 미확인으로 인한 사칭 및 사기 피해 발생 시 본 업체는 책임지지 않습니다.</p>
+            <p><CountryText id="tradeSafety.gameIdNoticeA" /></p>
+            <p className="mt-1">
+              <CountryText id="tradeSafety.gameIdNoticeB" />
+            </p>
           </div>
         </aside>
       </section>
@@ -131,7 +179,9 @@ function ChatHeader({
         </div>
         <div className="text-left sm:text-right">
           <p className="text-2xl font-black">{amount}</p>
-          <span className={`mt-2 inline-flex rounded-md px-3 py-2 text-xs font-black ${getStatusClass(status)}`}>
+          <span
+            className={`mt-2 inline-flex rounded-md px-3 py-2 text-xs font-black ${getStatusClass(status)}`}
+          >
             <CountryText id={getOrderStatusKey(status)} />
           </span>
         </div>
@@ -158,12 +208,26 @@ function InfoRow({ label, value }: { label: ReactNode; value: ReactNode }) {
   );
 }
 
-function QuantityValue({ quantity, category, moneyUnitName }: { quantity: string; category: string; moneyUnitName: string | null }) {
-  const moneyUnit = moneyUnitName?.trim();
+function QuantityValue({
+  quantity,
+  category,
+  moneyUnitName,
+  priceUnitQuantity,
+}: {
+  quantity: string;
+  category: string;
+  moneyUnitName: string | null;
+  priceUnitQuantity: string;
+}) {
+  if (category === "GAME_MONEY") {
+    return (
+      <>{formatGameMoneyQuantityWithUnit(quantity, priceUnitQuantity, moneyUnitName)}</>
+    );
+  }
 
   return (
     <>
-      {quantity} {category === "GAME_MONEY" && moneyUnit ? moneyUnit : <CountryText id={getCategoryKey(category)} />}
+      {quantity} <CountryText id={getCategoryKey(category)} />
     </>
   );
 }
@@ -171,23 +235,55 @@ function QuantityValue({ quantity, category, moneyUnitName }: { quantity: string
 function UnitPriceValue({
   view,
 }: {
-  view: Pick<NonNullable<Awaited<ReturnType<typeof getOrderChatView>>>, "category" | "currency" | "moneyUnitName" | "unitPrice">;
+  view: Pick<
+    NonNullable<Awaited<ReturnType<typeof getOrderChatView>>>,
+    "category" | "currency" | "moneyUnitName" | "priceUnitQuantity" | "unitPrice"
+  >;
 }) {
-  const moneyUnit = view.moneyUnitName?.trim();
+  if (view.category === "GAME_MONEY") {
+    const priceUnitQuantity = safeNormalizeGameMoneyPriceUnit(view.priceUnitQuantity);
+    const unitPrice = Number(view.unitPrice || "0");
+
+    return (
+      <>
+        {formatDisplayNumber(unitPrice * Number(priceUnitQuantity))} {view.currency} /{" "}
+        {getGameMoneyPriceUnitLabel(priceUnitQuantity, view.moneyUnitName)}
+      </>
+    );
+  }
 
   return (
     <>
       {view.unitPrice} {view.currency}
-      {view.category === "GAME_MONEY" && moneyUnit ? ` / 1 ${moneyUnit}` : ""}
     </>
   );
 }
 
+function formatDisplayNumber(value: number) {
+  if (!Number.isFinite(value)) {
+    return "0";
+  }
+
+  if (Number.isInteger(value)) {
+    return value.toLocaleString("en-US");
+  }
+
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: 6,
+  });
+}
+
 function getStatusClass(status: string) {
-  if (["REQUESTED", "SELLER_RESPONSE_PENDING", "BUYER_CONFIRM_PENDING"].includes(status)) return "bg-amber-100 text-amber-800";
-  if (["ESCROW_LOCKED", "DELIVERY_IN_PROGRESS", "DELIVERY_COMPLETED"].includes(status)) return "bg-blue-100 text-blue-800";
+  if (["REQUESTED", "SELLER_RESPONSE_PENDING", "BUYER_CONFIRM_PENDING"].includes(status)) {
+    return "bg-amber-100 text-amber-800";
+  }
+  if (["ESCROW_LOCKED", "DELIVERY_IN_PROGRESS", "DELIVERY_COMPLETED"].includes(status)) {
+    return "bg-blue-100 text-blue-800";
+  }
   if (status === "COMPLETED") return "bg-emerald-100 text-emerald-800";
-  if (["DISPUTED", "CANCELED", "REFUNDED"].includes(status)) return "bg-red-100 text-red-800";
+  if (["DISPUTED", "CANCELED", "REFUNDED"].includes(status)) {
+    return "bg-red-100 text-red-800";
+  }
   return "bg-slate-100 text-slate-700";
 }
 

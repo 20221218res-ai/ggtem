@@ -9,18 +9,22 @@ export async function POST(request: NextRequest) {
 
     if (!body.email) {
       return NextResponse.json(
-        { message: "Please enter an email." },
+        { code: "AUTH_EMAIL_REQUIRED", message: "이메일을 입력해 주세요." },
         { status: 400 },
       );
     }
 
     const result = await requestPasswordReset({ email: body.email });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      code: "AUTH_PASSWORD_RESET_REQUEST_PREPARED",
+      ...result,
+    });
   } catch (error) {
     return NextResponse.json(
       {
-        message: error instanceof Error ? error.message : "Could not create a password reset link.",
+        code: "AUTH_PASSWORD_RESET_REQUEST_FAILED",
+        message: error instanceof Error ? error.message : "비밀번호 재설정 링크를 생성하지 못했습니다.",
       },
       { status: 400 },
     );

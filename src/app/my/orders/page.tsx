@@ -4,6 +4,7 @@ import CountryText from "@/app/country-text";
 import type { TranslationKey } from "@/app/i18n";
 import UserContentText from "@/app/user-content-text";
 import { getMarketplaceMyOrders } from "@/lib/market/my-orders";
+import { formatGameMoneyQuantityWithUnit } from "@/lib/market/trade-unit";
 
 const statusTone: Record<string, string> = {
   REQUESTED: "bg-amber-100 text-amber-800",
@@ -246,10 +247,21 @@ function CountValue({ value }: { value: number }) {
 function QuantityValue({ order }: { order: MyOrder }) {
   const moneyUnit = order.moneyUnitName?.trim();
 
+  if (order.category === "GAME_MONEY") {
+    return (
+      <>
+        {formatGameMoneyQuantityWithUnit(
+          order.quantity,
+          order.priceUnitQuantity,
+          moneyUnit,
+        )}
+      </>
+    );
+  }
+
   return (
     <>
-      {order.quantity}{" "}
-      {order.category === "GAME_MONEY" && moneyUnit ? moneyUnit : <CountryText id={getCategoryKey(order.category)} />}
+      {order.quantity} <CountryText id={getCategoryKey(order.category)} />
     </>
   );
 }

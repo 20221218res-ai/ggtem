@@ -1,6 +1,10 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import CountryText from "@/app/country-text";
+import LocalizedInput, { LocalizedTextarea } from "@/app/localized-input";
 import UserMarketHeader from "@/app/user-market-header";
+import type { TranslationKey } from "@/app/i18n";
 import { getCurrentSessionUser } from "@/lib/auth/session";
 import { getPrismaClient } from "@/lib/prisma";
 import {
@@ -9,22 +13,22 @@ import {
 } from "@/lib/support/customer-center";
 
 const tabs = [
-  { key: "notice", label: "공지사항", type: "NOTICE" },
-  { key: "faq", label: "자주묻는질문", type: "FAQ" },
-  { key: "inquiry", label: "1:1문의", type: null },
-  { key: "policy", label: "회원정책", type: "POLICY" },
-  { key: "paid", label: "유료 서비스", type: "PAID_SERVICE" },
-  { key: "game-request", label: "신규 게임 / 서버 신청", type: "GAME_SERVER_REQUEST" },
-] satisfies Array<{ key: string; label: string; type: CustomerCenterType | null }>;
+  { key: "notice", labelKey: "support.notice", type: "NOTICE" },
+  { key: "faq", labelKey: "support.faq", type: "FAQ" },
+  { key: "inquiry", labelKey: "support.inquiry", type: null },
+  { key: "policy", labelKey: "support.policy", type: "POLICY" },
+  { key: "paid", labelKey: "support.paidService", type: "PAID_SERVICE" },
+  { key: "game-request", labelKey: "support.gameRequest", type: "GAME_SERVER_REQUEST" },
+] satisfies Array<{ key: string; labelKey: TranslationKey; type: CustomerCenterType | null }>;
 
 const inquiryCategories = [
-  { value: "WALLET", label: "충전/출금" },
-  { value: "ORDER", label: "주문/거래" },
-  { value: "DISPUTE", label: "분쟁/신고" },
-  { value: "ACCOUNT", label: "계정" },
-  { value: "GAME_SERVER", label: "게임/서버" },
-  { value: "OTHER", label: "기타" },
-] as const;
+  { value: "WALLET", labelKey: "support.walletCategory" },
+  { value: "ORDER", labelKey: "support.orderCategory" },
+  { value: "DISPUTE", labelKey: "support.disputeCategory" },
+  { value: "ACCOUNT", labelKey: "support.accountCategory" },
+  { value: "GAME_SERVER", labelKey: "support.gameServerCategory" },
+  { value: "OTHER", labelKey: "support.otherCategory" },
+] satisfies Array<{ value: string; labelKey: TranslationKey }>;
 
 type InquirySummary = {
   id: string;
@@ -92,8 +96,12 @@ export default async function CustomerCenterPage({
 
         <section className="min-w-0 space-y-6">
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-black text-[var(--gg-accent)]">CUSTOMER CENTER</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-950">고객센터</h1>
+            <p className="text-sm font-black text-[var(--gg-accent)]">
+              <CountryText id="support.customerCenterEyebrow" />
+            </p>
+            <h1 className="text-3xl font-black tracking-tight text-slate-950">
+              <CountryText id="support.customerCenter" />
+            </h1>
           </div>
 
           <nav className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
@@ -108,7 +116,7 @@ export default async function CustomerCenterPage({
                     : "border-[var(--gg-border)] bg-white text-slate-950 hover:border-[var(--gg-accent)]"
                 }`}
               >
-                {tab.label}
+                <CountryText id={tab.labelKey} />
               </Link>
             ))}
           </nav>
@@ -137,7 +145,7 @@ export default async function CustomerCenterPage({
               error={params.error === "invalid"}
             />
           ) : (
-            <DocumentList title={selected.label} documents={searchedDocuments} />
+            <DocumentList title={<CountryText id={selected.labelKey} />} documents={searchedDocuments} />
           )}
         </section>
       </section>
@@ -149,20 +157,26 @@ function CustomerSidebar() {
   return (
     <aside className="space-y-6 rounded-lg border border-[var(--gg-border)] bg-white p-5 shadow-sm lg:sticky lg:top-32 lg:self-start">
       <div>
-        <h2 className="text-xl font-black">고객센터</h2>
+        <h2 className="text-xl font-black">
+          <CountryText id="support.customerCenter" />
+        </h2>
         <div className="mt-4 grid gap-2 text-sm font-black">
           {tabs.map((tab) => (
             <Link key={tab.key} href={`/support?tab=${tab.key}`} prefetch={false} className="py-1 hover:text-[var(--gg-accent)]">
-              {tab.label}
+              <CountryText id={tab.labelKey} />
             </Link>
           ))}
         </div>
       </div>
       <div className="border-t border-[var(--gg-border)] pt-5">
-        <p className="text-sm font-black text-slate-500">고객지원센터</p>
-        <p className="mt-2 text-2xl font-black text-slate-950">온라인 문의</p>
+        <p className="text-sm font-black text-slate-500">
+          <CountryText id="support.supportCenter" />
+        </p>
+        <p className="mt-2 text-2xl font-black text-slate-950">
+          <CountryText id="support.onlineInquiry" />
+        </p>
         <p className="mt-3 text-sm font-bold leading-6 text-slate-600">
-          충전, 출금, 분쟁, 계정 거래 문의는 로그인 후 1:1 문의로 접수해 주세요. 답변은 내 문의 내역에서 바로 확인할 수 있습니다.
+          <CountryText id="support.sidebarDescription" />
         </p>
       </div>
       <Link
@@ -170,7 +184,7 @@ function CustomerSidebar() {
         prefetch={false}
         className="block rounded-lg bg-[var(--gg-accent)] px-4 py-3 text-center text-sm font-black text-white"
       >
-        1:1 문의하기
+        <CountryText id="support.inquiryAction" />
       </Link>
     </aside>
   );
@@ -181,13 +195,13 @@ function FaqSearch({ query }: { query: string }) {
     <form action="/support" className="rounded-lg border border-[var(--gg-border)] bg-white p-4">
       <input type="hidden" name="tab" value="faq" />
       <label className="sr-only" htmlFor="support-search">
-        FAQ 검색
+        <CountryText id="support.faqSearch" />
       </label>
-      <input
+      <LocalizedInput
         id="support-search"
         name="q"
         defaultValue={query}
-        placeholder="궁금한 내용을 검색해 주세요."
+        placeholderKey="support.faqSearchPlaceholder"
         className="h-12 w-full rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
       />
     </form>
@@ -198,7 +212,7 @@ function DocumentList({
   title,
   documents,
 }: {
-  title: string;
+  title: ReactNode;
   documents: DocumentSummary[];
 }) {
   return (
@@ -221,7 +235,9 @@ function DocumentList({
             </details>
           ))
         ) : (
-          <p className="px-5 py-10 text-sm font-bold text-slate-500">등록된 내용이 없습니다.</p>
+          <p className="px-5 py-10 text-sm font-bold text-slate-500">
+            <CountryText id="support.emptyDocuments" />
+          </p>
         )}
       </div>
     </section>
@@ -246,59 +262,61 @@ function InquiryPanel({
       <div className="rounded-lg border border-[var(--gg-border)] bg-white p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-xl font-black">1:1 문의</h2>
+            <h2 className="text-xl font-black">
+              <CountryText id="support.inquiry" />
+            </h2>
             <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
-              충전, 출금, 분쟁, 계정 거래처럼 운영자 확인이 필요한 내용을 접수하세요. 답변은 내 문의 내역과 알림에 표시됩니다.
+              <CountryText id="support.inquiryDescription" />
             </p>
           </div>
           {isSignedIn ? (
             <div className="rounded-lg bg-slate-50 px-4 py-3 text-sm font-black text-slate-700">
-              답변 완료 {answeredCount}건
+              <CountryText id="support.answeredCount" values={{ count: answeredCount }} />
             </div>
           ) : null}
         </div>
-        <SupportNotice submitted={submitted} error={error} successText="문의가 접수되었습니다. 운영자가 확인 후 답변을 남깁니다." />
+        <SupportNotice submitted={submitted} error={error} successKey="support.inquirySubmitted" />
         {isSignedIn ? (
           <form action={createSupportInquiryAction} className="mt-5 grid gap-4">
             <label className="grid gap-2 text-sm font-black">
-              문의 종류
+              <CountryText id="support.inquiryCategory" />
               <select name="category" className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold">
                 {inquiryCategories.map((category) => (
                   <option key={category.value} value={category.value}>
-                    {category.label}
+                    <CountryText id={category.labelKey} />
                   </option>
                 ))}
               </select>
             </label>
             <label className="grid gap-2 text-sm font-black">
-              제목
-              <input
+              <CountryText id="support.title" />
+              <LocalizedInput
                 name="title"
                 required
                 minLength={2}
                 maxLength={100}
-                placeholder="문의 제목을 입력해 주세요."
+                placeholderKey="support.titlePlaceholder"
                 className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold"
               />
             </label>
             <label className="grid gap-2 text-sm font-black">
-              내용
-              <textarea
+              <CountryText id="support.body" />
+              <LocalizedTextarea
                 name="body"
                 required
                 minLength={10}
                 maxLength={2000}
                 rows={6}
-                placeholder="주문번호, 지갑 요청번호, 상황 설명을 함께 적어 주세요."
+                placeholderKey="support.bodyPlaceholder"
                 className="rounded-lg border border-[var(--gg-border)] px-4 py-3 text-sm font-bold leading-6"
               />
             </label>
             <button type="submit" className="h-12 rounded-lg bg-[var(--gg-accent)] px-4 text-sm font-black text-white">
-              문의 접수
+              <CountryText id="support.submitInquiry" />
             </button>
           </form>
         ) : (
-          <SignInPrompt next="/support?tab=inquiry" label="로그인하고 문의하기" />
+          <SignInPrompt next="/support?tab=inquiry" label={<CountryText id="support.signInInquiry" />} />
         )}
       </div>
       <TopQuestions />
@@ -321,82 +339,92 @@ function GameRequestPanel({
   return (
     <section className="grid gap-5">
       <div className="rounded-lg border border-[var(--gg-border)] bg-white p-6">
-        <h2 className="text-xl font-black">게임 / 서버 신청</h2>
+        <h2 className="text-xl font-black">
+          <CountryText id="support.gameRequestTitle" />
+        </h2>
         <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
-          원하는 게임이나 서버가 목록에 없으면 아래 폼으로 요청하세요. 접수 내용은 어드민 1:1 문의 화면에서 검토됩니다.
+          <CountryText id="support.gameRequestDescription" />
         </p>
-        <SupportNotice submitted={submitted} error={error} successText="게임/서버 요청이 접수되었습니다. 운영자가 검토 후 반영 여부를 답변합니다." />
+        <SupportNotice submitted={submitted} error={error} successKey="support.gameRequestSubmitted" />
         {isSignedIn ? (
           <form action={createGameServerRequestAction} className="mt-6 grid gap-4">
             <label className="grid gap-2 text-sm font-black">
-              신청 종류
+              <CountryText id="support.requestKind" />
               <select name="requestKind" className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold">
-                <option value="신규 게임 신청">신규 게임 신청</option>
-                <option value="신규 서버 신청">신규 서버 신청</option>
-                <option value="게임 정보 수정">게임 정보 수정</option>
+                <option value="신규 게임 신청"><CountryText id="support.newGameRequest" /></option>
+                <option value="신규 서버 신청"><CountryText id="support.newServerRequest" /></option>
+                <option value="게임 정보 수정"><CountryText id="support.gameInfoEdit" /></option>
               </select>
             </label>
             <div className="grid gap-4 md:grid-cols-2">
               <label className="grid gap-2 text-sm font-black">
-                게임명
-                <input
+                <CountryText id="support.gameName" />
+                <LocalizedInput
                   name="gameName"
                   required
                   minLength={2}
                   maxLength={80}
                   className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold"
-                  placeholder="예: 리니지 클래식"
+                  placeholderKey="support.gameNamePlaceholder"
                 />
               </label>
               <label className="grid gap-2 text-sm font-black">
-                서버명
-                <input
+                <CountryText id="support.serverName" />
+                <LocalizedInput
                   name="serverName"
                   maxLength={80}
                   className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold"
-                  placeholder="신규 서버 요청 시 입력"
+                  placeholderKey="support.serverNamePlaceholder"
                 />
               </label>
             </div>
             <label className="grid gap-2 text-sm font-black">
-              참고 링크
-              <input
+              <CountryText id="support.referenceLink" />
+              <LocalizedInput
                 name="referenceUrl"
                 maxLength={300}
                 className="h-12 rounded-lg border border-[var(--gg-border)] px-4 text-sm font-bold"
-                placeholder="공식 홈페이지 또는 서버 공지 링크"
+                placeholderKey="support.referenceLinkPlaceholder"
               />
             </label>
             <label className="grid gap-2 text-sm font-black">
-              요청 사유
-              <textarea
+              <CountryText id="support.requestReason" />
+              <LocalizedTextarea
                 name="body"
                 required
                 minLength={10}
                 maxLength={2000}
                 rows={5}
                 className="rounded-lg border border-[var(--gg-border)] px-4 py-3 text-sm font-bold leading-6"
-                placeholder="거래 수요, 서버명, 필요한 카테고리를 적어 주세요."
+                placeholderKey="support.requestReasonPlaceholder"
               />
             </label>
             <button type="submit" className="h-12 rounded-lg bg-[var(--gg-accent)] px-4 text-sm font-black text-white">
-              요청 접수
+              <CountryText id="support.submitRequest" />
             </button>
           </form>
         ) : (
-          <SignInPrompt next="/support?tab=game-request" label="로그인하고 신청하기" />
+          <SignInPrompt next="/support?tab=game-request" label={<CountryText id="support.signInRequest" />} />
         )}
       </div>
-      <DocumentList title="신청 안내" documents={documents} />
+      <DocumentList title={<CountryText id="support.requestGuide" />} documents={documents} />
     </section>
   );
 }
 
-function SupportNotice({ submitted, error, successText }: { submitted: boolean; error: boolean; successText: string }) {
+function SupportNotice({
+  submitted,
+  error,
+  successKey,
+}: {
+  submitted: boolean;
+  error: boolean;
+  successKey: TranslationKey;
+}) {
   if (submitted) {
     return (
       <div className="mt-5 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm font-black text-cyan-800">
-        {successText}
+        <CountryText id={successKey} />
       </div>
     );
   }
@@ -404,7 +432,7 @@ function SupportNotice({ submitted, error, successText }: { submitted: boolean; 
   if (error) {
     return (
       <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-black text-red-700">
-        제목과 내용을 조금 더 자세히 입력해 주세요.
+        <CountryText id="support.invalidInput" />
       </div>
     );
   }
@@ -412,10 +440,12 @@ function SupportNotice({ submitted, error, successText }: { submitted: boolean; 
   return null;
 }
 
-function SignInPrompt({ next, label }: { next: string; label: string }) {
+function SignInPrompt({ next, label }: { next: string; label: ReactNode }) {
   return (
     <div className="mt-5 rounded-lg border border-[var(--gg-border)] bg-slate-50 p-4">
-      <p className="text-sm font-bold text-slate-600">로그인해야 접수할 수 있습니다.</p>
+      <p className="text-sm font-bold text-slate-600">
+        <CountryText id="support.signInRequired" />
+      </p>
       <Link
         href={`/sign-in?next=${encodeURIComponent(next)}`}
         prefetch={false}
@@ -428,22 +458,24 @@ function SignInPrompt({ next, label }: { next: string; label: string }) {
 }
 
 function TopQuestions() {
-  const questions = [
-    "입금자명과 회원명이 달라요",
-    "출금 처리가 되지 않아요",
-    "충전이 반영되지 않아요",
-    "계정 거래 정보는 어디에 입력하나요",
-    "분쟁은 어떻게 접수하나요",
+  const questions: TranslationKey[] = [
+    "support.topQuestion1",
+    "support.topQuestion2",
+    "support.topQuestion3",
+    "support.topQuestion4",
+    "support.topQuestion5",
   ];
 
   return (
     <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
-      {questions.map((title, index) => (
-        <div key={title} className="rounded-lg border border-[var(--gg-border)] bg-white p-5">
+      {questions.map((key, index) => (
+        <div key={key} className="rounded-lg border border-[var(--gg-border)] bg-white p-5">
           <span className="rounded bg-[color-mix(in_srgb,var(--gg-accent)_18%,white)] px-2 py-1 text-xs font-black text-[var(--gg-accent)]">
             TOP {index + 1}
           </span>
-          <p className="mt-4 text-sm font-black leading-6">{title}</p>
+          <p className="mt-4 text-sm font-black leading-6">
+            <CountryText id={key} />
+          </p>
         </div>
       ))}
     </div>
@@ -454,7 +486,9 @@ function InquiryHistory({ inquiries }: { inquiries: InquirySummary[] }) {
   return (
     <section className="rounded-lg border border-[var(--gg-border)] bg-white">
       <div className="border-b border-[var(--gg-border)] px-5 py-4">
-        <h3 className="text-lg font-black">내 문의 내역</h3>
+        <h3 className="text-lg font-black">
+          <CountryText id="support.myInquiries" />
+        </h3>
       </div>
       <div className="divide-y divide-[var(--gg-border)]">
         {inquiries.length ? (
@@ -465,11 +499,11 @@ function InquiryHistory({ inquiries }: { inquiries: InquirySummary[] }) {
                 <p className="font-black text-slate-950">{inquiry.title}</p>
                 {inquiry.adminNote ? (
                   <p className="mt-2 whitespace-pre-line rounded-lg border border-cyan-100 bg-cyan-50 p-3 text-sm font-semibold leading-6 text-cyan-900">
-                    운영자 답변: {inquiry.adminNote}
+                    <CountryText id="support.operatorAnswer" />: {inquiry.adminNote}
                   </p>
                 ) : (
                   <p className="mt-2 rounded-lg bg-slate-50 p-3 text-sm font-semibold leading-6 text-slate-500">
-                    운영자가 확인 중입니다. 답변이 등록되면 알림으로 안내됩니다.
+                    <CountryText id="support.operatorChecking" />
                   </p>
                 )}
               </div>
@@ -482,7 +516,9 @@ function InquiryHistory({ inquiries }: { inquiries: InquirySummary[] }) {
             </div>
           ))
         ) : (
-          <p className="px-5 py-8 text-sm font-bold text-slate-500">아직 접수한 문의가 없습니다.</p>
+          <p className="px-5 py-8 text-sm font-bold text-slate-500">
+            <CountryText id="support.noInquiries" />
+          </p>
         )}
       </div>
     </section>
@@ -563,18 +599,20 @@ async function createGameServerRequestAction(formData: FormData) {
 }
 
 function inquiryCategoryLabel(category: string) {
-  return inquiryCategories.find((item) => item.value === category)?.label ?? "기타";
+  const labelKey = inquiryCategories.find((item) => item.value === category)?.labelKey ?? "support.otherCategory";
+  return <CountryText id={labelKey} />;
 }
 
 function supportInquiryStatusLabel(status: string) {
-  const labels: Record<string, string> = {
-    OPEN: "접수",
-    IN_PROGRESS: "확인 중",
-    ANSWERED: "답변 완료",
-    CLOSED: "종료",
+  const labels: Record<string, TranslationKey> = {
+    OPEN: "support.statusOpen",
+    IN_PROGRESS: "support.statusInProgress",
+    ANSWERED: "support.statusAnswered",
+    CLOSED: "support.statusClosed",
   };
 
-  return labels[status] ?? status;
+  const labelKey = labels[status];
+  return labelKey ? <CountryText id={labelKey} /> : status;
 }
 
 function supportInquiryStatusClass(status: string) {

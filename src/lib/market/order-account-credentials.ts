@@ -1,5 +1,5 @@
-import { createUserNotification } from "@/lib/notifications/notifications";
 import { getCurrentSessionUser } from "@/lib/auth/session";
+import { createUserNotification } from "@/lib/notifications/notifications";
 import { getPrismaClient } from "@/lib/prisma";
 import {
   decryptAccountCredentialPayload,
@@ -127,7 +127,7 @@ export async function getOrderAccountCredentialView(input: {
         action: "ORDER_ACCOUNT_CREDENTIAL_VIEWED",
         targetType: "ORDER",
         targetId: order.id,
-        reason: "구매자가 계정거래 전달 정보를 열람했습니다.",
+        reason: "구매자가 계정 거래 전달 정보를 열람했습니다.",
         after: {
           buyerId: order.buyerId,
           sellerId: order.sellerId,
@@ -195,7 +195,9 @@ export async function submitOrderAccountCredential(input: {
   }
 
   if (!SELLER_SUBMIT_ALLOWED_STATUSES.includes(order.status)) {
-    throw new Error("에스크로 잠금 이후 진행 중인 주문에만 계정 전달 정보를 등록할 수 있습니다.");
+    throw new Error(
+      "에스크로 잠금 이후 진행 중인 주문에만 계정 전달 정보를 등록할 수 있습니다.",
+    );
   }
 
   const encryptedPayload = encryptAccountCredentialPayload({
@@ -227,7 +229,7 @@ export async function submitOrderAccountCredential(input: {
       data: {
         orderId: order.id,
         status: order.status,
-        message: "판매자가 계정거래 전달 정보를 보안 전달함에 등록했습니다.",
+        message: "판매자가 계정 거래 전달 정보를 보안 전달함에 등록했습니다.",
         metadata: {
           action: "ACCOUNT_CREDENTIAL_SUBMITTED",
           actor: "SELLER",
@@ -240,7 +242,7 @@ export async function submitOrderAccountCredential(input: {
         action: "ORDER_ACCOUNT_CREDENTIAL_SUBMITTED",
         targetType: "ORDER",
         targetId: order.id,
-        reason: "판매자가 계정거래 전달 정보를 등록 또는 수정했습니다.",
+        reason: "판매자가 계정 거래 전달 정보를 등록 또는 수정했습니다.",
         after: {
           sellerId: order.sellerId,
           buyerId: order.buyerId,
@@ -255,7 +257,7 @@ export async function submitOrderAccountCredential(input: {
     userId: order.buyerId,
     type: "ORDER_STATUS",
     title: "계정 전달 정보가 등록되었습니다",
-    body: "판매자가 계정거래 정보를 보안 전달함에 등록했습니다. 주문 상세에서 확인해 주세요.",
+    body: "판매자가 계정 거래 정보를 보안 전달함에 등록했습니다. 주문 상세에서 확인해 주세요.",
     href: `/my/orders/${order.id}`,
     metadata: {
       orderId: order.id,

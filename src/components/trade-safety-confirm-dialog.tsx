@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import useCountryTranslation from "@/app/use-country-translation";
 import { ActionConfirmDialog } from "@/components/action-confirm-dialog";
 
 type SummaryRow = {
@@ -35,25 +36,26 @@ type TradeSafetyConfirmDialogProps = {
 
 export function TradeSafetyConfirmDialog({
   isOpen,
-  eyebrow = "SAFE TRADE",
+  eyebrow,
   title,
   body,
   confirmLabel,
-  cancelLabel = "취소",
+  cancelLabel,
   tone = "primary",
   isSubmitting = false,
   summaryRows = [],
   serverLabel,
   requireCharacterName = false,
-  characterNameLabel = "거래 캐릭터명",
-  characterNamePlaceholder = "거래 캐릭터명을 입력해 주세요.",
-  passwordLabel = "결제 PIN 확인",
-  passwordPlaceholder = "4~6자리 결제 PIN",
-  warningLabel = "서버/캐릭터명 오류 시 보상받을 수 없습니다. 결제 전 반드시 확인해 주세요.",
+  characterNameLabel,
+  characterNamePlaceholder,
+  passwordLabel,
+  passwordPlaceholder,
+  warningLabel,
   paymentPinSetupHref = "/my/wallet?action=payment-pin#payment-pin",
   onCancel,
   onConfirm,
 }: TradeSafetyConfirmDialogProps) {
+  const { t } = useCountryTranslation();
   const [paymentPin, setPaymentPin] = useState("");
   const [characterName, setCharacterName] = useState("");
   const [isAcknowledged, setIsAcknowledged] = useState(true);
@@ -76,7 +78,7 @@ export function TradeSafetyConfirmDialog({
     fetch("/api/user/payment-pin", { cache: "no-store" })
       .then(async (response) => {
         if (!response.ok) {
-          throw new Error("결제 PIN 상태를 확인하지 못했습니다.");
+          throw new Error(t("tradeSafety.paymentPinStatusCheckFailed"));
         }
         return (await response.json()) as { hasPaymentPin?: boolean };
       })
@@ -92,39 +94,40 @@ export function TradeSafetyConfirmDialog({
     return () => {
       isMounted = false;
     };
-  }, [isOpen]);
+  }, [isOpen, t]);
 
   function confirm() {
     const trimmedPaymentPin = paymentPin.trim();
     const trimmedCharacterName = characterName.trim();
+    const nextCharacterNameLabel = characterNameLabel ?? t("tradeSafety.characterName");
 
     if (pinStatus === "loading") {
-      setError("결제 PIN 상태를 확인 중입니다. 잠시 후 다시 시도해 주세요.");
+      setError(t("tradeSafety.paymentPinChecking"));
       return;
     }
 
     if (pinStatus === "missing") {
-      setError("결제 PIN을 먼저 설정해 주세요.");
+      setError(t("tradeSafety.paymentPinMissing"));
       return;
     }
 
     if (pinStatus === "error") {
-      setError("결제 PIN 상태 확인에 실패했습니다. 새로고침 후 다시 시도해 주세요.");
+      setError(t("tradeSafety.paymentPinStatusError"));
       return;
     }
 
     if (!/^\d{4,6}$/.test(trimmedPaymentPin)) {
-      setError("결제 PIN은 숫자 4~6자리로 입력해 주세요.");
+      setError(t("tradeSafety.paymentPinInvalid"));
       return;
     }
 
     if (requireCharacterName && !trimmedCharacterName) {
-      setError("거래 캐릭터명을 입력해 주세요.");
+      setError(`${nextCharacterNameLabel}${t("tradeSafety.requiredSuffix")}`);
       return;
     }
 
     if (!isAcknowledged) {
-      setError("서버와 캐릭터명 확인 안내에 동의해 주세요.");
+      setError(t("tradeSafety.acknowledgeRequired"));
       return;
     }
 
@@ -137,7 +140,7 @@ export function TradeSafetyConfirmDialog({
   return (
     <ActionConfirmDialog
       isOpen={isOpen}
-      eyebrow={eyebrow}
+      eyebrow={eyebrow ?? t("tradeSafety.safeTrade")}
       title={title}
       body={body}
       confirmLabel={confirmLabel}
@@ -150,7 +153,7 @@ export function TradeSafetyConfirmDialog({
       <div className="space-y-4">
         {serverLabel ? (
           <div className="rounded-2xl border border-[var(--gg-border-soft)] bg-[var(--gg-card-bg)] p-4 text-center">
-            <p className="text-xs font-black text-[var(--gg-subtle)]">서버</p>
+            <p className="text-xs font-black text-[var(--gg-subtle)]">{t("tradeSafety.server")}</p>
             <p className="mt-2 inline-flex rounded-lg bg-[var(--gg-control-bg)] px-4 py-2 text-sm font-black text-[var(--gg-text)]">
               {serverLabel}
             </p>
@@ -169,26 +172,26 @@ export function TradeSafetyConfirmDialog({
         ) : null}
 
         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-black text-amber-800">
-          <p>반드시 판매자 및 구매자의 게임 아이디를 확인 후 거래하시기 바랍니다.</p>
+          <p>{t("tradeSafety.gameIdNoticeA")}</p>
           <p className="mt-1">
-            게임 아이디 미확인으로 인한 사칭 및 사기 피해 발생 시 본 업체는 책임지지 않습니다.
+            {t("tradeSafety.gameIdNoticeB")}
           </p>
         </div>
 
         {pinStatus === "missing" ? (
           <div className="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm font-bold leading-6 text-sky-900">
-            <p className="font-black">결제 PIN 설정이 필요합니다.</p>
-            <p>구매, 즉시판매, 인수확정, 출금에 사용할 4~6자리 PIN을 먼저 설정해 주세요.</p>
+            <p className="font-black">{t("tradeSafety.paymentPinSetupRequired")}</p>
+            <p>{t("tradeSafety.paymentPinSetupBody")}</p>
             <Link
               href={paymentPinSetupHref}
               className="mt-3 inline-flex rounded-xl bg-[var(--gg-accent)] px-4 py-2 text-xs font-black text-[var(--gg-inverse-text)]"
             >
-              결제 PIN 설정하기
+              {t("tradeSafety.paymentPinSetupAction")}
             </Link>
           </div>
         ) : (
           <label className="block">
-            <span className="text-xs font-black text-[var(--gg-text)]">{passwordLabel}</span>
+            <span className="text-xs font-black text-[var(--gg-text)]">{passwordLabel ?? t("tradeSafety.paymentPinLabel")}</span>
             <input
               type="password"
               inputMode="numeric"
@@ -199,7 +202,7 @@ export function TradeSafetyConfirmDialog({
                 setError("");
               }}
               autoComplete="one-time-code"
-              placeholder={pinStatus === "loading" ? "결제 PIN 상태 확인 중..." : passwordPlaceholder}
+              placeholder={pinStatus === "loading" ? t("tradeSafety.paymentPinLoadingPlaceholder") : passwordPlaceholder ?? t("tradeSafety.paymentPinPlaceholder")}
               disabled={pinStatus !== "set"}
               className="mt-2 h-12 w-full rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-4 text-sm font-bold outline-none focus:border-[var(--gg-accent)] disabled:cursor-not-allowed disabled:bg-slate-100"
             />
@@ -208,14 +211,14 @@ export function TradeSafetyConfirmDialog({
 
         {requireCharacterName ? (
           <label className="block">
-            <span className="text-xs font-black text-[var(--gg-text)]">{characterNameLabel}</span>
+            <span className="text-xs font-black text-[var(--gg-text)]">{characterNameLabel ?? t("tradeSafety.characterName")}</span>
             <input
               value={characterName}
               onChange={(event) => {
                 setCharacterName(event.target.value);
                 setError("");
               }}
-              placeholder={characterNamePlaceholder}
+              placeholder={characterNamePlaceholder ?? t("tradeSafety.characterNamePlaceholder")}
               className="mt-2 h-12 w-full rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-4 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
             />
           </label>
@@ -231,7 +234,7 @@ export function TradeSafetyConfirmDialog({
             }}
             className="mt-1 h-4 w-4 accent-red-500"
           />
-          <span>{warningLabel}</span>
+          <span>{warningLabel ?? t("tradeSafety.warningLabel")}</span>
         </label>
 
         {error ? (

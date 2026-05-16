@@ -1048,6 +1048,11 @@ export async function purchaseMarketplaceListing(input: {
 
     const feeBreakdown = calculateMarketplaceOrderFees(expectedAmount);
     const tradeCharacterName = normalizeTradeCharacterName(input.tradeCharacterName);
+    if (!tradeCharacterName) {
+      throw new Error("구매자 게임 아이디를 입력해 주세요.");
+    }
+    const buyerGameNickname = tradeCharacterName;
+    const sellerGameNickname = listing.sellerGameNickname;
 
     const inventoryResult = lockPurchaseQuantity(
       {
@@ -1131,6 +1136,8 @@ export async function purchaseMarketplaceListing(input: {
         sellerReceivableAmount: feeBreakdown.sellerReceivableAmount,
         currency: listing.currency,
         tradeCharacterName,
+        buyerGameNickname,
+        sellerGameNickname,
       },
     });
 
@@ -1146,6 +1153,8 @@ export async function purchaseMarketplaceListing(input: {
           platformFeeAmount: feeBreakdown.platformFeeAmount,
           sellerReceivableAmount: feeBreakdown.sellerReceivableAmount,
           tradeCharacterName,
+          buyerGameNickname,
+          sellerGameNickname,
         },
       },
     });

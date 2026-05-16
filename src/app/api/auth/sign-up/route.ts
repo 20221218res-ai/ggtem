@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     if (!body.email || !body.displayName || !body.password) {
       return NextResponse.json(
-        { message: "닉네임, 이메일, 비밀번호를 입력해 주세요." },
+        { code: "AUTH_SIGN_UP_FIELDS_REQUIRED", message: "닉네임, 이메일, 비밀번호를 입력해 주세요." },
         { status: 400 },
       );
     }
@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
+      code: "AUTH_SIGN_UP_VERIFICATION_SENT",
       message: "회원가입이 완료되었습니다. 이메일 인증 링크를 발송했습니다.",
       role: user.role,
       verificationUrl: user.verificationUrl,
@@ -31,6 +32,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
+        code: "AUTH_SIGN_UP_FAILED",
         message: error instanceof Error ? error.message : "회원가입에 실패했습니다.",
       },
       { status: 400 },

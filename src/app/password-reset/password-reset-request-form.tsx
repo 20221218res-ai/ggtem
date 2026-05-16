@@ -11,6 +11,7 @@ import {
 } from "@/components/ui";
 import CountryText from "../country-text";
 import useCountryTranslation from "../use-country-translation";
+import { getAuthApiMessage } from "../auth-api-message";
 
 export default function PasswordResetRequestForm() {
   const { t } = useCountryTranslation();
@@ -36,15 +37,16 @@ export default function PasswordResetRequestForm() {
         body: JSON.stringify({ email }),
       });
       const result = (await response.json()) as {
+        code?: string;
         message?: string;
         resetUrl?: string | null;
       };
 
       if (!response.ok) {
-        throw new Error(result.message ?? t("auth.resetLinkFailed"));
+        throw new Error(getAuthApiMessage(result, t, "auth.resetLinkFailed"));
       }
 
-      setMessage(result.message ?? t("auth.resetLinkCreated"));
+      setMessage(getAuthApiMessage(result, t, "auth.resetLinkCreated"));
       setResetUrl(result.resetUrl ?? null);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : t("auth.resetLinkFailed"));

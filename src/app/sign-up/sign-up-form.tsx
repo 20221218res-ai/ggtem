@@ -15,6 +15,7 @@ import {
 import PasswordVisibilityInput from "@/components/password-visibility-input";
 import CountryText from "../country-text";
 import useCountryTranslation from "../use-country-translation";
+import { getAuthApiMessage } from "../auth-api-message";
 
 export default function SignUpForm() {
   const router = useRouter();
@@ -33,9 +34,7 @@ export default function SignUpForm() {
   const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
-    if (!pendingVerificationEmail) {
-      return;
-    }
+    if (!pendingVerificationEmail) return;
 
     let isActive = true;
 
@@ -45,25 +44,24 @@ export default function SignUpForm() {
           cache: "no-store",
         });
         const result = (await response.json()) as {
+          code?: string;
           status?: string;
           redirectPath?: string;
           message?: string;
         };
 
-        if (!isActive) {
-          return;
-        }
+        if (!isActive) return;
 
         if (result.status === "verified") {
-          setMessage("이메일 인증이 완료되었습니다. 로그인 중입니다.");
+          setMessage(t("auth.emailVerificationCompletedSignIn"));
           setPendingVerificationEmail("");
           router.replace(result.redirectPath ?? "/my");
           router.refresh();
         } else if (result.status === "blocked") {
-          setError(result.message ?? "현재 사용할 수 없는 계정입니다.");
+          setError(getAuthApiMessage(result, t, "auth.accountUnavailable"));
           setPendingVerificationEmail("");
         } else if (result.status === "expired") {
-          setResendError("인증 대기 시간이 만료되었습니다. 다시 로그인하거나 인증 메일을 재발송해 주세요.");
+          setResendError(t("auth.emailVerificationExpired"));
           setPendingVerificationEmail("");
         }
       } catch {
@@ -81,9 +79,7 @@ export default function SignUpForm() {
   }, [pendingVerificationEmail, router]);
 
   async function resendVerificationEmail() {
-    if (!pendingVerificationEmail) {
-      return;
-    }
+    if (!pendingVerificationEmail) return;
 
     setResendMessage("");
     setResendError("");
@@ -100,21 +96,22 @@ export default function SignUpForm() {
         }),
       });
       const result = (await response.json()) as {
+        code?: string;
         message?: string;
         verificationUrl?: string | null;
       };
 
       if (!response.ok) {
-        throw new Error(result.message ?? "인증 메일을 다시 보내지 못했습니다.");
+        throw new Error(getAuthApiMessage(result, t, "auth.resendVerificationFailed"));
       }
 
-      setResendMessage(result.message ?? "인증 메일을 다시 발송했습니다.");
+      setResendMessage(getAuthApiMessage(result, t, "auth.resendVerificationSent"));
       setVerificationUrl(result.verificationUrl ?? null);
     } catch (submitError) {
       setResendError(
         submitError instanceof Error
           ? submitError.message
-          : "인증 메일을 다시 보내지 못했습니다.",
+          : t("auth.resendVerificationFailed"),
       );
     } finally {
       setIsResending(false);
@@ -130,7 +127,7 @@ export default function SignUpForm() {
     setVerificationUrl(null);
 
     if (password !== passwordConfirm) {
-      setError("비밀번호가 서로 일치하지 않습니다.");
+      setError(t("auth.passwordMismatch"));
       return;
     }
 
@@ -149,15 +146,16 @@ export default function SignUpForm() {
         }),
       });
       const result = (await response.json()) as {
+        code?: string;
         message?: string;
         verificationUrl?: string | null;
       };
 
       if (!response.ok) {
-        throw new Error(result.message ?? t("auth.signUpFailed"));
+        throw new Error(getAuthApiMessage(result, t, "auth.signUpFailed"));
       }
 
-      setMessage(result.message ?? "가입이 완료되었습니다. 이메일 인증을 진행해 주세요.");
+      setMessage(getAuthApiMessage(result, t, "auth.signUpCompleted"));
       setVerificationUrl(result.verificationUrl ?? null);
       setPendingVerificationEmail(email);
       setPassword("");
@@ -209,7 +207,7 @@ export default function SignUpForm() {
             />
           </Field>
 
-          <Field label="비밀번호 확인">
+          <Field label={<CountryText id="auth.passwordConfirm" />}>
             <PasswordVisibilityInput
               value={passwordConfirm}
               onChange={(event) => setPasswordConfirm(event.target.value)}
@@ -232,7 +230,7 @@ export default function SignUpForm() {
             <Alert tone="success">{message}</Alert>
             {verificationUrl ? (
               <ButtonLink href={verificationUrl} tone="secondary">
-                이메일 인증 링크 열기
+                <CountryText id="auth.openVerificationLink" />
               </ButtonLink>
             ) : null}
           </div>
@@ -243,17 +241,19 @@ export default function SignUpForm() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4">
           <div className="w-full max-w-md rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-6 shadow-2xl">
             <p className="text-xs font-black uppercase text-[var(--gg-accent)]">
-              Email verification
+              <CountryText id="auth.emailVerification" />
             </p>
             <h2 className="mt-2 text-2xl font-black text-[var(--gg-text)]">
-              인증 메일을 확인해 주세요
+              <CountryText id="auth.checkVerificationEmailTitle" />
             </h2>
             <p className="mt-3 text-sm leading-6 text-[var(--gg-muted)]">
-              {pendingVerificationEmail} 주소로 인증 링크를 발송했습니다. 휴대폰에서
-              링크를 눌러도 이 PC 화면에서 자동으로 인증 완료를 확인하고 로그인합니다.
+              <CountryText
+                id="auth.emailVerificationSentDescription"
+                values={{ email: pendingVerificationEmail }}
+              />
             </p>
             <div className="mt-5 rounded-xl bg-[var(--gg-card-soft-bg)] p-4 text-sm font-semibold text-[var(--gg-text)]">
-              인증 완료 여부를 확인하는 중입니다...
+              <CountryText id="auth.verificationChecking" />
             </div>
             {resendMessage ? (
               <div className="mt-4">
@@ -272,11 +272,15 @@ export default function SignUpForm() {
                 disabled={isResending}
                 onClick={() => void resendVerificationEmail()}
               >
-                {isResending ? "재발송 중" : "인증 메일 다시 보내기"}
+                {isResending ? (
+                  <CountryText id="auth.resendingVerification" />
+                ) : (
+                  <CountryText id="auth.resendVerificationEmail" />
+                )}
               </Button>
               {verificationUrl ? (
                 <ButtonLink href={verificationUrl} tone="secondary">
-                  인증 링크 열기
+                  <CountryText id="auth.openVerificationLink" />
                 </ButtonLink>
               ) : null}
             </div>

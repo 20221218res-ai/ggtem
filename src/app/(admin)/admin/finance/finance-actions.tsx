@@ -117,9 +117,7 @@ export default function FinanceActions({
       setRejectionReason("");
       router.refresh();
     } catch (submitError) {
-      setError(
-        submitError instanceof Error ? submitError.message : "요청을 처리하지 못했습니다.",
-      );
+      setError(submitError instanceof Error ? submitError.message : "요청을 처리하지 못했습니다.");
     } finally {
       setIsSubmitting(false);
       setActiveAction(null);
@@ -180,13 +178,13 @@ export default function FinanceActions({
         <label className="grid gap-2 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900">
           <span className="font-black">반려 사유</span>
           <span className="text-xs font-bold leading-5">
-            유저 알림과 감사 로그에 남길 사유를 입력하세요. 최소 5자 이상 입력해야 반려할 수 있습니다.
+            유저 알림과 감사 로그에 남을 사유를 입력하세요. 최소 5자 이상 입력해야 반려할 수 있습니다.
           </span>
           <input
             value={rejectionReason}
             onChange={(event) => setRejectionReason(event.target.value)}
             className="rounded-md border border-red-200 bg-white px-3 py-2 text-slate-900 outline-none placeholder:text-slate-400 focus:border-red-400"
-            placeholder={kind === "DEPOSIT" ? "예: TXID 미확인 또는 금액 불일치" : "예: 주소 오입력 또는 위험 심사 반려"}
+            placeholder={kind === "DEPOSIT" ? "예: TXID 미확인 또는 금액 불일치" : "예: 주소 오입력 또는 위험 사유 반려"}
           />
         </label>
       ) : null}
@@ -240,7 +238,7 @@ function getActionWarning(action: FinanceAction) {
     return "출금 완료는 실제 송금이 끝난 뒤에만 누르세요. 입력한 TXID는 감사 로그와 출금 로그에 저장됩니다.";
   }
   if (action === "REJECT_WITHDRAWAL") {
-    return "출금 거절 시 잠긴 금액이 유저 지갑으로 반환됩니다.";
+    return "출금 반려 시 잠긴 금액이 유저 지갑으로 반환됩니다.";
   }
   return "입금 요청을 반려합니다. 유저 지갑 금액은 변경되지 않습니다.";
 }
@@ -250,7 +248,7 @@ function getActionTitle(action: FinanceAction) {
     CONFIRM_DEPOSIT: "[입금 승인 최종 확인]",
     REJECT_DEPOSIT: "[입금 반려 최종 확인]",
     COMPLETE_WITHDRAWAL: "[출금 완료 최종 확인]",
-    REJECT_WITHDRAWAL: "[출금 거절 최종 확인]",
+    REJECT_WITHDRAWAL: "[출금 반려 최종 확인]",
   };
   return labels[action];
 }

@@ -5,7 +5,10 @@ import type { TranslationKey } from "@/app/i18n";
 import LocalizedInput from "@/app/localized-input";
 import UserContentText from "@/app/user-content-text";
 import { getMarketplaceMyBuyRequests } from "@/lib/market/buy-requests";
-import { getGameMoneyPriceUnitLabel } from "@/lib/market/trade-unit";
+import {
+  formatGameMoneyQuantityWithUnit,
+  getGameMoneyPriceUnitLabel,
+} from "@/lib/market/trade-unit";
 import BuyRequestActions from "./buy-request-actions";
 import OfferActions from "./offer-actions";
 
@@ -183,6 +186,8 @@ function BuyRequestRow({ request }: { request: MyBuyRequest }) {
   const price = getBuyRequestDisplayPrice(request);
   const accountTransferTypeLabel =
     request.category === "GAME_ACCOUNT" ? getAccountTransferTypeLabelNode(request.accountTransferType) : null;
+  const requestQuantityLabel = formatBuyRequestQuantity(request, request.quantity);
+  const minimumQuantityLabel = formatBuyRequestQuantity(request, request.minimumQuantity);
 
   return (
     <article className="border-b border-[var(--gg-border-soft)] p-5 transition last:border-b-0 hover:bg-[var(--gg-card-soft-bg)]">
@@ -216,12 +221,12 @@ function BuyRequestRow({ request }: { request: MyBuyRequest }) {
             {request.serverName ? ` / ${request.serverName}` : ""}
           </p>
           <div className="mt-3 flex flex-wrap gap-2 text-xs font-black text-[var(--gg-muted)]">
-            <InfoChip label={<CountryText id="manage.buyQuantity" />} value={formatQuantity(request.quantity, moneyUnit)} />
+            <InfoChip label={<CountryText id="manage.buyQuantity" />} value={requestQuantityLabel} />
             <InfoChip label={<CountryText id="manage.unitPrice" />} value={`${price.amount} ${request.currency}${price.unitLabel ? ` / ${price.unitLabel}` : ""}`} />
             {request.category === "GAME_MONEY" ? (
               <>
                 <InfoChip label="거래 방식" value={request.tradeMode === "BULK" ? "일괄 구매" : "분할 구매"} />
-                <InfoChip label={<CountryText id="manage.minimumQuantity" />} value={formatQuantity(request.minimumQuantity, moneyUnit)} />
+                <InfoChip label={<CountryText id="manage.minimumQuantity" />} value={minimumQuantityLabel} />
               </>
             ) : null}
             <InfoChip label={<CountryText id="manage.reserveAmount" />} value={`${request.lockAmount} ${request.currency}`} />
@@ -447,6 +452,18 @@ function getAccountTransferTypeLabelNode(value: string | null) {
 
 function formatQuantity(quantity: string, unit: string | null) {
   return unit ? `${quantity} ${unit}` : quantity;
+}
+
+function formatBuyRequestQuantity(request: MyBuyRequest, quantity: string) {
+  if (request.category === "GAME_MONEY") {
+    return formatGameMoneyQuantityWithUnit(
+      quantity,
+      request.priceUnitQuantity,
+      request.moneyUnitName,
+    );
+  }
+
+  return formatQuantity(quantity, request.category === "GAME_MONEY" ? request.moneyUnitName : "");
 }
 
 function getBuyRequestDisplayPrice(request: MyBuyRequest) {

@@ -68,7 +68,7 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
       }
 
       setStatus("success");
-      setMessage(result?.message ?? "입금 주소 설정이 저장되었습니다.");
+      setMessage(result?.message ?? "입금 주소 설정을 저장했습니다.");
       setAdminPassword("");
       setReason("");
       router.refresh();
@@ -119,7 +119,7 @@ export function DepositAddressForm({ chain, defaults, current }: DepositAddressF
         value={adminPassword}
         onChange={setAdminPassword}
         type="password"
-        placeholder="주소 변경을 위해 비밀번호를 다시 입력해 주세요"
+        placeholder="주소 변경을 위해 비밀번호를 다시 입력해 주세요."
         required
       />
       {message ? (

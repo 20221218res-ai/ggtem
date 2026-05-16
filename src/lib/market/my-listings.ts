@@ -84,6 +84,10 @@ export type MarketplaceSellerOrderDetail = {
   category: string;
   accountTransferType: string | null;
   tradeCharacterName: string | null;
+  buyerGameNickname: string | null;
+  sellerGameNickname: string | null;
+  moneyUnitName: string | null;
+  priceUnitQuantity: string;
   buyerName: string;
   quantity: string;
   grossAmount: string;
@@ -498,6 +502,7 @@ export async function createMarketplaceSellerListing(input: {
   serverDetail?: string;
   category: "GAME_MONEY" | "GAME_ITEM" | "GAME_ACCOUNT";
   accountTransferType?: string;
+  sellerGameNickname?: string;
   title: string;
   description?: string;
   unitPrice: string;
@@ -529,6 +534,7 @@ export async function createMarketplaceSellerListing(input: {
 
   const trimmedTitle = input.title.trim();
   const trimmedDescription = input.description?.trim() ?? "";
+  const sellerGameNickname = normalizeGameNickname(input.sellerGameNickname);
   const normalizedServerId = input.serverId?.trim() || null;
   const normalizedAccountTransferType = normalizeAccountTransferType(
     input.accountTransferType,
@@ -556,6 +562,10 @@ export async function createMarketplaceSellerListing(input: {
 
   if (!trimmedTitle) {
     throw new Error("판매글 제목을 입력해 주세요.");
+  }
+
+  if (!sellerGameNickname) {
+    throw new Error("판매자 게임 아이디를 입력해 주세요.");
   }
 
   if (unitPrice <= 0n) {
@@ -586,7 +596,7 @@ export async function createMarketplaceSellerListing(input: {
   }
 
   await assertNoOffPlatformContact(
-    [trimmedTitle, trimmedDescription].filter(Boolean).join("\n"),
+    [trimmedTitle, trimmedDescription, sellerGameNickname].filter(Boolean).join("\n"),
     {
       actorUserId: seller.id,
       sourceType: "LISTING_DRAFT",
@@ -642,6 +652,7 @@ export async function createMarketplaceSellerListing(input: {
         category: input.category,
         accountTransferType:
           input.category === "GAME_ACCOUNT" ? normalizedAccountTransferType : null,
+        sellerGameNickname,
         title: trimmedTitle,
         description: trimmedDescription || null,
         tradeMode,
@@ -1340,6 +1351,8 @@ export async function getMarketplaceSellerOrderDetail(
       sellerReceivableAmount: true,
       currency: true,
       tradeCharacterName: true,
+      buyerGameNickname: true,
+      sellerGameNickname: true,
       createdAt: true,
       completedAt: true,
       canceledAt: true,
@@ -1353,6 +1366,12 @@ export async function getMarketplaceSellerOrderDetail(
           title: true,
           category: true,
           accountTransferType: true,
+          priceUnitQuantity: true,
+          game: {
+            select: {
+              moneyUnitName: true,
+            },
+          },
         },
       },
       events: {
@@ -1381,12 +1400,16 @@ export async function getMarketplaceSellerOrderDetail(
     listingTitle: order.listing.title,
     category: order.listing.category,
     accountTransferType: order.listing.accountTransferType,
+    moneyUnitName: order.listing.game.moneyUnitName,
+    priceUnitQuantity: order.listing.priceUnitQuantity?.toString() ?? "10000",
     buyerName: order.buyer.displayName,
     quantity: order.quantity.toString(),
     grossAmount: order.grossAmount.toString(),
     sellerReceivableAmount: order.sellerReceivableAmount.toString(),
     currency: order.currency,
     tradeCharacterName: order.tradeCharacterName,
+    buyerGameNickname: order.buyerGameNickname,
+    sellerGameNickname: order.sellerGameNickname,
     createdAt: formatKoreanDate(order.createdAt),
     completedAt: order.completedAt ? formatKoreanDate(order.completedAt) : null,
     canceledAt: order.canceledAt ? formatKoreanDate(order.canceledAt) : null,
@@ -1588,6 +1611,12 @@ function getSellerOrderTransition(
     message: "\uD310\uB9E4\uC790\uAC00 \uC804\uB2EC \uC644\uB8CC\uB85C \uD45C\uC2DC\uD588\uC2B5\uB2C8\uB2E4. \uAD6C\uB9E4\uC790\uC758 \uC778\uC218\uD655\uC815\uC744 \uAE30\uB2E4\uB9BD\uB2C8\uB2E4.",
   };
 }
+
+function normalizeGameNickname(value?: string) {
+  const nextValue = value?.trim();
+  return nextValue ? nextValue.slice(0, 80) : null;
+}
+
 function formatKoreanDate(date: Date) {
   return date.toLocaleString("ko-KR", {
     hour12: false,

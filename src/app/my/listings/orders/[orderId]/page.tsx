@@ -6,6 +6,7 @@ import type { TranslationKey } from "@/app/i18n";
 import TrustReportForm from "@/app/trust-report-form";
 import UserContentText from "@/app/user-content-text";
 import { getMarketplaceSellerOrderDetail } from "@/lib/market/my-listings";
+import { formatGameMoneyQuantityWithUnit } from "@/lib/market/trade-unit";
 import { SellerOrderActions } from "./seller-order-actions";
 
 type SellerOrderDetailPageProps = {
@@ -14,6 +15,10 @@ type SellerOrderDetailPageProps = {
   }>;
 };
 
+type SellerOrderDetail = NonNullable<
+  Awaited<ReturnType<typeof getMarketplaceSellerOrderDetail>>
+>;
+
 export default async function SellerOrderDetailPage({ params }: SellerOrderDetailPageProps) {
   const { orderId } = await params;
   const order = await getMarketplaceSellerOrderDetail(orderId);
@@ -21,6 +26,9 @@ export default async function SellerOrderDetailPage({ params }: SellerOrderDetai
   if (!order) {
     return <SellerOrderNotFound orderId={orderId} />;
   }
+
+  const buyerGameNickname = order.buyerGameNickname;
+  const sellerGameNickname = order.sellerGameNickname ?? order.tradeCharacterName;
 
   return (
     <main className="min-h-screen bg-[var(--gg-page-bg)] px-4 py-6 text-[var(--gg-text)] lg:px-8">
@@ -52,9 +60,10 @@ export default async function SellerOrderDetailPage({ params }: SellerOrderDetai
 
           <section className="grid gap-3 sm:grid-cols-3">
             <Metric label={<CountryText id="orderManage.buyer" />} value={order.buyerName} />
-            <Metric label={<CountryText id="orderManage.quantity" />} value={order.quantity} />
+            <Metric label={<CountryText id="orderManage.quantity" />} value={<QuantityValue order={order} />} />
             <Metric label={<CountryText id="orderManage.orderAmount" />} value={`${order.grossAmount} ${order.currency}`} />
-            {order.tradeCharacterName ? <Metric label="거래 캐릭터명" value={order.tradeCharacterName} /> : null}
+            {buyerGameNickname ? <Metric label={<CountryText id="listingForm.buyerGameNickname" />} value={buyerGameNickname} /> : null}
+            {sellerGameNickname ? <Metric label={<CountryText id="listingForm.sellerGameNickname" />} value={sellerGameNickname} /> : null}
           </section>
 
           <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)]">
@@ -79,6 +88,8 @@ export default async function SellerOrderDetailPage({ params }: SellerOrderDetai
               ))}
             </div>
           </section>
+
+          <TradeSafetyNotice />
 
           <details className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)]">
             <summary className="cursor-pointer text-lg font-black">
@@ -165,6 +176,44 @@ function Metric({ label, value }: { label: ReactNode; value: ReactNode }) {
   );
 }
 
+function TradeSafetyNotice() {
+  return (
+    <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm font-black leading-6 text-amber-800">
+      <p><CountryText id="tradeSafety.gameIdNoticeA" /></p>
+      <p className="mt-1">
+        <CountryText id="tradeSafety.gameIdNoticeB" />
+      </p>
+    </section>
+  );
+}
+
+function QuantityValue({
+  order,
+}: {
+  order: Pick<
+    SellerOrderDetail,
+    "quantity" | "category" | "moneyUnitName" | "priceUnitQuantity"
+  >;
+}) {
+  if (order.category === "GAME_MONEY") {
+    return (
+      <>
+        {formatGameMoneyQuantityWithUnit(
+          order.quantity,
+          order.priceUnitQuantity,
+          order.moneyUnitName,
+        )}
+      </>
+    );
+  }
+
+  return (
+    <>
+      {order.quantity} <CountryText id={getCategoryKey(order.category)} />
+    </>
+  );
+}
+
 function EventMessage({ message }: { message: string }) {
   const key = getEventMessageKey(message);
   if (key) return <CountryText id={key} />;
@@ -222,4 +271,14 @@ function getEventMessageKey(message: string): TranslationKey | null {
   if (message.includes("reported")) return "orderManage.openDispute";
   if (message.includes("escrow")) return "orderStatus.escrowLocked";
   return null;
+}
+
+function getCategoryKey(category: string): TranslationKey {
+  const labels: Record<string, TranslationKey> = {
+    GAME_MONEY: "common.gameMoney",
+    GAME_ITEM: "common.item",
+    GAME_ACCOUNT: "common.account",
+  };
+
+  return labels[category] || "common.item";
 }

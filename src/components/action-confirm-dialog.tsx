@@ -1,14 +1,15 @@
 "use client";
 
 import type { ReactNode } from "react";
+import CountryText from "@/app/country-text";
 
 type ActionConfirmDialogProps = {
   isOpen: boolean;
-  eyebrow?: string;
-  title: string;
-  body?: string;
-  confirmLabel: string;
-  cancelLabel?: string;
+  eyebrow?: ReactNode;
+  title: ReactNode;
+  body?: ReactNode;
+  confirmLabel: ReactNode;
+  cancelLabel?: ReactNode;
   tone?: "primary" | "danger";
   isSubmitting?: boolean;
   children?: ReactNode;
@@ -18,11 +19,11 @@ type ActionConfirmDialogProps = {
 
 export function ActionConfirmDialog({
   isOpen,
-  eyebrow = "CONFIRM",
+  eyebrow,
   title,
   body,
   confirmLabel,
-  cancelLabel = "취소",
+  cancelLabel,
   tone = "primary",
   isSubmitting = false,
   children,
@@ -45,7 +46,7 @@ export function ActionConfirmDialog({
     >
       <div className="w-full max-w-md rounded-3xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-2xl shadow-black/20">
         <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--gg-accent)]">
-          {eyebrow}
+          {eyebrow ?? <CountryText id="common.confirm" />}
         </p>
         <h2 id="action-confirm-title" className="mt-2 text-2xl font-black text-[var(--gg-text)]">
           {title}
@@ -69,7 +70,7 @@ export function ActionConfirmDialog({
             disabled={isSubmitting}
             className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-4 py-3 text-sm font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {cancelLabel}
+            {cancelLabel ?? <CountryText id="common.cancel" />}
           </button>
           <button
             type="button"
@@ -77,7 +78,7 @@ export function ActionConfirmDialog({
             disabled={isSubmitting}
             className={`rounded-xl px-4 py-3 text-sm font-black disabled:cursor-not-allowed disabled:opacity-60 ${confirmClass}`}
           >
-            {isSubmitting ? "처리 중..." : confirmLabel}
+            {isSubmitting ? <CountryText id="common.processing" /> : confirmLabel}
           </button>
         </div>
       </div>

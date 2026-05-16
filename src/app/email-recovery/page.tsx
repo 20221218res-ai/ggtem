@@ -9,6 +9,8 @@ import {
 } from "@/components/ui";
 import { getPrismaClient } from "@/lib/prisma";
 import CountrySelector from "../country-selector";
+import CountryText from "../country-text";
+import { translate } from "../i18n";
 
 type EmailRecoveryPageProps = {
   searchParams?: Promise<{
@@ -28,14 +30,14 @@ export default async function EmailRecoveryPage({
     <PageShell>
       <PageContainer className="max-w-xl">
         <PageHeader
-          eyebrow="Account recovery"
-          title="이메일 찾기"
-          description="가입 이메일을 잊어버린 경우 운영자가 본인 확인 후 안내합니다."
+          eyebrow={<CountryText id="auth.accountRecovery" />}
+          title={<CountryText id="auth.emailRecoveryTitle" />}
+          description={<CountryText id="auth.emailRecoveryDescription" />}
           actions={
             <>
               <CountrySelector />
               <ButtonLink href="/sign-in" tone="secondary">
-                로그인으로 돌아가기
+                <CountryText id="auth.backToSignIn" />
               </ButtonLink>
             </>
           }
@@ -47,52 +49,49 @@ export default async function EmailRecoveryPage({
         >
           <div className="grid gap-4">
             <label className="flex flex-col gap-2 text-sm font-semibold text-[var(--gg-text)]">
-              닉네임 또는 기억나는 이름
+              <CountryText id="auth.recoveryNameLabel" />
               <input
                 name="displayName"
                 minLength={2}
                 required
                 className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-2 text-[var(--gg-text)] outline-none transition placeholder:text-[var(--gg-subtle)] focus:border-[var(--gg-accent)]"
-                placeholder="예: 테스트1"
               />
             </label>
             <label className="flex flex-col gap-2 text-sm font-semibold text-[var(--gg-text)]">
-              연락 가능한 이메일
+              <CountryText id="auth.recoveryContactEmailLabel" />
               <input
                 name="contactEmail"
                 type="email"
                 required
                 className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-2 text-[var(--gg-text)] outline-none transition placeholder:text-[var(--gg-subtle)] focus:border-[var(--gg-accent)]"
-                placeholder="답변 받을 이메일"
               />
             </label>
             <label className="flex flex-col gap-2 text-sm font-semibold text-[var(--gg-text)]">
-              본인 확인에 도움이 되는 내용
+              <CountryText id="auth.recoveryBodyLabel" />
               <textarea
                 name="body"
                 minLength={10}
                 required
                 rows={5}
                 className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-2 text-[var(--gg-text)] outline-none transition placeholder:text-[var(--gg-subtle)] focus:border-[var(--gg-accent)]"
-                placeholder="최근 거래 게임, 충전/출금 신청 내역, 가입 시 사용한 닉네임 등"
               />
             </label>
           </div>
           <Button type="submit" className="mt-5">
-            이메일 찾기 요청
+            <CountryText id="auth.emailRecoverySubmit" />
           </Button>
 
           {submitted ? (
             <div className="mt-4">
               <Alert tone="success">
-                요청이 접수되었습니다. 운영자가 본인 확인 후 안내합니다.
+                <CountryText id="auth.emailRecoverySubmitted" />
               </Alert>
             </div>
           ) : null}
           {error ? (
             <div className="mt-4">
               <Alert tone="danger">
-                이름은 2자 이상, 문의 내용은 10자 이상 입력해 주세요.
+                <CountryText id="auth.emailRecoveryInvalid" />
               </Alert>
             </div>
           ) : null}
@@ -118,10 +117,10 @@ async function createEmailRecoveryInquiryAction(formData: FormData) {
     data: {
       userId: null,
       category: "ACCOUNT",
-      title: `[이메일 찾기] ${displayName}`.slice(0, 100),
+      title: `[${translate("auth.emailRecoveryTitle", "KR")}] ${displayName}`.slice(0, 100),
       body: [
-        `연락 이메일: ${contactEmail}`,
-        `기억나는 이름: ${displayName}`,
+        `${translate("auth.recoveryContactEmailLabel", "KR")}: ${contactEmail}`,
+        `${translate("auth.recoveryNameLabel", "KR")}: ${displayName}`,
         "",
         body,
       ]

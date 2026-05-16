@@ -48,6 +48,7 @@ export type ListingMinAggregateOutputType = {
   serverDetail: string | null
   category: $Enums.ListingCategory | null
   accountTransferType: string | null
+  sellerGameNickname: string | null
   title: string | null
   description: string | null
   tradeMode: string | null
@@ -71,6 +72,7 @@ export type ListingMaxAggregateOutputType = {
   serverDetail: string | null
   category: $Enums.ListingCategory | null
   accountTransferType: string | null
+  sellerGameNickname: string | null
   title: string | null
   description: string | null
   tradeMode: string | null
@@ -94,6 +96,7 @@ export type ListingCountAggregateOutputType = {
   serverDetail: number
   category: number
   accountTransferType: number
+  sellerGameNickname: number
   title: number
   description: number
   tradeMode: number
@@ -133,6 +136,7 @@ export type ListingMinAggregateInputType = {
   serverDetail?: true
   category?: true
   accountTransferType?: true
+  sellerGameNickname?: true
   title?: true
   description?: true
   tradeMode?: true
@@ -156,6 +160,7 @@ export type ListingMaxAggregateInputType = {
   serverDetail?: true
   category?: true
   accountTransferType?: true
+  sellerGameNickname?: true
   title?: true
   description?: true
   tradeMode?: true
@@ -179,6 +184,7 @@ export type ListingCountAggregateInputType = {
   serverDetail?: true
   category?: true
   accountTransferType?: true
+  sellerGameNickname?: true
   title?: true
   description?: true
   tradeMode?: true
@@ -289,6 +295,7 @@ export type ListingGroupByOutputType = {
   serverDetail: string | null
   category: $Enums.ListingCategory
   accountTransferType: string | null
+  sellerGameNickname: string | null
   title: string
   description: string | null
   tradeMode: string
@@ -335,6 +342,7 @@ export type ListingWhereInput = {
   serverDetail?: Prisma.StringNullableFilter<"Listing"> | string | null
   category?: Prisma.EnumListingCategoryFilter<"Listing"> | $Enums.ListingCategory
   accountTransferType?: Prisma.StringNullableFilter<"Listing"> | string | null
+  sellerGameNickname?: Prisma.StringNullableFilter<"Listing"> | string | null
   title?: Prisma.StringFilter<"Listing"> | string
   description?: Prisma.StringNullableFilter<"Listing"> | string | null
   tradeMode?: Prisma.StringFilter<"Listing"> | string
@@ -365,6 +373,7 @@ export type ListingOrderByWithRelationInput = {
   serverDetail?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
   accountTransferType?: Prisma.SortOrderInput | Prisma.SortOrder
+  sellerGameNickname?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   tradeMode?: Prisma.SortOrder
@@ -398,6 +407,7 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   serverDetail?: Prisma.StringNullableFilter<"Listing"> | string | null
   category?: Prisma.EnumListingCategoryFilter<"Listing"> | $Enums.ListingCategory
   accountTransferType?: Prisma.StringNullableFilter<"Listing"> | string | null
+  sellerGameNickname?: Prisma.StringNullableFilter<"Listing"> | string | null
   title?: Prisma.StringFilter<"Listing"> | string
   description?: Prisma.StringNullableFilter<"Listing"> | string | null
   tradeMode?: Prisma.StringFilter<"Listing"> | string
@@ -428,6 +438,7 @@ export type ListingOrderByWithAggregationInput = {
   serverDetail?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
   accountTransferType?: Prisma.SortOrderInput | Prisma.SortOrder
+  sellerGameNickname?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   tradeMode?: Prisma.SortOrder
@@ -459,6 +470,7 @@ export type ListingScalarWhereWithAggregatesInput = {
   serverDetail?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
   category?: Prisma.EnumListingCategoryWithAggregatesFilter<"Listing"> | $Enums.ListingCategory
   accountTransferType?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  sellerGameNickname?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
   title?: Prisma.StringWithAggregatesFilter<"Listing"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
   tradeMode?: Prisma.StringWithAggregatesFilter<"Listing"> | string
@@ -479,6 +491,7 @@ export type ListingCreateInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -509,6 +522,7 @@ export type ListingUncheckedCreateInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -533,6 +547,7 @@ export type ListingUpdateInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -563,6 +578,7 @@ export type ListingUncheckedUpdateInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -590,6 +606,7 @@ export type ListingCreateManyInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -610,6 +627,7 @@ export type ListingUpdateManyMutationInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -633,6 +651,7 @@ export type ListingUncheckedUpdateManyInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -666,6 +685,7 @@ export type ListingCountOrderByAggregateInput = {
   serverDetail?: Prisma.SortOrder
   category?: Prisma.SortOrder
   accountTransferType?: Prisma.SortOrder
+  sellerGameNickname?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   tradeMode?: Prisma.SortOrder
@@ -696,6 +716,7 @@ export type ListingMaxOrderByAggregateInput = {
   serverDetail?: Prisma.SortOrder
   category?: Prisma.SortOrder
   accountTransferType?: Prisma.SortOrder
+  sellerGameNickname?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   tradeMode?: Prisma.SortOrder
@@ -719,6 +740,7 @@ export type ListingMinOrderByAggregateInput = {
   serverDetail?: Prisma.SortOrder
   category?: Prisma.SortOrder
   accountTransferType?: Prisma.SortOrder
+  sellerGameNickname?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   tradeMode?: Prisma.SortOrder
@@ -964,6 +986,7 @@ export type ListingCreateWithoutSellerInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -992,6 +1015,7 @@ export type ListingUncheckedCreateWithoutSellerInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1048,6 +1072,7 @@ export type ListingScalarWhereInput = {
   serverDetail?: Prisma.StringNullableFilter<"Listing"> | string | null
   category?: Prisma.EnumListingCategoryFilter<"Listing"> | $Enums.ListingCategory
   accountTransferType?: Prisma.StringNullableFilter<"Listing"> | string | null
+  sellerGameNickname?: Prisma.StringNullableFilter<"Listing"> | string | null
   title?: Prisma.StringFilter<"Listing"> | string
   description?: Prisma.StringNullableFilter<"Listing"> | string | null
   tradeMode?: Prisma.StringFilter<"Listing"> | string
@@ -1068,6 +1093,7 @@ export type ListingCreateWithoutGameInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1096,6 +1122,7 @@ export type ListingUncheckedCreateWithoutGameInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1146,6 +1173,7 @@ export type ListingCreateWithoutServerInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1174,6 +1202,7 @@ export type ListingUncheckedCreateWithoutServerInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1224,6 +1253,7 @@ export type ListingCreateWithoutImagesInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1253,6 +1283,7 @@ export type ListingUncheckedCreateWithoutImagesInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1292,6 +1323,7 @@ export type ListingUpdateWithoutImagesInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1321,6 +1353,7 @@ export type ListingUncheckedUpdateWithoutImagesInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1344,6 +1377,7 @@ export type ListingCreateWithoutInventoryInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1373,6 +1407,7 @@ export type ListingUncheckedCreateWithoutInventoryInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1412,6 +1447,7 @@ export type ListingUpdateWithoutInventoryInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1441,6 +1477,7 @@ export type ListingUncheckedUpdateWithoutInventoryInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1464,6 +1501,7 @@ export type ListingCreateWithoutBuyRequestOffersInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1493,6 +1531,7 @@ export type ListingUncheckedCreateWithoutBuyRequestOffersInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1532,6 +1571,7 @@ export type ListingUpdateWithoutBuyRequestOffersInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1561,6 +1601,7 @@ export type ListingUncheckedUpdateWithoutBuyRequestOffersInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1584,6 +1625,7 @@ export type ListingCreateWithoutOrdersInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1613,6 +1655,7 @@ export type ListingUncheckedCreateWithoutOrdersInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1652,6 +1695,7 @@ export type ListingUpdateWithoutOrdersInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1681,6 +1725,7 @@ export type ListingUncheckedUpdateWithoutOrdersInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1706,6 +1751,7 @@ export type ListingCreateManySellerInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1726,6 +1772,7 @@ export type ListingUpdateWithoutSellerInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1754,6 +1801,7 @@ export type ListingUncheckedUpdateWithoutSellerInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1780,6 +1828,7 @@ export type ListingUncheckedUpdateManyWithoutSellerInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1802,6 +1851,7 @@ export type ListingCreateManyGameInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1822,6 +1872,7 @@ export type ListingUpdateWithoutGameInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1850,6 +1901,7 @@ export type ListingUncheckedUpdateWithoutGameInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1876,6 +1928,7 @@ export type ListingUncheckedUpdateManyWithoutGameInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1898,6 +1951,7 @@ export type ListingCreateManyServerInput = {
   serverDetail?: string | null
   category: $Enums.ListingCategory
   accountTransferType?: string | null
+  sellerGameNickname?: string | null
   title: string
   description?: string | null
   tradeMode?: string
@@ -1918,6 +1972,7 @@ export type ListingUpdateWithoutServerInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1946,6 +2001,7 @@ export type ListingUncheckedUpdateWithoutServerInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1972,6 +2028,7 @@ export type ListingUncheckedUpdateManyWithoutServerInput = {
   serverDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2044,6 +2101,7 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   serverDetail?: boolean
   category?: boolean
   accountTransferType?: boolean
+  sellerGameNickname?: boolean
   title?: boolean
   description?: boolean
   tradeMode?: boolean
@@ -2075,6 +2133,7 @@ export type ListingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   serverDetail?: boolean
   category?: boolean
   accountTransferType?: boolean
+  sellerGameNickname?: boolean
   title?: boolean
   description?: boolean
   tradeMode?: boolean
@@ -2101,6 +2160,7 @@ export type ListingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   serverDetail?: boolean
   category?: boolean
   accountTransferType?: boolean
+  sellerGameNickname?: boolean
   title?: boolean
   description?: boolean
   tradeMode?: boolean
@@ -2127,6 +2187,7 @@ export type ListingSelectScalar = {
   serverDetail?: boolean
   category?: boolean
   accountTransferType?: boolean
+  sellerGameNickname?: boolean
   title?: boolean
   description?: boolean
   tradeMode?: boolean
@@ -2142,7 +2203,7 @@ export type ListingSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerId" | "gameId" | "serverId" | "serverDetail" | "category" | "accountTransferType" | "title" | "description" | "tradeMode" | "priceUnitQuantity" | "unitPrice" | "currency" | "status" | "premiumStartedAt" | "premiumEndsAt" | "premiumDurationHours" | "premiumFeeAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["listing"]>
+export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerId" | "gameId" | "serverId" | "serverDetail" | "category" | "accountTransferType" | "sellerGameNickname" | "title" | "description" | "tradeMode" | "priceUnitQuantity" | "unitPrice" | "currency" | "status" | "premiumStartedAt" | "premiumEndsAt" | "premiumDurationHours" | "premiumFeeAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["listing"]>
 export type ListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   game?: boolean | Prisma.GameDefaultArgs<ExtArgs>
@@ -2183,6 +2244,7 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     serverDetail: string | null
     category: $Enums.ListingCategory
     accountTransferType: string | null
+    sellerGameNickname: string | null
     title: string
     description: string | null
     tradeMode: string
@@ -2633,6 +2695,7 @@ export interface ListingFieldRefs {
   readonly serverDetail: Prisma.FieldRef<"Listing", 'String'>
   readonly category: Prisma.FieldRef<"Listing", 'ListingCategory'>
   readonly accountTransferType: Prisma.FieldRef<"Listing", 'String'>
+  readonly sellerGameNickname: Prisma.FieldRef<"Listing", 'String'>
   readonly title: Prisma.FieldRef<"Listing", 'String'>
   readonly description: Prisma.FieldRef<"Listing", 'String'>
   readonly tradeMode: Prisma.FieldRef<"Listing", 'String'>

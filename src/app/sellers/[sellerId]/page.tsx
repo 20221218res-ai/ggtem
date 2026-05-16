@@ -5,7 +5,10 @@ import type { TranslationKey } from "@/app/i18n";
 import { MarketplaceHeader } from "@/app/marketplace-home";
 import UserContentText, { SourceCountryFlag } from "@/app/user-content-text";
 import { getMarketplaceSellerProfile } from "@/lib/market/sellers";
-import { getGameMoneyPriceUnitLabel } from "@/lib/market/trade-unit";
+import {
+  formatGameMoneyQuantityWithUnit,
+  getGameMoneyPriceUnitLabel,
+} from "@/lib/market/trade-unit";
 
 type SellerProfilePageProps = {
   params: Promise<{
@@ -259,6 +262,9 @@ function SummaryCard({
 
 function SellerListingCard({ listing }: { listing: SellerListing }) {
   const price = getSellerListingDisplayPrice(listing);
+  const availableQuantity = formatSellerListingQuantity(listing, listing.availableQuantity);
+  const lockedQuantity = formatSellerListingQuantity(listing, listing.lockedQuantity);
+  const soldQuantity = formatSellerListingQuantity(listing, listing.soldQuantity);
 
   return (
     <Link
@@ -291,9 +297,9 @@ function SellerListingCard({ listing }: { listing: SellerListing }) {
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-[var(--gg-muted)]">
-        <InfoBadge><CountryText id="seller.buyAvailable" /> {listing.availableQuantity}</InfoBadge>
-        <InfoBadge><CountryText id="seller.lockedQuantity" /> {listing.lockedQuantity}</InfoBadge>
-        <InfoBadge><CountryText id="seller.soldQuantity" /> {listing.soldQuantity}</InfoBadge>
+        <InfoBadge><CountryText id="seller.buyAvailable" /> {availableQuantity}</InfoBadge>
+        <InfoBadge><CountryText id="seller.lockedQuantity" /> {lockedQuantity}</InfoBadge>
+        <InfoBadge><CountryText id="seller.soldQuantity" /> {soldQuantity}</InfoBadge>
       </div>
 
       <p className="mt-4 text-xs font-bold text-[var(--gg-subtle)]">
@@ -301,6 +307,18 @@ function SellerListingCard({ listing }: { listing: SellerListing }) {
       </p>
     </Link>
   );
+}
+
+function formatSellerListingQuantity(listing: SellerListing, quantity: string) {
+  if (listing.category === "GAME_MONEY") {
+    return formatGameMoneyQuantityWithUnit(
+      quantity,
+      listing.priceUnitQuantity,
+      listing.moneyUnitName,
+    );
+  }
+
+  return quantity;
 }
 
 function TrustSignal({ label, value }: { label: React.ReactNode; value: number }) {

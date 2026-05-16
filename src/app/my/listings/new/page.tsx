@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
+import CountryText from "@/app/country-text";
 import {
   getMarketplaceMyListings,
   getMarketplaceSellerListingFormView,
@@ -17,30 +19,42 @@ export default async function NewListingPage() {
       <section className="mx-auto max-w-[1180px] space-y-5">
         <header className="flex flex-col gap-4 rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)] lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-black text-[var(--gg-accent)]">SELL</p>
-            <h1 className="mt-1 text-3xl font-black">판매 등록</h1>
+            <p className="text-sm font-black text-[var(--gg-accent)]">
+              <CountryText id="manage.sellingEyebrow" />
+            </p>
+            <h1 className="mt-1 text-3xl font-black">
+              <CountryText id="manage.createSell" />
+            </h1>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link
               href="/my/listings"
               className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-4 py-3 text-sm font-black hover:bg-[var(--gg-control-bg)]"
             >
-              내 판매글
+              <CountryText id="manage.mySellPosts" />
             </Link>
             <Link
               href="/"
               className="rounded-xl bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
             >
-              홈으로
+              <CountryText id="common.backHome" />
             </Link>
           </div>
         </header>
 
         <section className="grid gap-3 md:grid-cols-3">
-          <SummaryCard label="판매중" value={`${listingsView.summary.activeListings}건`} />
-          <SummaryCard label="서버" value="글마다 1개" />
           <SummaryCard
-            label="보유 금액"
+            label={<CountryText id="manage.selling" />}
+            value={
+              <>
+                {listingsView.summary.activeListings}
+                <CountryText id="manage.countSuffix" />
+              </>
+            }
+          />
+          <SummaryCard label={<CountryText id="listingForm.server" />} value={<CountryText id="manage.serverOnePerPost" />} />
+          <SummaryCard
+            label={<CountryText id="manage.holdingAmount" />}
             value={`${listingsView.wallet?.availableBalance ?? "0"} ${walletCurrency}`}
           />
         </section>
@@ -56,7 +70,7 @@ export default async function NewListingPage() {
   );
 }
 
-function SummaryCard({ label, value }: { label: string; value: string }) {
+function SummaryCard({ label, value }: { label: ReactNode; value: ReactNode }) {
   return (
     <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 shadow-sm shadow-[var(--gg-shadow)]">
       <p className="text-xs font-bold text-[var(--gg-muted)]">{label}</p>

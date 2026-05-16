@@ -206,7 +206,7 @@ export function BuyerOrderActions({ orderId, status }: BuyerOrderActionsProps) {
         <TradeSafetyConfirmDialog
           isOpen
           eyebrow={dialog.eyebrow}
-          title="결제 비밀번호 확인"
+          title="결제 PIN 확인"
           body="인수확정을 누르면 거래가 완료되고 에스크로 금액이 판매자에게 정산됩니다. 물품을 받은 뒤에만 진행해 주세요."
           confirmLabel={dialog.confirmLabel}
           tone={dialog.tone}

@@ -649,6 +649,7 @@ export async function createMarketplaceBuyRequest(input: {
   description?: string;
   accountTransferType?: string;
   accountRank?: string;
+  buyerGameNickname?: string;
   quantity: string;
   unitPrice: string;
   pricePerUnit?: string;
@@ -689,6 +690,7 @@ export async function createMarketplaceBuyRequest(input: {
     input.accountTransferType,
   );
   const trimmedAccountRank = input.accountRank?.trim() || null;
+  const buyerGameNickname = normalizeTradeCharacterName(input.buyerGameNickname);
   const priceUnitQuantityValue =
     input.category === "GAME_MONEY"
       ? normalizeGameMoneyPriceUnit(input.priceUnitQuantity)
@@ -714,6 +716,10 @@ export async function createMarketplaceBuyRequest(input: {
     throw new Error("구매요청은 선택한 서버 1개 기준으로만 등록할 수 있습니다.");
   }
 
+  if (!buyerGameNickname) {
+    throw new Error("구매자 게임 아이디를 입력해 주세요.");
+  }
+
   if (quantity <= 0n) {
     throw new Error("수량은 0보다 커야 합니다.");
   }
@@ -734,7 +740,7 @@ export async function createMarketplaceBuyRequest(input: {
   }
 
   await assertNoOffPlatformContact(
-    [trimmedTitle, trimmedDescription, trimmedAccountRank]
+    [trimmedTitle, trimmedDescription, trimmedAccountRank, buyerGameNickname]
       .filter(Boolean)
       .join("\n"),
     {
@@ -804,6 +810,7 @@ export async function createMarketplaceBuyRequest(input: {
         accountTransferType:
           input.category === "GAME_ACCOUNT" ? normalizedAccountTransferType : null,
         accountRank: input.category === "GAME_ACCOUNT" ? trimmedAccountRank : null,
+        buyerGameNickname,
         tradeMode,
         priceUnitQuantity: formatFixedAmount(priceUnitQuantity),
         quantity: formatFixedAmount(quantity),
@@ -1370,6 +1377,11 @@ export async function sellToMarketplaceBuyRequest(input: {
     const nextBuyRequestStatus = nextRemainingQuantity <= 0n ? "ACCEPTED" : "ACTIVE";
     const feeBreakdown = calculateMarketplaceOrderFees(requestAmountText);
     const tradeCharacterName = normalizeTradeCharacterName(input.tradeCharacterName);
+    if (!tradeCharacterName) {
+      throw new Error("판매자 게임 아이디를 입력해 주세요.");
+    }
+    const buyerGameNickname = buyRequest.buyerGameNickname;
+    const sellerGameNickname = tradeCharacterName;
 
     const listing = await tx.listing.create({
       data: {
@@ -1379,6 +1391,7 @@ export async function sellToMarketplaceBuyRequest(input: {
         serverDetail: buyRequest.serverDetail,
         category: buyRequest.category,
         accountTransferType: buyRequest.accountTransferType,
+        sellerGameNickname,
         title: listingTitle,
         description: buyRequest.description,
         tradeMode: "BULK",
@@ -1412,6 +1425,8 @@ export async function sellToMarketplaceBuyRequest(input: {
         sellerReceivableAmount: feeBreakdown.sellerReceivableAmount,
         currency: buyRequest.currency,
         tradeCharacterName,
+        buyerGameNickname,
+        sellerGameNickname,
       },
     });
 
@@ -1485,6 +1500,8 @@ export async function sellToMarketplaceBuyRequest(input: {
           platformFeeAmount: feeBreakdown.platformFeeAmount,
           sellerReceivableAmount: feeBreakdown.sellerReceivableAmount,
           tradeCharacterName,
+          buyerGameNickname,
+          sellerGameNickname,
         },
       },
     });

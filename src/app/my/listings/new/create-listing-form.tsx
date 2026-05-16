@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TranslationKey } from "@/app/i18n";
 import useCountryTranslation from "@/app/use-country-translation";
 import { COUNTRY_CHANGE_EVENT, getCurrentCountryCode } from "@/app/country-text";
@@ -61,6 +61,7 @@ export default function CreateListingForm({
   const [tradeMode, setTradeMode] = useState<"BULK" | "SPLIT">("SPLIT");
   const [quantity, setQuantity] = useState("10");
   const [minimumQuantity, setMinimumQuantity] = useState("1");
+  const [sellerGameNickname, setSellerGameNickname] = useState("");
   const [premiumDurationHours, setPremiumDurationHours] = useState("0");
   const [imageAlt, setImageAlt] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -70,14 +71,16 @@ export default function CreateListingForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [countryCode, setCountryCode] = useState(() => getCurrentCountryCode());
   const [flowStep, setFlowStep] = useState(1);
-  const didNormalizeLegacyQuantityRef = useRef(false);
 
   const isAccountListing = category === "GAME_ACCOUNT";
   const selectedGame = useMemo(
     () => games.find((game) => game.gameId === gameId) ?? null,
     [gameId, games],
   );
-  const availableServers = selectedGame?.servers ?? [];
+  const availableServers = useMemo(
+    () => selectedGame?.servers ?? [],
+    [selectedGame?.servers],
+  );
   const serverDetailOptions = useMemo(
     () => getServerDetailOptionsForGameCode(selectedGame?.code),
     [selectedGame?.code],
@@ -103,11 +106,10 @@ export default function CreateListingForm({
   const selectedPriceUnitLabel = isGameMoneyListing
     ? getGameMoneyPriceUnitLabel(priceUnitQuantity, selectedGame?.moneyUnitName)
     : "";
-  const gameMoneyUnitHelperText =
-    "게임머니 수량과 최소 구매 수량은 선택한 단위 기준으로 입력 가능합니다.";
+  const gameMoneyUnitHelperText = t("listingForm.sellGameMoneyUnitHelper");
   const gameMoneyQuantityPlaceholder = selectedPriceUnitLabel
-    ? `예: 1 (${selectedPriceUnitLabel})`
-    : "예: 1";
+    ? `${t("listingForm.exampleUnitQuantity")} (${selectedPriceUnitLabel})`
+    : t("listingForm.exampleUnitQuantity");
   const selectedGameName = selectedGame
     ? getLocalizedGameName(selectedGame.name, selectedGame.localizedNames, countryCode)
     : "GGtem";
@@ -124,12 +126,6 @@ export default function CreateListingForm({
   }, [quantityInput, unitPrice]);
 
   useEffect(() => {
-    if (serverDetail && !serverDetailOptions.includes(serverDetail)) {
-      setServerDetail("");
-    }
-  }, [serverDetail, serverDetailOptions]);
-
-  useEffect(() => {
     const handleCountryChange = () => setCountryCode(getCurrentCountryCode());
     window.addEventListener(COUNTRY_CHANGE_EVENT, handleCountryChange);
     window.addEventListener("storage", handleCountryChange);
@@ -139,19 +135,6 @@ export default function CreateListingForm({
       window.removeEventListener("storage", handleCountryChange);
     };
   }, []);
-
-  useEffect(() => {
-    if (didNormalizeLegacyQuantityRef.current) return;
-    if (category !== "GAME_MONEY") return;
-
-    didNormalizeLegacyQuantityRef.current = true;
-    setQuantity((currentQuantity) =>
-      normalizeLegacyGameMoneyDisplayQuantity(currentQuantity, priceUnitQuantity),
-    );
-    setMinimumQuantity((currentMinimumQuantity) =>
-      normalizeLegacyGameMoneyDisplayQuantity(currentMinimumQuantity, priceUnitQuantity),
-    );
-  });
 
   function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
     setError("");
@@ -222,7 +205,7 @@ export default function CreateListingForm({
     setTitle(`${gameName} ${serverName} ${t("common.gameMoney")} ${t("listingForm.createSell")}`);
     setDescription(`${gameName} ${serverName}\n${t("listingForm.defaultMoneyDescription")}`);
     setImageAlt(`${gameName} ${serverName}`);
-    setFlowStep(3);
+    setFlowStep(4);
   }
 
   function validateForm() {
@@ -235,10 +218,11 @@ export default function CreateListingForm({
     if (!serverId) return t("listingForm.selectServer");
     if (title.trim().length < 4) return t("listingForm.titleTooShort");
     if (description.trim().length < 10) return t("listingForm.descriptionTooShort");
+    if (!sellerGameNickname.trim()) return t("listingForm.sellerGameNicknameRequired");
     if (!isPositiveNumber(unitPrice)) return t("listingForm.unitPriceInvalid");
 
     if (category === "GAME_MONEY" && !isPositiveWholeNumber(quantityInput)) {
-      return "선택한 단위 기준 수량은 1 이상의 정수로 입력해주세요.";
+      return t("listingForm.selectedUnitQuantityInvalid");
     }
 
     if (!isPositiveNumber(saleQuantity)) {
@@ -248,7 +232,7 @@ export default function CreateListingForm({
     }
 
     if (category === "GAME_MONEY" && tradeMode === "SPLIT" && !isPositiveWholeNumber(minimumQuantityInput)) {
-      return "선택한 단위 기준 최소 수량은 1 이상의 정수로 입력해주세요.";
+      return t("listingForm.selectedUnitMinimumInvalid");
     }
 
     if (!isPositiveNumber(effectiveMinimumQuantity)) return t("listingForm.minimumQuantityInvalid");
@@ -257,7 +241,7 @@ export default function CreateListingForm({
     }
     if (isAccountListing && !accountTransferType) return t("listingForm.accountTypeRequired");
     if (premiumFee > 0 && availableBalanceAmount < premiumFee) {
-      return "프리미엄 이용료를 결제할 지갑 잔액이 부족합니다.";
+      return t("listingForm.premiumFeeInsufficient");
     }
 
     return "";
@@ -287,6 +271,7 @@ export default function CreateListingForm({
           serverDetail: serverDetail || undefined,
           category,
           accountTransferType: isAccountListing ? accountTransferType : undefined,
+          sellerGameNickname: sellerGameNickname.trim(),
           title: title.trim(),
           description: description.trim(),
           unitPrice,
@@ -345,7 +330,7 @@ export default function CreateListingForm({
       <section className="space-y-5">
         <StepFlowGuide currentStep={flowStep} />
 
-        <Panel step={1} title={t("listingForm.itemType")} description="판매할 품목 유형을 먼저 선택하면 다음 단계가 열립니다.">
+        <Panel step={1} title={t("listingForm.itemType")} description={t("listingForm.sellItemTypeDescription")}>
           <div className="grid gap-3 md:grid-cols-3">
             {categoryOptions.map((option) => {
               const active = category === option.value;
@@ -370,10 +355,10 @@ export default function CreateListingForm({
           </div>
         </Panel>
 
-        {flowStep < 2 ? <LockedStepHint step={2} title="게임 / 서버 선택" /> : null}
+        {flowStep < 2 ? <LockedStepHint step={2} title={t("listingForm.gameServerLockedTitle")} t={t} /> : null}
 
         {flowStep >= 2 ? (
-        <Panel step={2} title={t("listingForm.gameAndServer")} description="선택한 게임과 서버 기준으로 판매글이 노출됩니다.">
+        <Panel step={2} title={t("listingForm.gameAndServer")} description={t("listingForm.sellGameServerDescription")}>
           <div className="grid gap-3 md:grid-cols-2">
             <FieldLabel label={t("listingForm.game")}>
               <select
@@ -408,13 +393,13 @@ export default function CreateListingForm({
               </select>
             </FieldLabel>
             {serverDetailOptions.length > 0 ? (
-              <FieldLabel label="서버 상세">
+              <FieldLabel label={t("listingForm.serverDetail")}>
                 <select
                   value={serverDetail}
                   onChange={(event) => setServerDetail(event.target.value)}
                   className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
                 >
-                  <option value="">전체</option>
+                  <option value="">{t("listingForm.allServerDetails")}</option>
                   {serverDetailOptions.map((detail) => (
                     <option key={detail} value={detail}>
                       {detail}
@@ -431,19 +416,19 @@ export default function CreateListingForm({
               onClick={() => setFlowStep(3)}
               className="rounded-2xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:bg-[#c7d2fe]"
             >
-              다음: 등록 정보 입력
+              {t("listingForm.nextTradeConditions")}
             </button>
           </div>
         </Panel>
         ) : null}
 
-        {flowStep < 3 ? <LockedStepHint step={3} title="판매 방식 / 수량 / 가격 / 내용" /> : null}
+        {flowStep < 3 ? <LockedStepHint step={3} title={t("listingForm.sellTradeConditionsLockedTitle")} t={t} /> : null}
 
         {flowStep >= 3 ? (
-        <Panel step={3} title="판매 방식 / 수량 / 가격 / 내용" description="구매자가 바로 이해할 수 있도록 판매 조건을 순서대로 입력합니다.">
+        <Panel step={3} title={t("listingForm.sellTradeConditionsLockedTitle")} description={t("listingForm.sellTradeConditionsDescription")}>
           <div className="grid gap-5">
             {isAccountListing ? (
-              <FormBlock title="계정 정보">
+              <FormBlock title={t("listingForm.accountInfo")}>
                 <FieldLabel label={t("listingForm.accountType")}>
                   <AccountTransferTypeSelector value={accountTransferType} onChange={setAccountTransferType} t={t} />
                 </FieldLabel>
@@ -457,15 +442,15 @@ export default function CreateListingForm({
               </div>
             ) : null}
 
-            <FormBlock title="판매 조건">
+            <FormBlock title={t("listingForm.sellConditions")}>
               <div className="grid gap-3 md:grid-cols-3">
                 {category === "GAME_MONEY" ? (
-                  <FieldLabel label="판매 방식">
-                    <SegmentedTradeMode value={tradeMode} onChange={setTradeMode} labels={["일괄판매", "분할판매"]} />
+                  <FieldLabel label={t("listingForm.sellMode")}>
+                    <SegmentedTradeMode value={tradeMode} onChange={setTradeMode} labels={[t("listingForm.bulkSell"), t("listingForm.splitSell")]} />
                   </FieldLabel>
                 ) : null}
                 {category === "GAME_MONEY" ? (
-                  <FieldLabel label="가격 기준 단위">
+                  <FieldLabel label={t("listingForm.priceUnitBasis")}>
                     <select
                       value={priceUnitQuantity}
                       onChange={(event) => setPriceUnitQuantity(event.target.value)}
@@ -479,7 +464,7 @@ export default function CreateListingForm({
                     </select>
                   </FieldLabel>
                 ) : null}
-                <FieldLabel label={category === "GAME_MONEY" ? `선택 단위당 판매가 (${currency})` : `${t("listingForm.unitPrice")} (${currency})`}>
+                <FieldLabel label={category === "GAME_MONEY" ? `${t("listingForm.selectedUnitSellPrice")} (${currency})` : `${t("listingForm.unitPrice")} (${currency})`}>
                   <input
                     value={unitPrice}
                     onChange={(event) => setUnitPrice(event.target.value)}
@@ -505,7 +490,7 @@ export default function CreateListingForm({
                     placeholder={
                       category === "GAME_MONEY"
                         ? tradeMode === "BULK"
-                          ? "일괄판매는 총 판매 수량과 동일"
+                          ? t("listingForm.bulkSellMinimumSame")
                           : gameMoneyQuantityPlaceholder
                         : undefined
                     }
@@ -519,15 +504,42 @@ export default function CreateListingForm({
             </FormBlock>
             {category === "GAME_MONEY" ? (
               <p className="text-xs font-bold text-[var(--gg-muted)]">
-                {gameMoneyUnitHelperText} 실제 저장 수량은 입력값에 선택 단위를 곱해 계산됩니다. 일괄판매는 최소 구매 수량이 총 판매 수량과 같게 저장됩니다.
+                {gameMoneyUnitHelperText} {t("listingForm.sellGameMoneySaveHelper")}
               </p>
             ) : null}
-            <FormBlock title="제목 / 내용">
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setFlowStep(4)}
+                className="rounded-2xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
+              >
+                {t("listingForm.nextContentPremium")}
+              </button>
+            </div>
+          </div>
+        </Panel>
+        ) : null}
+
+        {flowStep < 4 ? <LockedStepHint step={4} title={t("listingForm.contentPremiumLockedTitle")} t={t} /> : null}
+
+        {flowStep >= 4 ? (
+        <Panel step={4} title={t("listingForm.contentPremiumTitle")} description={t("listingForm.contentPremiumDescription")}>
+          <div className="grid gap-5">
+            <FormBlock title={t("listingForm.titleContent")}>
               <FieldLabel label={t("listingForm.title")}>
                 <input
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                   placeholder={t("listingForm.titlePlaceholder")}
+                  className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                />
+              </FieldLabel>
+              <FieldLabel label={t("listingForm.sellerGameNickname")}>
+                <input
+                  value={sellerGameNickname}
+                  onChange={(event) => setSellerGameNickname(event.target.value)}
+                  placeholder={t("listingForm.sellerGameNicknamePlaceholder")}
+                  maxLength={80}
                   className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
                 />
               </FieldLabel>
@@ -540,74 +552,98 @@ export default function CreateListingForm({
                 />
               </FieldLabel>
             </FormBlock>
-          </div>
-        </Panel>
-        ) : null}
 
-        {flowStep >= 3 ? (
-        <Panel title="프리미엄 상위 노출">
-          <div className="grid gap-4">
-            <div className="rounded-2xl border border-pink-200 bg-pink-50 p-4">
-              <p className="text-sm font-black text-pink-700">30시간 1 USDT</p>
-              <p className="mt-1 text-sm font-bold text-slate-700">
-                프리미엄 판매글은 일반글보다 위에 노출되며, 판매 완료 또는 만료 시 자동 해제됩니다.
-              </p>
-            </div>
-            <FieldLabel label="이용 설정">
-              <select
-                value={premiumDurationHours}
-                onChange={(event) => setPremiumDurationHours(event.target.value)}
-                className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+            <FormBlock title={t("listingForm.premiumPromotion")}>
+              <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4">
+                <p className="text-sm font-black text-[var(--gg-accent)]">{t("listingForm.premiumThirtyHourFee")}</p>
+                <p className="mt-1 text-sm font-bold text-[var(--gg-muted)]">
+                  {t("listingForm.premiumSellDescription")}
+                </p>
+              </div>
+              <FieldLabel label={t("listingForm.premiumSetting")}>
+                <select
+                  value={premiumDurationHours}
+                  onChange={(event) => setPremiumDurationHours(event.target.value)}
+                  className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                >
+                  <option value="0">{t("listingForm.premiumDisabled")}</option>
+                  {[30, 60, 90, 120, 150, 180].map((hours) => (
+                    <option key={hours} value={hours}>
+                      {hours}{t("listingForm.hoursSuffix")} / {hours / 30} USDT
+                    </option>
+                  ))}
+                </select>
+              </FieldLabel>
+              <div className="grid gap-2 rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 text-sm font-bold text-[var(--gg-muted)]">
+                <p>{t("listingForm.premiumTotalFee")}: <strong className="text-[var(--gg-text)]">{premiumFee} {currency}</strong></p>
+                <p>{t("listingForm.walletBalance")}: {availableBalance || "0"} {currency}</p>
+              </div>
+            </FormBlock>
+
+            <details className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5">
+              <summary className="cursor-pointer text-xl font-black">{t("listingForm.imageSection")}</summary>
+              <div className="mt-4 grid gap-3 md:grid-cols-[160px_1fr]">
+                <div className="flex h-40 items-center justify-center overflow-hidden rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)]">
+                  {imagePreviewUrl ? (
+                    <Image
+                      src={imagePreviewUrl}
+                      alt={imageAlt || t("listingForm.imageSection")}
+                      width={320}
+                      height={320}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-sm font-black text-[#9ca3af]">{t("listingForm.noImage")}</span>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={handleImageChange}
+                    className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-sm font-bold file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--gg-accent)] file:px-3 file:py-2 file:text-sm file:font-black file:text-[var(--gg-inverse-text)]"
+                  />
+                  <input
+                    value={imageAlt}
+                    onChange={(event) => setImageAlt(event.target.value)}
+                    placeholder={t("listingForm.imageAltPlaceholder")}
+                    className="w-full rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                  />
+                </div>
+              </div>
+            </details>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setFlowStep(5)}
+                className="rounded-2xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
               >
-                <option value="0">선택 안 함</option>
-                {[30, 60, 90, 120, 150, 180].map((hours) => (
-                  <option key={hours} value={hours}>
-                    {hours}시간 / {hours / 30} USDT
-                  </option>
-                ))}
-              </select>
-            </FieldLabel>
-            <div className="grid gap-2 rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 text-sm font-bold text-[var(--gg-muted)]">
-              <p>총 결제 금액: <strong className="text-[var(--gg-text)]">{premiumFee} {currency}</strong></p>
-              <p>보유 잔액: {availableBalance || "0"} {currency}</p>
+                {t("listingForm.nextFinalReview")}
+              </button>
             </div>
           </div>
         </Panel>
         ) : null}
 
-        {flowStep >= 3 ? (
-        <details className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)]">
-          <summary className="cursor-pointer text-xl font-black">{t("listingForm.imageSection")}</summary>
-          <div className="mt-4 grid gap-3 md:grid-cols-[160px_1fr]">
-            <div className="flex h-40 items-center justify-center overflow-hidden rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)]">
-              {imagePreviewUrl ? (
-                <Image
-                  src={imagePreviewUrl}
-                  alt={imageAlt || t("listingForm.imageSection")}
-                  width={320}
-                  height={320}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="text-sm font-black text-[#9ca3af]">{t("listingForm.noImage")}</span>
-              )}
-            </div>
-            <div className="space-y-3">
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                onChange={handleImageChange}
-                className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-2 text-sm font-bold file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--gg-accent)] file:px-3 file:py-2 file:text-sm file:font-black file:text-[var(--gg-inverse-text)]"
-              />
-              <input
-                value={imageAlt}
-                onChange={(event) => setImageAlt(event.target.value)}
-                placeholder={t("listingForm.imageAltPlaceholder")}
-                className="w-full rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
-              />
-            </div>
-          </div>
-        </details>
+        {flowStep < 5 ? <LockedStepHint step={5} title={t("listingForm.finalReviewLockedTitle")} t={t} /> : null}
+
+        {flowStep >= 5 ? (
+          <Panel step={5} title={t("listingForm.finalReviewTitle")} description={t("listingForm.sellFinalReviewDescription")}>
+            <FinalSummary
+              rows={[
+                [t("listingForm.summaryCategory"), categoryLabel(category, t)],
+                [t("listingForm.summaryGameServer"), `${selectedGameName} / ${formatServerLabel(selectedServer?.name ?? "-", serverDetail)}`],
+                [t("listingForm.summaryTradeMode"), category === "GAME_MONEY" ? (tradeMode === "BULK" ? t("listingForm.bulkSell") : t("listingForm.splitSell")) : categoryLabel(category, t)],
+                [t("listingForm.summarySelectedUnit"), selectedPriceUnitLabel || "-"],
+                [t("listingForm.summaryInputQuantity"), category === "GAME_MONEY" ? `${quantityInput} x ${selectedPriceUnitLabel}` : quantityInput],
+                [t("listingForm.summaryActualStoredQuantity"), saleQuantity || "-"],
+                [t("listingForm.summaryMinimumQuantity"), category === "GAME_MONEY" ? (tradeMode === "BULK" ? saleQuantity : saleMinimumQuantity) : minimumQuantityInput],
+                [t("listingForm.summaryUnitPrice"), `${unitPrice} ${currency}`],
+                [t("listingForm.summaryPremium"), premiumFee > 0 ? `${premiumDurationHours}${t("listingForm.hoursSuffix")} / ${premiumFee} ${currency}` : t("listingForm.premiumDisabled")],
+              ]}
+            />
+          </Panel>
         ) : null}
       </section>
 
@@ -627,7 +663,7 @@ export default function CreateListingForm({
               </p>
             ) : null}
             <p>
-              프리미엄: {premiumFee > 0 ? `${premiumDurationHours}시간 / ${premiumFee} ${currency}` : "선택 안 함"}
+              {t("listingForm.summaryPremium")}: {premiumFee > 0 ? `${premiumDurationHours}${t("listingForm.hoursSuffix")} / ${premiumFee} ${currency}` : t("listingForm.premiumDisabled")}
             </p>
           </div>
         </section>
@@ -638,7 +674,7 @@ export default function CreateListingForm({
         <div className="grid gap-2">
           <button
             type="submit"
-            disabled={isSubmitting || !hasSelectableCatalog || flowStep < 3}
+            disabled={isSubmitting || !hasSelectableCatalog || flowStep < 5}
             className="rounded-2xl bg-[var(--gg-accent)] px-5 py-4 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:bg-[#c7d2fe]"
           >
             {isSubmitting ? t("listingForm.creating") : t("listingForm.createSell")}
@@ -693,14 +729,21 @@ function Panel({
   );
 }
 
-function LockedStepHint({ step, title }: { step: number; title: string }) {
+function LockedStepHint({ step, title, t }: { step: number; title: string; t: TFunction }) {
   return (
     <div className="rounded-2xl border border-dashed border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-5 text-sm font-bold text-[var(--gg-muted)]">
       <span className="mr-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--gg-border)] bg-[var(--gg-card-bg)] text-xs font-black">
         {step}
       </span>
-      {title} 단계는 이전 선택을 완료하면 열립니다.
+      {formatMessage(t("listingForm.lockedStepHint"), { title })}
     </div>
+  );
+}
+
+function formatMessage(template: string, values: Record<string, string>) {
+  return Object.entries(values).reduce(
+    (message, [key, value]) => message.split(`{${key}}`).join(value),
+    template,
   );
 }
 
@@ -714,11 +757,18 @@ function FormBlock({ title, children }: { title: string; children: ReactNode }) 
 }
 
 function StepFlowGuide({ currentStep }: { currentStep: number }) {
-  const steps = ["카테고리", "게임 / 서버", "등록 정보"];
+  const { t } = useCountryTranslation();
+  const steps = [
+    t("listingForm.stepCategory"),
+    t("listingForm.stepGameServer"),
+    t("listingForm.stepTradeQuantity"),
+    t("listingForm.stepContentPremium"),
+    t("listingForm.stepFinalReview"),
+  ];
 
   return (
     <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 shadow-sm shadow-[var(--gg-shadow)]">
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-5">
         {steps.map((step, index) => {
           const stepNumber = index + 1;
           const isActive = stepNumber <= currentStep;
@@ -758,6 +808,22 @@ function FieldLabel({ label, children }: { label: string; children: ReactNode })
       {label}
       {children}
     </label>
+  );
+}
+
+function FinalSummary({ rows }: { rows: Array<[string, string]> }) {
+  return (
+    <div className="grid gap-2">
+      {rows.map(([label, value]) => (
+        <div
+          key={label}
+          className="grid gap-1 rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] px-4 py-3 sm:grid-cols-[120px_1fr]"
+        >
+          <p className="text-xs font-black text-[var(--gg-muted)]">{label}</p>
+          <p className="break-words text-sm font-black text-[var(--gg-text)]">{value}</p>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -883,24 +949,6 @@ function multiplyQuantityBySelectedUnit(value: string, unit: string) {
   }
 
   return (BigInt(normalizedValue) * BigInt(normalizedUnit)).toString();
-}
-
-function normalizeLegacyGameMoneyDisplayQuantity(value: string, unit: string) {
-  const normalizedValue = normalizeWholeNumber(value);
-  const normalizedUnit = normalizeWholeNumber(unit);
-
-  if (!normalizedValue || !normalizedUnit) {
-    return value;
-  }
-
-  const quantity = BigInt(normalizedValue);
-  const unitQuantity = BigInt(normalizedUnit);
-
-  if (quantity < unitQuantity || quantity % unitQuantity !== 0n) {
-    return value;
-  }
-
-  return (quantity / unitQuantity).toString();
 }
 
 function isQuantityGreater(left: string, right: string, useWholeNumber: boolean) {

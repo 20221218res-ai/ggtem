@@ -13,11 +13,14 @@ export type OrderChatView = {
   sellerReceivableAmount: string;
   currency: string;
   tradeCharacterName: string | null;
+  buyerGameNickname: string | null;
+  sellerGameNickname: string | null;
   listingTitle: string;
   category: string;
   gameName: string;
   serverName: string | null;
   moneyUnitName: string;
+  priceUnitQuantity: string;
   accountTransferType: string | null;
   quantity: string;
   unitPrice: string;
@@ -386,6 +389,8 @@ export async function getOrderChatView(input: {
       sellerReceivableAmount: true,
       currency: true,
       tradeCharacterName: true,
+      buyerGameNickname: true,
+      sellerGameNickname: true,
       quantity: true,
       unitPrice: true,
       buyer: {
@@ -402,6 +407,7 @@ export async function getOrderChatView(input: {
         select: {
           title: true,
           category: true,
+          priceUnitQuantity: true,
           accountTransferType: true,
           game: {
             select: {
@@ -479,11 +485,14 @@ export async function getOrderChatView(input: {
     sellerReceivableAmount: order.sellerReceivableAmount.toString(),
     currency: order.currency,
     tradeCharacterName: order.tradeCharacterName,
+    buyerGameNickname: order.buyerGameNickname,
+    sellerGameNickname: order.sellerGameNickname,
     listingTitle: order.listing.title,
     category: order.listing.category,
     gameName: order.listing.game.name,
     serverName: order.listing.server?.name ?? null,
     moneyUnitName: order.listing.game.moneyUnitName,
+    priceUnitQuantity: order.listing.priceUnitQuantity?.toString() ?? "10000",
     accountTransferType: order.listing.accountTransferType,
     quantity: order.quantity.toString(),
     unitPrice: order.unitPrice.toString(),

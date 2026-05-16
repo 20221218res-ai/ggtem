@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FormEvent, ReactNode } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TranslationKey } from "@/app/i18n";
 import useCountryTranslation from "@/app/use-country-translation";
 import { COUNTRY_CHANGE_EVENT, getCurrentCountryCode } from "@/app/country-text";
@@ -59,6 +59,7 @@ export default function CreateBuyRequestForm({
   const [accountTransferType, setAccountTransferType] = useState("GOOGLE");
   const [accountRank, setAccountRank] = useState("");
   const [accountMemo, setAccountMemo] = useState("");
+  const [buyerGameNickname, setBuyerGameNickname] = useState("");
   const [premiumDurationHours, setPremiumDurationHours] = useState("0");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -66,14 +67,16 @@ export default function CreateBuyRequestForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [countryCode, setCountryCode] = useState(() => getCurrentCountryCode());
   const [flowStep, setFlowStep] = useState(1);
-  const didNormalizeLegacyQuantityRef = useRef(false);
 
   const isAccountRequest = category === "GAME_ACCOUNT";
   const selectedGame = useMemo(
     () => games.find((game) => game.gameId === gameId) ?? null,
     [gameId, games],
   );
-  const availableServers = selectedGame?.servers ?? [];
+  const availableServers = useMemo(
+    () => selectedGame?.servers ?? [],
+    [selectedGame?.servers],
+  );
   const serverDetailOptions = useMemo(
     () => getServerDetailOptionsForGameCode(selectedGame?.code),
     [selectedGame?.code],
@@ -95,11 +98,10 @@ export default function CreateBuyRequestForm({
   const selectedPriceUnitLabel = isGameMoneyRequest
     ? getGameMoneyPriceUnitLabel(priceUnitQuantity, selectedGame?.moneyUnitName)
     : "";
-  const gameMoneyUnitHelperText =
-    "게임머니 수량과 최소 구매 수량은 선택한 단위 기준으로 입력 가능합니다.";
+  const gameMoneyUnitHelperText = t("listingForm.buyGameMoneyUnitHelper");
   const gameMoneyQuantityPlaceholder = selectedPriceUnitLabel
-    ? `예: 1 (${selectedPriceUnitLabel})`
-    : "예: 1";
+    ? `${t("listingForm.exampleUnitQuantity")} (${selectedPriceUnitLabel})`
+    : t("listingForm.exampleUnitQuantity");
   const estimatedReserveAmount = useMemo(() => {
     const nextQuantity = Number(quantityInput);
     const nextUnitPrice = Number(unitPrice);
@@ -128,12 +130,6 @@ export default function CreateBuyRequestForm({
     requiredBalanceAmount <= availableBalanceAmount;
 
   useEffect(() => {
-    if (serverDetail && !serverDetailOptions.includes(serverDetail)) {
-      setServerDetail("");
-    }
-  }, [serverDetail, serverDetailOptions]);
-
-  useEffect(() => {
     const handleCountryChange = () => setCountryCode(getCurrentCountryCode());
     window.addEventListener(COUNTRY_CHANGE_EVENT, handleCountryChange);
     window.addEventListener("storage", handleCountryChange);
@@ -143,19 +139,6 @@ export default function CreateBuyRequestForm({
       window.removeEventListener("storage", handleCountryChange);
     };
   }, []);
-
-  useEffect(() => {
-    if (didNormalizeLegacyQuantityRef.current) return;
-    if (category !== "GAME_MONEY") return;
-
-    didNormalizeLegacyQuantityRef.current = true;
-    setQuantity((currentQuantity) =>
-      normalizeLegacyGameMoneyDisplayQuantity(currentQuantity, priceUnitQuantity),
-    );
-    setMinimumQuantity((currentMinimumQuantity) =>
-      normalizeLegacyGameMoneyDisplayQuantity(currentMinimumQuantity, priceUnitQuantity),
-    );
-  });
 
   function handleCategoryChange(nextCategory: ListingCategory) {
     setCategory(nextCategory);
@@ -195,16 +178,17 @@ export default function CreateBuyRequestForm({
     setError("");
     setSuccess("");
     setCreatedBuyRequestId(null);
-    setFlowStep(3);
+    setFlowStep(4);
   }
 
   function validateForm() {
     if (!wallet) return t("listingForm.walletLoadFailed");
     if (!gameId || games.length === 0) return t("listingForm.noGame");
     if (!serverId) return t("listingForm.selectServer");
+    if (!buyerGameNickname.trim()) return t("listingForm.buyerGameNicknameRequired");
 
     if (category === "GAME_MONEY" && !isPositiveWholeNumber(quantityInput)) {
-      return "선택한 단위 기준 수량은 1 이상의 정수로 입력해주세요.";
+      return t("listingForm.selectedUnitQuantityInvalid");
     }
 
     if (!isPositiveNumber(requestQuantity)) {
@@ -217,14 +201,14 @@ export default function CreateBuyRequestForm({
       tradeMode === "SPLIT" &&
       !isPositiveWholeNumber(minimumQuantityInput)
     ) {
-      return "선택한 단위 기준 최소 판매 수량은 1 이상의 정수로 입력해 주세요.";
+      return t("listingForm.selectedUnitMinimumSellInvalid");
     }
     if (
       category === "GAME_MONEY" &&
       tradeMode === "SPLIT" &&
       isQuantityGreater(requestMinimumQuantity, requestQuantity, true)
     ) {
-      return "최소 판매 수량은 총 구매 수량보다 클 수 없습니다.";
+      return t("listingForm.minimumSellOverBuyQuantity");
     }
 
     if (!isPositiveNumber(unitPrice)) {
@@ -241,7 +225,7 @@ export default function CreateBuyRequestForm({
       return t("listingForm.buyDescriptionTooShort");
     }
     if (premiumFee > 0 && premiumFee > availableBalanceAmount) {
-      return "프리미엄 노출 비용을 결제할 잔액이 부족합니다.";
+      return t("listingForm.premiumBuyFeeInsufficient");
     }
     if (!canReserveBalance) return t("listingForm.insufficientBalance");
 
@@ -283,6 +267,7 @@ export default function CreateBuyRequestForm({
           description: isAccountRequest ? accountMemo.trim() : description.trim(),
           accountTransferType: isAccountRequest ? accountTransferType : undefined,
           accountRank: isAccountRequest ? accountRank.trim() : undefined,
+          buyerGameNickname: buyerGameNickname.trim(),
           quantity: requestQuantity,
           unitPrice,
           pricePerUnit: category === "GAME_MONEY" ? unitPrice : undefined,
@@ -321,7 +306,7 @@ export default function CreateBuyRequestForm({
       <section className="space-y-5">
         <StepFlowGuide currentStep={flowStep} />
 
-        <Panel step={1} title={t("listingForm.itemType")} description="구매할 품목 유형을 먼저 선택하면 다음 단계가 열립니다.">
+        <Panel step={1} title={t("listingForm.itemType")} description={t("listingForm.buyItemTypeDescription")}>
           <div className="grid gap-3 md:grid-cols-3">
             {categoryOptions.map((option) => {
               const active = category === option.value;
@@ -347,10 +332,10 @@ export default function CreateBuyRequestForm({
           </div>
         </Panel>
 
-        {flowStep < 2 ? <LockedStepHint step={2} title="게임 / 서버 선택" /> : null}
+        {flowStep < 2 ? <LockedStepHint step={2} title={t("listingForm.gameServerLockedTitle")} t={t} /> : null}
 
         {flowStep >= 2 ? (
-        <Panel step={2} title={t("listingForm.gameAndServer")} description="구매를 원하는 게임과 서버를 선택합니다.">
+        <Panel step={2} title={t("listingForm.gameAndServer")} description={t("listingForm.buyGameServerDescription")}>
           <div className="grid gap-3 md:grid-cols-2">
             <FieldLabel label={t("listingForm.game")}>
               <select
@@ -385,13 +370,13 @@ export default function CreateBuyRequestForm({
               </select>
             </FieldLabel>
             {serverDetailOptions.length > 0 ? (
-              <FieldLabel label="서버 상세">
+              <FieldLabel label={t("listingForm.serverDetail")}>
                 <select
                   value={serverDetail}
                   onChange={(event) => setServerDetail(event.target.value)}
                   className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
                 >
-                  <option value="">전체</option>
+                  <option value="">{t("listingForm.allServerDetails")}</option>
                   {serverDetailOptions.map((detail) => (
                     <option key={detail} value={detail}>
                       {detail}
@@ -408,30 +393,19 @@ export default function CreateBuyRequestForm({
               onClick={() => setFlowStep(3)}
               className="rounded-2xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:bg-[#c7d2fe]"
             >
-              다음: 등록 정보 입력
+              {t("listingForm.nextTradeConditions")}
             </button>
           </div>
         </Panel>
         ) : null}
 
-        {flowStep < 3 ? <LockedStepHint step={3} title="구매 방식 / 수량 / 가격 / 내용" /> : null}
+        {flowStep < 3 ? <LockedStepHint step={3} title={t("listingForm.buyTradeConditionsLockedTitle")} t={t} /> : null}
 
         {flowStep >= 3 ? (
-        <Panel step={3} title="구매 방식 / 수량 / 가격 / 내용" description="판매자가 바로 확인할 수 있도록 구매 조건을 순서대로 입력합니다.">
+        <Panel step={3} title={t("listingForm.buyTradeConditionsLockedTitle")} description={t("listingForm.buyTradeConditionsDescription")}>
           <div className="grid gap-5">
-            <FormBlock title="제목">
-              <FieldLabel label={t("listingForm.title")}>
-                <input
-                  value={title}
-                  onChange={(event) => setTitle(event.target.value)}
-                  placeholder={t("listingForm.autoTitlePlaceholder")}
-                  className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
-                />
-              </FieldLabel>
-            </FormBlock>
-
             {isAccountRequest ? (
-              <FormBlock title="계정 구매 조건">
+              <FormBlock title={t("listingForm.accountBuyConditions")}>
                 <FieldLabel label={`${t("listingForm.accountBudget")} (${currency})`}>
                   <input
                     value={unitPrice}
@@ -465,13 +439,13 @@ export default function CreateBuyRequestForm({
                 </FieldLabel>
               </FormBlock>
             ) : (
-              <FormBlock title="구매 조건">
+              <FormBlock title={t("listingForm.buyCondition")}>
                 {category === "GAME_MONEY" ? (
                   <div className="grid gap-3 md:grid-cols-2">
-                    <FieldLabel label="구매 방식">
-                      <SegmentedTradeMode value={tradeMode} onChange={setTradeMode} labels={["일괄구매", "분할구매"]} />
+                    <FieldLabel label={t("listingForm.buyMode")}>
+                      <SegmentedTradeMode value={tradeMode} onChange={setTradeMode} labels={[t("listingForm.bulkBuy"), t("listingForm.splitBuy")]} />
                     </FieldLabel>
-                    <FieldLabel label="가격 기준 단위">
+                    <FieldLabel label={t("listingForm.priceUnitBasis")}>
                       <select
                         value={priceUnitQuantity}
                         onChange={(event) => setPriceUnitQuantity(event.target.value)}
@@ -497,7 +471,7 @@ export default function CreateBuyRequestForm({
                       className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
                     />
                   </FieldLabel>
-                  <FieldLabel label={category === "GAME_MONEY" ? `선택 단위당 구매가 (${currency})` : `${t("listingForm.unitPrice")} (${currency})`}>
+                  <FieldLabel label={category === "GAME_MONEY" ? `${t("listingForm.selectedUnitBuyPrice")} (${currency})` : `${t("listingForm.unitPrice")} (${currency})`}>
                     <input
                       value={unitPrice}
                       onChange={(event) => setUnitPrice(event.target.value)}
@@ -507,13 +481,13 @@ export default function CreateBuyRequestForm({
                   </FieldLabel>
                 </div>
                 {category === "GAME_MONEY" ? (
-                  <FieldLabel label="최소 판매 수량">
+                  <FieldLabel label={t("listingForm.minimumSellQuantity")}>
                     <input
                       value={tradeMode === "BULK" ? quantityInput : minimumQuantityInput}
                       onChange={(event) => setMinimumQuantity(event.target.value)}
                       placeholder={
                         tradeMode === "BULK"
-                          ? "일괄구매는 총 구매 수량과 동일"
+                          ? t("listingForm.bulkBuyMinimumSame")
                           : gameMoneyQuantityPlaceholder
                       }
                       inputMode="numeric"
@@ -525,21 +499,13 @@ export default function CreateBuyRequestForm({
                 ) : null}
                 {category === "GAME_MONEY" ? (
                   <p className="text-xs font-bold text-[var(--gg-muted)]">
-                    {gameMoneyUnitHelperText} 실제 저장 수량은 입력값에 선택 단위를 곱해 계산됩니다. 일괄구매는 최소 판매 수량이 총 구매 수량과 같게 저장됩니다.
+                    {gameMoneyUnitHelperText} {t("listingForm.buyGameMoneySaveHelper")}
                   </p>
                 ) : null}
-                <FieldLabel label={t("listingForm.buyCondition")}>
-                  <textarea
-                    value={description}
-                    onChange={(event) => setDescription(event.target.value)}
-                    rows={5}
-                    className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
-                  />
-                </FieldLabel>
               </FormBlock>
             )}
 
-            <FormBlock title="모집 기간">
+            <FormBlock title={t("listingForm.recruitPeriod")}>
               <FieldLabel label={t("listingForm.recruitPeriod")}>
                 <select
                   value={expiresInDays}
@@ -554,40 +520,116 @@ export default function CreateBuyRequestForm({
                 </select>
               </FieldLabel>
             </FormBlock>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setFlowStep(4)}
+                className="rounded-2xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
+              >
+                {t("listingForm.nextContentPremium")}
+              </button>
+            </div>
           </div>
         </Panel>
         ) : null}
 
-        {flowStep >= 3 ? (
-        <Panel title="프리미엄 상위 노출">
-          <div className="grid gap-4">
-            <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4">
-              <p className="text-sm font-black text-[var(--gg-accent)]">상단 고정 노출</p>
-              <p className="mt-1 text-sm font-bold text-[var(--gg-muted)]">
-                선택한 구매글은 프리미엄 영역에 먼저 노출됩니다. 30시간마다 1 USDT가 즉시 차감됩니다.
-              </p>
-            </div>
-            <FieldLabel label="이용 시간">
-              <select
-                value={premiumDurationHours}
-                onChange={(event) => setPremiumDurationHours(event.target.value)}
-                className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+        {flowStep < 4 ? <LockedStepHint step={4} title={t("listingForm.contentPremiumLockedTitle")} t={t} /> : null}
+
+        {flowStep >= 4 ? (
+        <Panel step={4} title={t("listingForm.contentPremiumTitle")} description={t("listingForm.contentPremiumDescription")}>
+          <div className="grid gap-5">
+            <FormBlock title={t("listingForm.titleContent")}>
+              <FieldLabel label={t("listingForm.title")}>
+                <input
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder={t("listingForm.autoTitlePlaceholder")}
+                  className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                />
+              </FieldLabel>
+              <FieldLabel label={t("listingForm.buyerGameNickname")}>
+                <input
+                  value={buyerGameNickname}
+                  onChange={(event) => setBuyerGameNickname(event.target.value)}
+                  placeholder={t("listingForm.buyerGameNicknamePlaceholder")}
+                  maxLength={80}
+                  className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                />
+              </FieldLabel>
+              {!isAccountRequest ? (
+                <FieldLabel label={t("listingForm.buyCondition")}>
+                  <textarea
+                    value={description}
+                    onChange={(event) => setDescription(event.target.value)}
+                    rows={5}
+                    className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                  />
+                </FieldLabel>
+              ) : null}
+            </FormBlock>
+
+            <FormBlock title={t("listingForm.premiumPromotion")}>
+              <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4">
+                <p className="text-sm font-black text-[var(--gg-accent)]">{t("listingForm.premiumFixedTop")}</p>
+                <p className="mt-1 text-sm font-bold text-[var(--gg-muted)]">
+                  {t("listingForm.premiumBuyDescription")}
+                </p>
+              </div>
+              <FieldLabel label={t("listingForm.premiumDuration")}>
+                <select
+                  value={premiumDurationHours}
+                  onChange={(event) => setPremiumDurationHours(event.target.value)}
+                  className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-3 py-3 text-sm font-bold outline-none focus:border-[var(--gg-accent)]"
+                >
+                  <option value="0">{t("listingForm.premiumDisabled")}</option>
+                  {["30", "60", "90", "120", "150", "180"].map((hours) => (
+                    <option key={hours} value={hours}>
+                      {hours}{t("listingForm.hoursSuffix")} / {Number(hours) / 30} USDT
+                    </option>
+                  ))}
+                </select>
+              </FieldLabel>
+              <div className="grid gap-3 md:grid-cols-3">
+                <MiniSummary label={t("listingForm.premiumFee")} value={`${premiumFee} ${currency}`} />
+                <MiniSummary label={t("listingForm.reserveAmount")} value={`${totalAmount} ${currency}`} />
+                <MiniSummary label={t("listingForm.totalDebitExpected")} value={`${requiredBalance} ${currency}`} />
+              </div>
+            </FormBlock>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setFlowStep(5)}
+                className="rounded-2xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
               >
-                <option value="0">사용 안 함</option>
-                {["30", "60", "90", "120", "150", "180"].map((hours) => (
-                  <option key={hours} value={hours}>
-                    {hours}시간 / {Number(hours) / 30} USDT
-                  </option>
-                ))}
-              </select>
-            </FieldLabel>
-            <div className="grid gap-3 md:grid-cols-3">
-              <MiniSummary label="프리미엄 비용" value={`${premiumFee} ${currency}`} />
-              <MiniSummary label="예치 금액" value={`${totalAmount} ${currency}`} />
-              <MiniSummary label="총 차감 예정" value={`${requiredBalance} ${currency}`} />
+                {t("listingForm.nextFinalReview")}
+              </button>
             </div>
           </div>
         </Panel>
+        ) : null}
+
+        {flowStep < 5 ? <LockedStepHint step={5} title={t("listingForm.finalReviewLockedTitle")} t={t} /> : null}
+
+        {flowStep >= 5 ? (
+          <Panel step={5} title={t("listingForm.finalReviewTitle")} description={t("listingForm.buyFinalReviewDescription")}>
+            <FinalSummary
+              rows={[
+                [t("listingForm.summaryCategory"), categoryLabel(category, t)],
+                [t("listingForm.summaryGameServer"), `${selectedGame?.name ?? "GGtem"} / ${formatServerLabel(selectedServer?.name ?? "-", serverDetail)}`],
+                [t("listingForm.summaryTradeMode"), category === "GAME_MONEY" ? (tradeMode === "BULK" ? t("listingForm.bulkBuy") : t("listingForm.splitBuy")) : categoryLabel(category, t)],
+                [t("listingForm.summarySelectedUnit"), selectedPriceUnitLabel || "-"],
+                [t("listingForm.summaryInputQuantity"), category === "GAME_MONEY" ? `${quantityInput} x ${selectedPriceUnitLabel}` : quantityInput],
+                [t("listingForm.summaryActualStoredQuantity"), requestQuantity || "-"],
+                [t("listingForm.summaryMinimumQuantity"), category === "GAME_MONEY" ? (tradeMode === "BULK" ? requestQuantity : requestMinimumQuantity) : requestQuantity],
+                [t("listingForm.summaryUnitPrice"), `${unitPrice} ${currency}`],
+                [t("listingForm.reserveAmount"), `${totalAmount} ${currency}`],
+                [t("listingForm.summaryPremium"), premiumFee > 0 ? `${premiumDurationHours}${t("listingForm.hoursSuffix")} / ${premiumFee} ${currency}` : t("listingForm.premiumDisabled")],
+                [t("listingForm.totalDebitExpected"), `${requiredBalance} ${currency}`],
+              ]}
+            />
+          </Panel>
         ) : null}
       </section>
 
@@ -606,7 +648,7 @@ export default function CreateBuyRequestForm({
             </p>
             {premiumFee > 0 ? (
               <p>
-                프리미엄 {premiumDurationHours}시간: {premiumFee} {wallet?.currency ?? currency}
+                {t("listingForm.summaryPremium")} {premiumDurationHours}{t("listingForm.hoursSuffix")}: {premiumFee} {wallet?.currency ?? currency}
               </p>
             ) : null}
             {isAccountRequest ? (
@@ -624,7 +666,7 @@ export default function CreateBuyRequestForm({
         <div className="grid gap-2">
           <button
             type="submit"
-            disabled={isSubmitting || !canReserveBalance || !hasSelectableCatalog || flowStep < 3}
+            disabled={isSubmitting || !canReserveBalance || !hasSelectableCatalog || flowStep < 5}
             className="rounded-2xl bg-[var(--gg-accent)] px-5 py-4 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:bg-[#c7d2fe]"
           >
             {isSubmitting ? t("listingForm.creating") : t("listingForm.createBuy")}
@@ -679,14 +721,21 @@ function Panel({
   );
 }
 
-function LockedStepHint({ step, title }: { step: number; title: string }) {
+function LockedStepHint({ step, title, t }: { step: number; title: string; t: TFunction }) {
   return (
     <div className="rounded-2xl border border-dashed border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-5 text-sm font-bold text-[var(--gg-muted)]">
       <span className="mr-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--gg-border)] bg-[var(--gg-card-bg)] text-xs font-black">
         {step}
       </span>
-      {title} 단계는 이전 선택을 완료하면 열립니다.
+      {formatMessage(t("listingForm.lockedStepHint"), { title })}
     </div>
+  );
+}
+
+function formatMessage(template: string, values: Record<string, string>) {
+  return Object.entries(values).reduce(
+    (message, [key, value]) => message.split(`{${key}}`).join(value),
+    template,
   );
 }
 
@@ -700,11 +749,18 @@ function FormBlock({ title, children }: { title: string; children: ReactNode }) 
 }
 
 function StepFlowGuide({ currentStep }: { currentStep: number }) {
-  const steps = ["카테고리", "게임 / 서버", "등록 정보"];
+  const { t } = useCountryTranslation();
+  const steps = [
+    t("listingForm.stepCategory"),
+    t("listingForm.stepGameServer"),
+    t("listingForm.stepTradeQuantity"),
+    t("listingForm.stepContentPremium"),
+    t("listingForm.stepFinalReview"),
+  ];
 
   return (
     <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 shadow-sm shadow-[var(--gg-shadow)]">
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-5">
         {steps.map((step, index) => {
           const stepNumber = index + 1;
           const isActive = stepNumber <= currentStep;
@@ -752,6 +808,22 @@ function MiniSummary({ label, value }: { label: string; value: string }) {
     <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4">
       <p className="text-xs font-black text-[var(--gg-muted)]">{label}</p>
       <p className="mt-1 text-lg font-black">{value}</p>
+    </div>
+  );
+}
+
+function FinalSummary({ rows }: { rows: Array<[string, string]> }) {
+  return (
+    <div className="grid gap-2">
+      {rows.map(([label, value]) => (
+        <div
+          key={label}
+          className="grid gap-1 rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] px-4 py-3 sm:grid-cols-[120px_1fr]"
+        >
+          <p className="text-xs font-black text-[var(--gg-muted)]">{label}</p>
+          <p className="break-words text-sm font-black text-[var(--gg-text)]">{value}</p>
+        </div>
+      ))}
     </div>
   );
 }
@@ -905,24 +977,6 @@ function multiplyQuantityBySelectedUnit(value: string, unit: string) {
   }
 
   return (BigInt(normalizedValue) * BigInt(normalizedUnit)).toString();
-}
-
-function normalizeLegacyGameMoneyDisplayQuantity(value: string, unit: string) {
-  const normalizedValue = normalizeWholeNumber(value);
-  const normalizedUnit = normalizeWholeNumber(unit);
-
-  if (!normalizedValue || !normalizedUnit) {
-    return value;
-  }
-
-  const quantity = BigInt(normalizedValue);
-  const unitQuantity = BigInt(normalizedUnit);
-
-  if (quantity < unitQuantity || quantity % unitQuantity !== 0n) {
-    return value;
-  }
-
-  return (quantity / unitQuantity).toString();
 }
 
 function isQuantityGreater(left: string, right: string, useWholeNumber: boolean) {

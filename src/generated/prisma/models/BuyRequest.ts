@@ -59,6 +59,7 @@ export type BuyRequestMinAggregateOutputType = {
   category: $Enums.ListingCategory | null
   title: string | null
   description: string | null
+  buyerGameNickname: string | null
   accountTransferType: string | null
   accountRank: string | null
   tradeMode: string | null
@@ -89,6 +90,7 @@ export type BuyRequestMaxAggregateOutputType = {
   category: $Enums.ListingCategory | null
   title: string | null
   description: string | null
+  buyerGameNickname: string | null
   accountTransferType: string | null
   accountRank: string | null
   tradeMode: string | null
@@ -119,6 +121,7 @@ export type BuyRequestCountAggregateOutputType = {
   category: number
   title: number
   description: number
+  buyerGameNickname: number
   accountTransferType: number
   accountRank: number
   tradeMode: number
@@ -175,6 +178,7 @@ export type BuyRequestMinAggregateInputType = {
   category?: true
   title?: true
   description?: true
+  buyerGameNickname?: true
   accountTransferType?: true
   accountRank?: true
   tradeMode?: true
@@ -205,6 +209,7 @@ export type BuyRequestMaxAggregateInputType = {
   category?: true
   title?: true
   description?: true
+  buyerGameNickname?: true
   accountTransferType?: true
   accountRank?: true
   tradeMode?: true
@@ -235,6 +240,7 @@ export type BuyRequestCountAggregateInputType = {
   category?: true
   title?: true
   description?: true
+  buyerGameNickname?: true
   accountTransferType?: true
   accountRank?: true
   tradeMode?: true
@@ -352,6 +358,7 @@ export type BuyRequestGroupByOutputType = {
   category: $Enums.ListingCategory
   title: string | null
   description: string | null
+  buyerGameNickname: string | null
   accountTransferType: string | null
   accountRank: string | null
   tradeMode: string
@@ -405,6 +412,7 @@ export type BuyRequestWhereInput = {
   category?: Prisma.EnumListingCategoryFilter<"BuyRequest"> | $Enums.ListingCategory
   title?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   description?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
+  buyerGameNickname?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountTransferType?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountRank?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   tradeMode?: Prisma.StringFilter<"BuyRequest"> | string
@@ -437,6 +445,7 @@ export type BuyRequestOrderByWithRelationInput = {
   category?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  buyerGameNickname?: Prisma.SortOrderInput | Prisma.SortOrder
   accountTransferType?: Prisma.SortOrderInput | Prisma.SortOrder
   accountRank?: Prisma.SortOrderInput | Prisma.SortOrder
   tradeMode?: Prisma.SortOrder
@@ -472,6 +481,7 @@ export type BuyRequestWhereUniqueInput = Prisma.AtLeast<{
   category?: Prisma.EnumListingCategoryFilter<"BuyRequest"> | $Enums.ListingCategory
   title?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   description?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
+  buyerGameNickname?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountTransferType?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountRank?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   tradeMode?: Prisma.StringFilter<"BuyRequest"> | string
@@ -504,6 +514,7 @@ export type BuyRequestOrderByWithAggregationInput = {
   category?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  buyerGameNickname?: Prisma.SortOrderInput | Prisma.SortOrder
   accountTransferType?: Prisma.SortOrderInput | Prisma.SortOrder
   accountRank?: Prisma.SortOrderInput | Prisma.SortOrder
   tradeMode?: Prisma.SortOrder
@@ -542,6 +553,7 @@ export type BuyRequestScalarWhereWithAggregatesInput = {
   category?: Prisma.EnumListingCategoryWithAggregatesFilter<"BuyRequest"> | $Enums.ListingCategory
   title?: Prisma.StringNullableWithAggregatesFilter<"BuyRequest"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"BuyRequest"> | string | null
+  buyerGameNickname?: Prisma.StringNullableWithAggregatesFilter<"BuyRequest"> | string | null
   accountTransferType?: Prisma.StringNullableWithAggregatesFilter<"BuyRequest"> | string | null
   accountRank?: Prisma.StringNullableWithAggregatesFilter<"BuyRequest"> | string | null
   tradeMode?: Prisma.StringWithAggregatesFilter<"BuyRequest"> | string
@@ -571,6 +583,7 @@ export type BuyRequestCreateInput = {
   category: $Enums.ListingCategory
   title?: string | null
   description?: string | null
+  buyerGameNickname?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
   tradeMode?: string
@@ -603,6 +616,7 @@ export type BuyRequestUncheckedCreateInput = {
   category: $Enums.ListingCategory
   title?: string | null
   description?: string | null
+  buyerGameNickname?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
   tradeMode?: string
@@ -633,6 +647,7 @@ export type BuyRequestUpdateInput = {
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -665,6 +680,7 @@ export type BuyRequestUncheckedUpdateInput = {
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -696,6 +712,7 @@ export type BuyRequestCreateManyInput = {
   category: $Enums.ListingCategory
   title?: string | null
   description?: string | null
+  buyerGameNickname?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
   tradeMode?: string
@@ -725,6 +742,7 @@ export type BuyRequestUpdateManyMutationInput = {
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -755,6 +773,7 @@ export type BuyRequestUncheckedUpdateManyInput = {
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -795,6 +814,7 @@ export type BuyRequestCountOrderByAggregateInput = {
   category?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  buyerGameNickname?: Prisma.SortOrder
   accountTransferType?: Prisma.SortOrder
   accountRank?: Prisma.SortOrder
   tradeMode?: Prisma.SortOrder
@@ -837,6 +857,7 @@ export type BuyRequestMaxOrderByAggregateInput = {
   category?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  buyerGameNickname?: Prisma.SortOrder
   accountTransferType?: Prisma.SortOrder
   accountRank?: Prisma.SortOrder
   tradeMode?: Prisma.SortOrder
@@ -867,6 +888,7 @@ export type BuyRequestMinOrderByAggregateInput = {
   category?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  buyerGameNickname?: Prisma.SortOrder
   accountTransferType?: Prisma.SortOrder
   accountRank?: Prisma.SortOrder
   tradeMode?: Prisma.SortOrder
@@ -973,6 +995,7 @@ export type BuyRequestCreateWithoutBuyerInput = {
   category: $Enums.ListingCategory
   title?: string | null
   description?: string | null
+  buyerGameNickname?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
   tradeMode?: string
@@ -1003,6 +1026,7 @@ export type BuyRequestUncheckedCreateWithoutBuyerInput = {
   category: $Enums.ListingCategory
   title?: string | null
   description?: string | null
+  buyerGameNickname?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
   tradeMode?: string
@@ -1063,6 +1087,7 @@ export type BuyRequestScalarWhereInput = {
   category?: Prisma.EnumListingCategoryFilter<"BuyRequest"> | $Enums.ListingCategory
   title?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   description?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
+  buyerGameNickname?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountTransferType?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   accountRank?: Prisma.StringNullableFilter<"BuyRequest"> | string | null
   tradeMode?: Prisma.StringFilter<"BuyRequest"> | string
@@ -1092,6 +1117,7 @@ export type BuyRequestCreateWithoutOffersInput = {
   category: $Enums.ListingCategory
   title?: string | null
   description?: string | null
+  buyerGameNickname?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
   tradeMode?: string
@@ -1123,6 +1149,7 @@ export type BuyRequestUncheckedCreateWithoutOffersInput = {
   category: $Enums.ListingCategory
   title?: string | null
   description?: string | null
+  buyerGameNickname?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
   tradeMode?: string
@@ -1168,6 +1195,7 @@ export type BuyRequestUpdateWithoutOffersInput = {
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1199,6 +1227,7 @@ export type BuyRequestUncheckedUpdateWithoutOffersInput = {
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1228,6 +1257,7 @@ export type BuyRequestCreateManyBuyerInput = {
   category: $Enums.ListingCategory
   title?: string | null
   description?: string | null
+  buyerGameNickname?: string | null
   accountTransferType?: string | null
   accountRank?: string | null
   tradeMode?: string
@@ -1257,6 +1287,7 @@ export type BuyRequestUpdateWithoutBuyerInput = {
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1287,6 +1318,7 @@ export type BuyRequestUncheckedUpdateWithoutBuyerInput = {
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1317,6 +1349,7 @@ export type BuyRequestUncheckedUpdateManyWithoutBuyerInput = {
   category?: Prisma.EnumListingCategoryFieldUpdateOperationsInput | $Enums.ListingCategory
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerGameNickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountTransferType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountRank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tradeMode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1378,6 +1411,7 @@ export type BuyRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   category?: boolean
   title?: boolean
   description?: boolean
+  buyerGameNickname?: boolean
   accountTransferType?: boolean
   accountRank?: boolean
   tradeMode?: boolean
@@ -1411,6 +1445,7 @@ export type BuyRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   category?: boolean
   title?: boolean
   description?: boolean
+  buyerGameNickname?: boolean
   accountTransferType?: boolean
   accountRank?: boolean
   tradeMode?: boolean
@@ -1442,6 +1477,7 @@ export type BuyRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   category?: boolean
   title?: boolean
   description?: boolean
+  buyerGameNickname?: boolean
   accountTransferType?: boolean
   accountRank?: boolean
   tradeMode?: boolean
@@ -1473,6 +1509,7 @@ export type BuyRequestSelectScalar = {
   category?: boolean
   title?: boolean
   description?: boolean
+  buyerGameNickname?: boolean
   accountTransferType?: boolean
   accountRank?: boolean
   tradeMode?: boolean
@@ -1494,7 +1531,7 @@ export type BuyRequestSelectScalar = {
   updatedAt?: boolean
 }
 
-export type BuyRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "buyerId" | "gameId" | "serverId" | "serverDetail" | "category" | "title" | "description" | "accountTransferType" | "accountRank" | "tradeMode" | "priceUnitQuantity" | "quantity" | "minimumQuantity" | "remainingQuantity" | "unitPrice" | "totalAmount" | "lockAmount" | "currency" | "status" | "expiresAt" | "premiumStartedAt" | "premiumEndsAt" | "premiumDurationHours" | "premiumFeeAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["buyRequest"]>
+export type BuyRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "buyerId" | "gameId" | "serverId" | "serverDetail" | "category" | "title" | "description" | "buyerGameNickname" | "accountTransferType" | "accountRank" | "tradeMode" | "priceUnitQuantity" | "quantity" | "minimumQuantity" | "remainingQuantity" | "unitPrice" | "totalAmount" | "lockAmount" | "currency" | "status" | "expiresAt" | "premiumStartedAt" | "premiumEndsAt" | "premiumDurationHours" | "premiumFeeAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["buyRequest"]>
 export type BuyRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   offers?: boolean | Prisma.BuyRequest$offersArgs<ExtArgs>
@@ -1522,6 +1559,7 @@ export type $BuyRequestPayload<ExtArgs extends runtime.Types.Extensions.Internal
     category: $Enums.ListingCategory
     title: string | null
     description: string | null
+    buyerGameNickname: string | null
     accountTransferType: string | null
     accountRank: string | null
     tradeMode: string
@@ -1974,6 +2012,7 @@ export interface BuyRequestFieldRefs {
   readonly category: Prisma.FieldRef<"BuyRequest", 'ListingCategory'>
   readonly title: Prisma.FieldRef<"BuyRequest", 'String'>
   readonly description: Prisma.FieldRef<"BuyRequest", 'String'>
+  readonly buyerGameNickname: Prisma.FieldRef<"BuyRequest", 'String'>
   readonly accountTransferType: Prisma.FieldRef<"BuyRequest", 'String'>
   readonly accountRank: Prisma.FieldRef<"BuyRequest", 'String'>
   readonly tradeMode: Prisma.FieldRef<"BuyRequest", 'String'>

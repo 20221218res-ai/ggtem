@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Alert, Button, Card, CardHeading } from "@/components/ui";
 import CountryText from "../../country-text";
 import useCountryTranslation from "../../use-country-translation";
+import { getAuthApiMessage } from "../../auth-api-message";
 
 export default function VerifyEmailForm({ token }: { token: string }) {
   const router = useRouter();
@@ -29,15 +30,16 @@ export default function VerifyEmailForm({ token }: { token: string }) {
         body: JSON.stringify({ token }),
       });
       const result = (await response.json()) as {
+        code?: string;
         message?: string;
         redirectPath?: string;
       };
 
       if (!response.ok) {
-        throw new Error(result.message ?? t("auth.verifyEmailFailed"));
+        throw new Error(getAuthApiMessage(result, t, "auth.verifyEmailFailed"));
       }
 
-      setMessage(result.message ?? t("auth.verifyEmailCompleted"));
+      setMessage(getAuthApiMessage(result, t, "auth.verifyEmailCompleted"));
       setTimeout(() => {
         router.replace(result.redirectPath ?? "/my");
         router.refresh();
