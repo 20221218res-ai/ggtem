@@ -82,25 +82,21 @@ export default async function AdminUserDetailPage({
           <SummaryCard
             label="계정 상태"
             value={statusLabel(detail.user.status)}
-            body=""
             tone={detail.user.status === "ACTIVE" ? "emerald" : "amber"}
           />
           <SummaryCard
             label="거래 신호"
             value={`${totalTradeSignals.toLocaleString("ko-KR")}건`}
-            body=""
             tone="cyan"
           />
           <SummaryCard
             label="신고/리뷰 신호"
             value={`${reportSignalCount.toLocaleString("ko-KR")}건`}
-            body=""
             tone={reportSignalCount > 0 ? "amber" : "slate"}
           />
           <SummaryCard
             label="지갑 주의"
             value={walletHasLocks ? "잠금 있음" : "정상"}
-            body=""
             tone={walletHasLocks ? "red" : "blue"}
           />
         </section>
@@ -115,31 +111,18 @@ export default async function AdminUserDetailPage({
                   )}`
                 : "조치 이력 없음"
             }
-            body={
-              latestRestriction
-                ? `${latestRestriction.createdAt} / ${
-                    latestRestriction.adminName ?? "System"
-                  } / ${latestRestriction.reason ?? "사유 없음"}`
-                : "아직 제한 또는 복구 이력이 없습니다."
-            }
             href="#restriction-timeline"
             tone={latestRestriction ? "amber" : "slate"}
           />
           <OperationalSignalCard
             title="최근 운영 메모"
             value={latestAdminNote ? latestAdminNote.adminName : "메모 없음"}
-            body={
-              latestAdminNote
-                ? `${latestAdminNote.createdAt} / ${latestAdminNote.body}`
-                : ""
-            }
             href="#admin-notes"
             tone={latestAdminNote ? "cyan" : "slate"}
           />
           <OperationalSignalCard
             title="다음 확인 항목"
             value={nextAction.title}
-            body={nextAction.body}
             href={nextAction.href}
             tone={nextAction.tone}
           />
@@ -427,9 +410,6 @@ function OffPlatformRiskSection({ detail }: { detail: UserDetail }) {
           <h2 className="mt-1 text-xl font-black text-slate-950">
             {risk.escalationLabel}
           </h2>
-          <p className="mt-3 rounded-lg border border-white/70 bg-white/70 p-3 text-sm font-semibold leading-6 text-slate-700">
-            {risk.recommendedAction}
-          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <LinkButton
@@ -715,19 +695,16 @@ function LinkedAccountSignalsSection({ detail }: { detail: UserDetail }) {
 function SummaryCard({
   label,
   value,
-  body,
   tone = "slate",
 }: {
   label: string;
   value: string;
-  body: string;
   tone?: Tone;
 }) {
   return (
     <div className={`rounded-lg border p-5 shadow-sm ${toneClasses(tone)}`}>
       <p className="text-sm font-bold">{label}</p>
       <p className="mt-2 text-2xl font-black tracking-tight">{value}</p>
-      {body ? <p className="mt-3 text-xs font-semibold leading-5 opacity-80">{body}</p> : null}
     </div>
   );
 }
@@ -735,13 +712,11 @@ function SummaryCard({
 function OperationalSignalCard({
   title,
   value,
-  body,
   href,
   tone,
 }: {
   title: string;
   value: string;
-  body: string;
   href: string;
   tone: Tone;
 }) {
@@ -752,9 +727,6 @@ function OperationalSignalCard({
     >
       <p className="text-sm font-bold">{title}</p>
       <p className="mt-2 line-clamp-2 text-xl font-black tracking-tight">{value}</p>
-      <p className="sr-only">
-        {body}
-      </p>
       <p className="mt-3 text-xs font-black underline underline-offset-4">
         바로 확인
       </p>
@@ -1006,25 +978,6 @@ function linkedRiskLabel(riskLevel: string) {
   return "참고";
 }
 
-function accountStatusHint(status: string) {
-  const hints: Record<string, string> = {
-    ACTIVE: "로그인, 거래, 판매, 출금 흐름을 정상적으로 이용할 수 있습니다.",
-    SELLING_RESTRICTED: "판매 등록과 판매 진행이 제한됩니다.",
-    WITHDRAWAL_HOLD: "위험 신호가 있어 출금 요청 또는 처리가 보류됩니다.",
-    SUSPENDED: "계정 이용이 정지된 상태입니다. 복구 전 근거 확인이 필요합니다.",
-    BANNED: "차단 상태입니다. 계정 접근 해제 전 근거를 함께 확인하세요.",
-  };
-  return hints[status] ?? "계정 상태별 이용 가능 범위를 확인하세요.";
-}
-
-function walletStatusHint(hasLocks: boolean, hasWallet: boolean) {
-  if (!hasWallet) return "아직 지갑이 생성되지 않은 유저입니다.";
-  if (hasLocks) {
-    return "에스크로 또는 출금 처리 잠금이 있어 거래/출금 흐름 확인이 필요합니다.";
-  }
-  return "잠금 금액 없이 일반적인 지갑 상태입니다.";
-}
-
 function getUserDetailNextAction({
   status,
   walletHasLocks,
@@ -1041,7 +994,6 @@ function getUserDetailNextAction({
   if (walletHasLocks) {
     return {
       title: "지갑 원장 확인",
-      body: "잠금 금액이 있으면 출금, 에스크로, 환불 흐름을 먼저 확인하는 것이 안전합니다.",
       href: "#wallet-ledger",
       tone: "red" as const,
     };
@@ -1049,7 +1001,6 @@ function getUserDetailNextAction({
   if (reportSignalCount > 0) {
     return {
       title: "신고 패턴 확인",
-      body: "작성/받은 신고가 있으면 반복 패턴, 주문 번호, 상대 유저를 먼저 비교하세요.",
       href: "#reports",
       tone: "amber" as const,
     };
@@ -1057,7 +1008,6 @@ function getUserDetailNextAction({
   if (status !== "ACTIVE" || restrictionCount > 0) {
     return {
       title: "제한 이력 확인",
-      body: "현재 제한 상태이거나 이전 조치가 있으면 제한/복구 타임라인을 먼저 확인하세요.",
       href: "#restriction-timeline",
       tone: "cyan" as const,
     };
@@ -1065,14 +1015,12 @@ function getUserDetailNextAction({
   if (adminNoteCount === 0) {
     return {
       title: "운영 메모 작성",
-      body: "아직 운영 메모가 없습니다. 상담이나 조치가 있었다면 간단한 근거를 남겨 주세요.",
       href: "#admin-notes",
       tone: "blue" as const,
     };
   }
   return {
     title: "최근 주문 확인",
-    body: "위험 신호가 없으면 최근 구매/판매 주문 흐름부터 확인하세요.",
     href: "#orders",
     tone: "emerald" as const,
   };
