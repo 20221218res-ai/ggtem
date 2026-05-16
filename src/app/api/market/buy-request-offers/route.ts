@@ -27,7 +27,10 @@ export async function POST(request: NextRequest) {
 
     if (!body.buyRequestId || !body.quantity || !body.unitPrice) {
       return NextResponse.json(
-        { message: "구매요청, 수량, 단가 정보가 필요합니다." },
+        {
+          message: "구매요청, 수량, 단가 정보가 필요합니다.",
+          messageKey: "offerAction.createRequired",
+        },
         { status: 400 },
       );
     }
@@ -40,12 +43,16 @@ export async function POST(request: NextRequest) {
       message: body.message,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey: "offerAction.createSuccess",
+    });
   } catch (error) {
     return NextResponse.json(
       {
         message:
           error instanceof Error ? error.message : "판매 제안을 등록하지 못했습니다.",
+        messageKey: "offerAction.createFailed",
       },
       { status: 400 },
     );

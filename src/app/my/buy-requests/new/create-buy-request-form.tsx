@@ -288,13 +288,16 @@ export default function CreateBuyRequestForm({
       });
       const result = (await response.json()) as {
         message?: string;
+        messageKey?: TranslationKey;
         buyRequestId?: string;
       };
 
-      if (!response.ok) throw new Error(result.message ?? t("listingForm.buyFailed"));
+      if (!response.ok) {
+        throw new Error(getApiMessage(result, t, "listingForm.buyFailed"));
+      }
 
       setCreatedBuyRequestId(result.buyRequestId ?? null);
-      setSuccess(result.message ?? t("listingForm.buySuccess"));
+      setSuccess(getApiMessage(result, t, "listingForm.buySuccess"));
       router.push("/my/buy-requests");
       router.refresh();
     } catch (submitError) {
@@ -749,6 +752,14 @@ function FormBlock({ title, children }: { title: string; children: ReactNode }) 
       {children}
     </div>
   );
+}
+
+function getApiMessage(
+  result: { message?: string; messageKey?: TranslationKey },
+  t: TFunction,
+  fallbackKey: TranslationKey,
+) {
+  return result.messageKey ? t(result.messageKey) : result.message ?? t(fallbackKey);
 }
 
 function StepFlowGuide({ currentStep }: { currentStep: number }) {

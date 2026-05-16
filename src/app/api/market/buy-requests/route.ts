@@ -49,7 +49,10 @@ export async function POST(request: NextRequest) {
         buyRequestId: body.buyRequestId,
       });
 
-      return NextResponse.json(result);
+      return NextResponse.json({
+        ...result,
+        messageKey: "buyRequestAction.cancelSuccess",
+      });
     }
 
     if (
@@ -60,7 +63,10 @@ export async function POST(request: NextRequest) {
       !body.unitPrice
     ) {
       return NextResponse.json(
-        { message: "게임, 서버, 품목 유형, 수량, 단가를 모두 입력해 주세요." },
+        {
+          message: "게임, 서버, 품목 유형, 수량, 단가를 모두 입력해 주세요.",
+          messageKey: "buyRequestAction.createRequired",
+        },
         { status: 400 },
       );
     }
@@ -85,7 +91,10 @@ export async function POST(request: NextRequest) {
       premiumDurationHours: body.premiumDurationHours,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      messageKey: "listingForm.buySuccess",
+    });
   } catch (error) {
     return NextResponse.json(
       {
