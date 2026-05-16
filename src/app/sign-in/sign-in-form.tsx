@@ -285,7 +285,7 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
           src="/brand/minor-19.png"
           alt=""
           aria-hidden="true"
-          className="mx-auto h-28 w-28 rounded-full object-cover"
+          className="mx-auto h-48 w-48 rounded-full object-cover"
         />
         <p className="mx-auto mt-6 max-w-[520px] text-left text-base font-black leading-7 text-slate-950 sm:text-center">
           <CountryText id="auth.minorRestrictionNotice" />
