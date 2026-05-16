@@ -100,7 +100,6 @@ export default function AdminDisputesPage() {
   const summary = useMemo(() => getDisputeListSummary(state.disputes), [state.disputes]);
   const selectedAction = state.detail ? getDisputeNextAction(state.detail.status) : null;
   const noteLength = resolutionNote.trim().length;
-  const noteIsShort = noteLength > 0 && noteLength < 20;
   const canResolveDispute = noteLength >= 20;
 
   async function loadDisputes(orderId?: string, nextView?: string, nextQuery?: string) {
@@ -123,11 +122,7 @@ export default function AdminDisputesPage() {
       const nextState = (await response.json()) as AdminDisputesState | { message?: string };
 
       if (!response.ok) {
-        throw new Error(
-          "message" in nextState && nextState.message
-            ? cleanEventMessage(nextState.message)
-            : "분쟁 목록을 불러오지 못했습니다.",
-        );
+        throw new Error("message" in nextState && nextState.message ? cleanEventMessage(nextState.message) : "분쟁 목록을 불러오지 못했습니다.");
       }
 
       const typedState = nextState as AdminDisputesState;
@@ -146,7 +141,7 @@ export default function AdminDisputesPage() {
     if (!state.detail) return;
 
     if (resolutionNote.trim().length < 20) {
-      setError("분쟁 종료 전 처리 메모를 20자 이상 입력해 주세요. 나중에 감사 로그와 분쟁 근거로 남습니다.");
+      setError("처리 메모를 20자 이상 입력해 주세요. 감사 로그와 분쟁 처리 근거로 남습니다.");
       return;
     }
 
@@ -155,13 +150,13 @@ export default function AdminDisputesPage() {
         ? [
             `주문 ${state.detail.orderNumber}을 구매자 환불로 종료할까요?`,
             `환불 금액: ${state.detail.grossAmount} ${state.detail.currency}`,
-            `플랫폼 수수료 ${state.detail.platformFeeAmount} ${state.detail.currency}도 취소합니다.`,
+            `플랫폼 수수료: ${state.detail.platformFeeAmount} ${state.detail.currency}`,
             `처리 메모: ${resolutionNote.trim() || "없음"}`,
           ].join("\n")
         : [
             `주문 ${state.detail.orderNumber}을 판매자 정산으로 종료할까요?`,
             `판매자 정산액: ${state.detail.sellerReceivableAmount} ${state.detail.currency}`,
-            `플랫폼 수수료 ${state.detail.platformFeeAmount} ${state.detail.currency}는 수익으로 기록합니다.`,
+            `플랫폼 수수료: ${state.detail.platformFeeAmount} ${state.detail.currency}`,
             `처리 메모: ${resolutionNote.trim() || "없음"}`,
           ].join("\n"),
     );
@@ -274,16 +269,8 @@ export default function AdminDisputesPage() {
           </div>
         </section>
 
-        {error ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
-            {error}
-          </div>
-        ) : null}
-        {success ? (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
-            {success}
-          </div>
-        ) : null}
+        {error ? <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</div> : null}
+        {success ? <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">{success}</div> : null}
 
         <section className="grid gap-5 lg:grid-cols-[420px_1fr]">
           <aside className="rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -325,9 +312,7 @@ export default function AdminDisputesPage() {
                         </span>
                       </div>
                       {dispute.disputeNote ? (
-                        <p className="mt-3 rounded bg-red-50 px-2 py-1 text-xs font-semibold text-red-700">
-                          {cleanEventMessage(dispute.disputeNote)}
-                        </p>
+                        <p className="mt-3 rounded bg-red-50 px-2 py-1 text-xs font-semibold text-red-700">{cleanEventMessage(dispute.disputeNote)}</p>
                       ) : null}
                       <p className="mt-3 text-xs text-slate-500">{dispute.createdAt}</p>
                     </button>
@@ -344,11 +329,7 @@ export default function AdminDisputesPage() {
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusBadge status={state.detail.status} />
-                      {selectedAction ? (
-                        <span className="rounded-md bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">
-                          {selectedAction}
-                        </span>
-                      ) : null}
+                      {selectedAction ? <span className="rounded-md bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">{selectedAction}</span> : null}
                     </div>
                     <h2 className="mt-3 text-xl font-bold">{state.detail.listingTitle}</h2>
                     <p className="mt-1 text-sm text-slate-500">
@@ -367,33 +348,46 @@ export default function AdminDisputesPage() {
                 </div>
               </div>
 
-              <SettlementDecisionGuide detail={state.detail} />
-
-              <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                  <div>
-                    <h3 className="font-black">종료 처리</h3>
+              <section className="grid gap-3 xl:grid-cols-[1fr_360px]">
+                <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <h3 className="font-black">증거 링크</h3>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <TraceLink href={state.detail.links.buyerChat} label="구매자 채팅" />
+                      <TraceLink href={state.detail.links.sellerChat} label="판매자 채팅" />
+                      <TraceLink href={state.detail.links.ledger} label="지갑 원장" />
+                      <TraceLink href={state.detail.links.audit} label="감사 로그" />
+                    </div>
                   </div>
-                  <div className="text-sm text-slate-500">
-                    메모 {noteLength}자{" "}
-                    {noteIsShort || noteLength === 0 ? (
-                      <span className="font-semibold text-amber-600">
-                        / 판단 근거 20자 이상
-                      </span>
-                    ) : null}
-                  </div>
+                  {state.detail.disputeReason ? (
+                    <p className="mt-4 rounded-lg border border-red-100 bg-red-50 p-3 text-sm font-semibold text-red-700">
+                      {cleanEventMessage(state.detail.disputeReason)}
+                    </p>
+                  ) : null}
                 </div>
 
-                <div className="mt-4 grid gap-3 lg:grid-cols-2">
-                  <DecisionPreview label="구매자 환불" body={state.detail.decisionPreview.refundBuyer} />
-                  <DecisionPreview label="판매자 정산" body={state.detail.decisionPreview.releaseToSeller} />
+                <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <h3 className="font-black">처리 미리보기</h3>
+                  <div className="mt-4 flex flex-col gap-3">
+                    <DecisionPreview label="구매자 환불" body={state.detail.decisionPreview.refundBuyer} />
+                    <DecisionPreview label="판매자 정산" body={state.detail.decisionPreview.releaseToSeller} />
+                  </div>
+                </div>
+              </section>
+
+              <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+                  <h3 className="font-black">종료 처리</h3>
+                  <span className={`text-sm font-semibold ${canResolveDispute ? "text-emerald-700" : "text-amber-700"}`}>메모 {noteLength}자 / 20자 이상</span>
                 </div>
 
                 <textarea
                   value={resolutionNote}
                   onChange={(event) => setResolutionNote(event.target.value)}
                   rows={4}
-                  placeholder="예: 채팅에서 판매자 전달 증빙이 부족하고 구매자 미수령 캡처가 확인되어 구매자 환불 처리"
+                  placeholder="분쟁 판단 근거를 입력하세요."
                   className="mt-4 w-full rounded-lg border border-slate-200 p-3 text-sm outline-none focus:border-[var(--gg-accent)]"
                 />
 
@@ -417,38 +411,12 @@ export default function AdminDisputesPage() {
                     </button>
                   </div>
                 ) : (
-                  <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-                    이미 종료됨
-                  </div>
+                  <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">이미 종료된 분쟁입니다.</div>
                 )}
               </section>
 
               <details className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <summary className="cursor-pointer font-black">증빙 / 기록</summary>
-                <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_360px]">
-                  <section className="rounded-lg border border-slate-200 bg-white p-5">
-                    <h3 className="font-black">증빙</h3>
-                    <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                      <TraceLink href={state.detail.links.buyerChat} label="구매자 채팅" />
-                      <TraceLink href={state.detail.links.sellerChat} label="판매자 채팅" />
-                      <TraceLink href={state.detail.links.buyerOrder} label="구매자 주문" />
-                      <TraceLink href={state.detail.links.sellerOrder} label="판매자 주문" />
-                      <TraceLink href={state.detail.links.ledger} label="지갑 원장" />
-                      <TraceLink href={state.detail.links.audit} label="감사 로그" />
-                    </div>
-                  </section>
-
-                  <aside className="rounded-lg border border-slate-200 bg-white p-5">
-                    <h3 className="font-black">체크</h3>
-                    <div className="mt-4 flex flex-col gap-3">
-                      <ReviewCheckItem label="채팅 증빙" />
-                      <ReviewCheckItem label="상품/수량 일치" />
-                      <ReviewCheckItem label="원장 금액" />
-                      <ReviewCheckItem label="처리 메모" />
-                    </div>
-                  </aside>
-                </div>
-
+                <summary className="cursor-pointer font-black">기록 보기</summary>
                 <div className="mt-5 grid gap-5 xl:grid-cols-2">
                   <section className="rounded-lg border border-slate-200 bg-white p-5">
                     <h3 className="font-bold">주문 이벤트</h3>
@@ -459,9 +427,7 @@ export default function AdminDisputesPage() {
                             <StatusBadge status={event.status} />
                             <span className="text-xs text-slate-500">{event.createdAt}</span>
                           </div>
-                          <p className="mt-2 text-sm text-slate-700">
-                            {cleanEventMessage(event.message)}
-                          </p>
+                          <p className="mt-2 text-sm text-slate-700">{cleanEventMessage(event.message)}</p>
                         </div>
                       ))}
                     </div>
@@ -479,34 +445,6 @@ export default function AdminDisputesPage() {
         </section>
       </section>
     </main>
-  );
-}
-
-function SettlementDecisionGuide({ detail }: { detail: AdminOrderDetail }) {
-  return (
-    <section className="grid gap-3 lg:grid-cols-3">
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="text-xs font-black uppercase text-slate-500">구매자 결제 / 에스크로</p>
-        <p className="mt-2 text-2xl font-black text-slate-950">
-          {detail.grossAmount} {detail.currency}
-        </p>
-        <p className="mt-1 text-xs font-bold text-slate-500">환불 결정 시 구매자에게 전액 반환</p>
-      </div>
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
-        <p className="text-xs font-black uppercase text-emerald-700">판매자 실제 정산</p>
-        <p className="mt-2 text-2xl font-black text-emerald-700">
-          {detail.sellerReceivableAmount} {detail.currency}
-        </p>
-        <p className="mt-1 text-xs font-bold text-emerald-700">판매자 승소 시 지급되는 금액</p>
-      </div>
-      <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 shadow-sm">
-        <p className="text-xs font-black uppercase text-sky-700">플랫폼 수수료</p>
-        <p className="mt-2 text-2xl font-black text-sky-700">
-          {detail.platformFeeAmount} {detail.currency}
-        </p>
-        <p className="mt-1 text-xs font-bold text-sky-700">판매자 정산 시 수익 원장에 기록</p>
-      </div>
-    </section>
   );
 }
 
@@ -535,18 +473,10 @@ function LedgerSection({ entries }: { entries: AdminOrderDetail["ledgerEntries"]
                     <p className="font-semibold">
                       {ledgerTypeLabel(entry.type)} / {bucketLabel(entry.bucket)}
                     </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {cleanEventMessage(entry.memo || "메모 없음")}
-                    </p>
+                    <p className="mt-1 text-xs text-slate-500">{cleanEventMessage(entry.memo || "메모 없음")}</p>
                   </div>
                   <div className="text-right">
-                    <p
-                      className={
-                        entry.direction === "CREDIT"
-                          ? "font-bold text-emerald-700"
-                          : "font-bold text-red-600"
-                      }
-                    >
+                    <p className={entry.direction === "CREDIT" ? "font-bold text-emerald-700" : "font-bold text-red-600"}>
                       {directionLabel(entry.direction)} {entry.amount}
                     </p>
                     <p className="mt-1 text-xs text-slate-500">{entry.createdAt}</p>
@@ -700,16 +630,7 @@ function TraceLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-function ReviewCheckItem({ label }: { label: string }) {
-  return (
-    <label className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-      <input type="checkbox" className="h-4 w-4 accent-sky-500" />
-      <span>{label}</span>
-    </label>
-  );
-}
-
-function EmptyState({ title }: { title: string; description?: string }) {
+function EmptyState({ title }: { title: string }) {
   return (
     <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
       <p className="font-bold text-slate-700">{title}</p>
