@@ -206,14 +206,17 @@ export function BuyerOrderActions({ orderId, status }: BuyerOrderActionsProps) {
         <TradeSafetyConfirmDialog
           isOpen
           eyebrow={dialog.eyebrow}
-          title="결제 PIN 확인"
-          body="인수확정을 누르면 거래가 완료되고 에스크로 금액이 판매자에게 정산됩니다. 물품을 받은 뒤에만 진행해 주세요."
+          title={t("tradeSafety.paymentPinLabel")}
+          body={dialog.body}
           confirmLabel={dialog.confirmLabel}
           tone={dialog.tone}
           isSubmitting={isSubmitting}
-          warningLabel="인수확정 후에는 정산이 진행됩니다. 서버/캐릭터명 또는 물품 수령 여부를 다시 확인해 주세요."
+          warningLabel={t("tradeSafety.warningLabel")}
           summaryRows={dialog.lines.map((line, index) => ({
-            label: index === 0 ? "확인 사항" : "주의 사항",
+            label:
+              index === 0
+                ? t("orderManage.confirmCheckLabel")
+                : t("orderManage.confirmWarningLabel"),
             value: line,
           }))}
           onCancel={() => setPendingAction(null)}
