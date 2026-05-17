@@ -61,7 +61,7 @@ export default function UserMarketHeaderClient({
 
   return (
     <header className="sticky top-0 z-30 overflow-x-clip border-b border-[var(--gg-border-soft)] bg-white/95 shadow-sm shadow-[var(--gg-shadow)] backdrop-blur">
-      <div className="mx-auto flex max-w-[1360px] flex-wrap items-center gap-4 px-4 py-2 lg:px-8">
+      <div className="mx-auto flex max-w-[1360px] flex-wrap items-center gap-2 px-4 py-2 sm:gap-3 lg:gap-4 lg:px-8">
         <Link href="/" prefetch={false} className="flex shrink-0 items-center" aria-label="GGtem home">
           <BrandLogo />
         </Link>
@@ -147,7 +147,7 @@ export default function UserMarketHeaderClient({
         </button>
       </form>
 
-      <div className="mx-auto flex max-w-[1360px] flex-wrap items-center gap-2 px-4 pb-3 lg:px-8">
+      <div className="mx-auto flex max-w-[1360px] items-center gap-2 overflow-x-auto whitespace-nowrap px-4 pb-3 lg:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <HeaderAction href="/my/listings/new" tone="sell">
           {t("home.createListing")}
         </HeaderAction>
@@ -216,7 +216,7 @@ function QuickTextLink({
     <Link
       href={href}
       prefetch={false}
-      className={`inline-flex h-10 items-center justify-center rounded-xl border px-4 text-xs font-black transition ${className}`}
+      className={`inline-flex h-9 items-center justify-center rounded-xl border px-3 text-xs font-black transition sm:h-10 sm:px-4 ${className}`}
     >
       {children}
     </Link>

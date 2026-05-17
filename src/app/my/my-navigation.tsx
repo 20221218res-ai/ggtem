@@ -59,7 +59,7 @@ export default function MyNavigation({
 
   return (
     <header className="sticky top-0 z-40 overflow-x-clip border-b border-[var(--gg-border-soft)] bg-white/95 shadow-sm shadow-[var(--gg-shadow)] backdrop-blur">
-      <div className="mx-auto flex max-w-[1360px] flex-wrap items-center gap-4 px-4 py-3 lg:px-8">
+      <div className="mx-auto flex max-w-[1360px] flex-wrap items-center gap-2 px-4 py-3 sm:gap-3 lg:gap-4 lg:px-8">
         <Link href="/" aria-label="GGtem home" className="flex shrink-0 items-center">
           <BrandLogo />
         </Link>
@@ -137,7 +137,7 @@ export default function MyNavigation({
         </button>
       </form>
 
-      <div className="mx-auto flex max-w-[1360px] flex-wrap items-center gap-2 px-4 pb-3 lg:px-8">
+      <div className="mx-auto flex max-w-[1360px] items-center gap-2 overflow-x-auto whitespace-nowrap px-4 pb-3 lg:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <TopAction href="/my/listings/new" tone="sell">
           <CountryText id="home.createListing" />
         </TopAction>
