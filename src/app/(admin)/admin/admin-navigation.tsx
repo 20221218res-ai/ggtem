@@ -14,6 +14,7 @@ export type AdminNavigationLink = {
 
 const groupOrder = [
   "오늘 업무",
+  "거래 운영",
   "지갑/재무",
   "유저/리스크",
   "콘텐츠/설정",
@@ -25,6 +26,7 @@ const groupOrder = [
 const primaryHrefs = new Set([
   "/admin",
   "/admin/orders",
+  "/admin/market-listings",
   "/admin/order-chats",
   "/admin/disputes",
   "/admin/deposits",

@@ -36,22 +36,35 @@ export default async function AdminMarketListingsPage({
   return (
     <main className="min-h-screen bg-[#f3f6fa] px-5 py-6 text-slate-950">
       <section className="mx-auto max-w-[1720px] space-y-4">
-        <header className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black uppercase tracking-wide text-[var(--color-primary)]">
-              MARKET CONTROL
-            </p>
-            <h1 className="mt-1 text-3xl font-black tracking-tight">거래글 관리</h1>
+        <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-wide text-[var(--color-primary)]">
+                MARKET CONTROL
+              </p>
+              <h1 className="mt-1 text-3xl font-black tracking-tight">등록물품 확인</h1>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <QuickLink href="/admin/market-listings">전체</QuickLink>
+              <QuickLink href="/admin/market-listings?mode=SELL">판매글</QuickLink>
+              <QuickLink href="/admin/market-listings?mode=BUY">구매글</QuickLink>
+              <QuickLink href="/admin/audit?targetType=LISTING">감사 로그</QuickLink>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <QuickLink href="/admin/market-listings?mode=SELL&status=ACTIVE">판매중</QuickLink>
-            <QuickLink href="/admin/market-listings?mode=BUY&status=ACTIVE">구매중</QuickLink>
-            <QuickLink href="/admin/audit?targetType=LISTING">감사</QuickLink>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-4 xl:grid-cols-7">
+            <Metric label="판매 전체" value={state.summary.sellTotal} />
+            <Metric label="판매중" value={state.summary.sellActive} tone="green" />
+            <Metric label="숨김" value={state.summary.sellHidden} tone="amber" />
+            <Metric label="삭제 처리" value={state.summary.sellRemoved} tone="red" />
+            <Metric label="구매 전체" value={state.summary.buyTotal} />
+            <Metric label="구매중" value={state.summary.buyActive} tone="green" />
+            <Metric label="수락됨" value={state.summary.buyAccepted} tone="cyan" />
           </div>
         </header>
 
         {params.notice === "moderated" ? (
-          <Banner tone="success">거래글 조치 완료</Banner>
+          <Banner tone="success">판매글 조치 완료</Banner>
         ) : null}
         {params.notice === "buy-request-canceled" ? (
           <Banner tone="success">구매글 취소와 예약금 환불 완료</Banner>
@@ -77,16 +90,6 @@ export default async function AdminMarketListingsPage({
           </div>
         </section>
 
-        <section className="grid gap-3 md:grid-cols-4 xl:grid-cols-7">
-          <Metric label="판매 전체" value={state.summary.sellTotal} />
-          <Metric label="판매중" value={state.summary.sellActive} tone="green" />
-          <Metric label="숨김" value={state.summary.sellHidden} tone="amber" />
-          <Metric label="삭제 처리" value={state.summary.sellRemoved} tone="red" />
-          <Metric label="구매 전체" value={state.summary.buyTotal} />
-          <Metric label="구매중" value={state.summary.buyActive} tone="green" />
-          <Metric label="수락됨" value={state.summary.buyAccepted} tone="cyan" />
-        </section>
-
         <section className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
           <form className="grid gap-2 lg:grid-cols-[130px_150px_150px_1fr_96px]">
             <select name="mode" defaultValue={state.filters.mode} className={inputClass}>
@@ -102,6 +105,7 @@ export default async function AdminMarketListingsPage({
               <option value="HIDDEN">HIDDEN</option>
               <option value="REMOVED">REMOVED</option>
               <option value="ACCEPTED">ACCEPTED</option>
+              <option value="EXPIRED">EXPIRED</option>
               <option value="CANCELED">CANCELED</option>
               <option value="COMPLETED">COMPLETED</option>
             </select>
@@ -153,7 +157,7 @@ function SellerListingRow({ listing }: { listing: SellerListingRow }) {
   return (
     <article className="grid gap-3 py-4 xl:grid-cols-[1fr_560px]">
       <ListingMain
-        kind="판매"
+        kind="판매글"
         title={listing.title}
         status={listing.status}
         category={listing.category}
@@ -166,7 +170,7 @@ function SellerListingRow({ listing }: { listing: SellerListingRow }) {
           listing.gameName,
           listing.serverName,
           `주문 ${listing.orderCount}`,
-          `이미지 ${listing.imageCount}`,
+          `본문 이미지 ${listing.imageCount}`,
           listing.isPremium ? "프리미엄" : "",
         ]}
       />
@@ -194,7 +198,7 @@ function BuyRequestRow({ request }: { request: BuyRequestRow }) {
   return (
     <article className="grid gap-3 py-4 xl:grid-cols-[1fr_360px]">
       <ListingMain
-        kind="구매"
+        kind="구매글"
         title={request.title}
         status={request.status}
         category={request.category}
@@ -207,7 +211,7 @@ function BuyRequestRow({ request }: { request: BuyRequestRow }) {
           `총액 ${request.totalAmount} ${request.currency}`,
           `잠금 ${request.lockAmount} ${request.currency}`,
           `제안 ${request.offerCount}`,
-          `이미지 ${request.imageCount}`,
+          `본문 이미지 ${request.imageCount}`,
           request.isPremium ? "프리미엄" : "",
         ]}
       />
@@ -240,7 +244,7 @@ function ListingMain({
   auditHref,
   badges,
 }: {
-  kind: string;
+  kind: "판매글" | "구매글";
   title: string;
   status: string;
   category: string;
@@ -254,11 +258,11 @@ function ListingMain({
   return (
     <div className="min-w-0">
       <div className="flex flex-wrap items-center gap-2">
-        <Pill tone={kind === "판매" ? "cyan" : "amber"}>{kind}</Pill>
+        <Pill tone={kind === "판매글" ? "cyan" : "amber"}>{kind}</Pill>
         <Pill tone={status === "ACTIVE" ? "green" : status === "REMOVED" ? "red" : "slate"}>
           {status}
         </Pill>
-        <Pill tone="slate">{category}</Pill>
+        <Pill tone="slate">{formatCategoryLabel(category)}</Pill>
       </div>
       <h2 className="mt-2 truncate text-lg font-black">{title}</h2>
       <p className="mt-1 text-sm font-bold text-slate-500">
@@ -363,6 +367,16 @@ function EmptyState({ label }: { label: string }) {
       {label}
     </div>
   );
+}
+
+function formatCategoryLabel(category: string) {
+  const labels: Record<string, string> = {
+    GAME_MONEY: "게임머니",
+    GAME_ITEM: "아이템",
+    GAME_ACCOUNT: "계정",
+  };
+
+  return labels[category] ?? category;
 }
 
 const inputClass =
