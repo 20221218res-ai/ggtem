@@ -24,7 +24,11 @@ import {
   safeNormalizeGameMoneyPriceUnit,
   type MoneyUnitNameSource,
 } from "@/lib/market/trade-unit";
-import { copyFile, mkdir, unlink, writeFile } from "node:fs/promises";
+import {
+  copyUploadObject,
+  deleteUploadObject,
+  saveUploadObject,
+} from "@/lib/upload-storage";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 
@@ -1124,27 +1128,21 @@ export async function duplicateMarketplaceSellerListing(input: {
   const sourceImage = sourceListing.images[0];
 
   if (sourceImage) {
-    const uploadsDirectory = path.join(
-      process.cwd(),
-      "public",
-      "uploads",
-      "listings",
-    );
-    await mkdir(uploadsDirectory, { recursive: true });
-
     const sourceExtension =
       path.extname(sourceImage.storagePath || sourceImage.imageUrl) || ".png";
     const copiedFileName = `${duplicated.id}-${Date.now()}${sourceExtension}`;
-    const copiedStoragePath = path.join(uploadsDirectory, copiedFileName);
-    const copiedImageUrl = `/uploads/listings/${copiedFileName}`;
-
-    await copyFile(sourceImage.storagePath, copiedStoragePath);
+    const copied = await copyUploadObject({
+      sourceStoragePath: sourceImage.storagePath,
+      scope: "listings",
+      fileName: copiedFileName,
+      contentType: getListingContentTypeFromExtension(sourceExtension),
+    });
 
     await prisma.listingImage.create({
       data: {
         listingId: duplicated.id,
-        imageUrl: copiedImageUrl,
-        storagePath: copiedStoragePath,
+        imageUrl: copied.publicUrl,
+        storagePath: copied.storagePath,
         altText: sourceImage.altText,
         sortOrder: 0,
       },
@@ -1224,18 +1222,13 @@ export async function uploadMarketplaceSellerListingImage(input: {
       throw new Error(`본문 이미지는 최대 ${LISTING_IMAGE_MAX_COUNT}장까지 업로드할 수 있습니다.`);
     }
 
-    const uploadsDirectory = path.join(
-      process.cwd(),
-      "public",
-      "uploads",
-      "listings",
-    );
-    await mkdir(uploadsDirectory, { recursive: true });
-
     const nextFileName = `${listing.id}-${randomUUID()}.${extension}`;
-    const absoluteStoragePath = path.join(uploadsDirectory, nextFileName);
-    const publicImageUrl = `/uploads/listings/${nextFileName}`;
-    await writeFile(absoluteStoragePath, input.bytes);
+    const savedImage = await saveUploadObject({
+      scope: "listings",
+      fileName: nextFileName,
+      contentType: input.contentType,
+      bytes: input.bytes,
+    });
 
     const nextSortOrder =
       listing.images.reduce((max, image) => Math.max(max, image.sortOrder), -1) + 1;
@@ -1243,8 +1236,8 @@ export async function uploadMarketplaceSellerListingImage(input: {
     const createdImage = await tx.listingImage.create({
       data: {
         listingId: listing.id,
-        imageUrl: publicImageUrl,
-        storagePath: absoluteStoragePath,
+        imageUrl: savedImage.publicUrl,
+        storagePath: savedImage.storagePath,
         altText: trimmedAltText,
         sortOrder: nextSortOrder,
       },
@@ -1253,7 +1246,7 @@ export async function uploadMarketplaceSellerListingImage(input: {
     return {
       listingId: listing.id,
       imageId: createdImage.id,
-      imageUrl: publicImageUrl,
+      imageUrl: savedImage.publicUrl,
       altText: trimmedAltText,
       message: "본문 이미지가 추가되었습니다.",
     };
@@ -1319,10 +1312,7 @@ export async function removeMarketplaceSellerListingImage(input: {
     await Promise.all(
       imagesToDelete.map(async (image) => {
         try {
-          if (!isSafeListingUploadPath(image.storagePath)) {
-            return;
-          }
-          await unlink(image.storagePath);
+          await deleteUploadObject(image.storagePath);
         } catch {
           return;
         }
@@ -1566,6 +1556,10 @@ export async function updateMarketplaceSellerOrderStatus(input: {
       },
       data: {
         status: transition.nextStatus,
+        autoConfirmAt:
+          transition.nextStatus === "BUYER_CONFIRM_PENDING"
+            ? new Date(Date.now() + 72 * 60 * 60 * 1000)
+            : null,
       },
     });
 
@@ -1738,16 +1732,9 @@ function isListingImageSignatureValid(
   );
 }
 
-function isSafeListingUploadPath(storagePath: string) {
-  const uploadsDirectory = path.resolve(
-    process.cwd(),
-    "public",
-    "uploads",
-    "listings",
-  );
-  const resolvedStoragePath = path.resolve(storagePath);
-  return (
-    resolvedStoragePath.startsWith(`${uploadsDirectory}${path.sep}`) ||
-    resolvedStoragePath === uploadsDirectory
-  );
+function getListingContentTypeFromExtension(extension: string) {
+  const normalized = extension.toLowerCase().replace(/^\./, "");
+  if (normalized === "png") return "image/png";
+  if (normalized === "webp") return "image/webp";
+  return "image/jpeg";
 }

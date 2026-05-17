@@ -1,8 +1,7 @@
-import { mkdir, unlink, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { getCurrentSessionUser } from "@/lib/auth/session";
 import { getPrismaClient } from "@/lib/prisma";
+import { deleteUploadObject, saveUploadObject } from "@/lib/upload-storage";
 
 const BUY_REQUEST_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const BUY_REQUEST_IMAGE_MAX_COUNT = 8;
@@ -70,18 +69,13 @@ export async function uploadMarketplaceBuyRequestImage(input: {
       throw new Error(`본문 이미지는 최대 ${BUY_REQUEST_IMAGE_MAX_COUNT}장까지 업로드할 수 있습니다.`);
     }
 
-    const uploadsDirectory = path.join(
-      process.cwd(),
-      "public",
-      "uploads",
-      "buy-requests",
-    );
-    await mkdir(uploadsDirectory, { recursive: true });
-
     const nextFileName = `${buyRequest.id}-${randomUUID()}.${extension}`;
-    const absoluteStoragePath = path.join(uploadsDirectory, nextFileName);
-    const publicImageUrl = `/uploads/buy-requests/${nextFileName}`;
-    await writeFile(absoluteStoragePath, input.bytes);
+    const savedImage = await saveUploadObject({
+      scope: "buy-requests",
+      fileName: nextFileName,
+      contentType: input.contentType,
+      bytes: input.bytes,
+    });
 
     const nextSortOrder =
       buyRequest.images.reduce((max, image) => Math.max(max, image.sortOrder), -1) + 1;
@@ -89,8 +83,8 @@ export async function uploadMarketplaceBuyRequestImage(input: {
     const createdImage = await tx.buyRequestImage.create({
       data: {
         buyRequestId: buyRequest.id,
-        imageUrl: publicImageUrl,
-        storagePath: absoluteStoragePath,
+        imageUrl: savedImage.publicUrl,
+        storagePath: savedImage.storagePath,
         altText: trimmedAltText,
         sortOrder: nextSortOrder,
       },
@@ -99,7 +93,7 @@ export async function uploadMarketplaceBuyRequestImage(input: {
     return {
       buyRequestId: buyRequest.id,
       imageId: createdImage.id,
-      imageUrl: publicImageUrl,
+      imageUrl: savedImage.publicUrl,
       altText: trimmedAltText,
       message: "본문 이미지가 추가되었습니다.",
     };
@@ -146,11 +140,9 @@ export async function removeMarketplaceBuyRequestImage(input: {
     });
 
     try {
-      if (isSafeBuyRequestUploadPath(imageToDelete.storagePath)) {
-        await unlink(imageToDelete.storagePath);
-      }
+      await deleteUploadObject(imageToDelete.storagePath);
     } catch {
-      // The database row is the source of truth; missing local files should not block cleanup.
+      // The database row is the source of truth; missing remote/local files should not block cleanup.
     }
 
     return {
@@ -232,19 +224,5 @@ function isImageSignatureValid(
     bytes[9] === 0x45 &&
     bytes[10] === 0x42 &&
     bytes[11] === 0x50
-  );
-}
-
-function isSafeBuyRequestUploadPath(storagePath: string) {
-  const uploadsDirectory = path.resolve(
-    process.cwd(),
-    "public",
-    "uploads",
-    "buy-requests",
-  );
-  const resolvedStoragePath = path.resolve(storagePath);
-  return (
-    resolvedStoragePath.startsWith(`${uploadsDirectory}${path.sep}`) ||
-    resolvedStoragePath === uploadsDirectory
   );
 }

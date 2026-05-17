@@ -15,7 +15,7 @@ export default async function AdminTradeDemoPage() {
   return (
     <AdminMockPage
       icon="TRADE"
-      title="거래 점검"
+      title="거래 데모"
       subtitle=""
       actions={
         <>
@@ -27,14 +27,14 @@ export default async function AdminTradeDemoPage() {
     >
       <MetricGrid
         items={[
-          { label: "주문", value: "실데이터", hint: "", tone: "blue" },
+          { label: "주문", value: "데모 데이터", hint: "", tone: "blue" },
           { label: "에스크로", value: "원장 확인", hint: "", tone: "cyan" },
           { label: "분쟁", value: "분쟁 화면", hint: "", tone: "amber" },
           { label: "감사", value: "로그 확인", hint: "", tone: "slate" },
         ]}
       />
 
-      <Panel title="점검 이동">
+      <Panel title="데모 이동">
         <div className="grid gap-3 md:grid-cols-4">
           <LinkLike href="/admin/orders" tone="primary">주문</LinkLike>
           <LinkLike href="/admin/disputes">분쟁</LinkLike>

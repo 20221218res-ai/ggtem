@@ -52,10 +52,7 @@ export async function requireApiRole(allowedRoles: readonly AllowedRole[]) {
   if (!sessionUser) {
     return {
       ok: false as const,
-      response: NextResponse.json(
-        { message: "로그인이 필요합니다." },
-        { status: 401 },
-      ),
+      response: NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 }),
     };
   }
 

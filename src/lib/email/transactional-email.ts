@@ -27,7 +27,7 @@ export async function sendEmailVerificationEmail(input: {
     ].join("\n"),
     html: renderEmail({
       title: "이메일 인증",
-      greeting: `${input.displayName}님`,
+      greeting: `${input.displayName}님,`,
       body: "GGtem 계정을 사용하려면 이메일 인증이 필요합니다.",
       ctaLabel: "이메일 인증하기",
       ctaUrl: input.verificationUrl,
@@ -52,7 +52,7 @@ export async function sendPasswordResetEmail(input: {
     ].join("\n"),
     html: renderEmail({
       title: "비밀번호 재설정",
-      greeting: `${input.displayName}님`,
+      greeting: `${input.displayName}님,`,
       body: "아래 버튼으로 새 비밀번호를 설정할 수 있습니다. 링크는 제한된 시간 동안만 유효합니다.",
       ctaLabel: "비밀번호 재설정",
       ctaUrl: input.resetUrl,
@@ -75,7 +75,7 @@ export async function sendAdminMfaCodeEmail(input: {
       input.code,
       "",
       `이 인증번호는 ${input.expiresInMinutes}분 동안만 유효합니다.`,
-      "본인이 요청하지 않았다면 즉시 비밀번호를 변경하고 최고관리자에게 알려 주세요.",
+      "본인이 요청하지 않았다면 즉시 비밀번호를 변경하고 최고 관리자에게 알려 주세요.",
     ].join("\n"),
     html: renderEmail({
       title: "관리자 로그인 인증번호",
