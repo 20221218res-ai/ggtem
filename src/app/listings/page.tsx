@@ -150,7 +150,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
     <main className="min-h-screen bg-[var(--gg-page-bg)] text-[var(--gg-text)] transition-colors">
       <MarketplaceHeader />
 
-      <section className="mx-auto grid max-w-[1360px] gap-4 px-4 py-4 sm:gap-6 sm:px-5 sm:py-6 lg:px-8">
+      <section className="mx-auto grid max-w-[1360px] gap-3 px-2.5 py-3 sm:gap-6 sm:px-5 sm:py-6 lg:px-8">
         <MarketCategoryHeader
           selectedCategory={selectedCategory}
           selectedMode={selectedMode}
@@ -783,12 +783,12 @@ function ListingSection({
 
   const sectionClass =
     tone === "premium"
-      ? "rounded-xl border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_9%,white)] p-3 shadow-lg shadow-[color-mix(in_srgb,var(--gg-accent)_24%,transparent)] sm:rounded-2xl sm:p-4"
+      ? "rounded-xl border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_9%,white)] p-2.5 shadow-lg shadow-[color-mix(in_srgb,var(--gg-accent)_24%,transparent)] sm:rounded-2xl sm:p-4"
       : tone === "lowest"
-        ? "rounded-xl border border-[#10b981] bg-[#ecfdf5] p-3 shadow-sm shadow-[#10b9812e] sm:rounded-2xl sm:p-4"
+        ? "rounded-xl border border-[#10b981] bg-[#ecfdf5] p-2.5 shadow-sm shadow-[#10b9812e] sm:rounded-2xl sm:p-4"
         : tone === "highest"
-          ? "rounded-xl border border-[#22c55e] bg-[#f0fdf4] p-3 shadow-sm shadow-[#22c55e2e] sm:rounded-2xl sm:p-4"
-        : "rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 sm:rounded-2xl sm:p-4";
+          ? "rounded-xl border border-[#22c55e] bg-[#f0fdf4] p-2.5 shadow-sm shadow-[#22c55e2e] sm:rounded-2xl sm:p-4"
+        : "rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-2.5 sm:rounded-2xl sm:p-4";
 
   return (
     <section className={sectionClass}>
@@ -924,7 +924,7 @@ function ListingRow({
   return (
     <Link
       href={`/listings/${listing.listingId}`}
-      className={`grid gap-2.5 rounded-xl border bg-[var(--gg-card-bg)] p-3 hover:border-[var(--gg-accent)] sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[minmax(0,1fr)_340px_220px] md:items-center ${rowClass}`}
+      className={`grid gap-2.5 rounded-xl border bg-[var(--gg-card-bg)] p-2.5 hover:border-[var(--gg-accent)] sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[minmax(0,1fr)_340px_220px] md:items-center ${rowClass}`}
     >
       <div className="min-w-0">
         <div className="flex items-center gap-1.5 sm:gap-2">
@@ -965,7 +965,7 @@ function ListingRow({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 rounded-lg bg-[var(--gg-card-soft-bg)] px-3 py-2 text-[11px] font-black text-[var(--gg-muted)] sm:text-xs md:col-span-1 md:grid-cols-1 md:gap-2 md:bg-transparent md:p-0 md:text-sm md:items-center md:justify-self-center">
+      <div className="grid grid-cols-2 gap-2 rounded-lg bg-[var(--gg-card-soft-bg)] px-2.5 py-2 text-[11px] font-black text-[var(--gg-muted)] sm:px-3 sm:text-xs md:col-span-1 md:grid-cols-1 md:gap-2 md:bg-transparent md:p-0 md:text-sm md:items-center md:justify-self-center">
         <div className="flex min-w-0 items-baseline gap-2 md:grid md:grid-cols-[72px_minmax(0,1fr)] md:gap-3">
           <span className="shrink-0">
             <CountryText id="listings.minimum" />
