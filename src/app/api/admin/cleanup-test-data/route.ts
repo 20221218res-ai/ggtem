@@ -30,45 +30,51 @@ export async function POST(request: NextRequest) {
     const prisma = getPrismaClient();
     const before = await countModels(prisma);
 
-    const result = await prisma.$transaction(async (tx) => {
-      const deleted = {
-        orderReviewModeration: await tx.orderReviewModeration.deleteMany(),
-        orderReview: await tx.orderReview.deleteMany(),
-        trustReport: await tx.trustReport.deleteMany(),
-        chatMessage: await tx.chatMessage.deleteMany(),
-        chatRoom: await tx.chatRoom.deleteMany(),
-        orderAccountCredential: await tx.orderAccountCredential.deleteMany(),
-        orderEvent: await tx.orderEvent.deleteMany(),
-        buyRequestOffer: await tx.buyRequestOffer.deleteMany(),
-        order: await tx.order.deleteMany(),
-        listingImage: await tx.listingImage.deleteMany(),
-        listingInventory: await tx.listingInventory.deleteMany(),
-        buyRequestImage: await tx.buyRequestImage.deleteMany(),
-        buyRequest: await tx.buyRequest.deleteMany(),
-        listing: await tx.listing.deleteMany(),
-        withdrawalLog: await tx.withdrawalLog.deleteMany(),
-        withdrawalRequest: await tx.withdrawalRequest.deleteMany(),
-        depositRequest: await tx.depositRequest.deleteMany(),
-        walletLedgerEntry: await tx.walletLedgerEntry.deleteMany(),
-        notification: await tx.notification.deleteMany(),
-        adminFinanceCloseReport: await tx.adminFinanceCloseReport.deleteMany(),
-        adminSlaIncidentNote: await tx.adminSlaIncidentNote.deleteMany(),
-        adminSlaIncident: await tx.adminSlaIncident.deleteMany(),
-        supportInquiry: await tx.supportInquiry.deleteMany(),
-        adminAuditLog: await tx.adminAuditLog.deleteMany(),
-      };
+    const result = await prisma.$transaction(
+      async (tx) => {
+        const deleted = {
+          orderReviewModeration: await tx.orderReviewModeration.deleteMany(),
+          orderReview: await tx.orderReview.deleteMany(),
+          trustReport: await tx.trustReport.deleteMany(),
+          chatMessage: await tx.chatMessage.deleteMany(),
+          chatRoom: await tx.chatRoom.deleteMany(),
+          orderAccountCredential: await tx.orderAccountCredential.deleteMany(),
+          orderEvent: await tx.orderEvent.deleteMany(),
+          buyRequestOffer: await tx.buyRequestOffer.deleteMany(),
+          order: await tx.order.deleteMany(),
+          listingImage: await tx.listingImage.deleteMany(),
+          listingInventory: await tx.listingInventory.deleteMany(),
+          buyRequestImage: await tx.buyRequestImage.deleteMany(),
+          buyRequest: await tx.buyRequest.deleteMany(),
+          listing: await tx.listing.deleteMany(),
+          withdrawalLog: await tx.withdrawalLog.deleteMany(),
+          withdrawalRequest: await tx.withdrawalRequest.deleteMany(),
+          depositRequest: await tx.depositRequest.deleteMany(),
+          walletLedgerEntry: await tx.walletLedgerEntry.deleteMany(),
+          notification: await tx.notification.deleteMany(),
+          adminFinanceCloseReport: await tx.adminFinanceCloseReport.deleteMany(),
+          adminSlaIncidentNote: await tx.adminSlaIncidentNote.deleteMany(),
+          adminSlaIncident: await tx.adminSlaIncident.deleteMany(),
+          supportInquiry: await tx.supportInquiry.deleteMany(),
+          adminAuditLog: await tx.adminAuditLog.deleteMany(),
+        };
 
-      const walletsReset = await tx.wallet.updateMany({
-        data: RESET_WALLET_BALANCES,
-      });
+        const walletsReset = await tx.wallet.updateMany({
+          data: RESET_WALLET_BALANCES,
+        });
 
-      return {
-        deleted: Object.fromEntries(
-          Object.entries(deleted).map(([model, value]) => [model, value.count]),
-        ),
-        walletsReset: walletsReset.count,
-      };
-    });
+        return {
+          deleted: Object.fromEntries(
+            Object.entries(deleted).map(([model, value]) => [model, value.count]),
+          ),
+          walletsReset: walletsReset.count,
+        };
+      },
+      {
+        maxWait: 10_000,
+        timeout: 30_000,
+      },
+    );
 
     const after = await countModels(prisma);
 
