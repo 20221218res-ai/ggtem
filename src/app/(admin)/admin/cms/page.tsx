@@ -17,6 +17,7 @@ import {
   cmsTypeLabel,
   getAdminCmsState,
 } from "@/lib/admin/cms";
+import { broadcastSystemNotification } from "@/lib/notifications/notifications";
 
 export default async function AdminCmsPage({
   searchParams,
@@ -45,6 +46,7 @@ export default async function AdminCmsPage({
       />
 
       {params.notice === "saved" ? <SoftNotice tone="green">저장 완료</SoftNotice> : null}
+      {params.notice === "saved-notified" ? <SoftNotice tone="green">저장 및 공지 알림 발송 완료</SoftNotice> : null}
       {params.error ? <SoftNotice tone="red">{params.error}</SoftNotice> : null}
 
       <section className="grid gap-5 xl:grid-cols-[420px_1fr]">
@@ -105,6 +107,10 @@ export default async function AdminCmsPage({
                 className="h-11 rounded-md border border-slate-200 px-3 font-bold"
               />
             </label>
+            <label className="flex items-center gap-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-black">
+              <input name="notifyUsers" type="checkbox" value="1" className="h-4 w-4 accent-[var(--color-primary)]" />
+              공지 알림 발송
+            </label>
             <button
               type="submit"
               className="h-11 rounded-md border border-[var(--color-primary)] bg-[var(--color-primary)] text-sm font-black text-black shadow-sm hover:bg-[var(--color-primary-hover)]"
@@ -163,6 +169,10 @@ export default async function AdminCmsPage({
                 className="mt-3 w-full rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold leading-6"
               />
               <input type="hidden" name="changeNote" value="어드민 빠른 수정" />
+              <label className="mt-3 flex items-center gap-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-black">
+                <input name="notifyUsers" type="checkbox" value="1" className="h-4 w-4 accent-[var(--color-primary)]" />
+                공지 알림 발송
+              </label>
               <button type="submit" className="mt-3 rounded-md bg-slate-950 px-3 py-2 text-xs font-black text-white">
                 수정 저장
               </button>
@@ -194,6 +204,7 @@ async function saveCmsDocumentAction(formData: FormData) {
   const body = String(formData.get("body") ?? "").trim();
   const status = String(formData.get("status") ?? "DRAFT").trim();
   const changeNote = String(formData.get("changeNote") ?? "").trim() || "어드민 CMS 수정";
+  const shouldNotifyUsers = formData.get("notifyUsers") === "1";
 
   if (!slug || !title || !body) {
     redirect("/admin/cms?error=" + encodeURIComponent("슬러그, 제목, 본문을 모두 입력해 주세요."));
@@ -238,7 +249,23 @@ async function saveCmsDocumentAction(formData: FormData) {
     },
   });
 
+  let notified = false;
+  if (shouldNotifyUsers && type === "NOTICE" && status === "PUBLISHED") {
+    await broadcastSystemNotification({
+      title,
+      body,
+      href: "/support",
+      metadata: {
+        source: "admin_cms_notice",
+        documentId: document.id,
+        documentVersionId: documentVersion.id,
+        slug,
+      },
+    });
+    notified = true;
+  }
+
   revalidatePath("/admin/cms");
   revalidatePath("/support");
-  redirect("/admin/cms?notice=saved");
+  redirect(`/admin/cms?notice=${notified ? "saved-notified" : "saved"}`);
 }

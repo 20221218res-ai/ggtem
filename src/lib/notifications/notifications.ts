@@ -60,6 +60,60 @@ export async function createUserNotification(input: UserNotificationInput) {
   });
 }
 
+export async function broadcastSystemNotification(input: {
+  title: string;
+  body: string;
+  href?: string;
+  metadata?: Prisma.InputJsonValue;
+}) {
+  const prisma = getPrismaClient();
+  const users = await prisma.user.findMany({
+    where: {
+      role: {
+        in: ["CUSTOMER", "SELLER"],
+      },
+      status: {
+        in: ["ACTIVE", "SELLING_RESTRICTED", "WITHDRAWAL_HOLD"],
+      },
+    },
+    select: {
+      id: true,
+    },
+    take: 1000,
+  });
+
+  if (users.length === 0) {
+    return {
+      notifiedCount: 0,
+    };
+  }
+
+  await prisma.notification.createMany({
+    data: users.map((user) => ({
+      userId: user.id,
+      type: "SYSTEM",
+      title: input.title,
+      body: input.body,
+      href: input.href,
+      metadata: input.metadata,
+    })),
+  });
+
+  await Promise.allSettled(
+    users.map((user) =>
+      sendUserWebPushNotification(user.id, {
+        title: input.title,
+        body: input.body,
+        href: input.href,
+      }),
+    ),
+  );
+
+  return {
+    notifiedCount: users.length,
+  };
+}
+
 export async function getUnreadNotificationCount() {
   const sessionUser = await getCurrentSessionUser();
 
