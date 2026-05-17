@@ -93,7 +93,7 @@ export async function getAdminMarketListingsState(filters?: AdminMarketListingsF
       imageCount: item._count.images,
       isPremium: item.premiumEndsAt ? item.premiumEndsAt > new Date() : false,
       createdAt: formatDateTime(item.createdAt),
-      href: `/admin/market-listings?mode=SELL&query=${item.id}`,
+      href: `/admin/market-listings/sell/${item.id}`,
       auditHref: `/admin/audit?targetType=LISTING&query=${item.id}`,
     })),
     buyRequests: buyRequests.map((item) => ({
@@ -111,10 +111,134 @@ export async function getAdminMarketListingsState(filters?: AdminMarketListingsF
       imageCount: item._count.images,
       isPremium: item.premiumEndsAt ? item.premiumEndsAt > new Date() : false,
       createdAt: formatDateTime(item.createdAt),
-      href: `/admin/market-listings?mode=BUY&query=${item.id}`,
+      href: `/admin/market-listings/buy/${item.id}`,
       auditHref: `/admin/audit?targetType=BUY_REQUEST&query=${item.id}`,
       actionLocked: item.status === "ACTIVE" && Number(item.lockAmount) > 0,
     })),
+  };
+}
+
+export async function getAdminMarketListingDetail(kind: "sell" | "buy", id: string) {
+  const prisma = getPrismaClient();
+
+  if (kind === "sell") {
+    const listing = await prisma.listing.findUnique({
+      where: { id },
+      include: {
+        seller: { select: { id: true, email: true, displayName: true } },
+        game: { select: { name: true, moneyUnitName: true } },
+        server: { select: { name: true } },
+        inventory: true,
+        images: { orderBy: { sortOrder: "asc" } },
+        _count: { select: { orders: true, buyRequestOffers: true } },
+      },
+    });
+
+    if (!listing) return null;
+
+    return {
+      kind: "sell" as const,
+      id: listing.id,
+      title: listing.title,
+      description: listing.description ?? "",
+      category: listing.category,
+      status: listing.status,
+      ownerId: listing.seller.id,
+      ownerName: listing.seller.displayName || listing.seller.email,
+      ownerEmail: listing.seller.email,
+      gameName: listing.game.name,
+      serverName: listing.server?.name ?? "서버 없음",
+      serverDetail: listing.serverDetail ?? "",
+      gameNickname: listing.sellerGameNickname ?? "",
+      accountTransferType: listing.accountTransferType ?? "",
+      tradeMode: listing.tradeMode,
+      priceUnitQuantity: listing.priceUnitQuantity.toString(),
+      unitPrice: listing.unitPrice.toString(),
+      currency: listing.currency,
+      totalQuantity: listing.inventory?.totalQuantity.toString() ?? "0",
+      minimumQuantity: listing.inventory?.minimumQuantity.toString() ?? "0",
+      availableQuantity: listing.inventory?.availableQuantity.toString() ?? "0",
+      lockedQuantity: listing.inventory?.lockedQuantity.toString() ?? "0",
+      soldQuantity: listing.inventory?.soldQuantity.toString() ?? "0",
+      premiumStartedAt: listing.premiumStartedAt ? formatDateTime(listing.premiumStartedAt) : "-",
+      premiumEndsAt: listing.premiumEndsAt ? formatDateTime(listing.premiumEndsAt) : "-",
+      createdAt: formatDateTime(listing.createdAt),
+      updatedAt: formatDateTime(listing.updatedAt),
+      orderCount: listing._count.orders,
+      offerCount: listing._count.buyRequestOffers,
+      images: listing.images.map((image) => ({
+        id: image.id,
+        imageUrl: image.imageUrl,
+        altText: image.altText ?? "본문 이미지",
+      })),
+      auditHref: `/admin/audit?targetType=LISTING&query=${listing.id}`,
+      userHref: `/admin/users/${listing.seller.id}`,
+    };
+  }
+
+  const request = await prisma.buyRequest.findUnique({
+    where: { id },
+    include: {
+      buyer: { select: { id: true, email: true, displayName: true } },
+      images: { orderBy: { sortOrder: "asc" } },
+      _count: { select: { offers: true } },
+    },
+  });
+
+  if (!request) return null;
+
+  const [game, server] = await Promise.all([
+    prisma.game.findUnique({
+      where: { id: request.gameId },
+      select: { name: true, moneyUnitName: true },
+    }),
+    request.serverId
+      ? prisma.gameServer.findUnique({
+          where: { id: request.serverId },
+          select: { name: true },
+        })
+      : Promise.resolve(null),
+  ]);
+
+  return {
+    kind: "buy" as const,
+    id: request.id,
+    title: request.title || "구매글 제목 없음",
+    description: request.description ?? "",
+    category: request.category,
+    status: request.status,
+    ownerId: request.buyer.id,
+    ownerName: request.buyer.displayName || request.buyer.email,
+    ownerEmail: request.buyer.email,
+    gameName: game?.name ?? "알 수 없는 게임",
+    serverName: server?.name ?? "서버 없음",
+    serverDetail: request.serverDetail ?? "",
+    gameNickname: request.buyerGameNickname ?? "",
+    accountTransferType: request.accountTransferType ?? "",
+    accountRank: request.accountRank ?? "",
+    tradeMode: request.tradeMode,
+    priceUnitQuantity: request.priceUnitQuantity.toString(),
+    unitPrice: request.unitPrice.toString(),
+    quantity: request.quantity.toString(),
+    minimumQuantity: request.minimumQuantity.toString(),
+    remainingQuantity: request.remainingQuantity.toString(),
+    totalAmount: request.totalAmount.toString(),
+    lockAmount: request.lockAmount.toString(),
+    currency: request.currency,
+    premiumStartedAt: request.premiumStartedAt ? formatDateTime(request.premiumStartedAt) : "-",
+    premiumEndsAt: request.premiumEndsAt ? formatDateTime(request.premiumEndsAt) : "-",
+    expiresAt: request.expiresAt ? formatDateTime(request.expiresAt) : "-",
+    createdAt: formatDateTime(request.createdAt),
+    updatedAt: formatDateTime(request.updatedAt),
+    offerCount: request._count.offers,
+    images: request.images.map((image) => ({
+      id: image.id,
+      imageUrl: image.imageUrl,
+      altText: image.altText ?? "본문 이미지",
+    })),
+    auditHref: `/admin/audit?targetType=BUY_REQUEST&query=${request.id}`,
+    userHref: `/admin/users/${request.buyer.id}`,
+    actionLocked: request.status === "ACTIVE" && Number(request.lockAmount) > 0,
   };
 }
 
