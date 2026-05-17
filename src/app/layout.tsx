@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   title: "GGtem",
   description: "Global game item marketplace",
   manifest: "/manifest.webmanifest",
+  verification: {
+    other: {
+      "naver-site-verification": "195a5fb5ad2db4e7f9b7fe884af3f7ff6616cbb9",
+    },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
