@@ -783,17 +783,17 @@ function ListingSection({
 
   const sectionClass =
     tone === "premium"
-      ? "rounded-2xl border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_9%,white)] p-4 shadow-lg shadow-[color-mix(in_srgb,var(--gg-accent)_24%,transparent)]"
+      ? "rounded-xl border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_9%,white)] p-3 shadow-lg shadow-[color-mix(in_srgb,var(--gg-accent)_24%,transparent)] sm:rounded-2xl sm:p-4"
       : tone === "lowest"
-        ? "rounded-2xl border border-[#10b981] bg-[#ecfdf5] p-4 shadow-sm shadow-[#10b9812e]"
+        ? "rounded-xl border border-[#10b981] bg-[#ecfdf5] p-3 shadow-sm shadow-[#10b9812e] sm:rounded-2xl sm:p-4"
         : tone === "highest"
-          ? "rounded-2xl border border-[#22c55e] bg-[#f0fdf4] p-4 shadow-sm shadow-[#22c55e2e]"
-        : "rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4";
+          ? "rounded-xl border border-[#22c55e] bg-[#f0fdf4] p-3 shadow-sm shadow-[#22c55e2e] sm:rounded-2xl sm:p-4"
+        : "rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 sm:rounded-2xl sm:p-4";
 
   return (
     <section className={sectionClass}>
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className="text-lg font-black">
+      <div className="mb-2.5 flex items-center justify-between gap-3 sm:mb-3">
+        <h3 className="text-base font-black sm:text-lg">
           <CountryText id={titleKey} />
         </h3>
         <span className="rounded-full bg-[var(--gg-card-bg)] px-3 py-1 text-xs font-black text-[var(--gg-muted)]">
@@ -801,7 +801,7 @@ function ListingSection({
           <CountryText id="home.countSuffix" />
         </span>
       </div>
-      <div className="grid gap-3">
+      <div className="grid gap-2.5 sm:gap-3">
         {items.map((entry) =>
           entry.type === "listing" ? (
             <ListingRow key={entry.item.listingId} listing={entry.item} tone={tone} />
@@ -924,10 +924,10 @@ function ListingRow({
   return (
     <Link
       href={`/listings/${listing.listingId}`}
-      className={`grid grid-cols-[minmax(0,1fr)_112px] gap-3 rounded-xl border bg-[var(--gg-card-bg)] p-3 hover:border-[var(--gg-accent)] sm:grid-cols-[minmax(0,1fr)_150px] sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[minmax(0,1fr)_340px_220px] md:items-center ${rowClass}`}
+      className={`grid gap-2.5 rounded-xl border bg-[var(--gg-card-bg)] p-3 hover:border-[var(--gg-accent)] sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[minmax(0,1fr)_340px_220px] md:items-center ${rowClass}`}
     >
       <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-black text-emerald-700 sm:px-3 sm:text-xs">
             <CountryText id="listings.activeSale" />
           </span>
@@ -946,7 +946,7 @@ function ListingRow({
               <CountryText id="listings.premiumBadge" />
             </span>
           ) : null}
-          <span className="text-xs font-bold text-[var(--gg-muted)]">
+          <span className="ml-auto shrink-0 text-[11px] font-bold text-[var(--gg-muted)] sm:text-xs">
             <CountryText id="listings.createdPrefix" /> {listing.createdAt}
           </span>
         </div>
@@ -965,7 +965,7 @@ function ListingRow({
         </div>
       </div>
 
-      <div className="col-span-2 grid grid-cols-2 gap-2 rounded-lg border border-[var(--gg-border-soft)] bg-[var(--gg-card-soft-bg)] px-3 py-2 text-[11px] font-black text-[var(--gg-muted)] sm:text-xs md:col-span-1 md:grid-cols-1 md:gap-2 md:border-0 md:bg-transparent md:p-0 md:text-sm md:items-center md:justify-self-center">
+      <div className="grid grid-cols-2 gap-2 rounded-lg bg-[var(--gg-card-soft-bg)] px-3 py-2 text-[11px] font-black text-[var(--gg-muted)] sm:text-xs md:col-span-1 md:grid-cols-1 md:gap-2 md:bg-transparent md:p-0 md:text-sm md:items-center md:justify-self-center">
         <div className="flex min-w-0 items-baseline gap-2 md:grid md:grid-cols-[72px_minmax(0,1fr)] md:gap-3">
           <span className="shrink-0">
             <CountryText id="listings.minimum" />
@@ -1000,9 +1000,9 @@ function ListingRow({
         </div>
       </div>
 
-      <div className="row-span-2 flex min-w-0 flex-col items-end justify-between gap-3 text-right md:row-span-1 md:gap-4">
-        <div>
-          <p className="line-clamp-2 text-[10px] font-bold leading-snug text-[var(--gg-muted)] sm:text-xs md:text-sm">
+      <div className="flex min-w-0 items-end justify-between gap-3 md:flex-col md:items-end md:text-right">
+        <div className="min-w-0">
+          <p className="line-clamp-1 text-[10px] font-bold leading-snug text-[var(--gg-muted)] sm:text-xs md:line-clamp-2 md:text-sm">
             {listing.category === "GAME_MONEY" ? (
               <GameMoneyPriceUnitText
                 priceUnitQuantity={listing.priceUnitQuantity}
@@ -1013,11 +1013,11 @@ function ListingRow({
             )}{" "}
             <CountryText id="listings.unitPricePerUnit" />
           </p>
-          <p className="mt-1 break-words text-lg font-black leading-tight text-[var(--gg-accent)] sm:text-xl md:text-2xl">
+          <p className="mt-1 break-words text-2xl font-black leading-tight text-[var(--gg-accent)] md:text-2xl">
             {priceDisplay.price} {listing.currency}
           </p>
         </div>
-        <span className="inline-flex w-full justify-center rounded-lg bg-[var(--gg-accent)] px-2 py-2 text-xs font-black text-[var(--gg-inverse-text)] sm:rounded-xl sm:px-4 sm:py-2.5 sm:text-sm md:px-5 md:py-3">
+        <span className="inline-flex shrink-0 justify-center rounded-lg bg-[var(--gg-accent)] px-3 py-2 text-xs font-black text-[var(--gg-inverse-text)] sm:rounded-xl sm:px-4 sm:py-2.5 sm:text-sm md:w-full md:px-5 md:py-3">
           <CountryText id="listings.instantBuy" />
         </span>
       </div>
@@ -1069,7 +1069,7 @@ function BuyRequestRow({
   const rowClass = getListingRowClass(tone);
 
   return (
-    <article className={`grid grid-cols-[minmax(0,1fr)_112px] gap-3 rounded-xl border bg-[var(--gg-card-bg)] p-3 sm:grid-cols-[minmax(0,1fr)_150px] sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[1fr_240px] ${rowClass}`}>
+    <article className={`grid grid-cols-[minmax(0,1fr)_124px] gap-3 rounded-xl border bg-[var(--gg-card-bg)] p-3 sm:grid-cols-[minmax(0,1fr)_156px] sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[1fr_240px] ${rowClass}`}>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-black text-amber-700 sm:px-3 sm:text-xs">

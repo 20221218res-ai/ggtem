@@ -185,9 +185,9 @@ function ListingRow({ listing }: { listing: MyListing }) {
   const soldQuantityLabel = formatListingQuantity(listing, listing.soldQuantity);
 
   return (
-    <article className="grid gap-4 border-b border-[var(--gg-border-soft)] p-5 transition last:border-b-0 hover:bg-[var(--gg-card-soft-bg)] lg:grid-cols-[1fr_190px]">
+    <article className="grid gap-2.5 border-b border-[var(--gg-border-soft)] p-4 transition last:border-b-0 hover:bg-[var(--gg-card-soft-bg)] sm:gap-4 sm:p-5 lg:grid-cols-[1fr_190px]">
       <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <StatusBadge status={listing.status} soldOut={soldOut} />
           <span className="rounded-md bg-[var(--gg-control-bg)] px-2 py-1 text-xs font-black text-[var(--gg-muted)]">
             <CountryText id={getCategoryKey(listing.category)} />
@@ -197,49 +197,53 @@ function ListingRow({ listing }: { listing: MyListing }) {
               {accountTransferTypeLabel}
             </span>
           ) : null}
-          <span className="text-xs font-bold text-[var(--gg-subtle)]">
+          <span className="ml-auto shrink-0 text-[11px] font-bold text-[var(--gg-subtle)] sm:text-xs">
             <CountryText id="manage.registeredAt" /> {listing.createdAt}
           </span>
         </div>
         <Link
           href={soldOut ? editHref : publicHref}
-          className="mt-2 block truncate text-lg font-black hover:text-[var(--gg-accent)]"
+          className="mt-2 line-clamp-2 block text-base font-black leading-snug hover:text-[var(--gg-accent)] sm:text-lg"
         >
           <UserContentText text={listing.title} />
         </Link>
-        <p className="mt-1 text-sm font-bold text-[var(--gg-muted)]">
+        <p className="mt-1 line-clamp-1 text-xs font-bold text-[var(--gg-muted)] sm:text-sm">
           {listing.gameName}
           {listing.serverName ? ` / ${listing.serverName}` : ""}
         </p>
-        <div className="mt-3 flex flex-wrap gap-2 text-xs font-black text-[var(--gg-muted)]">
-          <InfoChip label={<CountryText id="manage.availableToSell" />} value={availableQuantityLabel} />
-          <InfoChip label={<CountryText id="manage.minimumQuantity" />} value={minimumQuantityLabel} />
-          <InfoChip label={<CountryText id="manage.soldQuantity" />} value={soldQuantityLabel} />
-          {listing.category === "GAME_MONEY" ? (
-            <InfoChip
-              label={<CountryText id="listingForm.sellMode" />}
-              value={
-                listing.tradeMode === "BULK" ? (
-                  <CountryText id="listingForm.bulkSell" />
-                ) : (
-                  <CountryText id="listingForm.splitSell" />
-                )
-              }
-            />
-          ) : null}
-        </div>
       </div>
 
-      <div className="flex flex-col gap-3 lg:items-end">
-        <div className="lg:text-right">
-          <p className="text-2xl font-black text-[var(--gg-accent)]">
+      <div className="flex min-w-0 items-end justify-between gap-3 lg:flex-col lg:items-end lg:text-right">
+        <div className="min-w-0">
+          <p className="break-words text-2xl font-black leading-tight text-[var(--gg-accent)] lg:text-2xl">
             {displayUnitPrice} {listing.currency}
           </p>
-          <p className="text-xs font-bold text-[var(--gg-muted)]">
+          <p className="mt-1 line-clamp-1 text-[10px] font-bold leading-snug text-[var(--gg-muted)] sm:text-xs lg:line-clamp-2">
             <CountryText id="manage.unitPrice" />
             {priceUnitLabel ? ` / ${priceUnitLabel}` : ""}
           </p>
         </div>
+      </div>
+
+      <div className="flex flex-wrap gap-1.5 rounded-lg bg-[var(--gg-card-soft-bg)] px-3 py-2 text-[11px] font-black text-[var(--gg-muted)] sm:gap-2 sm:text-xs lg:col-span-1 lg:bg-transparent lg:p-0">
+        <InfoChip label={<CountryText id="manage.availableToSell" />} value={availableQuantityLabel} />
+        <InfoChip label={<CountryText id="manage.minimumQuantity" />} value={minimumQuantityLabel} />
+        <InfoChip label={<CountryText id="manage.soldQuantity" />} value={soldQuantityLabel} />
+        {listing.category === "GAME_MONEY" ? (
+          <InfoChip
+            label={<CountryText id="listingForm.sellMode" />}
+            value={
+              listing.tradeMode === "BULK" ? (
+                <CountryText id="listingForm.bulkSell" />
+              ) : (
+                <CountryText id="listingForm.splitSell" />
+              )
+            }
+          />
+        ) : null}
+      </div>
+
+      <div className="lg:col-span-1 lg:justify-self-end">
         <SellerListingActions
           listingId={listing.listingId}
           status={listing.status}
