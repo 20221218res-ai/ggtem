@@ -366,26 +366,26 @@ function FeaturedListings({
   listings: MarketplaceListingSummary[];
 }) {
   return (
-    <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)]">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--gg-border-soft)] px-5 py-4">
+    <section className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] sm:rounded-2xl">
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--gg-border-soft)] px-4 py-3 sm:px-5 sm:py-4">
         <div>
-          <p className="text-sm font-black text-[var(--gg-accent)]">
+          <p className="text-xs font-black text-[var(--gg-accent)] sm:text-sm">
             <CountryText id="home.marketFeedLabel" />
           </p>
-          <h2 className="mt-1 text-2xl font-black">
+          <h2 className="mt-1 text-xl font-black sm:text-2xl">
             <CountryText id="home.marketFeed" />
           </h2>
         </div>
         <Link
           href="/listings"
           prefetch={false}
-          className="rounded-lg border border-[var(--gg-border)] px-4 py-2 text-sm font-bold hover:bg-[var(--gg-control-bg)]"
+          className="shrink-0 rounded-lg border border-[var(--gg-border)] px-3 py-2 text-xs font-bold hover:bg-[var(--gg-control-bg)] sm:px-4 sm:text-sm"
         >
           <CountryText id="common.viewAll" />
         </Link>
       </div>
 
-      <div className="grid gap-4 p-5 md:grid-cols-2">
+      <div className="grid gap-3 p-3 sm:gap-4 sm:p-5 md:grid-cols-2">
         {listings.map((listing) => (
           <ListingCard key={listing.listingId} listing={listing} />
         ))}
@@ -402,35 +402,35 @@ export function ListingCard({ listing }: { listing: MarketplaceListingSummary })
     <Link
       href={`/listings/${listing.listingId}`}
       prefetch={false}
-      className="block rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 hover:border-[var(--gg-accent)]"
+      className="block rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 hover:border-[var(--gg-accent)] sm:rounded-2xl sm:p-4"
     >
       <div className="min-w-0">
-        <div className="flex flex-wrap gap-2">
-          <span className="rounded-md bg-[var(--gg-control-bg)] px-2 py-1 text-xs font-bold text-[var(--gg-muted)]">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+          <span className="rounded-md bg-[var(--gg-control-bg)] px-2 py-1 text-[11px] font-bold text-[var(--gg-muted)] sm:text-xs">
             <GameNameText name={listing.gameName} localizedNames={listing.gameLocalizedNames} />
           </span>
-          <span className="rounded-md bg-emerald-400/10 px-2 py-1 text-xs font-bold text-[var(--gg-accent)]">
+          <span className="rounded-md bg-emerald-400/10 px-2 py-1 text-[11px] font-bold text-[var(--gg-accent)] sm:text-xs">
             <CategoryName category={listing.category} />
           </span>
         </div>
-        <h3 className="mt-3 line-clamp-2 text-base font-black">
+        <h3 className="mt-2 line-clamp-2 text-base font-black leading-snug sm:mt-3">
           <UserContentText text={listing.title} />
         </h3>
-        <p className="mt-2 text-sm text-[var(--gg-muted)]">
+        <p className="mt-1.5 line-clamp-1 text-xs text-[var(--gg-muted)] sm:mt-2 sm:text-sm">
           <SourceCountryFlag text={listing.title} />{" "}
           {listing.serverName ?? <CountryText id="home.allServers" />} ·{" "}
           <CountryText id="home.seller" /> {listing.sellerName}
         </p>
-        <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
-          <div>
+        <div className="mt-3 grid gap-3 sm:mt-4 sm:flex sm:flex-wrap sm:items-end sm:justify-between">
+          <div className="min-w-0">
             <p className="text-xs text-[var(--gg-subtle)]">
               <CountryText id="home.unitPrice" />
             </p>
-            <p className="text-xl font-black text-[var(--gg-accent)]">
+            <p className="mt-0.5 text-xl font-black leading-tight text-[var(--gg-accent)] sm:text-2xl md:text-xl">
               {price.amount} {listing.currency}
             </p>
             {listing.category === "GAME_MONEY" ? (
-              <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">
+              <p className="mt-1 text-xs font-bold leading-snug text-[var(--gg-muted)]">
                 <GameMoneyPriceUnitText
                   priceUnitQuantity={listing.priceUnitQuantity}
                   moneyUnitName={listing.moneyUnitName}
@@ -444,9 +444,12 @@ export function ListingCard({ listing }: { listing: MarketplaceListingSummary })
               </p>
             ) : null}
           </div>
-          <p className="rounded-lg border border-[var(--gg-border)] px-3 py-2 text-xs font-bold text-[var(--gg-muted)]">
-            <CountryText id="home.stock" /> {formatLiveListingQuantity(listing)}
-          </p>
+          <div className="rounded-lg border border-[var(--gg-border)] bg-white/60 px-3 py-2 text-xs font-bold text-[var(--gg-muted)] sm:text-right">
+            <span className="mr-1 text-[var(--gg-subtle)]">
+              <CountryText id="home.stock" />
+            </span>
+            <span className="text-[var(--gg-text)]">{formatLiveListingQuantity(listing)}</span>
+          </div>
         </div>
       </div>
     </Link>
