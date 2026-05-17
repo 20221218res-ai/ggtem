@@ -1,6 +1,7 @@
 ﻿import type { Prisma } from "@/generated/prisma/client";
 import { getCurrentSessionUser } from "@/lib/auth/session";
 import { getPrismaClient } from "@/lib/prisma";
+import { sendUserWebPushNotification } from "./web-push";
 
 export type UserNotificationInput = {
   userId: string;
@@ -41,7 +42,7 @@ export type PriorityNotificationItem = MyNotificationsView["notifications"][numb
 
 export async function createUserNotification(input: UserNotificationInput) {
   const prisma = getPrismaClient();
-  await prisma.notification.create({
+  const notification = await prisma.notification.create({
     data: {
       userId: input.userId,
       type: input.type,
@@ -50,6 +51,12 @@ export async function createUserNotification(input: UserNotificationInput) {
       href: input.href,
       metadata: input.metadata,
     },
+  });
+
+  await sendUserWebPushNotification(input.userId, {
+    title: notification.title,
+    body: notification.body,
+    href: notification.href,
   });
 }
 

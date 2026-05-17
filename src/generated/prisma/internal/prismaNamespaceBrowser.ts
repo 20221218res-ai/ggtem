@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   Session: 'Session',
   LoginAttempt: 'LoginAttempt',
+  AdminMfaChallenge: 'AdminMfaChallenge',
   PasswordResetToken: 'PasswordResetToken',
   EmailVerificationToken: 'EmailVerificationToken',
   EmailVerificationLoginToken: 'EmailVerificationLoginToken',
@@ -89,7 +90,8 @@ export const ModelName = {
   TrustReport: 'TrustReport',
   AdminUserNote: 'AdminUserNote',
   AdminGameNote: 'AdminGameNote',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  PushSubscription: 'PushSubscription'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -152,6 +154,22 @@ export const LoginAttemptScalarFieldEnum = {
 } as const
 
 export type LoginAttemptScalarFieldEnum = (typeof LoginAttemptScalarFieldEnum)[keyof typeof LoginAttemptScalarFieldEnum]
+
+
+export const AdminMfaChallengeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  codeHash: 'codeHash',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt',
+  requestIpKey: 'requestIpKey',
+  failedCount: 'failedCount',
+  lockedUntil: 'lockedUntil'
+} as const
+
+export type AdminMfaChallengeScalarFieldEnum = (typeof AdminMfaChallengeScalarFieldEnum)[keyof typeof AdminMfaChallengeScalarFieldEnum]
 
 
 export const PasswordResetTokenScalarFieldEnum = {
@@ -762,6 +780,23 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const PushSubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  endpoint: 'endpoint',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  userAgent: 'userAgent',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  lastSentAt: 'lastSentAt',
+  failedAt: 'failedAt'
+} as const
+
+export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
 
 
 export const SortOrder = {

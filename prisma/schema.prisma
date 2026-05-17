@@ -167,6 +167,7 @@ model User {
   sellerChatRooms    ChatRoom[]          @relation("SellerChatRooms")
   sentChatMessages   ChatMessage[]       @relation("SenderChatMessages")
   notifications      Notification[]
+  pushSubscriptions  PushSubscription[]
   supportInquiries   SupportInquiry[]
 }
 
@@ -908,4 +909,21 @@ model Notification {
 
   @@index([userId, isRead, createdAt])
   @@index([userId, isRead, type, createdAt], map: "Notification_user_read_type_created_idx")
+}
+
+model PushSubscription {
+  id         String   @id @default(cuid())
+  userId     String
+  endpoint   String   @unique
+  p256dh     String
+  auth       String
+  userAgent  String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  lastSentAt DateTime?
+  failedAt   DateTime?
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive, updatedAt])
 }

@@ -10,6 +10,8 @@ export default function PwaNotificationSettings() {
   const [permission, setPermission] = useState<PermissionState>("default");
   const [isStandalone, setIsStandalone] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const supportsNotifications = "Notification" in window;
@@ -25,6 +27,11 @@ export default function PwaNotificationSettings() {
       window.matchMedia("(display-mode: standalone)").matches ||
         ("standalone" in navigator && Boolean(navigator.standalone)),
     );
+
+    void navigator.serviceWorker.ready
+      .then((registration) => registration.pushManager.getSubscription())
+      .then((subscription) => setIsSubscribed(Boolean(subscription)))
+      .catch(() => undefined);
   }, []);
 
   async function enableNotifications() {
@@ -34,6 +41,7 @@ export default function PwaNotificationSettings() {
     }
 
     setIsSubmitting(true);
+    setError("");
 
     try {
       const nextPermission = await Notification.requestPermission();
@@ -41,6 +49,39 @@ export default function PwaNotificationSettings() {
 
       if (nextPermission === "granted" && "serviceWorker" in navigator) {
         const registration = await navigator.serviceWorker.ready;
+        const keyResponse = await fetch("/api/user/push-subscriptions", {
+          cache: "no-store",
+        });
+        const keyData = (await keyResponse.json()) as { publicKey?: string | null };
+
+        if (!keyResponse.ok || !keyData.publicKey) {
+          throw new Error(t("notification.pushServerKeyMissing"));
+        }
+
+        const subscription =
+          (await registration.pushManager.getSubscription()) ??
+          (await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(keyData.publicKey),
+          }));
+
+        const subscriptionPayload = subscription.toJSON();
+        const saveResponse = await fetch("/api/user/push-subscriptions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...subscriptionPayload,
+            userAgent: navigator.userAgent,
+          }),
+        });
+
+        if (!saveResponse.ok) {
+          throw new Error(t("notification.pushSaveFailed"));
+        }
+
+        setIsSubscribed(true);
         await registration.showNotification("GGtem", {
           body: t("notification.pushReady"),
           icon: "/icons/icon-192.png",
@@ -48,6 +89,8 @@ export default function PwaNotificationSettings() {
           data: { url: "/my/notifications" },
         });
       }
+    } catch (pushError) {
+      setError(pushError instanceof Error ? pushError.message : t("notification.pushSaveFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -55,7 +98,7 @@ export default function PwaNotificationSettings() {
 
   const statusText =
     permission === "granted"
-      ? t("notification.pushEnabled")
+      ? t(isSubscribed ? "notification.pushSubscribed" : "notification.pushEnabled")
       : permission === "denied"
         ? t("notification.pushDenied")
         : permission === "unsupported"
@@ -84,13 +127,27 @@ export default function PwaNotificationSettings() {
           <button
             type="button"
             onClick={() => void enableNotifications()}
-            disabled={isSubmitting || permission === "granted" || permission === "denied" || permission === "unsupported"}
+            disabled={isSubmitting || isSubscribed || permission === "denied" || permission === "unsupported"}
             className="rounded-xl bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:opacity-55"
           >
             {isSubmitting ? t("notification.pushChecking") : t("notification.pushEnable")}
           </button>
+          {error ? <p className="text-xs font-bold text-rose-600">{error}</p> : null}
         </div>
       </div>
     </section>
   );
+}
+
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = `${base64String}${padding}`.replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let index = 0; index < rawData.length; index += 1) {
+    outputArray[index] = rawData.charCodeAt(index);
+  }
+
+  return outputArray;
 }

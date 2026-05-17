@@ -33,6 +33,11 @@ export type Session = Prisma.SessionModel
  */
 export type LoginAttempt = Prisma.LoginAttemptModel
 /**
+ * Model AdminMfaChallenge
+ * 
+ */
+export type AdminMfaChallenge = Prisma.AdminMfaChallengeModel
+/**
  * Model PasswordResetToken
  * 
  */
@@ -212,3 +217,8 @@ export type AdminGameNote = Prisma.AdminGameNoteModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model PushSubscription
+ * 
+ */
+export type PushSubscription = Prisma.PushSubscriptionModel

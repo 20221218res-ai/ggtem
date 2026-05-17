@@ -28,3 +28,25 @@ self.addEventListener("notificationclick", (event) => {
     }),
   );
 });
+
+self.addEventListener("push", (event) => {
+  let payload = {};
+
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = {};
+  }
+
+  const title = payload.title || "GGtem";
+  const options = {
+    body: payload.body || "",
+    icon: "/icons/icon-192.png",
+    badge: "/icons/icon-192.png",
+    data: {
+      url: payload.href || "/my/notifications",
+    },
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});

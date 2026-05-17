@@ -387,6 +387,7 @@ export const ModelName = {
   User: 'User',
   Session: 'Session',
   LoginAttempt: 'LoginAttempt',
+  AdminMfaChallenge: 'AdminMfaChallenge',
   PasswordResetToken: 'PasswordResetToken',
   EmailVerificationToken: 'EmailVerificationToken',
   EmailVerificationLoginToken: 'EmailVerificationLoginToken',
@@ -422,7 +423,8 @@ export const ModelName = {
   TrustReport: 'TrustReport',
   AdminUserNote: 'AdminUserNote',
   AdminGameNote: 'AdminGameNote',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  PushSubscription: 'PushSubscription'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -438,7 +440,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "loginAttempt" | "passwordResetToken" | "emailVerificationToken" | "emailVerificationLoginToken" | "adminInviteToken" | "wallet" | "walletLedgerEntry" | "game" | "gameServer" | "listing" | "listingImage" | "listingInventory" | "buyRequest" | "buyRequestImage" | "buyRequestOffer" | "order" | "orderAccountCredential" | "chatRoom" | "chatMessage" | "orderEvent" | "orderReview" | "orderReviewModeration" | "depositRequest" | "depositWalletAddress" | "withdrawalRequest" | "withdrawalLog" | "adminAuditLog" | "cmsDocument" | "cmsDocumentVersion" | "supportInquiry" | "adminSlaIncident" | "adminSlaIncidentNote" | "adminFinanceCloseReport" | "trustReport" | "adminUserNote" | "adminGameNote" | "notification"
+    modelProps: "user" | "session" | "loginAttempt" | "adminMfaChallenge" | "passwordResetToken" | "emailVerificationToken" | "emailVerificationLoginToken" | "adminInviteToken" | "wallet" | "walletLedgerEntry" | "game" | "gameServer" | "listing" | "listingImage" | "listingInventory" | "buyRequest" | "buyRequestImage" | "buyRequestOffer" | "order" | "orderAccountCredential" | "chatRoom" | "chatMessage" | "orderEvent" | "orderReview" | "orderReviewModeration" | "depositRequest" | "depositWalletAddress" | "withdrawalRequest" | "withdrawalLog" | "adminAuditLog" | "cmsDocument" | "cmsDocumentVersion" | "supportInquiry" | "adminSlaIncident" | "adminSlaIncidentNote" | "adminFinanceCloseReport" | "trustReport" | "adminUserNote" | "adminGameNote" | "notification" | "pushSubscription"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -661,6 +663,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.LoginAttemptCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.LoginAttemptCountAggregateOutputType> | number
+        }
+      }
+    }
+    AdminMfaChallenge: {
+      payload: Prisma.$AdminMfaChallengePayload<ExtArgs>
+      fields: Prisma.AdminMfaChallengeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdminMfaChallengeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminMfaChallengePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdminMfaChallengeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminMfaChallengePayload>
+        }
+        findFirst: {
+          args: Prisma.AdminMfaChallengeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminMfaChallengePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdminMfaChallengeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminMfaChallengePayload>
+        }
+        findMany: {
+          args: Prisma.AdminMfaChallengeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminMfaChallengePayload>[]
+        }
+        create: {
+          args: Prisma.AdminMfaChallengeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminMfaChallengePayload>
+        }
+        createMany: {
+          args: Prisma.AdminMfaChallengeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AdminMfaChallengeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminMfaChallengePayload>[]
+        }
+        delete: {
+          args: Prisma.AdminMfaChallengeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminMfaChallengePayload>
+        }
+        update: {
+          args: Prisma.AdminMfaChallengeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminMfaChallengePayload>
+        }
+        deleteMany: {
+          args: Prisma.AdminMfaChallengeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdminMfaChallengeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AdminMfaChallengeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminMfaChallengePayload>[]
+        }
+        upsert: {
+          args: Prisma.AdminMfaChallengeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminMfaChallengePayload>
+        }
+        aggregate: {
+          args: Prisma.AdminMfaChallengeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminMfaChallenge>
+        }
+        groupBy: {
+          args: Prisma.AdminMfaChallengeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminMfaChallengeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdminMfaChallengeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminMfaChallengeCountAggregateOutputType> | number
         }
       }
     }
@@ -3328,6 +3404,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PushSubscription: {
+      payload: Prisma.$PushSubscriptionPayload<ExtArgs>
+      fields: Prisma.PushSubscriptionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PushSubscriptionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PushSubscriptionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        findFirst: {
+          args: Prisma.PushSubscriptionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PushSubscriptionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        findMany: {
+          args: Prisma.PushSubscriptionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[]
+        }
+        create: {
+          args: Prisma.PushSubscriptionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        createMany: {
+          args: Prisma.PushSubscriptionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PushSubscriptionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[]
+        }
+        delete: {
+          args: Prisma.PushSubscriptionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        update: {
+          args: Prisma.PushSubscriptionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PushSubscriptionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PushSubscriptionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PushSubscriptionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PushSubscriptionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        aggregate: {
+          args: Prisma.PushSubscriptionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePushSubscription>
+        }
+        groupBy: {
+          args: Prisma.PushSubscriptionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PushSubscriptionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PushSubscriptionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PushSubscriptionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3411,6 +3561,22 @@ export const LoginAttemptScalarFieldEnum = {
 } as const
 
 export type LoginAttemptScalarFieldEnum = (typeof LoginAttemptScalarFieldEnum)[keyof typeof LoginAttemptScalarFieldEnum]
+
+
+export const AdminMfaChallengeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  codeHash: 'codeHash',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt',
+  requestIpKey: 'requestIpKey',
+  failedCount: 'failedCount',
+  lockedUntil: 'lockedUntil'
+} as const
+
+export type AdminMfaChallengeScalarFieldEnum = (typeof AdminMfaChallengeScalarFieldEnum)[keyof typeof AdminMfaChallengeScalarFieldEnum]
 
 
 export const PasswordResetTokenScalarFieldEnum = {
@@ -4023,6 +4189,23 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+export const PushSubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  endpoint: 'endpoint',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  userAgent: 'userAgent',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  lastSentAt: 'lastSentAt',
+  failedAt: 'failedAt'
+} as const
+
+export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -4462,6 +4645,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   session?: Prisma.SessionOmit
   loginAttempt?: Prisma.LoginAttemptOmit
+  adminMfaChallenge?: Prisma.AdminMfaChallengeOmit
   passwordResetToken?: Prisma.PasswordResetTokenOmit
   emailVerificationToken?: Prisma.EmailVerificationTokenOmit
   emailVerificationLoginToken?: Prisma.EmailVerificationLoginTokenOmit
@@ -4498,6 +4682,7 @@ export type GlobalOmitConfig = {
   adminUserNote?: Prisma.AdminUserNoteOmit
   adminGameNote?: Prisma.AdminGameNoteOmit
   notification?: Prisma.NotificationOmit
+  pushSubscription?: Prisma.PushSubscriptionOmit
 }
 
 /* Types for Logging */
