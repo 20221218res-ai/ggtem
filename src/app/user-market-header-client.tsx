@@ -60,8 +60,8 @@ export default function UserMarketHeaderClient({
   }, [currentUser]);
 
   return (
-    <header className="sticky top-0 z-30 overflow-x-clip border-b border-[var(--gg-border-soft)] bg-white/95 shadow-sm shadow-[var(--gg-shadow)] backdrop-blur">
-      <div className="mx-auto flex max-w-[1360px] flex-wrap items-center gap-2 px-4 py-2 sm:gap-3 lg:gap-4 lg:px-8">
+    <header className="relative z-30 overflow-x-clip border-b border-[var(--gg-border-soft)] bg-white/95 shadow-sm shadow-[var(--gg-shadow)] backdrop-blur lg:sticky lg:top-0">
+      <div className="mx-auto flex max-w-[1360px] items-center gap-2 px-4 py-2 sm:gap-3 lg:gap-4 lg:px-8">
         <Link href="/" prefetch={false} className="flex shrink-0 items-center" aria-label="GGtem home">
           <BrandLogo />
         </Link>
@@ -91,28 +91,30 @@ export default function UserMarketHeaderClient({
           </button>
         </form>
 
-        <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
+        <div className="ml-auto flex min-w-0 shrink-0 items-center justify-end gap-1.5 sm:gap-2">
           <QuickTextLink href="/download">
             {t("pwaInstall.installButton")}
           </QuickTextLink>
           {currentUser ? (
             <>
-              <QuickTextLink href="/my/wallet?action=deposit" tone="primary">
+              <QuickTextLink href="/my/wallet?action=deposit" tone="primary" className="hidden sm:inline-flex">
                 {t("common.deposit")}
               </QuickTextLink>
-              <QuickTextLink href="/my/wallet?action=withdraw">
+              <QuickTextLink href="/my/wallet?action=withdraw" className="hidden sm:inline-flex">
                 {t("common.withdraw")}
               </QuickTextLink>
             </>
           ) : (
             null
           )}
-          <CountrySelector />
+          <div className="hidden sm:block">
+            <CountrySelector />
+          </div>
           {currentUser ? (
             <>
               <SignOutButton
                 redirectTo="/"
-                className="inline-flex h-9 items-center justify-center rounded-full border border-red-200 bg-white px-3 text-xs font-black text-red-500 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 sm:hidden"
+                className="hidden h-9 items-center justify-center rounded-full border border-red-200 bg-white px-3 text-xs font-black text-red-500 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
               />
               <MarketplaceAccountMenu
                 displayName={currentUser.displayName}
@@ -125,9 +127,13 @@ export default function UserMarketHeaderClient({
         </div>
       </div>
 
+      <div className="mx-4 mb-2 overflow-x-auto sm:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <CountrySelector />
+      </div>
+
       <form
         action="/listings"
-        className="mx-4 mb-3 flex items-center rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-2 py-1 xl:hidden"
+        className="mx-4 mb-2 flex items-center rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-2 py-1 sm:mb-3 xl:hidden"
       >
         <select
           name="mode"
@@ -150,7 +156,7 @@ export default function UserMarketHeaderClient({
         </button>
       </form>
 
-      <div className="mx-auto flex max-w-[1360px] items-center gap-2 overflow-x-auto whitespace-nowrap px-4 pb-3 lg:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="mx-auto flex max-w-[1360px] items-center gap-2 overflow-x-auto whitespace-nowrap px-4 pb-3 pt-1 lg:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <HeaderAction href="/my/listings/new" tone="sell">
           {t("home.createListing")}
         </HeaderAction>
@@ -162,7 +168,7 @@ export default function UserMarketHeaderClient({
             key={category.href}
             href={category.href}
             prefetch={false}
-            className="shrink-0 rounded-full px-3 py-2 text-sm font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)] hover:text-[var(--gg-accent)]"
+            className="shrink-0 rounded-full px-3 py-2 text-xs font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)] hover:text-[var(--gg-accent)] sm:text-sm"
           >
             {t(category.labelKey)}
           </Link>
@@ -170,7 +176,7 @@ export default function UserMarketHeaderClient({
         <Link
           href="/support"
           prefetch={false}
-          className="shrink-0 rounded-full px-3 py-2 text-sm font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)] hover:text-[var(--gg-accent)]"
+          className="shrink-0 rounded-full px-3 py-2 text-xs font-black text-[var(--gg-text)] hover:bg-[var(--gg-control-bg)] hover:text-[var(--gg-accent)] sm:text-sm"
         >
           {t("common.customerCenter")}
         </Link>
@@ -212,21 +218,24 @@ function QuickTextLink({
   href,
   children,
   tone = "default",
+  className,
 }: {
   href: string;
   children: ReactNode;
   tone?: "default" | "primary";
+  className?: string;
 }) {
-  const className =
+  const toneClassName =
     tone === "primary"
       ? "border-[var(--gg-accent)] bg-[var(--gg-accent)] text-[var(--gg-inverse-text)] shadow-md shadow-[color-mix(in_srgb,var(--gg-accent)_28%,transparent)] ring-2 ring-[color-mix(in_srgb,var(--gg-accent)_18%,white)] hover:bg-[var(--gg-accent-hover)]"
       : "border-[color-mix(in_srgb,var(--gg-accent)_34%,var(--gg-border))] bg-white text-[var(--gg-accent)] shadow-sm hover:border-[var(--gg-accent)] hover:bg-[color-mix(in_srgb,var(--gg-accent)_8%,white)]";
+  const displayClassName = className?.includes("hidden") ? "" : "inline-flex";
 
   return (
     <Link
       href={href}
       prefetch={false}
-      className={`inline-flex h-9 items-center justify-center rounded-xl border px-3 text-xs font-black transition sm:h-10 sm:px-4 ${className}`}
+      className={`${displayClassName} h-9 items-center justify-center rounded-xl border px-3 text-xs font-black transition sm:h-10 sm:px-4 ${toneClassName} ${className ?? ""}`}
     >
       {children}
     </Link>
@@ -272,7 +281,7 @@ function HeaderAction({
     <Link
       href={href}
       prefetch={false}
-      className={`shrink-0 rounded-full px-4 py-2 text-sm font-black ${className}`}
+      className={`shrink-0 rounded-full px-3 py-2 text-xs font-black sm:px-4 sm:text-sm ${className}`}
     >
       {children}
     </Link>
@@ -328,3 +337,4 @@ function formatHeaderBalance(value: string) {
     maximumFractionDigits: numericValue >= 100 ? 2 : 4,
   });
 }
+
