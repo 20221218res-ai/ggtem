@@ -16,7 +16,7 @@ export async function GET() {
   const sessionUser = await getCurrentSessionUser({ touch: false });
 
   if (!sessionUser) {
-    return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 });
+    return NextResponse.json({ message: "Authentication is required." }, { status: 401 });
   }
 
   return NextResponse.json({
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   const sessionUser = await getCurrentSessionUser();
 
   if (!sessionUser) {
-    return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 });
+    return NextResponse.json({ message: "Authentication is required." }, { status: 401 });
   }
 
   const body = (await request.json().catch(() => null)) as PushSubscriptionRequest | null;
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
   if (!endpoint || !p256dh || !auth) {
     return NextResponse.json(
-      { message: "푸시 구독 정보가 올바르지 않습니다." },
+      { message: "Invalid push subscription payload." },
       { status: 400 },
     );
   }
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json({
-    message: "푸시 알림 구독이 저장되었습니다.",
+    message: "Push subscription saved.",
   });
 }
 
@@ -76,14 +76,14 @@ export async function DELETE(request: Request) {
   const sessionUser = await getCurrentSessionUser();
 
   if (!sessionUser) {
-    return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 });
+    return NextResponse.json({ message: "Authentication is required." }, { status: 401 });
   }
 
   const body = (await request.json().catch(() => null)) as { endpoint?: unknown } | null;
   const endpoint = typeof body?.endpoint === "string" ? body.endpoint : "";
 
   if (!endpoint) {
-    return NextResponse.json({ message: "푸시 구독 endpoint가 필요합니다." }, { status: 400 });
+    return NextResponse.json({ message: "Push subscription endpoint is required." }, { status: 400 });
   }
 
   const prisma = getPrismaClient();
@@ -100,6 +100,6 @@ export async function DELETE(request: Request) {
   });
 
   return NextResponse.json({
-    message: "푸시 알림 구독이 해제되었습니다.",
+    message: "Push subscription disabled.",
   });
 }

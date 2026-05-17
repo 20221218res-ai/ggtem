@@ -10,8 +10,10 @@ export default function PwaNotificationSettings() {
   const [permission, setPermission] = useState<PermissionState>("default");
   const [isStandalone, setIsStandalone] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const supportsNotifications = "Notification" in window;
@@ -42,6 +44,7 @@ export default function PwaNotificationSettings() {
 
     setIsSubmitting(true);
     setError("");
+    setSuccessMessage("");
 
     try {
       const nextPermission = await Notification.requestPermission();
@@ -82,6 +85,7 @@ export default function PwaNotificationSettings() {
         }
 
         setIsSubscribed(true);
+        setSuccessMessage(t("notification.pushSubscribed"));
         await registration.showNotification("GGtem", {
           body: t("notification.pushReady"),
           icon: "/icons/icon-192.png",
@@ -93,6 +97,28 @@ export default function PwaNotificationSettings() {
       setError(pushError instanceof Error ? pushError.message : t("notification.pushSaveFailed"));
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function sendTestNotification() {
+    setIsTesting(true);
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      const response = await fetch("/api/user/push-test", {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error(t("notification.pushTestFailed"));
+      }
+
+      setSuccessMessage(t("notification.pushTestSent"));
+    } catch (testError) {
+      setError(testError instanceof Error ? testError.message : t("notification.pushTestFailed"));
+    } finally {
+      setIsTesting(false);
     }
   }
 
@@ -132,6 +158,15 @@ export default function PwaNotificationSettings() {
           >
             {isSubmitting ? t("notification.pushChecking") : t("notification.pushEnable")}
           </button>
+          <button
+            type="button"
+            onClick={() => void sendTestNotification()}
+            disabled={isTesting || !isSubscribed}
+            className="rounded-xl border border-[var(--gg-border)] bg-white px-4 py-3 text-sm font-black text-[var(--gg-text)] hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)] disabled:cursor-not-allowed disabled:opacity-55"
+          >
+            {isTesting ? t("notification.pushChecking") : t("notification.pushTest")}
+          </button>
+          {successMessage ? <p className="text-xs font-bold text-emerald-700">{successMessage}</p> : null}
           {error ? <p className="text-xs font-bold text-rose-600">{error}</p> : null}
         </div>
       </div>
