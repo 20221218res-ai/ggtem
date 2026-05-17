@@ -783,20 +783,20 @@ function ListingSection({
 
   const sectionClass =
     tone === "premium"
-      ? "rounded-xl border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_9%,white)] p-2.5 shadow-lg shadow-[color-mix(in_srgb,var(--gg-accent)_24%,transparent)] sm:rounded-2xl sm:p-4"
+      ? "rounded-xl border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_9%,white)] p-1.5 shadow-lg shadow-[color-mix(in_srgb,var(--gg-accent)_24%,transparent)] sm:rounded-2xl sm:p-4"
       : tone === "lowest"
-        ? "rounded-xl border border-[#10b981] bg-[#ecfdf5] p-2.5 shadow-sm shadow-[#10b9812e] sm:rounded-2xl sm:p-4"
+        ? "rounded-xl border border-[#10b981] bg-[#ecfdf5] p-1.5 shadow-sm shadow-[#10b9812e] sm:rounded-2xl sm:p-4"
         : tone === "highest"
-          ? "rounded-xl border border-[#22c55e] bg-[#f0fdf4] p-2.5 shadow-sm shadow-[#22c55e2e] sm:rounded-2xl sm:p-4"
-        : "rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-2.5 sm:rounded-2xl sm:p-4";
+          ? "rounded-xl border border-[#22c55e] bg-[#f0fdf4] p-1.5 shadow-sm shadow-[#22c55e2e] sm:rounded-2xl sm:p-4"
+        : "rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-1.5 sm:rounded-2xl sm:p-4";
 
   return (
     <section className={sectionClass}>
-      <div className="mb-2.5 flex items-center justify-between gap-3 sm:mb-3">
-        <h3 className="text-base font-black sm:text-lg">
+      <div className="mb-2 flex items-center justify-between gap-2 px-1 sm:mb-3 sm:px-0">
+        <h3 className="text-[15px] font-black sm:text-lg">
           <CountryText id={titleKey} />
         </h3>
-        <span className="rounded-full bg-[var(--gg-card-bg)] px-3 py-1 text-xs font-black text-[var(--gg-muted)]">
+        <span className="rounded-full bg-[var(--gg-card-bg)] px-2.5 py-1 text-[11px] font-black text-[var(--gg-muted)] sm:px-3 sm:text-xs">
           {items.length}
           <CountryText id="home.countSuffix" />
         </span>
@@ -1311,15 +1311,15 @@ function isMarketItemPremium(entry: MarketFeedItem) {
 
 function getListingRowClass(tone: ListingSectionTone) {
   if (tone === "premium") {
-    return "border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_5%,white)] shadow-md shadow-[color-mix(in_srgb,var(--gg-accent)_24%,transparent)]";
+    return "border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_6%,white)] shadow-md shadow-[color-mix(in_srgb,var(--gg-accent)_24%,transparent)]";
   }
 
   if (tone === "lowest") {
-    return "border-[#10b981] shadow-sm shadow-[#10b9812e]";
+    return "border-[#10b981] bg-[#fbfffd] shadow-sm shadow-[#10b9812e]";
   }
 
   if (tone === "highest") {
-    return "border-[#22c55e] shadow-sm shadow-[#22c55e2e]";
+    return "border-[#22c55e] bg-[#fbfffd] shadow-sm shadow-[#22c55e2e]";
   }
 
   return "border-[var(--gg-border)]";
