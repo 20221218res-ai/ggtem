@@ -92,6 +92,9 @@ export default function UserMarketHeaderClient({
         </form>
 
         <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
+          <QuickTextLink href="/download">
+            {t("pwaInstall.installButton")}
+          </QuickTextLink>
           {currentUser ? (
             <>
               <QuickTextLink href="/my/wallet?action=deposit" tone="primary">
@@ -174,7 +177,7 @@ export default function UserMarketHeaderClient({
         <Link
           href="/download"
           prefetch={false}
-          className="shrink-0 rounded-full px-3 py-2 text-sm font-black text-[var(--gg-accent)] hover:bg-[var(--gg-control-bg)]"
+          className="hidden shrink-0 rounded-full px-3 py-2 text-sm font-black text-[var(--gg-accent)] hover:bg-[var(--gg-control-bg)] sm:inline-flex"
         >
           {t("pwaInstall.installButton")}
         </Link>
