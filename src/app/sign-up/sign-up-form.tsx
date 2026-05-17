@@ -85,7 +85,7 @@ export default function SignUpForm() {
       isActive = false;
       window.clearInterval(timer);
     };
-  }, [pendingVerificationEmail, router]);
+  }, [pendingVerificationEmail, router, t]);
 
   async function resendVerificationEmail() {
     if (!pendingVerificationEmail) return;

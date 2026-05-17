@@ -712,51 +712,6 @@ function SelectedWithdrawalMethodCard({
   );
 }
 
-function DepositChannelButton({
-  active,
-  disabled = false,
-  onClick,
-  option,
-}: {
-  active: boolean;
-  disabled?: boolean;
-  onClick: () => void;
-  option: DepositChannelView;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={
-        active
-          ? "grid gap-2 rounded-2xl border-2 border-[var(--gg-accent)] bg-white px-4 py-4 text-left shadow-sm shadow-[var(--gg-shadow)]"
-          : disabled
-            ? "grid cursor-not-allowed gap-2 rounded-2xl border border-[var(--gg-border)] bg-white/60 px-4 py-4 text-left opacity-75"
-            : "grid gap-2 rounded-2xl border border-[var(--gg-border)] bg-white/80 px-4 py-4 text-left hover:border-[var(--gg-accent)] hover:bg-white"
-      }
-    >
-      <span className="flex items-center justify-between gap-3">
-        <span className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--gg-accent)] text-sm font-black text-[var(--gg-inverse-text)]">
-            US
-          </span>
-          <span>
-            <span className="block text-base font-black text-[var(--gg-text)]">{option.label}</span>
-            <span className="block text-xs font-bold text-[var(--gg-muted)]">{option.networkName}</span>
-          </span>
-        </span>
-        <span className={active ? "text-sm font-black text-[var(--gg-accent)]" : "text-sm font-black text-[var(--gg-muted)]"}>
-          {disabled ? <CountryText id="wallet.channelSetupNeeded" /> : option.chain}
-        </span>
-      </span>
-      <span className="text-xs font-bold text-[var(--gg-muted)]">
-        <CountryText id="wallet.minimumAmount" /> {option.minimumAmount} USDT
-      </span>
-    </button>
-  );
-}
-
 function SelectedDepositMethodCard({
   option,
   currency,
@@ -1388,32 +1343,6 @@ function WithdrawalFinalConfirmModal({
   );
 }
 
-function OptionButton({
-  active,
-  onClick,
-  title,
-  subtitle,
-}: {
-  active: boolean;
-  onClick: () => void;
-  title: string;
-  subtitle: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={
-        active
-          ? "rounded-xl border-2 border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_10%,white)] px-4 py-3 text-left text-sm font-black text-[var(--gg-text)]"
-          : "rounded-xl border border-[var(--gg-border)] bg-white/70 px-4 py-3 text-left text-sm font-black text-[var(--gg-muted)] hover:bg-[var(--gg-card-bg)]"
-      }
-    >
-      {title}
-      <span className="ml-2 text-xs font-bold text-[var(--gg-muted)]">{subtitle}</span>
-    </button>
-  );
-}
 
 function PanelTitle({ eyebrowKey, titleKey }: { eyebrowKey: TranslationKey; titleKey: TranslationKey }) {
   return (

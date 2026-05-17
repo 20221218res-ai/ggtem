@@ -1075,10 +1075,6 @@ export async function purchaseMarketplaceListing(input: {
     const buyerWithdrawable = parseFixedAmount(
       buyer.wallet.withdrawableBalance.toString(),
     );
-    const buyerEscrow = parseFixedAmount(
-      buyer.wallet.escrowLockedBalance.toString(),
-    );
-
     if (purchaseAmount <= 0n) {
       throw new Error("구매 금액은 0보다 커야 합니다.");
     }
@@ -1103,7 +1099,7 @@ export async function purchaseMarketplaceListing(input: {
     const buyerGameNickname = tradeCharacterName;
     const sellerGameNickname = listing.sellerGameNickname;
 
-    const inventoryResult = lockPurchaseQuantity(
+    lockPurchaseQuantity(
       {
         listingId: listing.id,
         totalQuantity: listing.inventory.totalQuantity.toString(),

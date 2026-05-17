@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Alert, Button, Card, CardHeading } from "@/components/ui";
 import CountryText from "../../country-text";
@@ -17,7 +17,7 @@ export default function VerifyEmailForm({ token }: { token: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const didAutoSubmit = useRef(false);
 
-  async function submit() {
+  const submit = useCallback(async () => {
     setMessage("");
     setError("");
     setIsSubmitting(true);
@@ -51,7 +51,7 @@ export default function VerifyEmailForm({ token }: { token: string }) {
     } finally {
       setIsSubmitting(false);
     }
-  }
+  }, [router, t, token]);
 
   useEffect(() => {
     if (didAutoSubmit.current) {
@@ -60,7 +60,7 @@ export default function VerifyEmailForm({ token }: { token: string }) {
 
     didAutoSubmit.current = true;
     void submit();
-  }, []);
+  }, [submit]);
 
   return (
     <Card>

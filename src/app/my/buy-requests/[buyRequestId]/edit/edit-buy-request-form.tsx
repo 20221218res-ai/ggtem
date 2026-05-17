@@ -213,6 +213,7 @@ export default function EditBuyRequestForm({
                   key={image.imageId}
                   className="relative overflow-hidden rounded-xl border border-[var(--gg-border-soft)] bg-white"
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={image.imageUrl}
                     alt={image.altText || title}
@@ -231,6 +232,7 @@ export default function EditBuyRequestForm({
             <div className="mt-3 grid gap-3 sm:grid-cols-3">
               {imagePreviewUrls.map((url, index) => (
                 <div key={`${url}-${index}`} className="overflow-hidden rounded-xl border border-[var(--gg-border-soft)] bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={url}
                     alt={`${t("listingForm.imageSection")} ${index + 1}`}

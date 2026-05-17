@@ -267,7 +267,11 @@ export async function getAdminReviewModerationState(): Promise<AdminReviewModera
   const queue = [...reportItems, ...reviewItems]
     .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime())
     .slice(0, 30)
-    .map(({ createdAt: _createdAt, ...item }) => item);
+    .map((entry) => {
+      const { createdAt, ...item } = entry;
+      void createdAt;
+      return item;
+    });
 
   return {
     summary: {

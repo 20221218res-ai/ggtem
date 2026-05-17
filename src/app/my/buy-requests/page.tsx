@@ -182,7 +182,6 @@ export default async function MyBuyRequestsPage({ searchParams }: MyBuyRequestsP
 
 function BuyRequestRow({ request }: { request: MyBuyRequest }) {
   const pendingOffers = request.offers?.filter((offer) => offer.status === "PENDING") ?? [];
-  const moneyUnit = request.category === "GAME_MONEY" ? request.moneyUnitName : "";
   const price = getBuyRequestDisplayPrice(request);
   const accountTransferTypeLabel =
     request.category === "GAME_ACCOUNT" ? getAccountTransferTypeLabelNode(request.accountTransferType) : null;

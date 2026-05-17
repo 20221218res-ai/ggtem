@@ -908,10 +908,6 @@ export async function createMarketplaceBuyRequest(input: {
   const buyerWithdrawable = parseFixedAmount(
     buyerWallet.withdrawableBalance.toString(),
   );
-  const buyerBuyRequestLocked = parseFixedAmount(
-    buyerWallet.buyRequestLocked.toString(),
-  );
-
   if (buyerAvailable < requiredAvailableAmount) {
     throw new Error("사용 가능 잔액이 부족합니다.");
   }

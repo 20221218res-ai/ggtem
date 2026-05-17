@@ -264,6 +264,7 @@ function GameCard({ game }: { game: GameRow }) {
       <div className="grid gap-4 border-b border-slate-200 p-5 xl:grid-cols-[1fr_360px]">
         <div className="flex min-w-0 gap-4">
           {game.imageUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={game.imageUrl}
               alt={game.imageAlt || game.name}

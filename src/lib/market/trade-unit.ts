@@ -270,14 +270,6 @@ function resolveMoneyUnitName(
   return value[countryCode] ?? value.KR ?? value.default ?? null;
 }
 
-function formatIntegerQuantity(value: string) {
-  if (!/^\d+$/.test(value)) {
-    return value;
-  }
-
-  return BigInt(value).toLocaleString("en-US");
-}
-
 function formatActualGameMoneyQuantity(
   value: string,
   countryCode: TradeUnitCountryCode,

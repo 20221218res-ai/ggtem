@@ -213,11 +213,12 @@ export default async function BuyRequestDetailPage({
 
               {request.contentImages.length > 0 ? (
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {request.contentImages.map((image, index) => (
+                  {request.contentImages.map((image) => (
                     <div
                       key={image.imageId}
                       className="overflow-hidden rounded-2xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)]"
                     >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={image.imageUrl}
                         alt={image.altText || request.title || request.gameName}

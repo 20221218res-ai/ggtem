@@ -135,14 +135,13 @@ export default function BuyRequestOfferForm({
   }, [
     actualQuantity,
     defaultQuantity,
-    displayDefaultQuantity,
     displayDefaultQuantityLabel,
-    displayMinimumQuantity,
     displayMinimumQuantityLabel,
     isBulkMode,
     isGameMoneyRequest,
     minimumQuantity,
     quantity,
+    t,
   ]);
 
   const effectiveTotalAmount = useMemo(() => {

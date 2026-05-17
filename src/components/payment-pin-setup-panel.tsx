@@ -62,7 +62,7 @@ export default function PaymentPinSetupPanel({
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [t]);
 
   async function submitPin() {
     setMessage("");

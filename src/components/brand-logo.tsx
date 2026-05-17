@@ -20,7 +20,7 @@ const sizeClasses = {
 
 export default function BrandLogo({
   size = "md",
-  admin: _admin = false,
+  admin: _admin,
   className = "",
   ...props
 }: BrandLogoProps) {
@@ -29,6 +29,7 @@ export default function BrandLogo({
   return (
     <span
       {...props}
+      data-admin-logo={_admin ? "true" : undefined}
       className={`inline-flex items-center ${className}`}
     >
       <Image

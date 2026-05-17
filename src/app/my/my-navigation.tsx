@@ -154,7 +154,11 @@ export default function MyNavigation({
           </Link>
         ))}
 
-        <nav className="flex shrink-0 items-center gap-1 sm:ml-auto" aria-label="My menu">
+        <nav
+          className="flex shrink-0 items-center gap-1 sm:ml-auto"
+          aria-label="My menu"
+          data-configured-links={links.length}
+        >
           <NavIconLink href="/my/wallet" active={isActivePath(pathname, "/my/wallet")}>
             <CountryText id="common.wallet" />
           </NavIconLink>

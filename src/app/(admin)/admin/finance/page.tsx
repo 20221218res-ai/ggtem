@@ -31,8 +31,6 @@ export default async function AdminFinancePage({
   const nextAction = getOperationNextAction({
     pendingDeposits: state.summary.pendingDeposits,
     pendingWithdrawals: state.summary.pendingWithdrawals,
-    pendingDepositAmount: state.summary.pendingDepositAmount,
-    pendingWithdrawalAmount: state.summary.pendingWithdrawalAmount,
   });
 
   const filteredHistory = state.recentProcessed.filter((item) => {
@@ -490,32 +488,6 @@ function HeaderLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-function ActionPill({
-  href,
-  label,
-  tone,
-}: {
-  href: string;
-  label: string;
-  tone: "emerald" | "amber" | "sky" | "dark";
-}) {
-  const tones = {
-    emerald: "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100",
-    amber: "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100",
-    sky: "border-sky-200 bg-sky-50 text-sky-800 hover:bg-sky-100",
-    dark: "border-slate-950 bg-slate-950 text-white hover:bg-slate-800",
-  };
-
-  return (
-    <Link
-      href={href}
-      className={`rounded-full border px-4 py-2 text-sm font-black ${tones[tone]}`}
-    >
-      {label}
-    </Link>
-  );
-}
-
 function QueueCard({
   href,
   eyebrow,
@@ -799,13 +771,9 @@ function buildFinanceHistoryHref({
 function getOperationNextAction({
   pendingDeposits,
   pendingWithdrawals,
-  pendingDepositAmount,
-  pendingWithdrawalAmount,
 }: {
   pendingDeposits: number;
   pendingWithdrawals: number;
-  pendingDepositAmount: string;
-  pendingWithdrawalAmount: string;
 }) {
   if (pendingWithdrawals > 0) {
     return {

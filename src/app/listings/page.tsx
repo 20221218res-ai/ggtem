@@ -1059,13 +1059,6 @@ function BuyRequestRow({
     moneyUnitName: request.moneyUnitName,
     fallbackUnit: moneyUnit,
   });
-  const minimumQuantityLabel = getDisplayQuantity({
-    category: request.category,
-    quantity: request.minimumQuantity,
-    priceUnitQuantity: request.priceUnitQuantity,
-    moneyUnitName: request.moneyUnitName,
-    fallbackUnit: moneyUnit,
-  });
   const rowClass = getListingRowClass(tone);
 
   return (
@@ -1453,50 +1446,6 @@ function filterMarketItemsByServerAndPrice(
 
     return true;
   });
-}
-
-function buildGameCards(
-  items: MarketFeedItem[],
-  games: GameCatalogOption[],
-  gameSearch: string,
-) {
-  const counts = new Map<string, { sellCount: number; buyCount: number }>();
-
-  for (const entry of items) {
-    const gameName = entry.item.gameName;
-    const current = counts.get(gameName) ?? { sellCount: 0, buyCount: 0 };
-
-    if (entry.type === "listing") {
-      current.sellCount += 1;
-    } else {
-      current.buyCount += 1;
-    }
-
-    counts.set(gameName, current);
-  }
-
-  const byName = new Map<string, GameCatalogOption>();
-
-  for (const game of games) {
-    if (!byName.has(game.name)) {
-      byName.set(game.name, game);
-    }
-  }
-
-  const normalizedSearch = gameSearch.toLowerCase();
-
-  return Array.from(byName.values())
-    .filter((game) => !normalizedSearch || game.name.toLowerCase().includes(normalizedSearch))
-    .slice(0, 12)
-    .map((game) => {
-      const count = counts.get(game.name) ?? { sellCount: 0, buyCount: 0 };
-
-      return {
-        ...game,
-        sellCount: count.sellCount,
-        buyCount: count.buyCount,
-      };
-    });
 }
 
 function buildGameCardsFromDirectory(

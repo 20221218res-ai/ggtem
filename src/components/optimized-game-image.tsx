@@ -34,6 +34,8 @@ export default function OptimizedGameImage({
   }
 
   return (
+    // Remote game catalog URLs are already normalized by the admin game settings flow.
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
       alt={alt}

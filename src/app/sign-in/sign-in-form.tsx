@@ -88,7 +88,7 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
       isActive = false;
       window.clearInterval(timer);
     };
-  }, [router, verificationNotice]);
+  }, [router, t, verificationNotice]);
 
   async function resendVerificationEmail() {
     if (!verificationNotice) return;
@@ -290,6 +290,7 @@ export default function SignInForm({ accounts }: { accounts: DemoAccount[] }) {
       </form>
 
       <section className="rounded-xl bg-transparent px-2 py-3 text-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/brand/minor-19.png"
           alt=""
