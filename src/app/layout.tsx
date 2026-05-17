@@ -4,6 +4,7 @@ import AuthStatus from "./auth-status";
 import ConditionalAuthStatus from "./conditional-auth-status";
 import CountryScript from "./country-script";
 import PriorityNotificationModal from "./priority-notification-modal";
+import PwaNotificationBridge from "./pwa-notification-bridge";
 import UserLocaleDomTranslator from "./user-locale-dom-translator";
 
 export const metadata: Metadata = {
@@ -51,6 +52,7 @@ export default function RootLayout({
         </ConditionalAuthStatus>
         {children}
         <PriorityNotificationModal />
+        <PwaNotificationBridge />
         <UserLocaleDomTranslator />
       </body>
     </html>

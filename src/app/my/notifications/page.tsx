@@ -11,6 +11,7 @@ import { getMyNotificationsView } from "@/lib/notifications/notifications";
 import MarkAllReadButton from "./mark-all-read";
 import NotificationActions from "./notification-actions";
 import NotificationOpenLink from "./notification-open-link";
+import PwaNotificationSettings from "./pwa-notification-settings";
 
 const notificationTypes = [
   "CHAT_MESSAGE",
@@ -119,6 +120,8 @@ export default async function MyNotificationsPage() {
             </div>
           </div>
         </header>
+
+        <PwaNotificationSettings />
 
         <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <SummaryCard

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import CountryText from "./country-text";
 
 type NotificationItem = {
   notificationId: string;
@@ -28,6 +29,7 @@ export default function PriorityNotificationModal() {
   const [notification, setNotification] = useState<NotificationItem | null>(null);
   const [dismissedId, setDismissedId] = useState<string | null>(null);
   const [isOpening, setIsOpening] = useState(false);
+  const browserNotifiedIdRef = useRef<string | null>(null);
   const shouldCheck = useMemo(() => {
     if (!pathname) return false;
     if (pathname.startsWith("/admin")) return false;
@@ -81,6 +83,11 @@ export default function PriorityNotificationModal() {
         if (isActive) {
           const nextNotification = data.notification ?? null;
           setNotification(nextNotification);
+
+          if (nextNotification) {
+            void showBrowserNotification(nextNotification);
+          }
+
           scheduleNextCheck(
             nextNotification || !dismissedId
               ? ACTIVE_CHECK_INTERVAL_MS
@@ -102,6 +109,34 @@ export default function PriorityNotificationModal() {
       }
     };
   }, [dismissedId, shouldCheck]);
+
+  async function showBrowserNotification(nextNotification: NotificationItem) {
+    if (browserNotifiedIdRef.current === nextNotification.notificationId) {
+      return;
+    }
+
+    if (!("Notification" in window) || Notification.permission !== "granted") {
+      return;
+    }
+
+    if (!("serviceWorker" in navigator)) {
+      return;
+    }
+
+    browserNotifiedIdRef.current = nextNotification.notificationId;
+
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(nextNotification.title, {
+        body: nextNotification.body,
+        icon: "/icons/icon-192.png",
+        badge: "/icons/icon-192.png",
+        data: { url: nextNotification.href ?? "/my/notifications" },
+      });
+    } catch {
+      browserNotifiedIdRef.current = null;
+    }
+  }
 
   async function openNotification() {
     if (!notification || isOpening) {
@@ -152,10 +187,10 @@ export default function PriorityNotificationModal() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-black uppercase text-[var(--gg-accent)]">
-              우선 알림
+              <CountryText id="notification.priority" />
             </p>
             <h2 className="mt-2 text-2xl font-black text-[var(--gg-text)]">
-              먼저 확인해야 할 거래 알림이 있습니다
+              <CountryText id="notification.unreadTitle" values={{ count: 1 }} />
             </h2>
           </div>
           <button
@@ -164,7 +199,7 @@ export default function PriorityNotificationModal() {
             disabled={isOpening}
             className="rounded-lg border border-[var(--gg-border)] px-3 py-2 text-sm font-black text-[var(--gg-muted)] hover:text-[var(--gg-text)]"
           >
-            닫기
+            <CountryText id="wallet.close" />
           </button>
         </div>
         <button
@@ -187,7 +222,7 @@ export default function PriorityNotificationModal() {
           disabled={isOpening}
           className="mt-4 w-full rounded-xl bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-white hover:brightness-105"
         >
-          바로 확인하기
+          <CountryText id="notification.openRelated" />
         </button>
       </div>
     </div>
