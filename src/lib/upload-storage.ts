@@ -18,6 +18,8 @@ type UploadResult = {
 const SUPABASE_STORAGE_PREFIX = "supabase://";
 
 export async function saveUploadObject(input: UploadInput): Promise<UploadResult> {
+  assertUploadStorageReady();
+
   if (isSupabaseStorageConfigured()) {
     return saveSupabaseObject(input);
   }
@@ -42,6 +44,8 @@ export async function copyUploadObject(input: {
   fileName: string;
   contentType: string;
 }): Promise<UploadResult> {
+  assertUploadStorageReady();
+
   if (input.sourceStoragePath.startsWith(SUPABASE_STORAGE_PREFIX)) {
     const bytes = await readSupabaseObject(input.sourceStoragePath);
     return saveUploadObject({
@@ -80,6 +84,24 @@ function isSupabaseStorageConfigured() {
       process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() &&
       getUploadBucket(),
   );
+}
+
+function assertUploadStorageReady() {
+  if (process.env.GGITEM_UPLOAD_STORAGE !== "supabase") {
+    return;
+  }
+
+  const missing = [
+    ["SUPABASE_URL", process.env.SUPABASE_URL],
+    ["SUPABASE_SERVICE_ROLE_KEY", process.env.SUPABASE_SERVICE_ROLE_KEY],
+    ["GGITEM_UPLOAD_BUCKET", getUploadBucket()],
+  ]
+    .filter(([, value]) => !value?.trim())
+    .map(([name]) => name);
+
+  if (missing.length > 0) {
+    throw new Error(`Supabase 업로드 저장소 설정이 완료되지 않았습니다. 누락: ${missing.join(", ")}`);
+  }
 }
 
 async function saveLocalObject(input: UploadInput): Promise<UploadResult> {

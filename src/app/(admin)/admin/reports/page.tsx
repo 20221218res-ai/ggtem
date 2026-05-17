@@ -531,8 +531,8 @@ function walletKindLabel(kind: string) {
   const labels: Record<string, string> = {
     DEPOSIT: "충전",
     WITHDRAWAL: "출금",
-    "異⑹쟾": "충전",
-    "異쒓툑": "출금",
+    "\u7570\u2479\uC7FE": "충전",
+    "\u7570\uC493\uD211": "출금",
   };
   return labels[kind] ?? kind;
 }

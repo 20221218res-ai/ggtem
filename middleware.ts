@@ -5,6 +5,7 @@ const ADMIN_ROUTE_PREFIXES = ["/admin", "/api/admin"];
 const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 const SHARED_ROUTE_PREFIXES = [
   "/api/auth",
+  "/api/cron",
   "/password-reset",
   "/sign-in",
   "/verify-email",
