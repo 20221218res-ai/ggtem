@@ -64,6 +64,15 @@ export default function DownloadInstallPanel() {
           {t(isIos ? "pwaInstall.iosBody" : "pwaInstall.androidBody")}
         </p>
 
+        <div className="mt-5 rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] p-4">
+          <p className="text-xs font-black uppercase text-[var(--gg-muted)]">
+            {t("pwaInstall.currentMode")}
+          </p>
+          <p className="mt-1 text-lg font-black text-[var(--gg-text)]">
+            {t(isReady && isStandalone ? "pwaInstall.modeApp" : "pwaInstall.modeBrowser")}
+          </p>
+        </div>
+
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {installPrompt ? (
             <button
@@ -91,25 +100,30 @@ export default function DownloadInstallPanel() {
 
         {isReady && isStandalone ? (
           <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-black text-emerald-700">
-            {t("pwaInstall.modeApp")}
+            {t("pwaInstall.installedNotice")}
           </p>
         ) : null}
       </div>
 
       <div className="grid gap-3">
-        <InstallStep title="iPhone / iPad" body="Safari > 공유 > 홈 화면에 추가" />
-        <InstallStep title="Android" body="Chrome > 앱 설치 또는 홈 화면에 추가" />
-        <InstallStep title="알림" body="설치 후 알림 설정에서 거래, 채팅, 공지 알림 켜기" />
+        <InstallStep step="1" title="iPhone / iPad" body={t("pwaInstall.iosStep")} />
+        <InstallStep step="2" title="Android" body={t("pwaInstall.androidStep")} />
+        <InstallStep step="3" title={t("pwaInstall.notificationStepTitle")} body={t("pwaInstall.notificationStep")} />
       </div>
     </section>
   );
 }
 
-function InstallStep({ title, body }: { title: string; body: string }) {
+function InstallStep({ step, title, body }: { step: string; title: string; body: string }) {
   return (
-    <div className="rounded-2xl border border-[var(--gg-border)] bg-white p-5 shadow-sm shadow-[var(--gg-shadow)]">
-      <p className="text-lg font-black text-[var(--gg-text)]">{title}</p>
-      <p className="mt-2 text-sm font-bold text-[var(--gg-muted)]">{body}</p>
+    <div className="flex gap-4 rounded-2xl border border-[var(--gg-border)] bg-white p-5 shadow-sm shadow-[var(--gg-shadow)]">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--gg-accent)] text-sm font-black text-[var(--gg-inverse-text)]">
+        {step}
+      </span>
+      <div>
+        <p className="text-lg font-black text-[var(--gg-text)]">{title}</p>
+        <p className="mt-2 text-sm font-bold leading-6 text-[var(--gg-muted)]">{body}</p>
+      </div>
     </div>
   );
 }
