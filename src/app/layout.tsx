@@ -4,6 +4,7 @@ import AuthStatus from "./auth-status";
 import ConditionalAuthStatus from "./conditional-auth-status";
 import CountryScript from "./country-script";
 import PriorityNotificationModal from "./priority-notification-modal";
+import PwaInstallPrompt from "./pwa-install-prompt";
 import PwaNotificationBridge from "./pwa-notification-bridge";
 import UserLocaleDomTranslator from "./user-locale-dom-translator";
 
@@ -53,6 +54,7 @@ export default function RootLayout({
         {children}
         <PriorityNotificationModal />
         <PwaNotificationBridge />
+        <PwaInstallPrompt />
         <UserLocaleDomTranslator />
       </body>
     </html>

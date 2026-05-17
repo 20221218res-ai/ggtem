@@ -141,6 +141,14 @@ export default function PwaNotificationSettings() {
           <h2 className="mt-1 text-2xl font-black text-[var(--gg-text)]">
             {t("notification.pushTitle")}
           </h2>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <span className="rounded-full border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-1 text-xs font-black text-[var(--gg-muted)]">
+              {t(isStandalone ? "pwaInstall.modeApp" : "pwaInstall.modeBrowser")}
+            </span>
+            <span className="rounded-full border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-1 text-xs font-black text-[var(--gg-muted)]">
+              {t(isSubscribed ? "notification.pushSubscribed" : "notification.pushDefault")}
+            </span>
+          </div>
           <p className="mt-2 text-sm font-bold leading-6 text-[var(--gg-muted)]">
             {t(isStandalone ? "notification.pushStandaloneBody" : "notification.pushInstallHint")}
           </p>
