@@ -924,7 +924,7 @@ function ListingRow({
   return (
     <Link
       href={`/listings/${listing.listingId}`}
-      className={`grid gap-3 rounded-xl border bg-[var(--gg-card-bg)] p-3 hover:border-[var(--gg-accent)] sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[minmax(0,1fr)_340px_220px] md:items-center ${rowClass}`}
+      className={`grid grid-cols-[minmax(0,1fr)_112px] gap-3 rounded-xl border bg-[var(--gg-card-bg)] p-3 hover:border-[var(--gg-accent)] sm:grid-cols-[minmax(0,1fr)_150px] sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[minmax(0,1fr)_340px_220px] md:items-center ${rowClass}`}
     >
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -965,12 +965,12 @@ function ListingRow({
         </div>
       </div>
 
-      <div className="grid gap-2 rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-card-soft-bg)] p-3 text-xs font-black text-[var(--gg-muted)] sm:text-sm md:border-0 md:bg-transparent md:p-0 md:items-center md:justify-self-center">
-        <div className="grid grid-cols-[64px_minmax(0,1fr)] items-baseline gap-3 sm:grid-cols-[72px_minmax(0,1fr)]">
-          <span className="text-center">
+      <div className="col-span-2 grid grid-cols-2 gap-2 rounded-lg border border-[var(--gg-border-soft)] bg-[var(--gg-card-soft-bg)] px-3 py-2 text-[11px] font-black text-[var(--gg-muted)] sm:text-xs md:col-span-1 md:grid-cols-1 md:gap-2 md:border-0 md:bg-transparent md:p-0 md:text-sm md:items-center md:justify-self-center">
+        <div className="flex min-w-0 items-baseline gap-2 md:grid md:grid-cols-[72px_minmax(0,1fr)] md:gap-3">
+          <span className="shrink-0">
             <CountryText id="listings.minimum" />
           </span>
-          <span className="text-[var(--gg-text)]">
+          <span className="min-w-0 truncate text-[var(--gg-text)]">
             {listing.category === "GAME_MONEY" ? (
               <GameMoneyQuantityText
                 quantity={listing.minimumQuantity}
@@ -982,11 +982,11 @@ function ListingRow({
             )}
           </span>
         </div>
-        <div className="grid grid-cols-[64px_minmax(0,1fr)] items-baseline gap-3 sm:grid-cols-[72px_minmax(0,1fr)]">
-          <span className="text-center">
+        <div className="flex min-w-0 items-baseline gap-2 md:grid md:grid-cols-[72px_minmax(0,1fr)] md:gap-3">
+          <span className="shrink-0">
             <CountryText id="listings.stock" />
           </span>
-          <span className="text-[var(--gg-text)]">
+          <span className="min-w-0 truncate text-[var(--gg-text)]">
             {listing.category === "GAME_MONEY" ? (
               <GameMoneyQuantityText
                 quantity={listing.availableQuantity}
@@ -1000,9 +1000,9 @@ function ListingRow({
         </div>
       </div>
 
-      <div className="flex flex-col justify-between gap-3 md:gap-4 md:text-right">
+      <div className="row-span-2 flex min-w-0 flex-col items-end justify-between gap-3 text-right md:row-span-1 md:gap-4">
         <div>
-          <p className="text-xs font-bold text-[var(--gg-muted)] sm:text-sm">
+          <p className="line-clamp-2 text-[10px] font-bold leading-snug text-[var(--gg-muted)] sm:text-xs md:text-sm">
             {listing.category === "GAME_MONEY" ? (
               <GameMoneyPriceUnitText
                 priceUnitQuantity={listing.priceUnitQuantity}
@@ -1013,11 +1013,11 @@ function ListingRow({
             )}{" "}
             <CountryText id="listings.unitPricePerUnit" />
           </p>
-          <p className="mt-1 text-2xl font-black leading-tight text-[var(--gg-accent)]">
+          <p className="mt-1 break-words text-lg font-black leading-tight text-[var(--gg-accent)] sm:text-xl md:text-2xl">
             {priceDisplay.price} {listing.currency}
           </p>
         </div>
-        <span className="inline-flex justify-center rounded-lg bg-[var(--gg-accent)] px-4 py-2.5 text-sm font-black text-[var(--gg-inverse-text)] sm:rounded-xl sm:px-5 sm:py-3">
+        <span className="inline-flex w-full justify-center rounded-lg bg-[var(--gg-accent)] px-2 py-2 text-xs font-black text-[var(--gg-inverse-text)] sm:rounded-xl sm:px-4 sm:py-2.5 sm:text-sm md:px-5 md:py-3">
           <CountryText id="listings.instantBuy" />
         </span>
       </div>
@@ -1069,7 +1069,7 @@ function BuyRequestRow({
   const rowClass = getListingRowClass(tone);
 
   return (
-    <article className={`grid gap-3 rounded-xl border bg-[var(--gg-card-bg)] p-3 sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[1fr_240px] ${rowClass}`}>
+    <article className={`grid grid-cols-[minmax(0,1fr)_112px] gap-3 rounded-xl border bg-[var(--gg-card-bg)] p-3 sm:grid-cols-[minmax(0,1fr)_150px] sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[1fr_240px] ${rowClass}`}>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-black text-amber-700 sm:px-3 sm:text-xs">
@@ -1143,15 +1143,15 @@ function BuyRequestRow({
         </div>
       </div>
 
-      <div className="flex flex-col justify-between gap-3 md:gap-4 md:text-right">
+      <div className="flex min-w-0 flex-col items-end justify-between gap-3 text-right md:gap-4">
         <div>
-          <p className="text-xs font-bold text-[var(--gg-muted)] sm:text-sm">
+          <p className="text-[10px] font-bold text-[var(--gg-muted)] sm:text-xs md:text-sm">
             <CountryText id="listings.lockedTotal" />
           </p>
-          <p className="mt-1 text-2xl font-black leading-tight text-[var(--gg-accent)]">
+          <p className="mt-1 break-words text-lg font-black leading-tight text-[var(--gg-accent)] sm:text-xl md:text-2xl">
             {request.totalAmount} {request.currency}
           </p>
-          <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">
+          <p className="mt-1 line-clamp-2 text-[10px] font-bold leading-snug text-[var(--gg-muted)] sm:text-xs">
             <CountryText id="listings.unitPriceShort" /> {priceDisplay.price} {request.currency} /{" "}
             {request.category === "GAME_MONEY" ? (
               <GameMoneyPriceUnitText
@@ -1165,10 +1165,28 @@ function BuyRequestRow({
         </div>
         <Link
           href={`/buy-requests/${request.buyRequestId}`}
-          className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-4 py-2.5 text-center text-sm font-black hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)] sm:rounded-xl sm:py-3"
+          className="w-full rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-2 py-2 text-center text-xs font-black hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)] sm:rounded-xl sm:px-4 sm:py-2.5 sm:text-sm md:py-3"
         >
           <CountryText id="orderManage.detail" />
         </Link>
+        <div className="hidden md:block">
+        <BuyRequestOfferForm
+          buyRequestId={request.buyRequestId}
+          category={request.category}
+          defaultQuantity={offerQuantity}
+          minimumQuantity={request.minimumQuantity}
+          tradeMode={request.tradeMode}
+          defaultUnitPrice={priceDisplay.price}
+          canonicalUnitPrice={request.unitPrice}
+          priceUnitQuantity={request.priceUnitQuantity}
+          priceUnitLabel={priceDisplay.unitLabel}
+          totalAmount={offerTotalAmount}
+          currency={request.currency}
+          serverLabel={formatServerLabel(request.serverName, request.serverDetail) || undefined}
+        />
+        </div>
+      </div>
+      <div className="col-span-2 md:hidden">
         <BuyRequestOfferForm
           buyRequestId={request.buyRequestId}
           category={request.category}
