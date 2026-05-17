@@ -150,7 +150,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
     <main className="min-h-screen bg-[var(--gg-page-bg)] text-[var(--gg-text)] transition-colors">
       <MarketplaceHeader />
 
-      <section className="mx-auto grid max-w-[1360px] gap-6 px-5 py-6 lg:px-8">
+      <section className="mx-auto grid max-w-[1360px] gap-4 px-4 py-4 sm:gap-6 sm:px-5 sm:py-6 lg:px-8">
         <MarketCategoryHeader
           selectedCategory={selectedCategory}
           selectedMode={selectedMode}
@@ -924,25 +924,25 @@ function ListingRow({
   return (
     <Link
       href={`/listings/${listing.listingId}`}
-      className={`grid gap-4 rounded-2xl border bg-[var(--gg-card-bg)] p-4 hover:border-[var(--gg-accent)] md:grid-cols-[minmax(0,1fr)_340px_220px] md:items-center ${rowClass}`}
+      className={`grid gap-3 rounded-xl border bg-[var(--gg-card-bg)] p-3 hover:border-[var(--gg-accent)] sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[minmax(0,1fr)_340px_220px] md:items-center ${rowClass}`}
     >
       <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-700">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-black text-emerald-700 sm:px-3 sm:text-xs">
             <CountryText id="listings.activeSale" />
           </span>
           {tone === "lowest" ? (
-            <span className="rounded-full bg-[#10b981] px-3 py-1 text-xs font-black text-white">
+            <span className="rounded-full bg-[#10b981] px-2.5 py-1 text-[11px] font-black text-white sm:px-3 sm:text-xs">
               <CountryText id="listings.lowestPriceTop" />
             </span>
           ) : null}
           {tone === "highest" ? (
-            <span className="rounded-full bg-[#22c55e] px-3 py-1 text-xs font-black text-white">
+            <span className="rounded-full bg-[#22c55e] px-2.5 py-1 text-[11px] font-black text-white sm:px-3 sm:text-xs">
               <CountryText id="listings.highestPriceTop" />
             </span>
           ) : null}
           {listing.isPremium ? (
-            <span className="rounded-full border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_16%,white)] px-3 py-1 text-xs font-black text-[var(--gg-accent)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_18%,transparent)]">
+            <span className="rounded-full border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_16%,white)] px-2.5 py-1 text-[11px] font-black text-[var(--gg-accent)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_18%,transparent)] sm:px-3 sm:text-xs">
               <CountryText id="listings.premiumBadge" />
             </span>
           ) : null}
@@ -950,10 +950,10 @@ function ListingRow({
             <CountryText id="listings.createdPrefix" /> {listing.createdAt}
           </span>
         </div>
-        <h3 className="mt-3 line-clamp-2 text-lg font-black">
+        <h3 className="mt-2 line-clamp-2 text-base font-black leading-snug sm:mt-3 sm:text-lg">
           <UserContentText text={listing.title} />
         </h3>
-        <p className="mt-2 text-sm font-bold text-[var(--gg-muted)]">
+        <p className="mt-1.5 line-clamp-1 text-xs font-bold text-[var(--gg-muted)] sm:mt-2 sm:text-sm">
           <SourceCountryFlag text={listing.title} />{" "}
           {formatServerLabel(listing.serverName, listing.serverDetail) || <CountryText id="listings.noServer" />} /{" "}
           <CountryText id="listings.seller" /> {listing.sellerName}
@@ -965,8 +965,8 @@ function ListingRow({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 text-sm font-black text-[var(--gg-muted)] md:items-center md:justify-self-center">
-        <div className="grid grid-cols-[72px_minmax(0,1fr)] items-baseline gap-3">
+      <div className="grid gap-2 rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-card-soft-bg)] p-3 text-xs font-black text-[var(--gg-muted)] sm:text-sm md:border-0 md:bg-transparent md:p-0 md:items-center md:justify-self-center">
+        <div className="grid grid-cols-[64px_minmax(0,1fr)] items-baseline gap-3 sm:grid-cols-[72px_minmax(0,1fr)]">
           <span className="text-center">
             <CountryText id="listings.minimum" />
           </span>
@@ -982,7 +982,7 @@ function ListingRow({
             )}
           </span>
         </div>
-        <div className="grid grid-cols-[72px_minmax(0,1fr)] items-baseline gap-3">
+        <div className="grid grid-cols-[64px_minmax(0,1fr)] items-baseline gap-3 sm:grid-cols-[72px_minmax(0,1fr)]">
           <span className="text-center">
             <CountryText id="listings.stock" />
           </span>
@@ -1000,9 +1000,9 @@ function ListingRow({
         </div>
       </div>
 
-      <div className="flex flex-col justify-between gap-4 md:text-right">
+      <div className="flex flex-col justify-between gap-3 md:gap-4 md:text-right">
         <div>
-          <p className="text-sm font-bold text-[var(--gg-muted)]">
+          <p className="text-xs font-bold text-[var(--gg-muted)] sm:text-sm">
             {listing.category === "GAME_MONEY" ? (
               <GameMoneyPriceUnitText
                 priceUnitQuantity={listing.priceUnitQuantity}
@@ -1013,11 +1013,11 @@ function ListingRow({
             )}{" "}
             <CountryText id="listings.unitPricePerUnit" />
           </p>
-          <p className="mt-1 text-2xl font-black text-[var(--gg-accent)]">
+          <p className="mt-1 text-2xl font-black leading-tight text-[var(--gg-accent)]">
             {priceDisplay.price} {listing.currency}
           </p>
         </div>
-        <span className="inline-flex justify-center rounded-xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)]">
+        <span className="inline-flex justify-center rounded-lg bg-[var(--gg-accent)] px-4 py-2.5 text-sm font-black text-[var(--gg-inverse-text)] sm:rounded-xl sm:px-5 sm:py-3">
           <CountryText id="listings.instantBuy" />
         </span>
       </div>
@@ -1069,19 +1069,19 @@ function BuyRequestRow({
   const rowClass = getListingRowClass(tone);
 
   return (
-    <article className={`grid gap-4 rounded-2xl border bg-[var(--gg-card-bg)] p-4 md:grid-cols-[1fr_240px] ${rowClass}`}>
+    <article className={`grid gap-3 rounded-xl border bg-[var(--gg-card-bg)] p-3 sm:gap-4 sm:rounded-2xl sm:p-4 md:grid-cols-[1fr_240px] ${rowClass}`}>
       <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-700">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-black text-amber-700 sm:px-3 sm:text-xs">
             <CountryText id="listings.buyRequestChip" />
           </span>
           {tone === "highest" ? (
-            <span className="rounded-full bg-[#22c55e] px-3 py-1 text-xs font-black text-white">
+            <span className="rounded-full bg-[#22c55e] px-2.5 py-1 text-[11px] font-black text-white sm:px-3 sm:text-xs">
               <CountryText id="listings.highestPriceTop" />
             </span>
           ) : null}
           {request.isPremium ? (
-            <span className="rounded-full border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_16%,white)] px-3 py-1 text-xs font-black text-[var(--gg-accent)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_18%,transparent)]">
+            <span className="rounded-full border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_16%,white)] px-2.5 py-1 text-[11px] font-black text-[var(--gg-accent)] shadow-sm shadow-[color-mix(in_srgb,var(--gg-accent)_18%,transparent)] sm:px-3 sm:text-xs">
               <CountryText id="listings.premiumBadge" />
             </span>
           ) : null}
@@ -1089,19 +1089,19 @@ function BuyRequestRow({
             <CountryText id="listings.createdPrefix" /> {request.createdAt}
           </span>
         </div>
-        <h3 className="mt-3 line-clamp-2 text-lg font-black">
+        <h3 className="mt-2 line-clamp-2 text-base font-black leading-snug sm:mt-3 sm:text-lg">
           <UserContentText text={request.title || "Buy request"} />
         </h3>
-        <p className="mt-2 text-sm font-bold text-[var(--gg-muted)]">
+        <p className="mt-1.5 line-clamp-1 text-xs font-bold text-[var(--gg-muted)] sm:mt-2 sm:text-sm">
           <SourceCountryFlag text={request.title || request.description || "Buy request"} />{" "}
           {formatServerLabel(request.serverName, request.serverDetail) || <CountryText id="listings.noServer" />} /{" "}
           <CountryText id="listings.buyer" /> {request.buyerName}
         </p>
-        <div className="mt-3 flex flex-wrap gap-2 text-xs font-black text-[var(--gg-muted)]">
+        <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] font-black text-[var(--gg-muted)] sm:gap-2 sm:text-xs">
           {request.category === "GAME_ACCOUNT" ? (
             <AccountTypeChip value={request.accountTransferType} />
           ) : null}
-          <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
+          <span className="rounded-lg bg-[var(--gg-card-bg)] px-2.5 py-2 sm:px-3">
             <CountryText id="listings.wanted" />{" "}
             {request.category === "GAME_MONEY" ? (
               <GameMoneyQuantityText
@@ -1124,7 +1124,7 @@ function BuyRequestRow({
             )}
           </span>
           {request.category === "GAME_MONEY" ? (
-            <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
+            <span className="rounded-lg bg-[var(--gg-card-bg)] px-2.5 py-2 sm:px-3">
               <CountryText
                 id={request.tradeMode === "BULK" ? "listingForm.bulkBuy" : "listingForm.splitBuy"}
               />{" "}
@@ -1136,19 +1136,19 @@ function BuyRequestRow({
               />
             </span>
           ) : null}
-          <span className="rounded-lg bg-[var(--gg-card-bg)] px-3 py-2">
+          <span className="rounded-lg bg-[var(--gg-card-bg)] px-2.5 py-2 sm:px-3">
             <CountryText id="listings.offerCountPrefix" /> {request.offerCount}
             <CountryText id="listings.offerCountSuffix" />
           </span>
         </div>
       </div>
 
-      <div className="flex flex-col justify-between gap-4 md:text-right">
+      <div className="flex flex-col justify-between gap-3 md:gap-4 md:text-right">
         <div>
-          <p className="text-sm font-bold text-[var(--gg-muted)]">
+          <p className="text-xs font-bold text-[var(--gg-muted)] sm:text-sm">
             <CountryText id="listings.lockedTotal" />
           </p>
-          <p className="mt-1 text-2xl font-black text-[var(--gg-accent)]">
+          <p className="mt-1 text-2xl font-black leading-tight text-[var(--gg-accent)]">
             {request.totalAmount} {request.currency}
           </p>
           <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">
@@ -1165,7 +1165,7 @@ function BuyRequestRow({
         </div>
         <Link
           href={`/buy-requests/${request.buyRequestId}`}
-          className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-4 py-3 text-center text-sm font-black hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)]"
+          className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-bg)] px-4 py-2.5 text-center text-sm font-black hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)] sm:rounded-xl sm:py-3"
         >
           <CountryText id="orderManage.detail" />
         </Link>

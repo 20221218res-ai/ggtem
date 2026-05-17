@@ -66,8 +66,8 @@ export default async function ListingDetailPage({
     <main className="min-h-screen bg-[var(--gg-page-bg)] text-[var(--gg-text)]">
       <MarketplaceHeader />
 
-      <section className="mx-auto grid max-w-[1280px] gap-5 px-4 py-5 lg:px-8">
-        <nav className="flex flex-wrap items-center gap-2 text-sm font-bold text-[var(--gg-muted)]">
+      <section className="mx-auto grid max-w-[1280px] gap-4 px-4 py-4 sm:gap-5 sm:py-5 lg:px-8">
+        <nav className="flex flex-wrap items-center gap-2 text-xs font-bold text-[var(--gg-muted)] sm:text-sm">
           <Link href="/" className="hover:text-[var(--gg-accent)]">
             <CountryText id="common.home" />
           </Link>
@@ -86,9 +86,9 @@ export default async function ListingDetailPage({
 
         <section className="grid gap-5 xl:grid-cols-[1fr_390px]">
           <div className="grid gap-5">
-            <section className="overflow-hidden rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] shadow-sm shadow-[var(--gg-shadow)]">
-              <div className="p-6">
-                  <div className="flex flex-wrap items-center gap-2">
+            <section className="overflow-hidden rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] shadow-sm shadow-[var(--gg-shadow)] sm:rounded-2xl">
+              <div className="p-4 sm:p-6">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <Badge>
                       <CategoryName category={listing.category} />
                     </Badge>
@@ -99,17 +99,17 @@ export default async function ListingDetailPage({
                         <AccountTransferTypeText value={accountTransferTypeLabel} />
                       </Badge>
                     ) : null}
-                    <span className="ml-auto text-xs font-bold text-[var(--gg-muted)]">
+                    <span className="w-full text-xs font-bold text-[var(--gg-muted)] sm:ml-auto sm:w-auto">
                       <CountryText id="listingDetail.registeredPrefix" /> {listing.createdAt}
                     </span>
                   </div>
 
-                  <h1 className="mt-5 text-3xl font-black leading-tight lg:text-4xl">
+                  <h1 className="mt-4 text-2xl font-black leading-tight sm:mt-5 sm:text-3xl lg:text-4xl">
                     <SourceCountryFlag text={listing.title} />
                     <UserContentText text={listing.title} showSourceFlag={false} />
                   </h1>
 
-                  <div className="mt-6 grid gap-3 md:grid-cols-3">
+                  <div className="mt-4 grid gap-2 sm:mt-6 sm:gap-3 md:grid-cols-3">
                     <Metric
                       label={<CountryText id="listingDetail.unitPrice" />}
                       value={`${priceDisplay.price} ${listing.currency}`}
@@ -160,24 +160,24 @@ export default async function ListingDetailPage({
               </div>
             </section>
 
-            <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-6">
-              <div className="flex flex-wrap items-center justify-between gap-4">
+            <section className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 sm:rounded-2xl sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--gg-accent)]">
                     <CountryText id="listingDetail.sellerInfo" />
                   </p>
-                  <h2 className="mt-2 text-2xl font-black"><CountryText id="listingDetail.sellerInfo" /></h2>
+                  <h2 className="mt-1 text-xl font-black sm:mt-2 sm:text-2xl"><CountryText id="listingDetail.sellerInfo" /></h2>
                 </div>
                 <Link
                   href={`/sellers/${listing.sellerId}`}
-                  className="rounded-xl border border-[var(--gg-border)] px-4 py-3 text-sm font-black hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)]"
+                  className="rounded-lg border border-[var(--gg-border)] px-4 py-2.5 text-sm font-black hover:border-[var(--gg-accent)] hover:text-[var(--gg-accent)] sm:rounded-xl sm:py-3"
                 >
                   <CountryText id="listingDetail.sellerView" />
                 </Link>
               </div>
 
-              <div className="mt-5 grid gap-4 lg:grid-cols-[260px_1fr]">
-                <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-5">
+              <div className="mt-4 grid gap-3 sm:mt-5 sm:gap-4 lg:grid-cols-[260px_1fr]">
+                <div className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4 sm:rounded-2xl sm:p-5">
                   <div className="flex items-center gap-4">
                     <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--gg-accent)] text-lg font-black text-[var(--gg-inverse-text)]">
                       {getInitials(listing.sellerName)}
@@ -221,12 +221,12 @@ export default async function ListingDetailPage({
               </div>
             </section>
 
-            <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-6">
+            <section className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 sm:rounded-2xl sm:p-6">
               <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--gg-accent)]">
                 <CountryText id="listingDetail.sellerContent" />
               </p>
-              <h2 className="mt-2 text-2xl font-black"><CountryText id="listingDetail.sellerContent" /></h2>
-              <div className="mt-5 rounded-2xl border border-[var(--gg-border-soft)] bg-[var(--gg-card-soft-bg)] p-5 text-sm leading-7 text-[var(--gg-muted)]">
+              <h2 className="mt-1 text-xl font-black sm:mt-2 sm:text-2xl"><CountryText id="listingDetail.sellerContent" /></h2>
+              <div className="mt-4 rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-card-soft-bg)] p-4 text-sm leading-7 text-[var(--gg-muted)] sm:mt-5 sm:rounded-2xl sm:p-5">
                 {description ? (
                   <UserContentText text={description} multiline className="whitespace-pre-wrap" />
                 ) : (
@@ -234,11 +234,11 @@ export default async function ListingDetailPage({
                 )}
               </div>
               {listing.contentImages.length > 0 ? (
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <div className="mt-4 grid gap-3 sm:mt-5 sm:grid-cols-2">
                   {listing.contentImages.map((image, index) => (
                     <div
                       key={`${image.imageUrl}-${index}`}
-                      className="overflow-hidden rounded-2xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)]"
+                      className="overflow-hidden rounded-xl border border-[var(--gg-border-soft)] bg-[var(--gg-control-bg)] sm:rounded-2xl"
                     >
                       <Image
                         src={image.imageUrl}
@@ -253,8 +253,8 @@ export default async function ListingDetailPage({
               ) : null}
             </section>
 
-            <details className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-6">
-              <summary className="cursor-pointer text-xl font-black">
+            <details className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 sm:rounded-2xl sm:p-6">
+              <summary className="cursor-pointer text-lg font-black sm:text-xl">
                 <CountryText id="listingDetail.reviewAndRelated" />
               </summary>
 
@@ -301,7 +301,7 @@ export default async function ListingDetailPage({
               serverLabel={serverLabel ?? undefined}
             />
 
-            <section className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5">
+            <section className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 sm:rounded-2xl sm:p-5">
               <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--gg-accent)]">
                 <CountryText id="listingDetail.tradeProtection" />
               </p>
@@ -376,9 +376,9 @@ function Metric({
   strong?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4">
+    <div className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 sm:rounded-2xl sm:p-4">
       <p className="text-xs font-bold text-[var(--gg-subtle)]">{label}</p>
-      <p className={strong ? "mt-2 text-2xl font-black text-[var(--gg-accent)]" : "mt-2 text-xl font-black"}>
+      <p className={strong ? "mt-1.5 text-xl font-black text-[var(--gg-accent)] sm:mt-2 sm:text-2xl" : "mt-1.5 text-lg font-black sm:mt-2 sm:text-xl"}>
         {value}
       </p>
       {hint ? <p className="mt-1 text-xs font-bold text-[var(--gg-muted)]">{hint}</p> : null}
@@ -388,7 +388,7 @@ function Metric({
 
 function InfoTile({ label, value }: { label: React.ReactNode; value: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-4">
+    <div className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 sm:rounded-2xl sm:p-4">
       <p className="text-xs font-bold text-[var(--gg-subtle)]">{label}</p>
       <p className="mt-2 truncate text-sm font-black">{value}</p>
     </div>
@@ -397,7 +397,7 @@ function InfoTile({ label, value }: { label: React.ReactNode; value: React.React
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] px-3 py-2 text-xs font-black text-[var(--gg-muted)]">
+    <span className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] px-2.5 py-1.5 text-xs font-black text-[var(--gg-muted)] sm:px-3 sm:py-2">
       {children}
     </span>
   );
