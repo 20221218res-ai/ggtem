@@ -128,12 +128,10 @@ export default async function AdminMarketListingDetailPage({
               {detail.kind === "sell" ? (
                 <form action={moderateSellerListingAction} className="grid gap-3">
                   <input type="hidden" name="listingId" value={detail.id} />
-                  <select name="nextStatus" defaultValue="HIDDEN" className={inputClass}>
-                    <option value="HIDDEN">숨김</option>
-                    <option value="REMOVED">삭제 처리</option>
-                    <option value="PAUSED">중지</option>
-                    <option value="ACTIVE">복구</option>
-                  </select>
+                <select name="nextStatus" defaultValue="HIDDEN" className={inputClass}>
+                  <option value="HIDDEN">숨김</option>
+                  <option value="PAUSED">중지</option>
+                </select>
                   <input name="reason" className={inputClass} placeholder="조치 사유" />
                   <FormSubmitButton className="rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
                     저장
@@ -156,7 +154,16 @@ export default async function AdminMarketListingDetailPage({
               <div className="grid gap-3">
                 <Info label={detail.kind === "sell" ? "주문" : "제안"} value={`${detail.offerCount}건`} />
                 {detail.kind === "sell" ? (
-                  <Info label="연결 주문" value={`${detail.orderCount}건`} />
+                  <>
+                    <Info label="전체 주문" value={`${detail.orderCount}건`} />
+                    <Info label="진행 주문" value={`${detail.activeOrderCount}건`} />
+                    <Info label="분쟁 주문" value={`${detail.disputeOrderCount}건`} />
+                    <Info
+                      label="잠긴 재고"
+                      value={`${detail.lockedQuantity}`}
+                      tone={Number(detail.lockedQuantity) > 0 ? "amber" : "slate"}
+                    />
+                  </>
                 ) : null}
                 <Info label="본문 이미지" value={`${detail.images.length}장`} />
                 <Info label="ID" value={detail.id} breakAll />
@@ -215,9 +222,22 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function Info({ label, value, breakAll = false }: { label: string; value: string; breakAll?: boolean }) {
+function Info({
+  label,
+  value,
+  breakAll = false,
+  tone = "slate",
+}: {
+  label: string;
+  value: string;
+  breakAll?: boolean;
+  tone?: "slate" | "amber";
+}) {
+  const toneClass =
+    tone === "amber" ? "border-amber-200 bg-amber-50" : "border-slate-200 bg-slate-50";
+
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+    <div className={`rounded-lg border px-3 py-2 ${toneClass}`}>
       <p className="text-xs font-black text-slate-500">{label}</p>
       <p className={`mt-1 text-sm font-black text-slate-950 ${breakAll ? "break-all" : "break-words"}`}>
         {value || "-"}

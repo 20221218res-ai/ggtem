@@ -194,7 +194,7 @@ function PremiumItemRow({
           href={item.href}
           className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-black text-slate-700 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
         >
-          관리 보기
+          보기
         </Link>
       </div>
     </div>

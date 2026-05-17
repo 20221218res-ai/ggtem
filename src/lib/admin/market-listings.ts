@@ -130,11 +130,28 @@ export async function getAdminMarketListingDetail(kind: "sell" | "buy", id: stri
         server: { select: { name: true } },
         inventory: true,
         images: { orderBy: { sortOrder: "asc" } },
+        orders: {
+          select: {
+            status: true,
+          },
+        },
         _count: { select: { orders: true, buyRequestOffers: true } },
       },
     });
 
     if (!listing) return null;
+    const activeOrderStatuses = new Set([
+      "REQUESTED",
+      "ESCROW_LOCKED",
+      "SELLER_RESPONSE_PENDING",
+      "DELIVERY_IN_PROGRESS",
+      "DELIVERY_COMPLETED",
+      "BUYER_CONFIRM_PENDING",
+    ]);
+    const activeOrderCount = listing.orders.filter((order) =>
+      activeOrderStatuses.has(order.status),
+    ).length;
+    const disputeOrderCount = listing.orders.filter((order) => order.status === "DISPUTED").length;
 
     return {
       kind: "sell" as const,
@@ -165,6 +182,8 @@ export async function getAdminMarketListingDetail(kind: "sell" | "buy", id: stri
       createdAt: formatDateTime(listing.createdAt),
       updatedAt: formatDateTime(listing.updatedAt),
       orderCount: listing._count.orders,
+      activeOrderCount,
+      disputeOrderCount,
       offerCount: listing._count.buyRequestOffers,
       images: listing.images.map((image) => ({
         id: image.id,

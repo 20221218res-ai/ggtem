@@ -187,7 +187,7 @@ function SellerListingRow({ listing }: { listing: SellerListingRow }) {
           저장
         </FormSubmitButton>
         <Link href={listing.href} className="rounded-lg border border-slate-200 px-3 py-2.5 text-center text-sm font-black">
-          확인
+          보기
         </Link>
       </form>
     </article>
@@ -277,7 +277,7 @@ function ListingMain({
       </div>
       <div className="mt-2 flex flex-wrap gap-3">
         <Link href={href} className="text-sm font-black text-[var(--color-primary)]">
-          관리 보기
+          보기
         </Link>
         <Link href={auditHref} className="text-sm font-black text-slate-500">
           감사 로그
