@@ -31,6 +31,10 @@ export function getWebPushPublicKey() {
   return process.env.GGITEM_WEB_PUSH_PUBLIC_KEY || null;
 }
 
+export function isWebPushConfigured() {
+  return Boolean(process.env.GGITEM_WEB_PUSH_PUBLIC_KEY && process.env.GGITEM_WEB_PUSH_PRIVATE_KEY);
+}
+
 export async function sendUserWebPushNotification(userId: string, payload: WebPushPayload) {
   if (!configureWebPush()) {
     return;

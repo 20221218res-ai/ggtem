@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentSessionUser } from "@/lib/auth/session";
-import { getWebPushPublicKey } from "@/lib/notifications/web-push";
+import { getWebPushPublicKey, isWebPushConfigured } from "@/lib/notifications/web-push";
 import { getPrismaClient } from "@/lib/prisma";
 
 type PushSubscriptionRequest = {
@@ -21,6 +21,7 @@ export async function GET() {
 
   return NextResponse.json({
     publicKey: getWebPushPublicKey(),
+    configured: isWebPushConfigured(),
   });
 }
 

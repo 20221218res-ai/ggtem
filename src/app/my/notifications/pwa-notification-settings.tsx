@@ -12,6 +12,7 @@ export default function PwaNotificationSettings() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isServerConfigured, setIsServerConfigured] = useState<boolean | null>(null);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -34,6 +35,18 @@ export default function PwaNotificationSettings() {
       .then((registration) => registration.pushManager.getSubscription())
       .then((subscription) => setIsSubscribed(Boolean(subscription)))
       .catch(() => undefined);
+
+    void fetch("/api/user/push-subscriptions", {
+      cache: "no-store",
+    })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return (await response.json()) as { configured?: boolean };
+      })
+      .then((data) => {
+        if (data) setIsServerConfigured(Boolean(data.configured));
+      })
+      .catch(() => setIsServerConfigured(false));
   }, []);
 
   async function enableNotifications() {
@@ -55,9 +68,11 @@ export default function PwaNotificationSettings() {
         const keyResponse = await fetch("/api/user/push-subscriptions", {
           cache: "no-store",
         });
-        const keyData = (await keyResponse.json()) as { publicKey?: string | null };
+        const keyData = (await keyResponse.json()) as { publicKey?: string | null; configured?: boolean };
 
-        if (!keyResponse.ok || !keyData.publicKey) {
+        setIsServerConfigured(Boolean(keyData.configured));
+
+        if (!keyResponse.ok || !keyData.publicKey || !keyData.configured) {
           throw new Error(t("notification.pushServerKeyMissing"));
         }
 
@@ -148,6 +163,15 @@ export default function PwaNotificationSettings() {
             <span className="rounded-full border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-1 text-xs font-black text-[var(--gg-muted)]">
               {t(isSubscribed ? "notification.pushSubscribed" : "notification.pushDefault")}
             </span>
+            <span
+              className={`rounded-full border px-3 py-1 text-xs font-black ${
+                isServerConfigured
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : "border-amber-200 bg-amber-50 text-amber-700"
+              }`}
+            >
+              {t(isServerConfigured ? "notification.pushServerReady" : "notification.pushServerNeedsSetup")}
+            </span>
           </div>
           <p className="mt-2 text-sm font-bold leading-6 text-[var(--gg-muted)]">
             {t(isStandalone ? "notification.pushStandaloneBody" : "notification.pushInstallHint")}
@@ -161,7 +185,7 @@ export default function PwaNotificationSettings() {
           <button
             type="button"
             onClick={() => void enableNotifications()}
-            disabled={isSubmitting || isSubscribed || permission === "denied" || permission === "unsupported"}
+            disabled={isSubmitting || isSubscribed || isServerConfigured === false || permission === "denied" || permission === "unsupported"}
             className="rounded-xl bg-[var(--gg-accent)] px-4 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] disabled:cursor-not-allowed disabled:opacity-55"
           >
             {isSubmitting ? t("notification.pushChecking") : t("notification.pushEnable")}
