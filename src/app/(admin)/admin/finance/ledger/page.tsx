@@ -40,46 +40,35 @@ export default async function AdminFinanceLedgerPage({
   return (
     <main className="bg-slate-100 px-6 py-8 text-slate-950">
       <section className="mx-auto flex max-w-7xl flex-col gap-6">
-        <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black text-emerald-700">WALLET LEDGER</p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">
-              지갑 원장
-            </h1>
+        <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-black text-emerald-700">WALLET LEDGER</p>
+              <h1 className="mt-2 text-3xl font-black tracking-tight">
+                지갑 원장
+              </h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">{nextAction.title}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <HeaderLink href={buildLedgerExportHref(state.filters)} label="CSV" tone="emerald" />
+              <HeaderLink href="/admin/deposits" label="입금" />
+              <HeaderLink href="/admin/withdrawals" label="출금" />
+              <HeaderLink href="/admin/finance/reconciliation" label="정산" />
+              <HeaderLink href={nextAction.href} label={nextAction.actionLabel} />
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <HeaderLink href={buildLedgerExportHref(state.filters)} label="CSV" tone="emerald" />
-            <HeaderLink href="/admin/deposits" label="입금" />
-            <HeaderLink href="/admin/withdrawals" label="출금" />
-            <HeaderLink href="/admin/finance/reconciliation" label="정산" />
-            <HeaderLink href="/admin/audit" label="감사" />
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <MetricCard label="전체" value={`${state.summary.totalEntries}건`} tone="sky" />
+            <MetricCard label="현재 표시" value={`${state.summary.shownEntries}건`} tone="sky" />
+            <MetricCard label="증가 합계" value={`${state.summary.creditAmount} USDT`} tone="emerald" />
+            <MetricCard label="차감 합계" value={`${state.summary.debitAmount} USDT`} tone="rose" />
           </div>
         </header>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MetricCard label="전체" value={`${state.summary.totalEntries}건`} tone="sky" />
-          <MetricCard label="현재 표시" value={`${state.summary.shownEntries}건`} tone="sky" />
-          <MetricCard label="증가 합계" value={`${state.summary.creditAmount} USDT`} tone="emerald" />
-          <MetricCard label="차감 합계" value={`${state.summary.debitAmount} USDT`} tone="rose" />
-        </section>
-
-        <section className="rounded-lg border border-amber-200 bg-amber-50 p-5">
-          <p className="text-sm font-black text-amber-800">다음 액션</p>
-          <h2 className="mt-2 text-2xl font-black">{nextAction.title}</h2>
-          <Link
-            href={nextAction.href}
-            className="mt-4 inline-flex rounded-md bg-amber-600 px-4 py-2 text-sm font-black text-white hover:bg-amber-700"
-          >
-            {nextAction.actionLabel}
-          </Link>
-        </section>
-
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <p className="text-sm font-black text-slate-600">필터</p>
-              <h2 className="mt-1 text-xl font-black">검색</h2>
-            </div>
+            <h2 className="text-xl font-black">검색</h2>
             <HeaderLink href="/admin/users" label="유저" />
           </div>
 
@@ -187,7 +176,7 @@ function LedgerEntryRow({ entry }: { entry: LedgerEntry }) {
   const isCredit = entry.direction === "CREDIT";
 
   return (
-    <article className="p-5 hover:bg-slate-50">
+    <article className="p-4 hover:bg-slate-50">
       <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr_0.8fr] lg:items-start">
         <div>
           <div className="flex flex-wrap gap-2">

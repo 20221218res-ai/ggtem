@@ -45,52 +45,28 @@ export default async function AdminFinanceReconciliationPage({
   return (
     <main className="bg-slate-100 px-6 py-8 text-slate-950">
       <section className="mx-auto flex max-w-7xl flex-col gap-6">
-        <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black text-emerald-700">
-              RECONCILIATION
-            </p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">
-              정산 대조
-            </h1>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <HeaderLink
-              href={buildReconciliationExportHref(state.filters.range)}
-              label="CSV"
-              tone="emerald"
-            />
-            <HeaderLink href="/admin/finance/ledger" label="원장" />
-            <HeaderLink href="/admin/deposits" label="입금" />
-            <HeaderLink href="/admin/withdrawals" label="출금" />
-            <HeaderLink
-              href="/admin/audit?action=FINANCE_RECONCILIATION_CLOSED"
-              label="감사"
-            />
-          </div>
-        </header>
-
-        <section className="rounded-lg border border-amber-200 bg-amber-50 p-5">
-          <p className="text-sm font-black text-amber-800">다음 액션</p>
-          <h2 className="mt-2 text-2xl font-black">{nextAction.title}</h2>
-          <Link
-            href={nextAction.href}
-            className="mt-4 inline-flex rounded-md bg-amber-600 px-4 py-2 text-sm font-black text-white hover:bg-amber-700"
-          >
-            {nextAction.actionLabel}
-          </Link>
-        </section>
-
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="text-sm font-black text-slate-600">기간</p>
-              <h2 className="mt-1 text-xl font-black">기간</h2>
+              <p className="text-sm font-black text-emerald-700">
+                RECONCILIATION
+              </p>
+              <h1 className="mt-2 text-3xl font-black tracking-tight">
+                정산 대조
+              </h1>
               <p className="mt-2 text-sm font-semibold text-slate-700">
-                {state.summary.from}부터 {state.summary.to}까지
+                {nextAction.title} · {state.summary.from}부터 {state.summary.to}까지
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
+              <HeaderLink
+                href={buildReconciliationExportHref(state.filters.range)}
+                label="CSV"
+                tone="emerald"
+              />
+              <HeaderLink href="/admin/finance/ledger" label="원장" />
+              <HeaderLink href="/admin/deposits" label="입금" />
+              <HeaderLink href="/admin/withdrawals" label="출금" />
               <FilterTab
                 href="/admin/finance/reconciliation"
                 active={state.filters.range === "today"}
@@ -108,15 +84,15 @@ export default async function AdminFinanceReconciliationPage({
               />
             </div>
           </div>
-        </section>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-          <MetricCard label="원장 건수" value={`${state.summary.entryCount}건`} tone="sky" />
-          <MetricCard label="관련 유저" value={`${state.summary.uniqueUsers}명`} tone="sky" />
-          <MetricCard label="증가 합계" value={`${state.summary.creditAmount} USDT`} tone="emerald" />
-          <MetricCard label="차감 합계" value={`${state.summary.debitAmount} USDT`} tone="rose" />
-          <MetricCard label="순 이동" value={`${state.summary.netAmount} USDT`} tone="cyan" />
-        </section>
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            <MetricCard label="원장 건수" value={`${state.summary.entryCount}건`} tone="sky" />
+            <MetricCard label="관련 유저" value={`${state.summary.uniqueUsers}명`} tone="sky" />
+            <MetricCard label="증가 합계" value={`${state.summary.creditAmount} USDT`} tone="emerald" />
+            <MetricCard label="차감 합계" value={`${state.summary.debitAmount} USDT`} tone="rose" />
+            <MetricCard label="순 이동" value={`${state.summary.netAmount} USDT`} tone="cyan" />
+          </div>
+        </header>
 
         <section className="grid gap-4 md:grid-cols-3">
           <StatusCard
@@ -137,7 +113,7 @@ export default async function AdminFinanceReconciliationPage({
         </section>
 
         <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          <section className="rounded-lg border border-sky-200 bg-sky-50 p-5">
+          <section className="rounded-lg border border-sky-200 bg-sky-50 p-4">
             <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <p className="text-sm font-black text-sky-700">
@@ -156,7 +132,7 @@ export default async function AdminFinanceReconciliationPage({
             </div>
           </section>
 
-          <section className="rounded-lg border border-amber-200 bg-amber-50 p-5">
+          <section className="rounded-lg border border-amber-200 bg-amber-50 p-4">
             <p className="text-sm font-black text-amber-800">이상 신호</p>
             <h2 className="mt-2 text-2xl font-black text-slate-950">
               확인 필요

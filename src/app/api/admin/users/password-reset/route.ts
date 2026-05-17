@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
-import { requireAdminPasswordRecheck } from "@/lib/auth/admin-step-up";
+import {
+  getAdminActionErrorResponse,
+  requireAdminActionGuard,
+} from "@/lib/auth/admin-action-guard";
 import { requestPasswordReset } from "@/lib/auth/session";
 import { getPrismaClient } from "@/lib/prisma";
 
@@ -33,9 +36,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await requireAdminPasswordRecheck({
+    await requireAdminActionGuard({
+      request,
       adminId: auth.user.userId,
+      action: "users:password-reset",
       adminPassword: body.adminPassword,
+      limit: 3,
     });
 
     const prisma = getPrismaClient();
@@ -88,6 +94,11 @@ export async function POST(request: NextRequest) {
       resetUrl: reset.resetUrl,
     });
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       {
         message:

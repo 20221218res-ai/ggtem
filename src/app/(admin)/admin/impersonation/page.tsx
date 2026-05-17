@@ -47,13 +47,25 @@ export default async function ImpersonationPage() {
         ]}
       />
 
-      <Panel title="최근 세션">
+      <Panel
+        title="최근 세션"
+        action={
+          <StatusPill tone="blue">
+            진행 1건
+          </StatusPill>
+        }
+      >
         <DataTable headers={["권한", "대상 유저", "모드", "사유", "시간", "상태"]} rows={sessionRows} />
       </Panel>
 
-      <Panel title="채팅 개입 규칙">
-        <DataTable headers={["신호", "조치", "우선순위"]} rows={chatRules} />
-      </Panel>
+      <details className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <summary className="cursor-pointer text-lg font-black text-slate-950">
+          채팅 개입 기준
+        </summary>
+        <div className="mt-4">
+          <DataTable headers={["신호", "조치", "우선순위"]} rows={chatRules} />
+        </div>
+      </details>
     </AdminMockPage>
   );
 }

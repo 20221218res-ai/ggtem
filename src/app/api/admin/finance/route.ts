@@ -1,6 +1,9 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
-import { requireAdminPasswordRecheck } from "@/lib/auth/admin-step-up";
+import {
+  getAdminActionErrorResponse,
+  requireAdminActionGuard,
+} from "@/lib/auth/admin-action-guard";
 import { getAdminFinanceState, processAdminFinanceAction } from "@/lib/admin/finance";
 
 export async function GET() {
@@ -13,6 +16,11 @@ export async function GET() {
     const state = await getAdminFinanceState();
     return NextResponse.json(state);
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       {
         message: error instanceof Error ? error.message : "관리자 재무 상태를 불러오지 못했습니다.",
@@ -53,9 +61,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await requireAdminPasswordRecheck({
+    if (body.action === "COMPLETE_WITHDRAWAL" && auth.user.role !== "SUPER") {
+      return NextResponse.json(
+        { message: "출금 최종 완료는 최고 관리자만 처리할 수 있습니다." },
+        { status: 403 },
+      );
+    }
+
+    await requireAdminActionGuard({
+      request,
       adminId: auth.user.userId,
+      action: `finance:${body.action}`,
       adminPassword: body.adminPassword,
+      limit: body.action === "COMPLETE_WITHDRAWAL" ? 3 : 5,
     });
 
     const result = await processAdminFinanceAction({
@@ -68,6 +86,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       {
         message: error instanceof Error ? error.message : "재무 처리 요청을 완료하지 못했습니다.",

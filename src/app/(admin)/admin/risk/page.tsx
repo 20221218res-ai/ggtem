@@ -35,38 +35,30 @@ export default async function AdminRiskPage({ searchParams }: AdminRiskPageProps
   return (
     <main className="bg-slate-100 px-6 py-8 text-slate-950">
       <section className="mx-auto flex max-w-7xl flex-col gap-5">
-        <header className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black text-[var(--color-primary)]">RISK DESK</p>
-            <h1 className="mt-1 text-2xl font-black">신고·리스크 관리</h1>
+        <header className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-black text-[var(--color-primary)]">RISK DESK</p>
+              <h1 className="mt-1 text-2xl font-black">신고·리스크 관리</h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">{nextAction.title}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <AdminLink href="/admin/users">유저</AdminLink>
+              <AdminLink href="/admin/orders?status=DISPUTED">분쟁 주문</AdminLink>
+              <AdminLink href="/admin/review-moderation">리뷰 검토</AdminLink>
+              <AdminLink href="/admin/audit?targetType=TRUST_REPORT">감사 로그</AdminLink>
+              <AdminLink href={nextAction.href}>바로 보기</AdminLink>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <AdminLink href="/admin/users">유저</AdminLink>
-            <AdminLink href="/admin/orders?status=DISPUTED">분쟁 주문</AdminLink>
-            <AdminLink href="/admin/review-moderation">리뷰 검토</AdminLink>
-            <AdminLink href="/admin/audit?targetType=TRUST_REPORT">감사 로그</AdminLink>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            <Metric label="전체 신고" value={state.summary.totalReports} tone="slate" />
+            <Metric label="표시 중" value={state.summary.shownReports} tone="blue" />
+            <Metric label="처리 대기" value={state.summary.openReports} tone="amber" />
+            <Metric label="고위험" value={state.summary.highSeverityReports} tone="red" />
+            <Metric label="판매 제한 후보" value={state.summary.sellerRiskCandidates} tone="cyan" />
           </div>
         </header>
-
-        <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-          <Metric label="전체 신고" value={state.summary.totalReports} tone="slate" />
-          <Metric label="표시 중" value={state.summary.shownReports} tone="blue" />
-          <Metric label="처리 대기" value={state.summary.openReports} tone="amber" />
-          <Metric label="고위험" value={state.summary.highSeverityReports} tone="red" />
-          <Metric label="판매 제한 후보" value={state.summary.sellerRiskCandidates} tone="cyan" />
-        </section>
-
-        <section className={`rounded-lg border p-5 shadow-sm ${toneClasses(nextAction.tone)}`}>
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-sm font-black">다음 확인</p>
-              <h2 className="mt-1 text-xl font-black">{nextAction.title}</h2>
-            </div>
-            <Link href={nextAction.href} className="rounded-md bg-white px-4 py-2 text-center text-sm font-black text-slate-950 shadow-sm hover:bg-slate-50">
-              바로 보기
-            </Link>
-          </div>
-        </section>
 
         <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-4 flex flex-wrap gap-2">
@@ -101,7 +93,7 @@ function SellerRiskCandidatesSection({ candidates }: { candidates: SellerRiskCan
           const signal = getSellerCandidateReviewSignal(candidate);
 
           return (
-            <article key={candidate.userId} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <article key={candidate.userId} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <div className="flex flex-wrap gap-2">
@@ -166,7 +158,7 @@ function RiskReportList({ reports }: { reports: RiskReport[] }) {
           const description = cleanText(report.description, "내용 없음");
 
           return (
-            <article key={report.reportId} className="p-5">
+            <article key={report.reportId} className="p-4">
               <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap gap-2">

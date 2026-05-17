@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
+import {
+  getAdminActionErrorResponse,
+  requireAdminActionGuard,
+} from "@/lib/auth/admin-action-guard";
 import { createAdminFinanceCloseReport } from "@/lib/admin/finance";
 
 export async function POST(request: NextRequest) {
@@ -13,6 +17,14 @@ export async function POST(request: NextRequest) {
       range?: string;
       note?: string;
     };
+    await requireAdminActionGuard({
+      request,
+      adminId: auth.user.userId,
+      action: "finance:reconciliation-close",
+      requirePassword: false,
+      limit: 3,
+    });
+
     const result = await createAdminFinanceCloseReport({
       actorId: auth.user.userId,
       range: body.range,
@@ -21,6 +33,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       {
         message:

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/guards";
-import { requireAdminPasswordRecheck } from "@/lib/auth/admin-step-up";
+import {
+  getAdminActionErrorResponse,
+  requireAdminActionGuard,
+} from "@/lib/auth/admin-action-guard";
 import {
   createAdminInvite,
   createPreparedAdminAccount,
@@ -35,9 +38,12 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      await requireAdminPasswordRecheck({
+      await requireAdminActionGuard({
+        request,
         adminId: auth.user.userId,
+        action: "admin-accounts:create",
         adminPassword: body.adminPassword,
+        limit: 3,
       });
 
       const result = await createPreparedAdminAccount({
@@ -59,9 +65,12 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      await requireAdminPasswordRecheck({
+      await requireAdminActionGuard({
+        request,
         adminId: auth.user.userId,
+        action: "admin-accounts:update-access",
         adminPassword: body.adminPassword,
+        limit: 3,
       });
 
       const result = await updateAdminAccountAccess({
@@ -83,9 +92,12 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      await requireAdminPasswordRecheck({
+      await requireAdminActionGuard({
+        request,
         adminId: auth.user.userId,
+        action: "admin-accounts:create-invite",
         adminPassword: body.adminPassword,
+        limit: 5,
       });
 
       const result = await createAdminInvite({
@@ -105,9 +117,12 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      await requireAdminPasswordRecheck({
+      await requireAdminActionGuard({
+        request,
         adminId: auth.user.userId,
+        action: "admin-accounts:revoke-invite",
         adminPassword: body.adminPassword,
+        limit: 5,
       });
 
       const result = await revokeAdminInvite({
@@ -124,6 +139,11 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       {
         message:

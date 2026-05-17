@@ -44,15 +44,22 @@ export default async function AdminAccountsPage() {
         </>
       }
     >
-      <section className="grid gap-4 md:grid-cols-4">
+      <section className="grid gap-3 md:grid-cols-4">
         <SummaryCard label="전체 관리자" value={`${state.summary.totalAdmins}명`} />
         <SummaryCard label="활성 관리자" value={`${state.summary.activeAdmins}명`} />
         <SummaryCard label="잠금/차단" value={`${state.summary.lockedAdmins}명`} />
         <SummaryCard label="최고관리자" value={`${state.summary.superAdmins}명`} />
       </section>
 
-      <div className="grid gap-5 xl:grid-cols-[1fr_420px]">
-        <Panel title="관리자 계정 목록">
+      <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
+        <Panel
+          title="관리자 계정 목록"
+          action={
+            <StatusPill tone={state.summary.lockedAdmins > 0 ? "amber" : "green"}>
+              잠금/차단 {state.summary.lockedAdmins}명
+            </StatusPill>
+          }
+        >
           <DataTable
             headers={[
               "이름",
@@ -89,14 +96,19 @@ export default async function AdminAccountsPage() {
           />
         </Panel>
 
-        <div className="space-y-4">
-          <AdminAccountCreateForm />
-          <AdminAccountAccessForm accounts={state.adminAccounts} />
-          <AdminAccountInviteForm accounts={state.adminAccounts} />
-        </div>
+        <details className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <summary className="cursor-pointer text-lg font-black text-slate-950">
+            계정 생성 / 초대
+          </summary>
+          <div className="mt-4 space-y-4">
+            <AdminAccountCreateForm />
+            <AdminAccountAccessForm accounts={state.adminAccounts} />
+            <AdminAccountInviteForm accounts={state.adminAccounts} />
+          </div>
+        </details>
       </div>
 
-      <section className="grid gap-5 xl:grid-cols-[1fr_420px]">
+      <section className="grid gap-5 xl:grid-cols-[1fr_360px]">
         <Panel title="관리자별 최근 작업">
           <div className="grid gap-4 lg:grid-cols-2">
             {state.adminActivityCards.map((card) => (
@@ -151,51 +163,56 @@ export default async function AdminAccountsPage() {
           </div>
         </Panel>
 
-        <div className="space-y-5">
-          <Panel title="민감 작업 원칙">
-            <div className="space-y-3">
-              {ADMIN_RISK_ACTIONS.map((item) => (
-                <div
-                  key={item.title}
-                  className="rounded-lg border border-slate-200 bg-slate-50 p-4"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="font-black text-slate-950">{item.title}</p>
-                    <StatusPill tone={item.tone}>{item.state}</StatusPill>
+        <details className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <summary className="cursor-pointer text-lg font-black text-slate-950">
+            권한 기준
+          </summary>
+          <div className="mt-4 space-y-5">
+            <Panel title="민감 작업 원칙">
+              <div className="space-y-3">
+                {ADMIN_RISK_ACTIONS.map((item) => (
+                  <div
+                    key={item.title}
+                    className="rounded-lg border border-slate-200 bg-slate-50 p-3"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="font-black text-slate-950">{item.title}</p>
+                      <StatusPill tone={item.tone}>{item.state}</StatusPill>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Panel>
+                ))}
+              </div>
+            </Panel>
 
-          <Panel title="권한 매트릭스">
-            <div className="space-y-4">
-              {ADMIN_PERMISSION_GROUPS.map((group) => (
-                <div key={group.title}>
-                  <p className="text-sm font-black text-slate-950">{group.title}</p>
-                  <div className="mt-2 space-y-2">
-                    {group.items.map((item) => (
-                      <div
-                        key={item.label}
-                        className="rounded-md border border-slate-200 bg-slate-50 p-3"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-black">{item.label}</p>
-                          <StatusPill tone={riskTone(item.risk)}>
-                            {riskLabel(item.risk)}
-                          </StatusPill>
+            <Panel title="권한 매트릭스">
+              <div className="space-y-4">
+                {ADMIN_PERMISSION_GROUPS.map((group) => (
+                  <div key={group.title}>
+                    <p className="text-sm font-black text-slate-950">{group.title}</p>
+                    <div className="mt-2 space-y-2">
+                      {group.items.map((item) => (
+                        <div
+                          key={item.label}
+                          className="rounded-md border border-slate-200 bg-slate-50 p-3"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-black">{item.label}</p>
+                            <StatusPill tone={riskTone(item.risk)}>
+                              {riskLabel(item.risk)}
+                            </StatusPill>
+                          </div>
+                          <p className="mt-2 text-xs font-black text-slate-700">
+                            {item.roles.map(roleLabel).join(" · ")}
+                          </p>
                         </div>
-                        <p className="mt-2 text-xs font-black text-slate-700">
-                          {item.roles.map(roleLabel).join(" · ")}
-                        </p>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Panel>
-        </div>
+                ))}
+              </div>
+            </Panel>
+          </div>
+        </details>
       </section>
 
       <details className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
@@ -270,9 +287,9 @@ export default async function AdminAccountsPage() {
 
 function SummaryCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
       <p className="text-sm font-black text-slate-500">{label}</p>
-      <p className="mt-3 text-3xl font-black text-slate-950">{value}</p>
+      <p className="mt-2 text-2xl font-black text-slate-950">{value}</p>
     </div>
   );
 }

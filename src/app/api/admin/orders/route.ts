@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminOrdersState, resolveAdminDispute } from "@/lib/admin/orders";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
+import {
+  getAdminActionErrorResponse,
+  requireAdminActionGuard,
+} from "@/lib/auth/admin-action-guard";
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,6 +35,7 @@ type AdminOrderActionBody = {
   orderId?: string;
   action?: "REFUND_BUYER" | "RELEASE_TO_SELLER";
   note?: string;
+  adminPassword?: string;
 };
 
 export async function POST(request: NextRequest) {
@@ -51,6 +56,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    await requireAdminActionGuard({
+      request,
+      adminId: auth.user.userId,
+      action: `orders:${body.action}`,
+      adminPassword: body.adminPassword,
+      limit: 3,
+    });
+
     const result = await resolveAdminDispute({
       orderId: body.orderId,
       action: body.action,
@@ -60,6 +73,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       {
         message: error instanceof Error ? error.message : "\uC8FC\uBB38 \uC0C1\uD0DC\uB97C \uBCC0\uACBD\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.",

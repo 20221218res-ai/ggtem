@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAdminActionGuardResponse } from "@/lib/auth/admin-action-guard";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
 import {
   type AdminSlaIncidentExportRow,
@@ -46,6 +47,19 @@ export async function GET(request: NextRequest) {
   const auth = await requireApiRole(ROLE_GROUPS.ORDER_OPERATORS);
   if (!auth.ok) {
     return auth.response;
+  }
+
+  const guardResponse = await getAdminActionGuardResponse({
+    request,
+    adminId: auth.user.userId,
+    action: "export:sla-incidents",
+    requirePassword: false,
+    limit: 5,
+    windowMinutes: 15,
+    lockMinutes: 30,
+  });
+  if (guardResponse) {
+    return guardResponse;
   }
 
   const searchParams = request.nextUrl.searchParams;

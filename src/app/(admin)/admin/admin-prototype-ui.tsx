@@ -27,17 +27,19 @@ export function AdminMockPage({
 }) {
   return (
     <main className="min-h-screen bg-[#f3f4f6] px-5 py-7 text-slate-950">
-      <div className="mx-auto max-w-[1720px] space-y-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-950">
-              <span className="mr-2">{icon}</span>
-              {title}
-            </h1>
-            <p className="sr-only">{subtitle}</p>
+      <div className="mx-auto max-w-[1720px] space-y-5">
+        <header className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <h1 className="text-3xl font-black tracking-tight text-slate-950">
+                <span className="mr-2">{icon}</span>
+                {title}
+              </h1>
+              <p className="sr-only">{subtitle}</p>
+            </div>
+            {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
           </div>
-          {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
-        </div>
+        </header>
         {children}
       </div>
     </main>
@@ -110,14 +112,14 @@ export function MetricGrid({
   items: Array<{ label: string; value: string; hint: string; tone: Tone }>;
 }) {
   return (
-    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+    <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
       {items.map((item) => (
         <div
           key={item.label}
-          className={`min-h-28 rounded-lg border border-slate-200 border-l-4 bg-white p-5 shadow-sm ${toneMap[item.tone]}`}
+          className={`rounded-lg border border-slate-200 border-l-4 bg-white p-4 shadow-sm ${toneMap[item.tone]}`}
         >
           <p className="text-sm font-black text-slate-700">{item.label}</p>
-          <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">{item.value}</p>
+          <p className="mt-2 text-2xl font-black tracking-tight text-slate-950">{item.value}</p>
           <p className="sr-only">{item.hint}</p>
         </div>
       ))}
@@ -138,11 +140,11 @@ export function Panel({
 }) {
   return (
     <section className={`overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm ${className}`}>
-      <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
+      <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-4 py-3">
         <h2 className="text-lg font-black text-slate-950">{title}</h2>
         {action}
       </div>
-      <div className="p-5">{children}</div>
+      <div className="p-4">{children}</div>
     </section>
   );
 }
@@ -160,7 +162,7 @@ export function DataTable({
         <thead className="bg-slate-50 text-xs font-black text-slate-700">
           <tr>
             {headers.map((header) => (
-              <th key={header} className="border-b border-slate-200 px-4 py-3">
+              <th key={header} className="border-b border-slate-200 px-3 py-2.5">
                 {header}
               </th>
             ))}
@@ -170,7 +172,7 @@ export function DataTable({
           {rows.map((row, index) => (
             <tr key={index} className="bg-white align-top">
               {row.map((cell, cellIndex) => (
-                <td key={cellIndex} className="px-4 py-4 font-semibold text-slate-800">
+                <td key={cellIndex} className="px-3 py-3 font-semibold text-slate-800">
                   {cell}
                 </td>
               ))}

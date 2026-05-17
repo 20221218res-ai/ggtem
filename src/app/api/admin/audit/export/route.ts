@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAdminActionGuardResponse } from "@/lib/auth/admin-action-guard";
 import { ROLE_GROUPS, requireApiRole } from "@/lib/auth/guards";
 import {
   type AdminAuditExportRow,
@@ -39,6 +40,19 @@ export async function GET(request: NextRequest) {
   const auth = await requireApiRole(ROLE_GROUPS.PLATFORM_ADMINS);
   if (!auth.ok) {
     return auth.response;
+  }
+
+  const guardResponse = await getAdminActionGuardResponse({
+    request,
+    adminId: auth.user.userId,
+    action: "export:audit",
+    requirePassword: false,
+    limit: 5,
+    windowMinutes: 15,
+    lockMinutes: 30,
+  });
+  if (guardResponse) {
+    return guardResponse;
   }
 
   const searchParams = request.nextUrl.searchParams;

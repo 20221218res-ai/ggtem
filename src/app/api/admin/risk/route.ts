@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
 import {
+  getAdminActionErrorResponse,
+  requireAdminActionGuard,
+} from "@/lib/auth/admin-action-guard";
+import {
   applySellerRiskRestriction,
   getAdminRiskState,
   resolveAdminRiskReport,
@@ -49,6 +53,7 @@ export async function POST(request: NextRequest) {
       severity?: string;
       targetStatus?: string;
       resolutionNote?: string;
+      adminPassword?: string;
     };
 
     if (body.action === "APPLY_SELLING_RESTRICTION") {
@@ -58,6 +63,13 @@ export async function POST(request: NextRequest) {
           { status: 400 },
         );
       }
+
+      await requireAdminActionGuard({
+        request,
+        adminId: auth.user.userId,
+        action: "risk:apply-selling-restriction",
+        adminPassword: body.adminPassword,
+      });
 
       const result = await applySellerRiskRestriction({
         actorId: auth.user.userId,
@@ -76,6 +88,13 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      await requireAdminActionGuard({
+        request,
+        adminId: auth.user.userId,
+        action: "risk:restore-selling-access",
+        adminPassword: body.adminPassword,
+      });
+
       const result = await restoreSellerSellingAccess({
         actorId: auth.user.userId,
         userId: body.userId,
@@ -92,6 +111,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    await requireAdminActionGuard({
+      request,
+      adminId: auth.user.userId,
+      action: "risk:resolve-report",
+      requirePassword: false,
+    });
+
     const result = await resolveAdminRiskReport({
       actorId: auth.user.userId,
       reportId: body.reportId,
@@ -103,6 +129,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       {
         message:

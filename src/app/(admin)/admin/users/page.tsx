@@ -44,15 +44,17 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
     <main className="min-h-screen bg-slate-100 p-6 text-slate-950">
       <section className="mx-auto flex max-w-[1500px] flex-col gap-5">
         <header className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-sm font-black text-emerald-600">USER DESK</p>
               <h1 className="mt-1 text-2xl font-black">유저 관리</h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">{nextAction.title}</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <HeaderLink href="/admin/admin-accounts" label="관리자" />
               <HeaderLink href="/admin/finance/ledger" label="원장" />
               <HeaderLink href="/admin/audit?targetType=USER" label="감사 로그" />
+              <HeaderLink href={nextAction.href} label={nextAction.actionLabel} />
             </div>
           </div>
 
@@ -63,23 +65,6 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
             <Metric label="운영 계정" value={state.summary.operatorUsers} tone="cyan" />
           </div>
         </header>
-
-        <section className="rounded-lg border border-amber-200 bg-amber-50 p-5 shadow-sm">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-sm font-black text-amber-700">다음 액션</p>
-              <h2 className="mt-1 text-xl font-black text-slate-950">
-                {nextAction.title}
-              </h2>
-            </div>
-            <Link
-              href={nextAction.href}
-              className="rounded-md bg-amber-600 px-4 py-2 text-sm font-black text-white hover:bg-amber-700"
-            >
-              {nextAction.actionLabel}
-            </Link>
-          </div>
-        </section>
 
         <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <RiskMetric
@@ -190,7 +175,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
           {state.users.map((user) => (
             <article
               key={user.userId}
-              className={`rounded-lg border p-5 shadow-sm ${
+              className={`rounded-lg border p-4 shadow-sm ${
                 user.isOperator
                   ? "border-[color-mix(in_srgb,var(--gg-accent)_40%,transparent)] bg-[color-mix(in_srgb,var(--gg-accent)_12%,transparent)]/70"
                   : "border-slate-200 bg-white"

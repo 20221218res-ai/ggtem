@@ -38,10 +38,13 @@ export default async function AdminOrderChatsPage({
     <main className="min-h-screen bg-slate-100 p-6 text-slate-950">
       <section className="mx-auto flex max-w-[1500px] flex-col gap-5">
         <header className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-sm font-black text-[var(--gg-accent)]">ORDER CHAT MONITOR</p>
               <h1 className="mt-1 text-2xl font-black">주문 채팅 모니터</h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">
+                위험 {state.summary.riskyRooms.toLocaleString("ko-KR")}건 / 표시 {state.summary.shownRooms.toLocaleString("ko-KR")}건
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <AdminLink href="/admin/risk">위험 관리</AdminLink>
@@ -67,13 +70,13 @@ export default async function AdminOrderChatsPage({
             </Link>
           </form>
           <AdminOrderChatsRefresh autoRefresh={params?.refresh === "1"} riskOnly={state.filters.riskOnly} />
-        </header>
 
-        <section className="grid gap-3 md:grid-cols-3">
-          <Metric label="전체" value={state.summary.totalRooms} tone="blue" />
-          <Metric label="표시" value={state.summary.shownRooms} tone="slate" />
-          <Metric label="위험" value={state.summary.riskyRooms} tone="red" />
-        </section>
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            <Metric label="전체" value={state.summary.totalRooms} tone="blue" />
+            <Metric label="표시" value={state.summary.shownRooms} tone="slate" />
+            <Metric label="위험" value={state.summary.riskyRooms} tone="red" />
+          </div>
+        </header>
 
         <section className="grid gap-5 xl:grid-cols-[440px_1fr]">
           <ChatRoomList rooms={state.rooms} selectedOrderId={state.selectedRoom?.orderId ?? null} />
@@ -105,7 +108,7 @@ function ChatRoomList({
             <Link
               key={room.roomId}
               href={`/admin/order-chats?orderId=${room.orderId}`}
-              className={`mb-3 block rounded-lg border p-4 transition ${
+              className={`mb-2 block rounded-lg border p-3 transition ${
                 active
                   ? "border-[var(--gg-accent)] bg-cyan-50"
                   : risky
@@ -137,9 +140,7 @@ function ChatRoomList({
           );
         })}
 
-        {rooms.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-sm font-semibold text-slate-500">채팅방 없음</p>
-        ) : null}
+        {rooms.length === 0 ? <EmptyLine label="채팅방 없음" /> : null}
       </div>
     </section>
   );
@@ -208,9 +209,7 @@ function ChatDetailPanel({ detail }: { detail: ChatDetail | null }) {
           );
         })}
 
-        {detail.messages.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm font-semibold text-slate-500">아직 메시지가 없습니다.</p>
-        ) : null}
+        {detail.messages.length === 0 ? <EmptyLine label="아직 메시지가 없습니다." /> : null}
       </div>
     </section>
   );
@@ -218,10 +217,18 @@ function ChatDetailPanel({ detail }: { detail: ChatDetail | null }) {
 
 function Metric({ label, value, tone }: { label: string; value: number; tone: Tone }) {
   return (
-    <div className={`rounded-lg border bg-white p-4 shadow-sm ${toneClass(tone)}`}>
+    <div className={`rounded-lg border bg-white p-3 shadow-sm ${toneClass(tone)}`}>
       <p className="text-sm font-black text-slate-500">{label}</p>
       <p className="mt-2 text-2xl font-black">{value.toLocaleString("ko-KR")}</p>
     </div>
+  );
+}
+
+function EmptyLine({ label }: { label: string }) {
+  return (
+    <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-sm font-semibold text-slate-500">
+      {label}
+    </p>
   );
 }
 

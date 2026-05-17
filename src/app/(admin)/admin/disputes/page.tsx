@@ -163,6 +163,9 @@ export default function AdminDisputesPage() {
 
     if (!confirmed) return;
 
+    const adminPassword = window.prompt("관리자 비밀번호를 다시 입력해 주세요.");
+    if (!adminPassword) return;
+
     setError("");
     setIsResolving(true);
     setResolvingAction(action);
@@ -177,6 +180,7 @@ export default function AdminDisputesPage() {
           orderId: state.detail.orderId,
           action,
           note: resolutionNote,
+          adminPassword: adminPassword.trim(),
         }),
       });
       const result = (await response.json()) as { message?: string };
@@ -208,10 +212,13 @@ export default function AdminDisputesPage() {
     <main className="min-h-screen bg-slate-100 p-6 text-slate-950">
       <section className="mx-auto flex max-w-[1500px] flex-col gap-5">
         <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-sm font-black text-[var(--gg-accent)]">DISPUTE DESK</p>
               <h1 className="mt-1 text-2xl font-black">분쟁 처리</h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">
+                {selectedAction ?? "분쟁을 선택해 판단 근거 확인"}
+              </p>
             </div>
             <div className="grid grid-cols-3 gap-2 text-sm">
               <Metric label="대기" value={summary.open} tone="red" />
@@ -221,7 +228,7 @@ export default function AdminDisputesPage() {
           </div>
         </header>
 
-        <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-wrap gap-2">
               {disputeTabs.map((tab) => (
@@ -273,7 +280,7 @@ export default function AdminDisputesPage() {
         {success ? <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">{success}</div> : null}
 
         <section className="grid gap-5 lg:grid-cols-[420px_1fr]">
-          <aside className="rounded-xl border border-slate-200 bg-white shadow-sm">
+          <aside className="rounded-lg border border-slate-200 bg-white shadow-sm">
             <div className="border-b border-slate-200 p-4">
               <h2 className="font-black">분쟁 주문</h2>
             </div>
@@ -290,7 +297,7 @@ export default function AdminDisputesPage() {
                       type="button"
                       disabled={isLoading || isResolving}
                       onClick={() => void loadDisputes(dispute.orderId, viewFilter, searchQuery)}
-                      className={`rounded-lg border p-4 text-left transition ${
+                      className={`rounded-lg border p-3 text-left transition ${
                         selectedOrderId === dispute.orderId
                           ? "border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_10%,white)]"
                           : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
@@ -324,7 +331,7 @@ export default function AdminDisputesPage() {
 
           {state.detail ? (
             <section className="flex flex-col gap-5">
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -349,7 +356,7 @@ export default function AdminDisputesPage() {
               </div>
 
               <section className="grid gap-3 xl:grid-cols-[1fr_360px]">
-                <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                     <div>
                       <h3 className="font-black">증거 링크</h3>
@@ -368,7 +375,7 @@ export default function AdminDisputesPage() {
                   ) : null}
                 </div>
 
-                <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                   <h3 className="font-black">처리 미리보기</h3>
                   <div className="mt-4 flex flex-col gap-3">
                     <DecisionPreview label="구매자 환불" body={state.detail.decisionPreview.refundBuyer} />
@@ -377,7 +384,7 @@ export default function AdminDisputesPage() {
                 </div>
               </section>
 
-              <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                   <h3 className="font-black">종료 처리</h3>
                   <span className={`text-sm font-semibold ${canResolveDispute ? "text-emerald-700" : "text-amber-700"}`}>메모 {noteLength}자 / 20자 이상</span>
@@ -415,7 +422,7 @@ export default function AdminDisputesPage() {
                 )}
               </section>
 
-              <details className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <details className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                 <summary className="cursor-pointer font-black">기록 보기</summary>
                 <div className="mt-5 grid gap-5 xl:grid-cols-2">
                   <section className="rounded-lg border border-slate-200 bg-white p-5">
@@ -438,7 +445,7 @@ export default function AdminDisputesPage() {
               </details>
             </section>
           ) : (
-            <section className="rounded-xl border border-slate-200 bg-white p-10 shadow-sm">
+            <section className="rounded-lg border border-slate-200 bg-white p-10 shadow-sm">
               <EmptyState title="분쟁을 선택하세요" />
             </section>
           )}
@@ -450,7 +457,7 @@ export default function AdminDisputesPage() {
 
 function DecisionPreview({ label, body }: { label: string; body: string }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
       <p className="text-sm font-black text-slate-950">{label}</p>
       <p className="mt-2 text-sm font-semibold text-slate-600">{cleanEventMessage(body)}</p>
     </div>

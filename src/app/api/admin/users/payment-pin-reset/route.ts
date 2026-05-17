@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
-import { requireAdminPasswordRecheck } from "@/lib/auth/admin-step-up";
+import {
+  getAdminActionErrorResponse,
+  requireAdminActionGuard,
+} from "@/lib/auth/admin-action-guard";
 import { resetUserPaymentPin } from "@/lib/auth/payment-pin";
 import { getPrismaClient } from "@/lib/prisma";
 
@@ -30,9 +33,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await requireAdminPasswordRecheck({
+    await requireAdminActionGuard({
+      request,
       adminId: auth.user.userId,
+      action: "users:payment-pin-reset",
       adminPassword: body.adminPassword,
+      limit: 3,
     });
 
     const prisma = getPrismaClient();
@@ -85,6 +91,11 @@ export async function POST(request: NextRequest) {
       message: "유저 결제 PIN을 초기화했습니다. 다음 결제 또는 출금 전에 유저가 새 PIN을 설정해야 합니다.",
     });
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       {
         message:

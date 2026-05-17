@@ -47,36 +47,28 @@ export default async function AdminAuditPage({ searchParams }: AdminAuditPagePro
   return (
     <main className="bg-slate-100 px-6 py-8 text-slate-950">
       <section className="mx-auto flex max-w-7xl flex-col gap-6">
-        <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black text-[var(--color-primary)]">AUDIT LOG</p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">감사 로그</h1>
+        <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-black text-[var(--color-primary)]">AUDIT LOG</p>
+              <h1 className="mt-2 text-3xl font-black tracking-tight">감사 로그</h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">{nextAction.title}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <HeaderLink href={buildAuditExportHref(state.filters, "csv")} label="CSV" />
+              <HeaderLink href={buildAuditExportHref(state.filters, "xlsx")} label="XLSX" />
+              <HeaderLink href="/admin/finance/ledger" label="원장 조회" />
+              <HeaderLink href={nextAction.href} label={nextAction.actionLabel} />
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <HeaderLink href={buildAuditExportHref(state.filters, "csv")} label="CSV" />
-            <HeaderLink href={buildAuditExportHref(state.filters, "xlsx")} label="XLSX" />
-            <HeaderLink href="/admin/finance/ledger" label="원장 조회" />
-            <HeaderLink href="/admin/reports" label="리포트" />
+
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <MetricCard label="전체 로그" value={`${state.summary.totalLogs}건`} tone="sky" />
+            <MetricCard label="현재 표시" value={`${state.summary.shownLogs}건`} tone="sky" />
+            <MetricCard label="액션 종류" value={`${state.summary.uniqueActions}개`} tone="slate" />
+            <MetricCard label="대상 종류" value={`${state.summary.uniqueTargets}개`} tone="slate" />
           </div>
         </header>
-
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MetricCard label="전체 로그" value={`${state.summary.totalLogs}건`} tone="sky" />
-          <MetricCard label="현재 표시" value={`${state.summary.shownLogs}건`} tone="sky" />
-          <MetricCard label="액션 종류" value={`${state.summary.uniqueActions}개`} tone="slate" />
-          <MetricCard label="대상 종류" value={`${state.summary.uniqueTargets}개`} tone="slate" />
-        </section>
-
-        <section className="rounded-lg border border-amber-200 bg-amber-50 p-5">
-          <p className="text-sm font-black text-amber-800">다음 액션</p>
-          <h2 className="mt-2 text-2xl font-black">{nextAction.title}</h2>
-          <Link
-            href={nextAction.href}
-            className="mt-4 inline-flex rounded-md bg-amber-600 px-4 py-2 text-sm font-black text-white hover:bg-amber-700"
-          >
-            {nextAction.actionLabel}
-          </Link>
-        </section>
 
         <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
           <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">

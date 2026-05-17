@@ -82,17 +82,31 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
   return (
     <main className="min-h-screen bg-[#f3f6fa] px-5 py-7 text-slate-950">
       <section className="mx-auto max-w-[1720px] space-y-5">
-        <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black uppercase tracking-wide text-[var(--color-primary)]">
-              GAME CATALOG
-            </p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">게임 / 서버</h1>
+        <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-wide text-[var(--color-primary)]">
+                GAME CATALOG
+              </p>
+              <h1 className="mt-2 text-3xl font-black tracking-tight">게임 / 서버</h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">
+                표시 {filteredGames.length.toLocaleString("ko-KR")}개 / 서버 없음 {gamesWithoutServers.length.toLocaleString("ko-KR")}개
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <TopLink href="/admin/audit?targetType=GAME">감사</TopLink>
+              <TopLink href="/listings">유저 화면</TopLink>
+              <TopLink href="#manage-catalog">추가/수정</TopLink>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <TopLink href="/admin/audit?targetType=GAME">감사</TopLink>
-            <TopLink href="/listings">유저 화면</TopLink>
-            <TopLink href="#create-game">게임 추가</TopLink>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+            <Metric label="전체 게임" value={state.summary.totalGames} />
+            <Metric label="활성 게임" value={state.summary.activeGames} tone="green" />
+            <Metric label="전체 서버" value={state.summary.totalServers} />
+            <Metric label="활성 서버" value={state.summary.activeServers} tone="green" />
+            <Metric label="판매글" value={state.summary.totalListings} />
+            <Metric label="구매글" value={state.summary.totalBuyRequests} tone="cyan" />
           </div>
         </header>
 
@@ -106,15 +120,6 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
           </Banner>
         ) : null}
         {params.error ? <Banner tone="error">{params.error}</Banner> : null}
-
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-          <Metric label="전체 게임" value={state.summary.totalGames} />
-          <Metric label="활성 게임" value={state.summary.activeGames} tone="green" />
-          <Metric label="전체 서버" value={state.summary.totalServers} />
-          <Metric label="활성 서버" value={state.summary.activeServers} tone="green" />
-          <Metric label="판매글" value={state.summary.totalListings} />
-          <Metric label="구매글" value={state.summary.totalBuyRequests} tone="cyan" />
-        </section>
 
         <section className="grid gap-4 xl:grid-cols-3">
           <ActionCard
@@ -139,60 +144,6 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
             action="등록"
           />
         </section>
-
-        <section className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
-          <Panel title="게임 추가" id="create-game">
-            <form action={createGameAction} className="grid gap-3 sm:grid-cols-4" encType="multipart/form-data">
-              <Field name="name" label="게임명" placeholder="Lineage W" />
-              <Field name="code" label="게임 코드" placeholder="lineage-w" />
-              <Field name="moneyUnitName" label="게임머니 단위명" placeholder="아데나" />
-              <Field name="sortOrder" label="노출 순서" placeholder="1" />
-              <Field name="moneyUnitNameKo" label="KR 단위명" placeholder="아데나" />
-              <Field name="moneyUnitNameCn" label="CN 단위명" placeholder="Adena" />
-              <Field name="moneyUnitNameVn" label="VN 단위명" placeholder="Adena" />
-              <Field name="moneyUnitNamePh" label="PH 단위명" placeholder="Adena" />
-              <Field name="moneyUnitNameTh" label="TH 단위명" placeholder="Adena" />
-              <Field name="nameKo" label="한국어 게임명" placeholder="리니지W" />
-              <Field name="nameCn" label="중국어 게임명" placeholder="天堂W" />
-              <Field name="nameVn" label="베트남어 게임명" placeholder="Lineage W" />
-              <Field name="namePh" label="필리핀/영어 게임명" placeholder="Lineage W" />
-              <Field name="nameTh" label="태국어 게임명" placeholder="Lineage W" />
-              <Field name="imageAlt" label="이미지 ALT" placeholder="Lineage W" />
-              <FileField name="image" label="게임 이미지" />
-              <FormSubmitButton className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
-                게임 추가
-              </FormSubmitButton>
-            </form>
-          </Panel>
-
-          <Panel title="서버 추가" id="create-server">
-            <form action={createGameServerAction} className="grid gap-3 sm:grid-cols-5">
-              <SelectGame games={state.games} name="gameId" label="게임" />
-              <Field name="name" label="서버명" placeholder="Aphrodite" />
-              <Field name="code" label="서버 코드" placeholder="aphrodite" />
-              <FormSubmitButton className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black sm:col-span-2">
-                서버 추가
-              </FormSubmitButton>
-            </form>
-          </Panel>
-        </section>
-
-        <Panel title="서버 일괄 추가" id="bulk-create-server">
-          <form action={createGameServersBulkAction} className="grid gap-3 lg:grid-cols-[260px_1fr_160px]">
-            <SelectGame games={state.games} name="bulkGameId" label="게임" />
-            <label className="text-sm font-black text-slate-700">
-              서버 목록
-              <textarea
-                name="servers"
-                className="mt-2 min-h-28 w-full rounded-lg border border-slate-200 px-3 py-2 font-semibold"
-                placeholder={"Aphrodite, aphrodite\nKerenis, kerenis\nJillian, jillian"}
-              />
-            </label>
-            <FormSubmitButton className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
-              일괄 추가
-            </FormSubmitButton>
-          </form>
-        </Panel>
 
         <Panel title="게임 검색">
           <form className="grid gap-3 lg:grid-cols-[1fr_220px_120px]">
@@ -224,6 +175,67 @@ export default async function AdminGameSettingsPage({ searchParams }: AdminGameS
             </Panel>
           ) : null}
         </section>
+
+        <details id="manage-catalog" className="space-y-5">
+          <summary className="cursor-pointer rounded-xl border border-slate-200 bg-white p-5 text-lg font-black shadow-sm">
+            추가 / 일괄 등록
+          </summary>
+          <div className="mt-5 grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
+            <Panel title="게임 추가" id="create-game">
+              <form action={createGameAction} className="grid gap-3 sm:grid-cols-4" encType="multipart/form-data">
+                <Field name="name" label="게임명" placeholder="Lineage W" />
+                <Field name="code" label="게임 코드" placeholder="lineage-w" />
+                <Field name="moneyUnitName" label="게임머니 단위명" placeholder="아데나" />
+                <Field name="sortOrder" label="노출 순서" placeholder="1" />
+                <Field name="moneyUnitNameKo" label="KR 단위명" placeholder="아데나" />
+                <Field name="moneyUnitNameCn" label="CN 단위명" placeholder="Adena" />
+                <Field name="moneyUnitNameVn" label="VN 단위명" placeholder="Adena" />
+                <Field name="moneyUnitNamePh" label="PH 단위명" placeholder="Adena" />
+                <Field name="moneyUnitNameTh" label="TH 단위명" placeholder="Adena" />
+                <Field name="nameKo" label="한국어 게임명" placeholder="리니지W" />
+                <Field name="nameCn" label="중국어 게임명" placeholder="天堂W" />
+                <Field name="nameVn" label="베트남어 게임명" placeholder="Lineage W" />
+                <Field name="namePh" label="필리핀/영어 게임명" placeholder="Lineage W" />
+                <Field name="nameTh" label="태국어 게임명" placeholder="Lineage W" />
+                <Field name="imageAlt" label="이미지 ALT" placeholder="Lineage W" />
+                <FileField name="image" label="게임 이미지" />
+                <FormSubmitButton className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
+                  게임 추가
+                </FormSubmitButton>
+              </form>
+            </Panel>
+
+            <Panel title="서버 추가" id="create-server">
+              <form action={createGameServerAction} className="grid gap-3 sm:grid-cols-5">
+                <SelectGame games={state.games} name="gameId" label="게임" />
+                <Field name="name" label="서버명" placeholder="Aphrodite" />
+                <Field name="code" label="서버 코드" placeholder="aphrodite" />
+                <FormSubmitButton className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black sm:col-span-2">
+                  서버 추가
+                </FormSubmitButton>
+              </form>
+            </Panel>
+          </div>
+
+          <div className="mt-5">
+            <Panel title="서버 일괄 추가" id="bulk-create-server">
+              <form action={createGameServersBulkAction} className="grid gap-3 lg:grid-cols-[260px_1fr_160px]">
+                <SelectGame games={state.games} name="bulkGameId" label="게임" />
+                <label className="text-sm font-black text-slate-700">
+                  서버 목록
+                  <textarea
+                    name="servers"
+                    className="mt-2 min-h-28 w-full rounded-lg border border-slate-200 px-3 py-2 font-semibold"
+                    placeholder={"Aphrodite, aphrodite\nKerenis, kerenis\nJillian, jillian"}
+                  />
+                </label>
+                <FormSubmitButton className="self-end rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-black text-black">
+                  일괄 추가
+                </FormSubmitButton>
+              </form>
+            </Panel>
+          </div>
+        </details>
 
         <Panel title="최근 변경">
           <div className="divide-y divide-slate-100">
@@ -290,7 +302,7 @@ function GameCard({ game }: { game: GameRow }) {
         </form>
       </div>
 
-      <div className="grid gap-5 p-5 xl:grid-cols-[420px_1fr]">
+      <div className="grid gap-5 p-5 xl:grid-cols-[380px_1fr]">
         <div className="space-y-5">
           <form action={updateGameAction} className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4" encType="multipart/form-data">
             <input type="hidden" name="gameId" value={game.id} />

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
 import {
+  getAdminActionErrorResponse,
+  requireAdminActionGuard,
+} from "@/lib/auth/admin-action-guard";
+import {
   acknowledgeSlaIncident,
   createSlaIncidentNote,
   reopenSlaIncident,
@@ -46,6 +50,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    await requireAdminActionGuard({
+      request,
+      adminId: auth.user.userId,
+      action: `sla-incidents:${body.action}`,
+      requirePassword: false,
+      limit: 10,
+    });
+
     const result =
       body.action === "ACKNOWLEDGE"
         ? await acknowledgeSlaIncident({
@@ -72,6 +84,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       {
         message:

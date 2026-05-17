@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/guards";
+import {
+  getAdminActionErrorResponse,
+  requireAdminActionGuard,
+} from "@/lib/auth/admin-action-guard";
 import { updateDepositWalletAddress } from "@/lib/wallet/deposit-address-admin";
 
 export async function POST(request: NextRequest) {
@@ -10,6 +14,15 @@ export async function POST(request: NextRequest) {
 
   try {
     const payload = await request.json();
+    const adminPassword = String(payload.adminPassword ?? "");
+    await requireAdminActionGuard({
+      request,
+      adminId: auth.user.userId,
+      action: "deposit-addresses:update",
+      adminPassword,
+      limit: 3,
+    });
+
     const updated = await updateDepositWalletAddress({
       adminUserId: auth.user.userId,
       chain: String(payload.chain ?? ""),
@@ -19,7 +32,7 @@ export async function POST(request: NextRequest) {
       address: String(payload.address ?? ""),
       minimumAmount: String(payload.minimumAmount ?? ""),
       reason: String(payload.reason ?? ""),
-      adminPassword: String(payload.adminPassword ?? ""),
+      adminPassword,
       isActive: Boolean(payload.isActive),
     });
 
@@ -28,6 +41,11 @@ export async function POST(request: NextRequest) {
       address: updated,
     });
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       { message: error instanceof Error ? error.message : "입금 주소 저장에 실패했습니다." },
       { status: 400 },

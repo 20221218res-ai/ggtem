@@ -109,7 +109,14 @@ export default async function AdminSupportInquiriesPage({
       ) : null}
       {params.error ? <InlineBanner tone="error">{params.error}</InlineBanner> : null}
 
-      <Panel title="문의 목록">
+      <Panel
+        title="문의 목록"
+        action={
+          <StatusPill tone={(statusCounts.get("OPEN") ?? 0) > 0 ? "amber" : "green"}>
+            표시 {inquiries.length.toLocaleString("ko-KR")}건
+          </StatusPill>
+        }
+      >
         <form action="/admin/support-inquiries" className="mb-4 grid gap-3 lg:grid-cols-[1fr_1fr_auto_auto]">
           <select
             name="status"
@@ -143,10 +150,6 @@ export default async function AdminSupportInquiriesPage({
             초기화
           </Link>
         </form>
-
-        <p className="mb-3 text-sm font-bold text-slate-500">
-          표시 {inquiries.length.toLocaleString("ko-KR")}건
-        </p>
 
         {inquiries.length === 0 ? (
           <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-bold text-slate-500">

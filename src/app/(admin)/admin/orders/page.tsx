@@ -168,6 +168,9 @@ export default function AdminOrdersPage() {
 
     if (!confirmed) return;
 
+    const adminPassword = window.prompt("관리자 비밀번호를 다시 입력해 주세요.");
+    if (!adminPassword) return;
+
     setError("");
     setIsResolving(true);
 
@@ -181,6 +184,7 @@ export default function AdminOrdersPage() {
           orderId: state.detail.orderId,
           action,
           note: disputeNote,
+          adminPassword: adminPassword.trim(),
         }),
       });
       const result = (await response.json()) as { message?: string };
@@ -210,10 +214,13 @@ export default function AdminOrdersPage() {
     <main className="min-h-screen bg-slate-100 p-6 text-slate-950">
       <section className="mx-auto flex max-w-[1500px] flex-col gap-5">
         <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-sm font-black text-[var(--gg-accent)]">ORDER DESK</p>
               <h1 className="mt-1 text-2xl font-black">주문 관리</h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">
+                {selectedAction ? selectedAction.title : "주문을 선택해 상태를 확인"}
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <ActionLink href="/admin/disputes" label="분쟁" />
@@ -222,7 +229,7 @@ export default function AdminOrdersPage() {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-5 grid gap-3 md:grid-cols-4">
             <Metric label="전체" value={summary.total} tone="slate" />
             <Metric label="진행" value={summary.active} tone="blue" />
             <Metric label="분쟁" value={summary.disputed} tone="red" />
@@ -230,7 +237,7 @@ export default function AdminOrdersPage() {
           </div>
         </header>
 
-        <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex flex-wrap gap-2">
             {statusTabs.map((tab) => (
               <button
@@ -305,8 +312,8 @@ export default function AdminOrdersPage() {
                   onClick={() => void loadOrders(order.orderId, statusFilter, searchQuery)}
                   className={
                     state.selectedOrderId === order.orderId
-                      ? "w-full rounded-xl border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_8%,white)] p-4 text-left shadow-sm"
-                      : "w-full rounded-xl border border-slate-200 bg-white p-4 text-left hover:bg-slate-50"
+                      ? "w-full rounded-lg border border-[var(--gg-accent)] bg-[color-mix(in_srgb,var(--gg-accent)_8%,white)] p-3 text-left shadow-sm"
+                      : "w-full rounded-lg border border-slate-200 bg-white p-3 text-left hover:bg-slate-50"
                   }
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -382,7 +389,7 @@ function OrderDetail({
       </div>
 
       {selectedAction ? (
-        <div className="flex flex-col gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-3 rounded-lg border border-sky-200 bg-sky-50 p-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">NEXT ACTION</p>
             <p className="mt-1 text-xl font-black text-slate-950">{selectedAction.title}</p>
@@ -402,7 +409,7 @@ function OrderDetail({
         <DetailCard label="플랫폼 수수료" value={`${detail.platformFeeAmount} ${detail.currency}`} />
       </div>
 
-      <details className="rounded-xl border border-slate-200 p-4">
+      <details className="rounded-lg border border-slate-200 p-4">
         <summary className="cursor-pointer text-base font-black">상세 정보 / 바로가기</summary>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <DetailRow label="수량" value={detail.quantity} />
@@ -423,7 +430,7 @@ function OrderDetail({
       </details>
 
       {detail.status === "DISPUTED" ? (
-        <section className="rounded-xl border border-red-200 bg-red-50 p-4">
+        <section className="rounded-lg border border-red-200 bg-red-50 p-4">
           <h3 className="text-base font-black text-red-800">분쟁 처리</h3>
           <p className="mt-2 text-sm font-bold text-red-700">{detail.disputeReason ?? disputeDecisionNote ?? "분쟁 사유 확인 필요"}</p>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -458,7 +465,7 @@ function OrderDetail({
         </section>
       ) : null}
 
-      <details className="rounded-xl border border-slate-200 p-4">
+      <details className="rounded-lg border border-slate-200 p-4">
         <summary className="cursor-pointer text-base font-black">원장 / 이벤트 기록</summary>
         <div className="mt-4 grid gap-5 xl:grid-cols-2">
           <LedgerSection entries={detail.ledgerEntries} />
@@ -642,7 +649,7 @@ function Metric({
   };
 
   return (
-    <div className={`rounded-lg border p-4 ${tones[tone]}`}>
+    <div className={`rounded-lg border p-3 ${tones[tone]}`}>
       <p className="text-xs font-black opacity-70">{label}</p>
       <p className="mt-2 text-2xl font-black">{value.toLocaleString("ko-KR")}</p>
     </div>

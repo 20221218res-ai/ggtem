@@ -4,6 +4,10 @@ import {
   updateReviewModerationReviewStatus,
 } from "@/lib/admin/review-moderation";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
+import {
+  getAdminActionErrorResponse,
+  requireAdminActionGuard,
+} from "@/lib/auth/admin-action-guard";
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,6 +37,13 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      await requireAdminActionGuard({
+        request,
+        adminId: auth.user.userId,
+        action: "review-moderation:review",
+        requirePassword: false,
+      });
+
       const result = await updateReviewModerationReviewStatus({
         actorId: auth.user.userId,
         reviewId: body.reviewId,
@@ -54,6 +65,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    await requireAdminActionGuard({
+      request,
+      adminId: auth.user.userId,
+      action: "review-moderation:report",
+      requirePassword: false,
+    });
+
     const result = await updateReviewModerationReportStatus({
       actorId: auth.user.userId,
       reportId: body.reportId,
@@ -63,6 +81,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       {
         message:

@@ -41,6 +41,9 @@ export default function SellerRiskCandidateActions({
 
     if (!confirmed) return;
 
+    const adminPassword = window.prompt("관리자 비밀번호를 다시 입력해 주세요.");
+    if (!adminPassword) return;
+
     setError("");
     setMessage("");
     setIsSubmitting(true);
@@ -55,6 +58,7 @@ export default function SellerRiskCandidateActions({
           action,
           userId,
           resolutionNote: trimmedReason,
+          adminPassword: adminPassword.trim(),
         }),
       });
       const result = (await response.json()) as { message?: string };

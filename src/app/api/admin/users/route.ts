@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
-import { requireAdminPasswordRecheck } from "@/lib/auth/admin-step-up";
+import {
+  getAdminActionErrorResponse,
+  requireAdminActionGuard,
+} from "@/lib/auth/admin-action-guard";
 import { getAdminUsersState, updateAdminUserAccess } from "@/lib/admin/users";
 
 export async function GET(request: NextRequest) {
@@ -59,9 +62,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await requireAdminPasswordRecheck({
+    await requireAdminActionGuard({
+      request,
       adminId: auth.user.userId,
+      action: "users:update-access",
       adminPassword: body.adminPassword,
+      limit: 3,
     });
 
     const result = await updateAdminUserAccess({
@@ -75,6 +81,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
+    const rateLimitResponse = getAdminActionErrorResponse(error);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     return NextResponse.json(
       {
         message:
