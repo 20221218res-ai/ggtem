@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { NextResponse } from "next/server";
 import { getPrismaClient } from "@/lib/prisma";
 
 export class RateLimitError extends Error {
@@ -86,6 +87,17 @@ export function getRequestRateLimitKey(headers: Headers) {
     headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     headers.get("x-real-ip")?.trim() ||
     "unknown"
+  );
+}
+
+export function createAuthRateLimitResponse(error: RateLimitError) {
+  return NextResponse.json(
+    {
+      code: error.code,
+      message: error.message,
+      messageKey: "auth.rateLimited",
+    },
+    { status: error.status },
   );
 }
 

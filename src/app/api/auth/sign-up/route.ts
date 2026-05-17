@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   assertAuthRateLimit,
+  createAuthRateLimitResponse,
   getRequestRateLimitKey,
   RateLimitError,
 } from "@/lib/auth/rate-limit";
@@ -61,14 +62,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof RateLimitError) {
-      return NextResponse.json(
-        {
-          code: error.code,
-          message: error.message,
-          messageKey: "auth.rateLimited",
-        },
-        { status: error.status },
-      );
+      return createAuthRateLimitResponse(error);
     }
 
     return NextResponse.json(
