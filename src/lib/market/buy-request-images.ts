@@ -1,9 +1,11 @@
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
 import { getCurrentSessionUser } from "@/lib/auth/session";
 import { getPrismaClient } from "@/lib/prisma";
 
 const BUY_REQUEST_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+const BUY_REQUEST_IMAGE_MAX_COUNT = 8;
 
 export type MarketplaceBuyRequestImageMutationResult = {
   buyRequestId: string;
@@ -64,6 +66,10 @@ export async function uploadMarketplaceBuyRequestImage(input: {
       throw new Error("구매글을 찾을 수 없습니다.");
     }
 
+    if (buyRequest.images.length >= BUY_REQUEST_IMAGE_MAX_COUNT) {
+      throw new Error(`본문 이미지는 최대 ${BUY_REQUEST_IMAGE_MAX_COUNT}장까지 업로드할 수 있습니다.`);
+    }
+
     const uploadsDirectory = path.join(
       process.cwd(),
       "public",
@@ -72,7 +78,7 @@ export async function uploadMarketplaceBuyRequestImage(input: {
     );
     await mkdir(uploadsDirectory, { recursive: true });
 
-    const nextFileName = `${buyRequest.id}-${Date.now()}.${extension}`;
+    const nextFileName = `${buyRequest.id}-${randomUUID()}.${extension}`;
     const absoluteStoragePath = path.join(uploadsDirectory, nextFileName);
     const publicImageUrl = `/uploads/buy-requests/${nextFileName}`;
     await writeFile(absoluteStoragePath, input.bytes);
@@ -140,7 +146,9 @@ export async function removeMarketplaceBuyRequestImage(input: {
     });
 
     try {
-      await unlink(imageToDelete.storagePath);
+      if (isSafeBuyRequestUploadPath(imageToDelete.storagePath)) {
+        await unlink(imageToDelete.storagePath);
+      }
     } catch {
       // The database row is the source of truth; missing local files should not block cleanup.
     }
@@ -224,5 +232,19 @@ function isImageSignatureValid(
     bytes[9] === 0x45 &&
     bytes[10] === 0x42 &&
     bytes[11] === 0x50
+  );
+}
+
+function isSafeBuyRequestUploadPath(storagePath: string) {
+  const uploadsDirectory = path.resolve(
+    process.cwd(),
+    "public",
+    "uploads",
+    "buy-requests",
+  );
+  const resolvedStoragePath = path.resolve(storagePath);
+  return (
+    resolvedStoragePath.startsWith(`${uploadsDirectory}${path.sep}`) ||
+    resolvedStoragePath === uploadsDirectory
   );
 }

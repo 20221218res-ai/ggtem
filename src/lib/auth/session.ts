@@ -134,6 +134,7 @@ async function createSessionForUser(user: {
 }) {
   const prisma = getPrismaClient();
   const token = randomUUID();
+  const tokenHash = hashToken(token);
   const expiresAt = new Date(
     Date.now() + SESSION_DURATION_DAYS * 24 * 60 * 60 * 1000,
   );
@@ -150,7 +151,7 @@ async function createSessionForUser(user: {
   await prisma.session.create({
     data: {
       userId: user.id,
-      token,
+      token: tokenHash,
       expiresAt,
     },
   });
@@ -347,6 +348,7 @@ export async function signInWithCredentials(input: {
   ipAddress?: string | null;
   allowedRoles?: readonly string[];
   forbiddenMessage?: string;
+  createSession?: boolean;
 }) {
   const prisma = getPrismaClient();
   const email = input.email.trim().toLowerCase();
@@ -398,6 +400,30 @@ export async function signInWithCredentials(input: {
   }
 
   await recordSuccessfulLoginAttempt(email, ipKey);
+  if (input.createSession === false) {
+    return {
+      userId: user.id,
+      email: user.email,
+      displayName: user.displayName,
+      role: user.role,
+      status: user.status,
+      emailVerifiedAt: user.emailVerifiedAt,
+    };
+  }
+
+  return createSessionForUser(user);
+}
+
+export async function createSessionForVerifiedUserId(userId: string) {
+  const prisma = getPrismaClient();
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user || ["SUSPENDED", "BANNED"].includes(user.status)) {
+    throw new Error("로그인할 수 없는 관리자 계정입니다.");
+  }
+
   return createSessionForUser(user);
 }
 export async function signOutCurrentSession() {
@@ -406,9 +432,10 @@ export async function signOutCurrentSession() {
 
   if (token) {
     const prisma = getPrismaClient();
+    const tokenHash = hashToken(token);
     await prisma.session.deleteMany({
       where: {
-        token,
+        token: tokenHash,
       },
     });
   }
@@ -433,9 +460,10 @@ export async function getCurrentSessionUser(input?: {
   }
 
   const prisma = getPrismaClient();
+  const tokenHash = hashToken(token);
   const session = await prisma.session.findUnique({
     where: {
-      token,
+      token: tokenHash,
     },
     include: {
       user: true,
@@ -449,7 +477,7 @@ export async function getCurrentSessionUser(input?: {
   if (session.expiresAt.getTime() <= Date.now()) {
     await prisma.session.deleteMany({
       where: {
-        token,
+        token: tokenHash,
       },
     });
 
@@ -462,7 +490,7 @@ export async function getCurrentSessionUser(input?: {
   ) {
     await prisma.session.deleteMany({
       where: {
-        token,
+        token: tokenHash,
       },
     });
 
@@ -472,7 +500,7 @@ export async function getCurrentSessionUser(input?: {
   if (["SUSPENDED", "BANNED"].includes(session.user.status)) {
     await prisma.session.deleteMany({
       where: {
-        token,
+        token: tokenHash,
       },
     });
 
@@ -487,7 +515,7 @@ export async function getCurrentSessionUser(input?: {
   if (shouldTouchSession) {
     const touchedSession = await prisma.session.updateMany({
       where: {
-        token,
+        token: tokenHash,
         userId: session.userId,
       },
       data: {
@@ -1033,7 +1061,7 @@ function shouldUseSecureSessionCookie() {
     return ["1", "true", "yes"].includes(configuredValue);
   }
 
-  return false;
+  return process.env.NODE_ENV === "production";
 }
 
 function isInternalRole(role: string) {

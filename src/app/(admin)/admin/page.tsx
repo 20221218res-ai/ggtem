@@ -57,31 +57,31 @@ export default async function AdminDashboardPage() {
   return (
     <main className="min-h-screen bg-[#f3f7fb] px-5 py-8 text-slate-950">
       <section className="mx-auto max-w-7xl space-y-5">
-        <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black uppercase tracking-wide text-[var(--color-primary)]">
-              Admin Today
-            </p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">
-              오늘 처리할 업무
-            </h1>
+        <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-wide text-[var(--color-primary)]">
+                Admin Today
+              </p>
+              <h1 className="mt-2 text-3xl font-black tracking-tight">
+                오늘 처리할 업무
+              </h1>
+            </div>
+            <nav className="flex flex-wrap gap-2" aria-label="관리자 빠른 이동">
+              {quickActions.map((action) => (
+                <Link
+                  key={action.href}
+                  href={action.href}
+                  className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-800 shadow-sm hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                >
+                  {action.label}
+                </Link>
+              ))}
+            </nav>
           </div>
-          <nav className="flex flex-wrap gap-2" aria-label="관리자 빠른 이동">
-            {quickActions.map((action) => (
-              <Link
-                key={action.href}
-                href={action.href}
-                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-800 shadow-sm hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
-              >
-                {action.label}
-              </Link>
-            ))}
-          </nav>
-        </header>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div className="flex flex-wrap items-end gap-4">
+          <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div className="flex flex-wrap items-center gap-3">
               <div>
                 <p className="text-sm font-black text-slate-500">운영 큐</p>
                 <h2 className="mt-1 text-2xl font-black">
@@ -96,7 +96,7 @@ export default async function AdminDashboardPage() {
               </div>
               {firstAction ? (
                 <p className="text-sm font-bold text-slate-500">
-                  다음: {firstAction.label}
+                  다음: {cleanPreview(firstAction.label, queueLabel(firstAction.key))}
                 </p>
               ) : null}
             </div>
@@ -107,7 +107,7 @@ export default async function AdminDashboardPage() {
               먼저 처리하기
             </Link>
           </div>
-        </section>
+        </header>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           {mainQueues.map((item) => (
@@ -124,7 +124,7 @@ export default async function AdminDashboardPage() {
 
         <OffPlatformAlertPanel alerts={state.offPlatformChatAlerts} />
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-black">전체 작업 큐</h2>
             <Link
@@ -146,7 +146,7 @@ export default async function AdminDashboardPage() {
           </div>
         </section>
 
-        <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <details className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <summary className="cursor-pointer text-lg font-black text-slate-950">
             최근 주문 / 분쟁
           </summary>
@@ -208,7 +208,7 @@ function QueueCard({
   return (
     <Link
       href={item.href}
-      className={`rounded-2xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${tone.card}`}
+      className={`rounded-xl border p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${tone.card}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -232,9 +232,10 @@ function OffPlatformAlertPanel({
   alerts: DashboardState["offPlatformChatAlerts"];
 }) {
   const alertCount = alerts.length;
+  if (alertCount === 0) return null;
 
   return (
-    <section className="rounded-2xl border border-red-200 bg-white p-5 shadow-sm">
+    <section className="rounded-xl border border-red-200 bg-white p-5 shadow-sm">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-sm font-black text-red-600">위험 채팅</p>
@@ -290,11 +291,6 @@ function OffPlatformAlertPanel({
           </Link>
         ))}
 
-        {alerts.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm font-bold text-slate-500 lg:col-span-5">
-            감지 없음
-          </div>
-        ) : null}
       </div>
     </section>
   );
@@ -356,7 +352,7 @@ function MetricCard({
   };
 
   return (
-    <Link href={href} className={`rounded-2xl border p-5 shadow-sm ${classes[tone]}`}>
+    <Link href={href} className={`rounded-xl border p-4 shadow-sm ${classes[tone]}`}>
       <p className="text-sm font-black opacity-80">{label}</p>
       <p className="mt-3 text-2xl font-black">
         {typeof value === "number" ? value.toLocaleString("ko-KR") : value}

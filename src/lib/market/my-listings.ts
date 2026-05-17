@@ -26,10 +26,12 @@ import {
 } from "@/lib/market/trade-unit";
 import { copyFile, mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
 
 const MARKET_USER_EMAIL = "user-demo@ggitem.local";
 const MARKET_USER_ROLES = ["CUSTOMER", "SELLER"];
 const LISTING_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+const LISTING_IMAGE_MAX_COUNT = 8;
 
 export type MarketplaceMyListingsView = {
   sellerName: string;
@@ -1218,6 +1220,10 @@ export async function uploadMarketplaceSellerListingImage(input: {
       throw new Error("판매글을 찾을 수 없습니다.");
     }
 
+    if (listing.images.length >= LISTING_IMAGE_MAX_COUNT) {
+      throw new Error(`본문 이미지는 최대 ${LISTING_IMAGE_MAX_COUNT}장까지 업로드할 수 있습니다.`);
+    }
+
     const uploadsDirectory = path.join(
       process.cwd(),
       "public",
@@ -1226,7 +1232,7 @@ export async function uploadMarketplaceSellerListingImage(input: {
     );
     await mkdir(uploadsDirectory, { recursive: true });
 
-    const nextFileName = `${listing.id}-${Date.now()}.${extension}`;
+    const nextFileName = `${listing.id}-${randomUUID()}.${extension}`;
     const absoluteStoragePath = path.join(uploadsDirectory, nextFileName);
     const publicImageUrl = `/uploads/listings/${nextFileName}`;
     await writeFile(absoluteStoragePath, input.bytes);
@@ -1313,6 +1319,9 @@ export async function removeMarketplaceSellerListingImage(input: {
     await Promise.all(
       imagesToDelete.map(async (image) => {
         try {
+          if (!isSafeListingUploadPath(image.storagePath)) {
+            return;
+          }
           await unlink(image.storagePath);
         } catch {
           return;
@@ -1726,5 +1735,19 @@ function isListingImageSignatureValid(
     bytes[9] === 0x45 &&
     bytes[10] === 0x42 &&
     bytes[11] === 0x50
+  );
+}
+
+function isSafeListingUploadPath(storagePath: string) {
+  const uploadsDirectory = path.resolve(
+    process.cwd(),
+    "public",
+    "uploads",
+    "listings",
+  );
+  const resolvedStoragePath = path.resolve(storagePath);
+  return (
+    resolvedStoragePath.startsWith(`${uploadsDirectory}${path.sep}`) ||
+    resolvedStoragePath === uploadsDirectory
   );
 }

@@ -1,5 +1,6 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
+import { requireAdminPasswordRecheck } from "@/lib/auth/admin-step-up";
 import { getAdminFinanceState, processAdminFinanceAction } from "@/lib/admin/finance";
 
 export async function GET() {
@@ -40,6 +41,7 @@ export async function POST(request: NextRequest) {
         txId?: string;
         memo?: string;
       };
+      adminPassword?: string;
     };
 
     if (!body.kind || !body.requestId || !body.action) {
@@ -50,6 +52,11 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
+
+    await requireAdminPasswordRecheck({
+      adminId: auth.user.userId,
+      adminPassword: body.adminPassword,
+    });
 
     const result = await processAdminFinanceAction({
       kind: body.kind,

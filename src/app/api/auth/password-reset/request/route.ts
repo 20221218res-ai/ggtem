@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  assertAuthRateLimit,
+  getRequestRateLimitKey,
+  RateLimitError,
+} from "@/lib/auth/rate-limit";
 import { requestPasswordReset } from "@/lib/auth/session";
 
 export async function POST(request: NextRequest) {
@@ -14,6 +19,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const ipKey = getRequestRateLimitKey(request.headers);
+    await assertAuthRateLimit({
+      scope: "password-reset-ip",
+      identifier: ipKey,
+      ipKey,
+      limit: 10,
+      windowMinutes: 30,
+      lockMinutes: 30,
+      message: "비밀번호 재설정 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+    });
+    await assertAuthRateLimit({
+      scope: "password-reset-email",
+      identifier: body.email,
+      ipKey,
+      limit: 3,
+      windowMinutes: 30,
+      lockMinutes: 30,
+      message: "이 이메일로 비밀번호 재설정 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+    });
+
     const result = await requestPasswordReset({ email: body.email });
 
     return NextResponse.json({
@@ -21,6 +46,16 @@ export async function POST(request: NextRequest) {
       ...result,
     });
   } catch (error) {
+    if (error instanceof RateLimitError) {
+      return NextResponse.json(
+        {
+          code: error.code,
+          message: error.message,
+        },
+        { status: error.status },
+      );
+    }
+
     return NextResponse.json(
       {
         code: "AUTH_PASSWORD_RESET_REQUEST_FAILED",

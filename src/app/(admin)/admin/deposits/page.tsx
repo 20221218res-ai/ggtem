@@ -12,32 +12,43 @@ export default async function AdminDepositsPage() {
 
   const state = await getAdminFinanceState();
   const hasPendingDeposits = state.pendingDeposits.length > 0;
+  const firstPendingDeposit = state.pendingDeposits[0];
 
   return (
     <main className="bg-slate-100 px-6 py-8 text-slate-950">
       <section className="mx-auto flex max-w-7xl flex-col gap-6">
-        <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black text-[var(--color-primary)]">DEPOSIT DESK</p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">충전 승인</h1>
+        <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-black text-[var(--color-primary)]">DEPOSIT DESK</p>
+              <h1 className="mt-2 text-3xl font-black tracking-tight">충전 승인</h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">
+                {hasPendingDeposits
+                  ? `${firstPendingDeposit.userName} 요청부터 확인`
+                  : "승인 대기 없음"}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <HeaderLink href="/admin/withdrawals" label="출금" />
+              <HeaderLink href="/admin/finance/ledger" label="원장" />
+              <HeaderLink href="/admin/audit?targetType=DEPOSIT_REQUEST" label="감사 로그" />
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <HeaderLink href="/admin/withdrawals" label="출금" />
-            <HeaderLink href="/admin/finance/ledger" label="원장" />
-            <HeaderLink href="/admin/audit?targetType=DEPOSIT_REQUEST" label="감사 로그" />
+
+          <div className="mt-5 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+            <MetricCard label="승인 대기" value={`${state.summary.pendingDeposits}건`} tone="emerald" />
+            <MetricCard label="대기 금액" value={`${state.summary.pendingDepositAmount} USDT`} tone="sky" />
+            <StatusPanel
+              label={hasPendingDeposits ? "확인 필요" : "정상"}
+              value={hasPendingDeposits ? "TXID / 체인 / 주소" : "대기 없음"}
+              tone={hasPendingDeposits ? "amber" : "emerald"}
+            />
           </div>
         </header>
-
-        <section className="grid gap-4 md:grid-cols-3">
-          <MetricCard label="승인 대기" value={`${state.summary.pendingDeposits}건`} tone="emerald" />
-          <MetricCard label="대기 금액" value={`${state.summary.pendingDepositAmount} USDT`} tone="sky" />
-          <MetricCard label="필수 확인" value="TXID / 체인 / 주소" tone="amber" />
-        </section>
 
         <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-sm font-semibold text-slate-500">입금 요청</p>
               <h2 className="mt-1 text-xl font-black">대기 목록</h2>
             </div>
             <StatusBadge
@@ -63,7 +74,7 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
   const hasValidTxId = Boolean(item.evidence.txHash && !item.evidence.isTxHashPending);
 
   return (
-    <article className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+    <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
       <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -86,7 +97,7 @@ function DepositReviewCard({ item }: { item: PendingDeposit }) {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_1fr]">
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
         <InfoPanel title="입금 증빙">
           <InfoRow label="코인" value={item.evidence.asset ?? "미확인"} />
           <InfoRow label="네트워크" value={item.evidence.network ?? "미확인"} />
@@ -141,6 +152,28 @@ function MetricCard({ label, value, tone }: { label: string; value: string; tone
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <p className="text-sm font-bold text-slate-600">{label}</p>
       <p className={`mt-2 text-2xl font-black ${tones[tone]}`}>{value}</p>
+    </div>
+  );
+}
+
+function StatusPanel({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "amber" | "emerald";
+}) {
+  const tones = {
+    amber: "border-amber-200 bg-amber-50 text-amber-800",
+    emerald: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  };
+
+  return (
+    <div className={`rounded-xl border px-4 py-3 shadow-sm ${tones[tone]}`}>
+      <p className="text-xs font-black">{label}</p>
+      <p className="mt-2 text-sm font-black">{value}</p>
     </div>
   );
 }

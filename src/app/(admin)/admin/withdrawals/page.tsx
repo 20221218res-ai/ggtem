@@ -12,32 +12,43 @@ export default async function AdminWithdrawalsPage() {
 
   const state = await getAdminFinanceState();
   const hasPendingWithdrawals = state.pendingWithdrawals.length > 0;
+  const firstPendingWithdrawal = state.pendingWithdrawals[0];
 
   return (
     <main className="bg-slate-100 px-6 py-8 text-slate-950">
       <section className="mx-auto flex max-w-7xl flex-col gap-6">
-        <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black text-amber-700">WITHDRAWAL DESK</p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">출금 처리</h1>
+        <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-black text-amber-700">WITHDRAWAL DESK</p>
+              <h1 className="mt-2 text-3xl font-black tracking-tight">출금 처리</h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">
+                {hasPendingWithdrawals
+                  ? `${firstPendingWithdrawal.userName} 요청부터 확인`
+                  : "출금 대기 없음"}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <HeaderLink href="/admin/deposits" label="충전" />
+              <HeaderLink href="/admin/finance/ledger?q=WITHDRAWAL" label="원장" />
+              <HeaderLink href="/admin/audit?targetType=WITHDRAWAL_REQUEST" label="감사 로그" />
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <HeaderLink href="/admin/deposits" label="충전" />
-            <HeaderLink href="/admin/finance/ledger?q=WITHDRAWAL" label="원장" />
-            <HeaderLink href="/admin/audit?targetType=WITHDRAWAL_REQUEST" label="감사 로그" />
+
+          <div className="mt-5 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+            <MetricCard label="처리 대기" value={`${state.summary.pendingWithdrawals}건`} tone="amber" />
+            <MetricCard label="대기 금액" value={`${state.summary.pendingWithdrawalAmount} USDT`} tone="sky" />
+            <StatusPanel
+              label={hasPendingWithdrawals ? "송금 확인" : "정상"}
+              value={hasPendingWithdrawals ? "주소 / 체인 / TXID" : "대기 없음"}
+              tone={hasPendingWithdrawals ? "red" : "emerald"}
+            />
           </div>
         </header>
-
-        <section className="grid gap-4 md:grid-cols-3">
-          <MetricCard label="처리 대기" value={`${state.summary.pendingWithdrawals}건`} tone="amber" />
-          <MetricCard label="대기 금액" value={`${state.summary.pendingWithdrawalAmount} USDT`} tone="sky" />
-          <MetricCard label="필수 확인" value="주소 / 체인 / TXID" tone="red" />
-        </section>
 
         <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-sm font-semibold text-slate-500">출금 요청</p>
               <h2 className="mt-1 text-xl font-black">대기 목록</h2>
             </div>
             <StatusBadge
@@ -62,7 +73,7 @@ function WithdrawalReviewCard({ item }: { item: PendingWithdrawal }) {
   const hasRiskFlags = item.riskFlags.length > 0;
 
   return (
-    <article className="rounded-xl border border-amber-200 bg-amber-50/60 p-5">
+    <article className="rounded-xl border border-amber-200 bg-amber-50/60 p-4">
       <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -87,7 +98,7 @@ function WithdrawalReviewCard({ item }: { item: PendingWithdrawal }) {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_1fr]">
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
         <InfoPanel title="송금 정보">
           <InfoRow label="체인" value={item.chain ?? "TRC20"} />
           <InfoRow label="받을 주소" value={item.destination} breakAll />
@@ -154,6 +165,28 @@ function MetricCard({ label, value, tone }: { label: string; value: string; tone
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <p className="text-sm font-bold text-slate-600">{label}</p>
       <p className={`mt-2 text-2xl font-black ${tones[tone]}`}>{value}</p>
+    </div>
+  );
+}
+
+function StatusPanel({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "red" | "emerald";
+}) {
+  const tones = {
+    red: "border-red-200 bg-red-50 text-red-800",
+    emerald: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  };
+
+  return (
+    <div className={`rounded-xl border px-4 py-3 shadow-sm ${tones[tone]}`}>
+      <p className="text-xs font-black">{label}</p>
+      <p className="mt-2 text-sm font-black">{value}</p>
     </div>
   );
 }

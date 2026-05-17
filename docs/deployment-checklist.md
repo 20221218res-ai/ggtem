@@ -105,14 +105,43 @@ Migration list currently expected:
 - `20260507090000_add_listing_account_transfer_type`
 - `20260509090000_add_game_catalog_images`
 - `20260509120000_add_premium_promotions`
+- `20260510110000_add_game_localized_names`
+- `20260510120000_add_server_detail_to_market`
+- `20260510143000_seed_customer_center_cms`
+- `20260510153000_limit_initial_game_catalog`
+- `20260510162000_add_game_sort_order`
+- `20260510193000_add_support_inquiries`
+- `20260510194000_refresh_customer_center_content`
+- `20260510210000_add_email_verification_login_tokens`
+- `20260510211000_enable_rls_email_verification_login_tokens`
+- `20260510213000_refresh_support_center_operational_content`
+- `20260510221000_normalize_five_game_catalog_servers`
+- `20260511223000_add_runtime_lookup_indexes`
+- `20260513124500_add_trade_modes_and_price_units`
+- `20260513142000_add_order_trade_character_name`
+- `20260514100000_add_user_payment_pin`
+- `20260515122000_split_trade_game_nicknames`
+- `20260516183000_add_localized_money_unit_names`
+- `20260517153000_add_admin_mfa_challenges`
+- `20260517161000_harden_admin_mfa_challenges`
 
 ## Admin Safety
 
 - `/admin/deposit-addresses` must remain `SUPER` only.
+- Admin login requires email OTP after password verification.
+- Admin OTP locks after repeated failures and cannot be resent continuously.
+- Admin account create, role/status changes, invite creation, and invite revocation require password recheck.
+- Admin invite acceptance is rate-limited and requires a strong initial password.
 - Deposit address changes require password recheck.
 - Deposit approval requires TXID and rejects duplicate TXID.
 - Withdrawal completion requires payout TXID.
 - Admin audit logs should be reviewed after test operations.
+
+## Fee And PWA Notes
+
+- Marketplace fee change to 5% is planned, not launch-confirmed.
+- Current code review found marketplace order fee calculation at 6%; do not publish 5% user-facing policy until code, copy, reports, and smoke tests match.
+- PWA is a planned item. Do not cache wallet, order, admin, auth, or API responses until a safe cache policy is reviewed.
 
 ## Full Smoke Test Order
 

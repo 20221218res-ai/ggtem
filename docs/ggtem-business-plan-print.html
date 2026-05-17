@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GGtem 사업계획서 - 인쇄용</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 16mm 15mm 17mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: #111827;
+      background: #f8fafc;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
+      line-height: 1.62;
+      word-break: keep-all;
+    }
+
+    .page {
+      min-height: 250mm;
+      padding: 0;
+      break-after: page;
+      background: #ffffff;
+    }
+
+    .page:last-child {
+      break-after: auto;
+    }
+
+    .cover {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      min-height: 250mm;
+      padding: 22mm 0 0;
+      color: #ffffff;
+      background: #0f172a;
+      overflow: hidden;
+    }
+
+    .cover-grid {
+      display: grid;
+      grid-template-columns: 1fr 0.95fr;
+      gap: 9mm;
+      align-items: center;
+    }
+
+    .cover-copy {
+      padding-left: 2mm;
+    }
+
+    .brand {
+      margin-bottom: 18mm;
+      color: #20d4b0;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      font-size: 38px;
+      font-weight: 900;
+    }
+
+    h2 {
+      padding-top: 4mm;
+      padding-bottom: 3mm;
+      border-bottom: 1px solid #cbd5e1;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    h3 {
+      margin-top: 8mm;
+      margin-bottom: 3mm;
+      font-size: 15px;
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    p {
+      margin: 3mm 0;
+      font-size: 10.8px;
+    }
+
+    .lead {
+      margin-top: 9mm;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: 6px;
+      margin-top: 14mm;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #075985;
+      font-size: 9px;
+      font-weight: 900;
+    }
+
+    .pill.dark {
+      background: #1e293b;
+      color: #cbd5e1;
+    }
+
+    .pill.green {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .pill.yellow {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .shot {
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
+      background: #ffffff;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+    }
+
+    .cover .shot {
+      border-color: rgba(148, 163, 184, 0.35);
+      box-shadow: 0 18px 46px rgba(0, 0, 0, 0.35);
+    }
+
+    .caption {
+      margin-top: 2mm;
+      color: #64748b;
+      font-size: 8.5px;
+      text-align: center;
+    }
+
+    .cover .caption {
+      color: #94a3b8;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid rgba(148, 163, 184, 0.32);
+      padding: 5mm 0 0;
+      color: #94a3b8;
+      font-size: 8px;
+    }
+
+    .section {
+      padding: 0;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7mm;
+      align-items: start;
+    }
+
+    .wide-split {
+      display: grid;
+      grid-template-columns: 1.25fr 0.85fr;
+      gap: 7mm;
+      align-items: start;
+    }
+
+    .box {
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
+      padding: 4mm;
+      background: #f8fafc;
+    }
+
+    .box strong {
+      color: #0f172a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 4mm 0;
+      font-size: 9.4px;
+      line-height: 1.45;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 6px 7px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .money-table th {
+      white-space: nowrap;
+    }
+
+    .flow {
+      display: grid;
+      gap: 3mm;
+      margin: 5mm 0;
+    }
+
+    .flow-row {
+      display: grid;
+      grid-template-columns: 31mm 1fr;
+      gap: 4mm;
+      align-items: start;
+    }
+
+    .step {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 10mm;
+      border-radius: 6px;
+      background: #dbeafe;
+      color: #1e40af;
+      font-size: 9.5px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .step.green {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .step.yellow {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .step.red {
+      background: #ffe4e6;
+      color: #9f1239;
+    }
+
+    .note {
+      margin: 4mm 0;
+      border-left: 4px solid #00a885;
+      padding: 3mm 4mm;
+      background: #f0fdfa;
+      color: #134e4a;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .warn {
+      border-left-color: #ef4444;
+      background: #fff1f2;
+      color: #9f1239;
+    }
+
+    ul {
+      margin: 3mm 0 4mm;
+      padding-left: 5mm;
+      font-size: 10px;
+    }
+
+    li {
+      margin: 1.6mm 0;
+    }
+
+    .small {
+      color: #64748b;
+      font-size: 8.8px;
+    }
+
+    .toc {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3mm 8mm;
+      margin-top: 7mm;
+    }
+
+    .toc div {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 2.5mm 0;
+      font-size: 10px;
+    }
+
+    .toc span {
+      display: inline-block;
+      width: 9mm;
+      color: #00a885;
+      font-weight: 900;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="page cover">
+      <div class="cover-grid">
+        <div class="cover-copy">
+          <div class="brand">GGTEM BUSINESS PLAN</div>
+          <h1>실제 UI로 이해하는<br />게임 아이템 거래 플랫폼</h1>
+          <p class="lead">
+            이 문서는 발표용 장표가 아니라, 종이로 받은 사람이 혼자 읽어도 GGtem의 서비스 구조,
+            유저/운영자 화면, 그리고 돈의 흐름을 이해할 수 있도록 작성한 인쇄용 사업계획서입니다.
+          </p>
+          <div class="cover-meta">
+            <span class="pill dark">작성일 2026.05.16</span>
+            <span class="pill green">실제 UI 캡처 기반</span>
+            <span class="pill dark">돈의 흐름 상세 포함</span>
+          </div>
+        </div>
+        <figure>
+          <img class="shot" src="assets/business-plan-ui/home.png" alt="GGtem 홈 화면" />
+          <figcaption class="caption">GGtem 실제 홈 UI</figcaption>
+        </figure>
+      </div>
+      <div class="footer">
+        <span>GGtem</span>
+        <span>인쇄용 사업계획서</span>
+      </div>
+    </section>
+
+    <section class="page">
+      <h2>목차와 요약</h2>
+      <div class="toc">
+        <div><span>01</span>서비스 한 줄 정의</div>
+        <div><span>02</span>고객 문제와 해결 방식</div>
+        <div><span>03</span>실제 UI 기반 서비스 구조</div>
+        <div><span>04</span>유저 플로우</div>
+        <div><span>05</span>운영자 플로우</div>
+        <div><span>06</span>돈의 흐름 전체 구조</div>
+        <div><span>07</span>충전, 에스크로, 정산</div>
+        <div><span>08</span>출금, 분쟁, 수익 모델</div>
+        <div><span>09</span>운영 리스크와 통제</div>
+        <div><span>10</span>데모/추가 자료 요청</div>
+      </div>
+      <h3>핵심 요약</h3>
+      <p>
+        GGtem은 게임머니, 게임아이템, 게임계정 거래를 판매등록, 구매등록, 즉시구매, 즉시판매,
+        주문 채팅, 지갑 충전/출금, 관리자 정산/분쟁 처리까지 하나의 운영 콘솔로 연결하는 거래 플랫폼입니다.
+        단순히 상품을 올리고 연락하는 게시판이 아니라, 돈이 언제 들어오고 어디에 잠기며 누구에게 풀리는지를
+        지갑 버킷과 원장으로 추적하는 구조입니다.
+      </p>
+      <div class="note">
+        이 사업계획서에서 가장 중요한 메시지는 “GGtem의 신뢰는 에스크로와 원장에서 나온다”는 점입니다.
+        구매자는 돈을 먼저 판매자에게 보내지 않고, 판매자는 전달과 주문 상태를 근거로 정산을 받습니다.
+      </div>
+      <table>
+        <thead>
+          <tr><th>구분</th><th>설명</th><th>사업적 의미</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>거래 진입</td><td>판매 매물과 구매 요청을 모두 받을 수 있음</td><td>공급과 수요를 동시에 확보</td></tr>
+          <tr><td>신뢰 장치</td><td>구매 금액은 주문 완료 전까지 에스크로에 잠김</td><td>사기 위험과 정산 분쟁 감소</td></tr>
+          <tr><td>운영 장치</td><td>충전, 출금, 분쟁, 고객센터를 어드민에서 처리</td><td>운영자가 상태와 다음 액션을 판단</td></tr>
+          <tr><td>수익 모델</td><td>거래 수수료, 출금 수수료, 프리미엄 노출</td><td>완료 이벤트 기반 매출 인식</td></tr>
+        </tbody>
+      </table>
+      <div class="footer"><span>GGtem</span><span>01 / Executive Summary</span></div>
+    </section>
+
+    <section class="page">
+      <h2>1. 서비스 한 줄 정의</h2>
+      <p>
+        GGtem은 글로벌 게임 유저가 게임머니, 아이템, 계정을 안전하게 사고팔 수 있도록
+        거래 등록, 에스크로 결제, 주문 채팅, 지갑 원장, 관리자 분쟁 처리를 연결한 게임 아이템 거래 플랫폼입니다.
+      </p>
+      <div class="wide-split">
+        <div>
+          <h3>기존 거래의 문제</h3>
+          <table>
+            <thead>
+              <tr><th>문제</th><th>왜 중요한가</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>상대방 신뢰 부족</td><td>구매자는 돈을 먼저 보낼 때 사기 위험을 느끼고, 판매자는 전달 후 미확정 위험을 느낍니다.</td></tr>
+              <tr><td>주문과 채팅의 분리</td><td>전달 증빙, 캐릭터명, 거래 조건이 흩어져 분쟁 시 판단이 어렵습니다.</td></tr>
+              <tr><td>정산 불투명</td><td>입금, 구매, 환불, 출금이 같은 기준으로 추적되지 않으면 운영 사고가 발생합니다.</td></tr>
+              <tr><td>게임/서버 구조 복잡</td><td>게임별 서버, 단위, 카테고리가 다르면 검색과 가격 비교가 어렵습니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <img class="shot" src="assets/business-plan-ui/listings.png" alt="GGtem 거래 목록 화면" />
+          <figcaption class="caption">공개 거래 목록 UI</figcaption>
+        </figure>
+      </div>
+      <h3>GGtem의 해결 방식</h3>
+      <p>
+        GGtem은 판매자와 구매자가 플랫폼 안에서 거래 조건을 만들고, 주문이 생성되면 구매자의 금액을
+        에스크로 버킷에 잠급니다. 판매자가 게임 내 전달을 진행하고 구매자가 확인하면 판매자에게 정산되며,
+        문제가 생기면 운영자가 주문 채팅과 원장을 확인해 환불 또는 판매자 지급을 결정합니다.
+      </p>
+      <div class="footer"><span>GGtem</span><span>02 / Service Definition</span></div>
+    </section>
+
+    <section class="page">
+      <h2>2. 실제 UI 기반 서비스 구조</h2>
+      <p>
+        GGtem은 유저 화면과 관리자 화면이 분리되어 있지만, 실제 업무는 하나의 상태 흐름으로 연결됩니다.
+        유저가 판매등록, 구매등록, 즉시구매, 주문 채팅, 지갑 신청을 하면 관리자는 어드민에서 충전, 출금,
+        분쟁, 고객센터, 게임/서버 설정을 처리합니다.
+      </p>
+      <div class="two-col">
+        <figure>
+          <img class="shot" src="assets/business-plan-ui/support.png" alt="고객센터 화면" />
+          <figcaption class="caption">고객센터, 문의, 신규 게임 신청</figcaption>
+        </figure>
+        <figure>
+          <img class="shot" src="assets/business-plan-ui/admin-deposits.png" alt="관리자 충전 승인 화면" />
+          <figcaption class="caption">관리자 충전 승인 화면</figcaption>
+        </figure>
+      </div>
+      <table>
+        <thead>
+          <tr><th>축</th><th>사용자 화면</th><th>관리자 화면</th><th>의미</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>거래 생성</td><td>판매등록, 구매등록</td><td>게임/서버 설정</td><td>거래 가능한 카탈로그와 수요/공급 확보</td></tr>
+          <tr><td>거래 체결</td><td>공개 목록, 상품 상세, 주문</td><td>주문 관리, 주문 채팅</td><td>에스크로 기반 주문 전환</td></tr>
+          <tr><td>돈의 흐름</td><td>지갑, 충전/출금 신청, 원장</td><td>충전 승인, 출금 처리, 재무 원장</td><td>잔액과 수익의 근거</td></tr>
+          <tr><td>신뢰 운영</td><td>고객센터, 알림, 채팅</td><td>분쟁, QNA, 감사 로그</td><td>분쟁 대응과 운영 투명성</td></tr>
+        </tbody>
+      </table>
+      <div class="footer"><span>GGtem</span><span>03 / Product Structure</span></div>
+    </section>
+
+    <section class="page">
+      <h2>3. 유저 플로우</h2>
+      <p>
+        사용자는 가입과 인증을 거쳐 거래를 시작합니다. 거래는 크게 판매등록, 구매등록, 즉시구매, 즉시판매로 나뉩니다.
+        각 플로우는 주문 또는 구매요청 상태를 만들고, 필요한 경우 지갑 잔액을 잠급니다.
+      </p>
+      <div class="two-col">
+        <figure>
+          <img class="shot" src="assets/business-plan-ui/sign-up.png" alt="회원가입 화면" />
+          <figcaption class="caption">회원가입 화면</figcaption>
+        </figure>
+        <figure>
+          <img class="shot" src="assets/business-plan-ui/sign-in.png" alt="로그인 화면" />
+          <figcaption class="caption">로그인 화면</figcaption>
+        </figure>
+      </div>
+      <h3>유저 플로우 상세</h3>
+      <table>
+        <thead>
+          <tr><th>플로우</th><th>사용자 행동</th><th>시스템에서 일어나는 일</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>회원가입/인증</td><td>이메일과 비밀번호로 계정을 만들고 인증합니다.</td><td>유저, 세션, 인증 토큰이 생성되고 거래 가능 계정이 됩니다.</td></tr>
+          <tr><td>판매등록</td><td>게임, 서버, 카테고리, 수량, 단가, 설명, 이미지를 입력합니다.</td><td>공개 매물이 생성되고 재고 수량이 관리됩니다.</td></tr>
+          <tr><td>구매등록</td><td>원하는 게임/서버/수량/단가를 등록합니다.</td><td>구매 요청 총액이 `BUY_REQUEST_LOCKED`로 잠겨 허수 수요를 줄입니다.</td></tr>
+          <tr><td>즉시구매</td><td>공개 매물을 선택해 수량과 캐릭터명을 입력합니다.</td><td>구매자 잔액이 에스크로로 이동하고 주문/채팅방이 생성됩니다.</td></tr>
+          <tr><td>주문/채팅</td><td>판매자와 전달 정보를 확인하고 거래 상태를 진행합니다.</td><td>주문 상태, 채팅, 알림, 원장이 분쟁 근거로 남습니다.</td></tr>
+        </tbody>
+      </table>
+      <div class="footer"><span>GGtem</span><span>04 / User Flow</span></div>
+    </section>
+
+    <section class="page">
+      <h2>4. 돈의 흐름 전체 구조</h2>
+      <p>
+        GGtem의 자금 구조는 “돈이 어디에 있는가”를 지갑 버킷으로 나누어 설명합니다.
+        이 구조가 명확해야 충전, 구매, 에스크로, 판매자 정산, 출금, 분쟁 처리가 서로 충돌하지 않습니다.
+      </p>
+      <table class="money-table">
+        <thead>
+          <tr><th>버킷</th><th>의미</th><th>증가 시점</th><th>감소 시점</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>`AVAILABLE`</td><td>거래에 사용할 수 있는 잔액</td><td>충전 승인, 환불, 잠금 해제</td><td>즉시구매, 구매등록, 출금 신청</td></tr>
+          <tr><td>`WITHDRAWABLE`</td><td>출금 가능한 잔액</td><td>충전 승인, 판매 정산, 환불</td><td>구매, 구매등록, 출금 신청</td></tr>
+          <tr><td>`ESCROW_LOCKED`</td><td>주문에 잠긴 구매자 금액</td><td>즉시구매, 즉시판매 주문 전환</td><td>구매확정, 환불, 분쟁 처리</td></tr>
+          <tr><td>`BUY_REQUEST_LOCKED`</td><td>구매요청에 잠긴 금액</td><td>구매등록 생성</td><td>구매요청 취소, 즉시판매 체결</td></tr>
+          <tr><td>`WITHDRAWAL_LOCKED`</td><td>출금 신청 후 운영 처리 중인 금액</td><td>출금 신청</td><td>출금 완료, 반려, 취소</td></tr>
+          <tr><td>`PLATFORM_REVENUE`</td><td>플랫폼 수익 원장 버킷</td><td>주문 수수료, 출금 수수료 확정</td><td>회계/정산 처리 시 별도 관리</td></tr>
+        </tbody>
+      </table>
+      <div class="note">
+        중요한 점은 `Order`가 생성되는 순간이 곧 매출이 아니라는 것입니다.
+        주문 생성 시에는 구매자 돈이 에스크로로 잠길 뿐이고, 매출은 주문 완료 또는 분쟁에서 판매자 지급이 확정될 때 수수료 원장으로 잡힙니다.
+      </div>
+      <div class="flow">
+        <div class="flow-row"><div class="step">외부 입금</div><p>사용자가 플랫폼이 안내한 입금 방식으로 자금을 보냅니다. 이 단계에서는 아직 내부 지갑 잔액이 아닙니다.</p></div>
+        <div class="flow-row"><div class="step green">충전 승인</div><p>운영자가 증빙과 TXID를 확인한 뒤 승인하면 `AVAILABLE`과 `WITHDRAWABLE`이 증가합니다.</p></div>
+        <div class="flow-row"><div class="step yellow">에스크로</div><p>구매가 발생하면 구매자의 잔액이 `ESCROW_LOCKED`로 이동합니다.</p></div>
+        <div class="flow-row"><div class="step green">정산</div><p>거래 완료 후 판매자에게 수수료를 제외한 금액이 정산되고, 플랫폼 수수료가 수익 원장에 기록됩니다.</p></div>
+        <div class="flow-row"><div class="step red">출금/분쟁</div><p>출금과 분쟁은 운영자가 최종적으로 돈의 방향을 확정하는 고위험 구간입니다.</p></div>
+      </div>
+      <div class="footer"><span>GGtem</span><span>05 / Money Architecture</span></div>
+    </section>
+
+    <section class="page">
+      <h2>5. 충전과 입금 승인 흐름</h2>
+      <div class="wide-split">
+        <div>
+          <p>
+            충전은 사용자가 입금을 요청했다고 바로 내부 잔액이 되는 구조가 아닙니다.
+            사용자는 지갑 화면에서 충전 요청을 만들고, 운영자는 관리자 충전 화면에서 금액과 증빙을 확인합니다.
+            승인 전까지는 `DepositRequest(PENDING)` 상태이며 지갑 잔액 변화는 없습니다.
+          </p>
+          <h3>승인 시 처리</h3>
+          <ul>
+            <li>`DepositRequest.status`가 `CONFIRMED`로 변경됩니다.</li>
+            <li>사용자 `AVAILABLE` 잔액이 입금액만큼 증가합니다.</li>
+            <li>사용자 `WITHDRAWABLE` 잔액도 입금액만큼 증가합니다.</li>
+            <li>`ADMIN_DEPOSIT_APPROVED` 원장이 `AVAILABLE`, `WITHDRAWABLE`에 각각 남습니다.</li>
+            <li>관리자 감사 로그와 사용자 알림이 생성됩니다.</li>
+          </ul>
+          <h3>반려 시 처리</h3>
+          <ul>
+            <li>`DepositRequest.status`가 `REJECTED`로 변경됩니다.</li>
+            <li>잔액은 증가하지 않습니다.</li>
+            <li>반려 사유와 관리자 감사 로그가 남습니다.</li>
+          </ul>
+        </div>
+        <figure>
+          <img class="shot" src="assets/business-plan-ui/admin-deposits.png" alt="관리자 충전 승인 화면" />
+          <figcaption class="caption">충전 승인 화면: 운영자가 대기 입금을 확인하는 지점</figcaption>
+        </figure>
+      </div>
+      <div class="note">
+        사업계획서 표현: GGtem의 충전은 “사용자가 입금했다”가 아니라
+        “운영자가 입금 증빙을 확인하고 원장에 확정 반영했다”는 시점에서 내부 잔액이 됩니다.
+      </div>
+      <div class="footer"><span>GGtem</span><span>06 / Deposit Flow</span></div>
+    </section>
+
+    <section class="page">
+      <h2>6. 즉시구매, 에스크로, 판매자 정산</h2>
+      <p>
+        즉시구매는 구매자가 판매자의 공개 매물을 선택해 바로 주문을 만드는 흐름입니다.
+        구매 금액은 판매자에게 바로 지급되지 않고, 구매자의 지갑에서 에스크로 버킷으로 이동합니다.
+        이 때문에 판매자는 주문을 보고 전달을 진행하고, 구매자는 전달 확인 전까지 보호를 받습니다.
+      </p>
+      <div class="two-col">
+        <figure>
+          <img class="shot" src="assets/business-plan-ui/listings.png" alt="거래 목록 화면" />
+          <figcaption class="caption">거래 진입 화면</figcaption>
+        </figure>
+        <figure>
+          <img class="shot" src="assets/business-plan-ui/wallet.png" alt="지갑 화면" />
+          <figcaption class="caption">유저 지갑 충전 화면</figcaption>
+        </figure>
+      </div>
+      <table class="money-table">
+        <thead>
+          <tr><th>단계</th><th>처리 내용</th><th>돈의 변화</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>구매 요청</td><td>수량, 캐릭터명, 구매 금액 계산</td><td>잔액 변화 없음</td></tr>
+          <tr><td>잔액 검증</td><td>구매자 `AVAILABLE`, `WITHDRAWABLE` 확인</td><td>구매 가능 여부 판단</td></tr>
+          <tr><td>에스크로 잠금</td><td>주문 생성, 채팅방 생성, 재고 잠금</td><td>`AVAILABLE - 금액`, `WITHDRAWABLE - 금액`, `ESCROW_LOCKED + 금액`</td></tr>
+          <tr><td>구매 확정</td><td>구매자가 전달 완료를 확인</td><td>`ESCROW_LOCKED - 총액`, 판매자 `AVAILABLE/WITHDRAWABLE + 정산액`</td></tr>
+          <tr><td>수수료 확정</td><td>플랫폼 수수료 원장 생성</td><td>`PLATFORM_REVENUE + 수수료`</td></tr>
+        </tbody>
+      </table>
+      <h3>100 USDT 거래 예시</h3>
+      <table>
+        <thead><tr><th>항목</th><th>금액</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td>구매 총액</td><td>100 USDT</td><td>구매자가 결제한 주문 총액</td></tr>
+          <tr><td>판매자 정산액</td><td>95 USDT</td><td>플랫폼 수수료를 제외하고 판매자가 받는 금액</td></tr>
+          <tr><td>플랫폼 수수료</td><td>5 USDT</td><td>주문 완료 시 플랫폼 수익으로 확정</td></tr>
+        </tbody>
+      </table>
+      <div class="footer"><span>GGtem</span><span>07 / Escrow & Settlement</span></div>
+    </section>
+
+    <section class="page">
+      <h2>7. 구매등록과 즉시판매 흐름</h2>
+      <p>
+        GGtem은 판매자가 매물을 올리는 구조만 가진 것이 아닙니다.
+        구매자가 “이 조건으로 사고 싶다”는 구매요청을 먼저 등록할 수 있고, 판매자는 그 요청에 즉시판매할 수 있습니다.
+        이 기능은 초기 거래량 확보에 중요합니다. 판매 매물이 충분하지 않아도 수요를 먼저 모을 수 있기 때문입니다.
+      </p>
+      <table class="money-table">
+        <thead>
+          <tr><th>단계</th><th>상태</th><th>돈의 변화</th><th>사업적 의미</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>구매요청 생성</td><td>`BuyRequest(ACTIVE)`</td><td>`AVAILABLE - lockAmount`, `BUY_REQUEST_LOCKED + lockAmount`</td><td>허수 구매요청 감소</td></tr>
+          <tr><td>판매자 제안/즉시판매</td><td>요청 수량 일부 또는 전체 체결</td><td>잠금 금액 중 체결분이 주문 에스크로 성격으로 이동</td><td>판매자가 수요를 보고 바로 거래 가능</td></tr>
+          <tr><td>구매요청 취소</td><td>`BuyRequest(CANCELED)`</td><td>`BUY_REQUEST_LOCKED - lockAmount`, `AVAILABLE/WITHDRAWABLE + lockAmount`</td><td>미체결 수요의 자금 반환</td></tr>
+          <tr><td>거래 완료</td><td>`Order(COMPLETED)`</td><td>판매자 정산, 플랫폼 수수료 확정</td><td>일반 즉시구매와 같은 수익 구조</td></tr>
+        </tbody>
+      </table>
+      <div class="note">
+        구매등록은 마켓플레이스의 수요 측면을 강화합니다.
+        판매자는 “누가 무엇을 얼마에 사고 싶어 하는지”를 보고 공급을 맞출 수 있고,
+        플랫폼은 구매 요청 잠금 금액으로 거래 의지를 확인할 수 있습니다.
+      </div>
+      <div class="footer"><span>GGtem</span><span>08 / Buy Request Flow</span></div>
+    </section>
+
+    <section class="page">
+      <h2>8. 출금과 분쟁 처리</h2>
+      <p>
+        출금과 분쟁은 운영자가 돈의 방향을 최종적으로 확정하는 고위험 영역입니다.
+        따라서 데모나 실제 운영에서 가장 조심해야 하며, 버튼 클릭 전에는 주소, 체인, 금액, 수수료,
+        채팅 증빙, 주문 상태, 감사 로그를 확인해야 합니다.
+      </p>
+      <div class="two-col">
+        <figure>
+          <img class="shot" src="assets/business-plan-ui/admin-withdrawals.png" alt="출금 처리 화면" />
+          <figcaption class="caption">관리자 출금 처리 화면</figcaption>
+        </figure>
+        <figure>
+          <img class="shot" src="assets/business-plan-ui/admin-disputes.png" alt="분쟁 처리 화면" />
+          <figcaption class="caption">관리자 분쟁 처리 화면</figcaption>
+        </figure>
+      </div>
+      <h3>출금 흐름</h3>
+      <table>
+        <thead><tr><th>단계</th><th>처리</th><th>돈의 변화</th></tr></thead>
+        <tbody>
+          <tr><td>출금 신청</td><td>사용자가 금액, 체인, 주소를 입력</td><td>`AVAILABLE/WITHDRAWABLE - totalDebit`, `WITHDRAWAL_LOCKED + totalDebit`</td></tr>
+          <tr><td>관리자 완료</td><td>외부 송금 완료 후 TXID/메모 입력</td><td>`WITHDRAWAL_LOCKED - totalDebit`, 출금 수수료 수익 확정</td></tr>
+          <tr><td>관리자 반려</td><td>주소 오류, 위험 플래그 등으로 반려</td><td>`WITHDRAWAL_LOCKED - totalDebit`, `AVAILABLE/WITHDRAWABLE + totalDebit`</td></tr>
+        </tbody>
+      </table>
+      <h3>분쟁 흐름</h3>
+      <table>
+        <thead><tr><th>운영자 결정</th><th>결과</th><th>돈의 변화</th></tr></thead>
+        <tbody>
+          <tr><td>구매자 환불</td><td>주문이 환불 상태로 종료</td><td>`ESCROW_LOCKED - 금액`, 구매자 `AVAILABLE/WITHDRAWABLE + 금액`</td></tr>
+          <tr><td>판매자 지급</td><td>주문이 완료 상태로 종료</td><td>판매자 정산액 증가, 플랫폼 수수료 확정</td></tr>
+        </tbody>
+      </table>
+      <div class="warn note">
+        입금 승인, 출금 완료/반려, 분쟁 환불/판매자 지급은 실제 잔액과 원장을 바꾸는 기능입니다.
+        인쇄 자료에서는 설명 가능하지만, 실제 운영 데이터로 시연 클릭하면 안 됩니다.
+      </div>
+      <div class="footer"><span>GGtem</span><span>09 / Withdrawal & Dispute</span></div>
+    </section>
+
+    <section class="page">
+      <h2>9. 수익 모델과 운영 KPI</h2>
+      <p>
+        GGtem의 수익은 단순 게시 비용이 아니라 거래 완료와 출금 완료 같은 검증 가능한 이벤트에서 발생합니다.
+        원장에 남는 수익 이벤트를 기준으로 매출을 집계할 수 있으므로, 운영자와 투자자에게 설명하기 쉽습니다.
+      </p>
+      <table>
+        <thead><tr><th>수익원</th><th>인식 시점</th><th>원장 기준</th><th>비고</th></tr></thead>
+        <tbody>
+          <tr><td>거래 수수료</td><td>주문 완료 또는 분쟁 판매자 지급</td><td>`PLATFORM_FEE_COLLECTED / PLATFORM_REVENUE`</td><td>핵심 매출</td></tr>
+          <tr><td>출금 수수료</td><td>출금 완료</td><td>`PLATFORM_FEE_COLLECTED / PLATFORM_REVENUE`</td><td>송금/운영비 보전</td></tr>
+          <tr><td>프리미엄 노출</td><td>판매/구매 등록 홍보 구매</td><td>`PREMIUM_PROMOTION_PURCHASED`</td><td>추가 매출 후보</td></tr>
+        </tbody>
+      </table>
+      <h3>운영 KPI</h3>
+      <table>
+        <thead><tr><th>KPI</th><th>정의</th><th>확인 화면</th></tr></thead>
+        <tbody>
+          <tr><td>GMV</td><td>완료 주문의 총 거래액</td><td>주문/재무 원장</td></tr>
+          <tr><td>플랫폼 수익</td><td>수수료 원장 합계</td><td>`PLATFORM_REVENUE`</td></tr>
+          <tr><td>에스크로 잔액</td><td>진행 중 주문 잠금액</td><td>어드민 대시보드, 원장</td></tr>
+          <tr><td>출금 처리 시간</td><td>출금 요청부터 완료까지</td><td>출금 처리 화면</td></tr>
+          <tr><td>분쟁률</td><td>전체 주문 대비 분쟁 주문 비율</td><td>분쟁 처리 화면</td></tr>
+          <tr><td>CS 응답 시간</td><td>문의 접수부터 답변까지</td><td>고객센터/어드민 문의</td></tr>
+        </tbody>
+      </table>
+      <div class="footer"><span>GGtem</span><span>10 / Revenue & KPI</span></div>
+    </section>
+
+    <section class="page">
+      <h2>10. 운영 리스크와 통제</h2>
+      <p>
+        GGtem처럼 돈과 게임 아이템이 함께 움직이는 플랫폼은 기능의 많고 적음보다 운영 통제가 중요합니다.
+        특히 입금주소, 충전 승인, 출금 완료, 분쟁 처리, 권한 변경은 실제 잔액과 신뢰에 직접 영향을 주므로
+        관리자 권한, 감사 로그, 원장 대조가 함께 필요합니다.
+      </p>
+      <table>
+        <thead><tr><th>리스크</th><th>발생 지점</th><th>통제 방안</th></tr></thead>
+        <tbody>
+          <tr><td>입금 TXID 중복</td><td>충전 승인</td><td>중복 TXID 검증, 감사 로그</td></tr>
+          <tr><td>무권한 잔액 변경</td><td>관리자 기능</td><td>최고관리자/재무 권한 분리</td></tr>
+          <tr><td>외부거래 유도</td><td>주문 채팅</td><td>위험 키워드 탐지, 관리자 채팅 확인</td></tr>
+          <tr><td>판매자 미전달</td><td>주문 진행</td><td>에스크로 잠금, 구매자 확정 전 정산 금지</td></tr>
+          <tr><td>구매자 허위 분쟁</td><td>분쟁 처리</td><td>채팅, 주문 이벤트, 전달 증빙 확인</td></tr>
+          <tr><td>출금 주소 오류</td><td>출금 신청</td><td>주소/체인 재확인, 지급 PIN, 운영 승인</td></tr>
+          <tr><td>원장 불일치</td><td>정산</td><td>일마감 대사, 버킷별 크레딧/데빗 점검</td></tr>
+        </tbody>
+      </table>
+      <div class="warn note">
+        데모 또는 심사 자료 제출 전에는 실제 운영 데이터에서 위험 버튼을 클릭하지 않습니다.
+        필요한 경우 데모 계정과 데모 주문을 별도로 만들어 화면만 재현하는 방식이 안전합니다.
+      </div>
+      <div class="footer"><span>GGtem</span><span>11 / Risk Control</span></div>
+    </section>
+
+    <section class="page">
+      <h2>11. 최종 제출 전 보강하면 좋은 자료</h2>
+      <p>
+        현재 자료는 실제 UI 캡처와 코드 기준 돈의 흐름을 바탕으로 작성되었습니다.
+        더 설득력 있는 인쇄용 사업계획서로 만들려면 실제 주문과 분쟁이 있는 데모 데이터를 추가하고,
+        수수료율과 월간 거래액 가정을 넣어 재무 전망을 추가하는 것이 좋습니다.
+      </p>
+      <table>
+        <thead><tr><th>필요 자료</th><th>이유</th><th>우선순위</th></tr></thead>
+        <tbody>
+          <tr><td>구매자/판매자 데모 계정</td><td>주문 상세, 채팅, 지갑 원장 캡처</td><td>높음</td></tr>
+          <tr><td>관리자 처리 사례</td><td>충전 승인, 출금 완료, 분쟁 해결 전후 상태를 같은 요청 ID로 보여주기</td><td>높음</td></tr>
+          <tr><td>데모 주문 1건</td><td>에스크로에서 완료까지 실제 흐름 설명</td><td>높음</td></tr>
+          <tr><td>데모 분쟁 1건</td><td>환불/판매자 지급 판단 구조 설명</td><td>중간</td></tr>
+          <tr><td>수수료율 정책</td><td>매출 추정표 작성</td><td>높음</td></tr>
+          <tr><td>월 GMV/활성 유저 가정</td><td>12개월 손익 전망 작성</td><td>높음</td></tr>
+          <tr><td>지원 게임 우선순위</td><td>시장 진입 전략 구체화</td><td>중간</td></tr>
+        </tbody>
+      </table>
+      <h3>결론</h3>
+      <p>
+        GGtem의 핵심 경쟁력은 “거래 게시판”이 아니라 “돈과 상태를 함께 통제하는 운영 시스템”입니다.
+        실제 UI는 사용자가 거래를 쉽게 시작하게 만들고, 관리자 UI는 돈과 분쟁을 추적하게 만듭니다.
+        사업계획서에서는 이 점을 중심으로 시장성, 운영 안정성, 수익 모델을 설명하는 것이 가장 설득력 있습니다.
+      </p>
+      <div class="footer"><span>GGtem</span><span>12 / Next Materials</span></div>
+    </section>
+  </main>
+</body>
+</html>

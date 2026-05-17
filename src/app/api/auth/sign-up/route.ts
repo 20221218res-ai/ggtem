@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  assertAuthRateLimit,
+  getRequestRateLimitKey,
+  RateLimitError,
+} from "@/lib/auth/rate-limit";
 import { registerUserAccount } from "@/lib/auth/session";
 
 export async function POST(request: NextRequest) {
@@ -20,6 +25,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const ipKey = getRequestRateLimitKey(request.headers);
+    await assertAuthRateLimit({
+      scope: "sign-up-ip",
+      identifier: ipKey,
+      ipKey,
+      limit: 5,
+      windowMinutes: 30,
+      lockMinutes: 30,
+      message: "회원가입 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+    });
+    await assertAuthRateLimit({
+      scope: "sign-up-email",
+      identifier: body.email,
+      ipKey,
+      limit: 3,
+      windowMinutes: 60,
+      lockMinutes: 60,
+      message: "이 이메일로 회원가입 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+    });
+
     const user = await registerUserAccount({
       email: body.email,
       displayName: body.displayName,
@@ -35,6 +60,17 @@ export async function POST(request: NextRequest) {
       verificationPending: user.verificationPending,
     });
   } catch (error) {
+    if (error instanceof RateLimitError) {
+      return NextResponse.json(
+        {
+          code: error.code,
+          message: error.message,
+          messageKey: "auth.rateLimited",
+        },
+        { status: error.status },
+      );
+    }
+
     return NextResponse.json(
       {
         code: "AUTH_SIGN_UP_FAILED",

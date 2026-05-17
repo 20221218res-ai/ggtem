@@ -1,6 +1,6 @@
 import { formatFixedAmount, parseFixedAmount } from "@/lib/wallet/manual-deposit";
 
-const PLATFORM_FEE_BASIS_POINTS = 600n;
+const PLATFORM_FEE_BASIS_POINTS = 500n; // 5%
 const BASIS_POINTS = 10_000n;
 
 export type MarketplaceOrderFeeBreakdown = {

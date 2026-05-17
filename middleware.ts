@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const DEFAULT_ADMIN_HOSTS = ["admin.localhost:3000", "topofword.com"];
 const ADMIN_ROUTE_PREFIXES = ["/admin", "/api/admin"];
+const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 const SHARED_ROUTE_PREFIXES = [
   "/api/auth",
   "/password-reset",
@@ -16,8 +17,13 @@ export function middleware(request: NextRequest) {
   const adminHosts = getAdminHosts();
   const isAdminHost = adminHosts.includes(host);
 
+  const csrfError = validateSameOriginMutation(request, pathname);
+  if (csrfError) {
+    return withSecurityHeaders(csrfError);
+  }
+
   if (isAdminHost) {
-    return routeAdminHostRequest(request, pathname, requestHeaders);
+    return withSecurityHeaders(routeAdminHostRequest(request, pathname, requestHeaders));
   }
 
   const adminBaseUrl = normalizeBaseUrl(process.env.ADMIN_BASE_URL);
@@ -29,14 +35,16 @@ export function middleware(request: NextRequest) {
     ADMIN_ROUTE_PREFIXES.some((prefix) => pathname.startsWith(prefix))
   ) {
     const redirectUrl = new URL(`${pathname}${request.nextUrl.search}`, adminBaseUrl);
-    return NextResponse.redirect(redirectUrl);
+    return withSecurityHeaders(NextResponse.redirect(redirectUrl));
   }
 
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  return withSecurityHeaders(
+    NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    }),
+  );
 }
 
 export const config = {
@@ -102,4 +110,69 @@ function normalizeBaseUrl(value?: string) {
   }
 
   return trimmedValue.endsWith("/") ? trimmedValue.slice(0, -1) : trimmedValue;
+}
+
+function validateSameOriginMutation(request: NextRequest, pathname: string) {
+  if (!pathname.startsWith("/api/") || !MUTATING_METHODS.has(request.method)) {
+    return null;
+  }
+
+  const requestOrigin = normalizeOrigin(request.nextUrl.origin);
+  const allowedOrigins = new Set(
+    [
+      requestOrigin,
+      normalizeOrigin(process.env.GGITEM_BASE_URL),
+      normalizeOrigin(process.env.ADMIN_BASE_URL),
+      normalizeOrigin(process.env.NEXT_PUBLIC_ADMIN_BASE_URL),
+    ].filter(Boolean),
+  );
+
+  const headerOrigin =
+    normalizeOrigin(request.headers.get("origin")) ||
+    normalizeOriginFromReferer(request.headers.get("referer"));
+
+  if (!headerOrigin) {
+    return null;
+  }
+
+  if (!allowedOrigins.has(headerOrigin)) {
+    return NextResponse.json(
+      { message: "요청 출처를 확인할 수 없습니다." },
+      { status: 403 },
+    );
+  }
+
+  return null;
+}
+
+function withSecurityHeaders(response: NextResponse) {
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), payment=()",
+  );
+  response.headers.set(
+    "Content-Security-Policy",
+    "frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+  );
+  return response;
+}
+
+function normalizeOrigin(value?: string | null) {
+  const trimmedValue = value?.trim();
+  if (!trimmedValue) {
+    return "";
+  }
+
+  try {
+    return new URL(trimmedValue).origin.toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
+function normalizeOriginFromReferer(value?: string | null) {
+  return normalizeOrigin(value);
 }

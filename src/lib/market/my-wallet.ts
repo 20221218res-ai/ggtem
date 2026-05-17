@@ -8,6 +8,7 @@ import {
   calculateWithdrawalFee,
   evaluateWithdrawalEligibility,
   normalizeWithdrawalChain,
+  validateWithdrawalDestination,
   WITHDRAWAL_POLICY,
 } from "@/lib/wallet/withdrawal-policy";
 
@@ -499,12 +500,10 @@ export async function createMarketplaceWalletRequest(input: {
       throw new Error("보유 잔액이 부족합니다.");
     }
 
-    if (!input.destination?.trim()) {
-      throw new Error("받을 지갑 주소를 입력해 주세요.");
-    }
-
-    if (input.destination.trim().length < 12) {
-      throw new Error("받을 지갑 주소를 정확히 입력해 주세요.");
+    const destination = input.destination?.trim() ?? "";
+    const destinationError = validateWithdrawalDestination(chain, destination);
+    if (destinationError) {
+      throw new Error(destinationError);
     }
 
     if (buyer.status === "WITHDRAWAL_HOLD") {
@@ -543,7 +542,7 @@ export async function createMarketplaceWalletRequest(input: {
         netAmount: formatFixedAmount(amount),
         chain,
         status: "REQUESTED",
-        destination: input.destination.trim(),
+        destination,
         riskFlags: {
           flags: eligibility.riskFlags,
           completedTradesLast24h: eligibility.completedTradesLast24h,

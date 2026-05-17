@@ -32,6 +32,7 @@ export default function UserAccessActions({
     "유저 요청으로 비밀번호 재설정 지원",
   );
   const [pinResetReason, setPinResetReason] = useState("유저 요청으로 결제 PIN 초기화 지원");
+  const [adminPassword, setAdminPassword] = useState("");
   const [error, setError] = useState("");
   const [passwordResetMessage, setPasswordResetMessage] = useState("");
   const [passwordResetError, setPasswordResetError] = useState("");
@@ -45,7 +46,10 @@ export default function UserAccessActions({
   const isOperatorRoleChange =
     operatorRoles.includes(role) || operatorRoles.includes(currentRole);
   const canSubmit =
-    !isSubmitting && reason.trim().length >= 10 && (roleChanged || statusChanged);
+    !isSubmitting &&
+    adminPassword.trim().length > 0 &&
+    reason.trim().length >= 10 &&
+    (roleChanged || statusChanged);
 
   async function submitUpdate() {
     const trimmedReason = reason.trim();
@@ -88,6 +92,7 @@ export default function UserAccessActions({
           role,
           status,
           reason: trimmedReason,
+          adminPassword,
         }),
       });
       const result = (await response.json()) as { message?: string };
@@ -97,6 +102,7 @@ export default function UserAccessActions({
       }
 
       router.refresh();
+      setAdminPassword("");
     } catch (updateError) {
       setError(
         updateError instanceof Error
@@ -140,6 +146,7 @@ export default function UserAccessActions({
         body: JSON.stringify({
           userId,
           reason: trimmedReason,
+          adminPassword,
         }),
       });
       const result = (await response.json()) as {
@@ -152,6 +159,7 @@ export default function UserAccessActions({
       }
 
       setPasswordResetMessage(result.message ?? "비밀번호 재설정 메일을 발송했습니다.");
+      setAdminPassword("");
       router.refresh();
     } catch (resetError) {
       setPasswordResetError(
@@ -196,6 +204,7 @@ export default function UserAccessActions({
         body: JSON.stringify({
           userId,
           reason: trimmedReason,
+          adminPassword,
         }),
       });
       const result = (await response.json()) as { message?: string };
@@ -205,6 +214,7 @@ export default function UserAccessActions({
       }
 
       setPinResetMessage(result.message ?? "결제 PIN을 초기화했습니다.");
+      setAdminPassword("");
       router.refresh();
     } catch (resetError) {
       setPinResetError(
@@ -274,6 +284,24 @@ export default function UserAccessActions({
         영향: {buildImpactSummary(role, status)}
       </div>
 
+      <label className="flex flex-col gap-1 rounded-md border border-slate-200 bg-white p-3 text-xs font-black text-slate-600">
+        관리자 비밀번호 재확인
+        <input
+          type="password"
+          value={adminPassword}
+          onChange={(event) => setAdminPassword(event.target.value)}
+          className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-emerald-500"
+          placeholder="현재 로그인한 관리자 비밀번호"
+          autoComplete="current-password"
+        />
+      </label>
+
+      {!adminPassword.trim() ? (
+        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900">
+          권한/상태 변경, 비밀번호 재설정, 결제 PIN 초기화에는 관리자 비밀번호 재확인이 필요합니다.
+        </div>
+      ) : null}
+
       {isOperatorRoleChange ? (
         <div className="rounded-md border border-[color-mix(in_srgb,var(--gg-accent)_40%,transparent)] bg-[color-mix(in_srgb,var(--gg-accent)_12%,transparent)] px-3 py-2 text-xs font-bold text-[var(--gg-accent)]">
           운영 권한 변경
@@ -301,7 +329,11 @@ export default function UserAccessActions({
             <button
               type="button"
               onClick={() => void requestUserPasswordReset()}
-              disabled={isPasswordResetting || passwordResetReason.trim().length < 10}
+              disabled={
+                isPasswordResetting ||
+                passwordResetReason.trim().length < 10 ||
+                !adminPassword.trim()
+              }
               className="w-full rounded-md border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-black text-amber-900 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isPasswordResetting ? "발송 중..." : "비밀번호 초기화 메일 발송"}
@@ -335,7 +367,11 @@ export default function UserAccessActions({
             <button
               type="button"
               onClick={() => void resetPaymentPin()}
-              disabled={isPinResetting || pinResetReason.trim().length < 10}
+              disabled={
+                isPinResetting ||
+                pinResetReason.trim().length < 10 ||
+                !adminPassword.trim()
+              }
               className="w-full rounded-md border border-sky-300 bg-sky-50 px-4 py-2 text-sm font-black text-sky-900 hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isPinResetting ? "초기화 중..." : "결제 PIN 초기화"}

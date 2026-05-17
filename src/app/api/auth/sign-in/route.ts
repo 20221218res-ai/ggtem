@@ -3,7 +3,13 @@ import {
   EmailVerificationRequiredError,
   signInWithCredentials,
 } from "@/lib/auth/session";
+import { createAdminMfaChallenge } from "@/lib/auth/admin-mfa";
 import { getSignedInRedirectPath, ROLE_GROUPS } from "@/lib/auth/guards";
+import {
+  assertAuthRateLimit,
+  getRequestRateLimitKey,
+  RateLimitError,
+} from "@/lib/auth/rate-limit";
 
 const MARKET_FORBIDDEN_MESSAGE = "관리자 계정은 유저 로그인 페이지에서 로그인할 수 없습니다. 관리자 페이지를 이용해 주세요.";
 const ADMIN_FORBIDDEN_MESSAGE = "유저 계정은 관리자 로그인 페이지에서 로그인할 수 없습니다. 일반 로그인 페이지를 이용해 주세요.";
@@ -34,7 +40,44 @@ export async function POST(request: NextRequest) {
       ipAddress: request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip"),
       allowedRoles: getAllowedRolesForSurface(body.surface),
       forbiddenMessage: getForbiddenMessageForSurface(body.surface),
+      createSession: body.surface !== "admin",
     });
+
+    if (body.surface === "admin") {
+      const ipKey = getRequestRateLimitKey(request.headers);
+      await assertAuthRateLimit({
+        scope: "admin-mfa-send-ip",
+        identifier: ipKey,
+        ipKey,
+        limit: 10,
+        windowMinutes: 30,
+        lockMinutes: 30,
+        message: "관리자 인증번호 발송 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+      });
+      await assertAuthRateLimit({
+        scope: "admin-mfa-send-account",
+        identifier: user.email,
+        ipKey,
+        limit: 5,
+        windowMinutes: 30,
+        lockMinutes: 30,
+        message: "이 관리자 계정의 인증번호 발송 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+      });
+
+      const challenge = await createAdminMfaChallenge({
+        userId: user.userId,
+        email: user.email,
+        displayName: user.displayName,
+        requestIpKey: request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip"),
+      });
+
+      return NextResponse.json({
+        code: "AUTH_ADMIN_MFA_REQUIRED",
+        message: "관리자 인증번호를 이메일로 보냈습니다.",
+        challengeToken: challenge.challengeToken,
+        expiresAt: challenge.expiresAt,
+      });
+    }
 
     return NextResponse.json({
       code: "AUTH_SIGN_IN_SUCCESS",
@@ -54,6 +97,17 @@ export async function POST(request: NextRequest) {
           verificationUrl: error.verificationUrl,
         },
         { status: 403 },
+      );
+    }
+
+    if (error instanceof RateLimitError) {
+      return NextResponse.json(
+        {
+          code: error.code,
+          message: error.message,
+          messageKey: "auth.rateLimited",
+        },
+        { status: error.status },
       );
     }
 

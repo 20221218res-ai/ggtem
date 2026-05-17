@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  assertAuthRateLimit,
+  getRequestRateLimitKey,
+  RateLimitError,
+} from "@/lib/auth/rate-limit";
 import { resetPasswordWithToken } from "@/lib/auth/session";
 
 export async function POST(request: NextRequest) {
@@ -15,6 +20,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const ipKey = getRequestRateLimitKey(request.headers);
+    await assertAuthRateLimit({
+      scope: "password-reset-confirm-ip",
+      identifier: ipKey,
+      ipKey,
+      limit: 20,
+      windowMinutes: 30,
+      lockMinutes: 30,
+      message: "Too many password reset attempts. Please try again later.",
+    });
+    await assertAuthRateLimit({
+      scope: "password-reset-confirm-token",
+      identifier: body.token,
+      ipKey,
+      limit: 5,
+      windowMinutes: 30,
+      lockMinutes: 30,
+      message: "Too many password reset attempts for this link. Please request a new link.",
+    });
+
     const result = await resetPasswordWithToken({
       token: body.token,
       password: body.password,
@@ -25,6 +50,16 @@ export async function POST(request: NextRequest) {
       ...result,
     });
   } catch (error) {
+    if (error instanceof RateLimitError) {
+      return NextResponse.json(
+        {
+          code: error.code,
+          message: error.message,
+        },
+        { status: error.status },
+      );
+    }
+
     return NextResponse.json(
       {
         code: "AUTH_PASSWORD_RESET_CONFIRM_FAILED",

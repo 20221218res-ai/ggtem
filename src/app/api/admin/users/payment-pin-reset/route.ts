@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
+import { requireAdminPasswordRecheck } from "@/lib/auth/admin-step-up";
 import { resetUserPaymentPin } from "@/lib/auth/payment-pin";
 import { getPrismaClient } from "@/lib/prisma";
 
@@ -13,6 +14,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as {
       userId?: string;
       reason?: string;
+      adminPassword?: string;
     };
     const userId = body.userId?.trim();
     const reason = body.reason?.trim() ?? "";
@@ -27,6 +29,11 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
+
+    await requireAdminPasswordRecheck({
+      adminId: auth.user.userId,
+      adminPassword: body.adminPassword,
+    });
 
     const prisma = getPrismaClient();
     const user = await prisma.user.findUnique({

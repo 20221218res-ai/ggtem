@@ -61,6 +61,27 @@ export function normalizeWithdrawalChain(chain: string | null | undefined): With
   throw new Error("출금 네트워크는 TRC20 또는 BEP20만 선택할 수 있습니다.");
 }
 
+export function validateWithdrawalDestination(
+  chain: WithdrawalChainInput,
+  destination: string | null | undefined,
+) {
+  const address = destination?.trim() ?? "";
+
+  if (!address) {
+    return "받을 지갑 주소를 입력해 주세요.";
+  }
+
+  if (chain === "TRC20" && !/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address)) {
+    return "TRC20 주소는 T로 시작하는 34자리 주소여야 합니다.";
+  }
+
+  if (chain === "BEP20" && !/^0x[a-fA-F0-9]{40}$/.test(address)) {
+    return "BEP20 주소는 0x로 시작하는 42자리 주소여야 합니다.";
+  }
+
+  return null;
+}
+
 export function getWithdrawalFeePreview(amountText: string): WithdrawalFeePreview {
   const amount = parseFixedAmount(amountText);
   const fee = calculateWithdrawalFee(amount);

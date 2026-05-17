@@ -144,6 +144,7 @@ function getPaymentPinErrorKey(code: string) {
   if (code === "PAYMENT_PIN_REQUIRED") return "tradeSafety.paymentPinMissing";
   if (code === "PAYMENT_PIN_FORMAT_INVALID") return "tradeSafety.paymentPinInvalid";
   if (code === "PAYMENT_PIN_INVALID") return "tradeSafety.paymentPinStatusError";
+  if (code === "PAYMENT_PIN_LOCKED") return "tradeSafety.paymentPinStatusError";
 
   return "wallet.requestFailed";
 }

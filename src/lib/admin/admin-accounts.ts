@@ -15,6 +15,21 @@ const ADMIN_INVITE_TOKEN_HOURS = 24;
 const PASSWORD_KEY_LENGTH = 64;
 const scrypt = promisify(nodeScrypt);
 
+function assertStrongAdminPassword(password: string) {
+  if (password.length < 12) {
+    throw new Error("관리자 초기 비밀번호는 12자 이상이어야 합니다.");
+  }
+
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSymbol = /[^A-Za-z0-9]/.test(password);
+
+  if (!hasUpper || !hasLower || !hasNumber || !hasSymbol) {
+    throw new Error("관리자 초기 비밀번호는 영문 대문자, 소문자, 숫자, 특수문자를 모두 포함해야 합니다.");
+  }
+}
+
 export type AdminAccountsState = {
   summary: {
     totalAdmins: number;
@@ -531,12 +546,13 @@ export async function createAdminInvite(input: {
       where: {
         userId: user.id,
         usedAt: null,
+        revokedAt: null,
         expiresAt: {
           gt: new Date(),
         },
       },
       data: {
-        usedAt: new Date(),
+        revokedAt: new Date(),
       },
     });
 
@@ -660,10 +676,7 @@ export async function acceptAdminInviteWithToken(input: {
   password: string;
 }) {
   const prisma = getPrismaClient();
-
-  if (input.password.length < 8) {
-    throw new Error("비밀번호는 8자 이상이어야 합니다.");
-  }
+  assertStrongAdminPassword(input.password);
 
   const tokenHash = hashToken(input.token);
   const inviteToken = await prisma.adminInviteToken.findUnique({

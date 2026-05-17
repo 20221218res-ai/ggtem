@@ -41,6 +41,7 @@ export default function FinanceActions({
   const [evidenceTxId, setEvidenceTxId] = useState("");
   const [evidenceMemo, setEvidenceMemo] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
 
   const effectiveCompletionPhrase =
     completionPhrase ?? (primaryAction === "COMPLETE_WITHDRAWAL" ? "출금완료" : undefined);
@@ -49,10 +50,12 @@ export default function FinanceActions({
   const hasWithdrawalEvidence = !needsWithdrawalEvidence || Boolean(evidenceTxId.trim());
   const needsRejectionReason = secondaryAction === "REJECT_DEPOSIT" || secondaryAction === "REJECT_WITHDRAWAL";
   const hasRejectionReason = !needsRejectionReason || rejectionReason.trim().length >= 5;
+  const hasAdminPassword = adminPassword.trim().length > 0;
   const canSubmitPrimary =
+    hasAdminPassword &&
     hasWithdrawalEvidence &&
     (!needsCompletionPhrase || confirmationText.trim() === effectiveCompletionPhrase);
-  const canSubmitSecondary = hasRejectionReason;
+  const canSubmitSecondary = hasAdminPassword && hasRejectionReason;
 
   async function submit(action: FinanceAction) {
     const confirmed = window.confirm(
@@ -90,6 +93,7 @@ export default function FinanceActions({
           kind,
           requestId,
           action,
+          adminPassword,
           adminEvidence:
             action === "COMPLETE_WITHDRAWAL" ||
             action === "REJECT_WITHDRAWAL" ||
@@ -115,6 +119,7 @@ export default function FinanceActions({
       setEvidenceTxId("");
       setEvidenceMemo("");
       setRejectionReason("");
+      setAdminPassword("");
       router.refresh();
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "요청을 처리하지 못했습니다.");
@@ -194,6 +199,24 @@ export default function FinanceActions({
           {primaryAction === "COMPLETE_WITHDRAWAL"
             ? "출금 완료는 송금 TXID와 확인 문구를 모두 입력해야 가능합니다."
             : "최종 확인 조건을 입력해야 처리할 수 있습니다."}
+        </p>
+      ) : null}
+
+      <label className="grid gap-2 rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-900">
+        <span className="font-black">관리자 비밀번호 재확인</span>
+        <input
+          type="password"
+          value={adminPassword}
+          onChange={(event) => setAdminPassword(event.target.value)}
+          className="rounded-md border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none placeholder:text-slate-400 focus:border-sky-400"
+          placeholder="현재 로그인한 관리자 비밀번호"
+          autoComplete="current-password"
+        />
+      </label>
+
+      {!hasAdminPassword ? (
+        <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-800">
+          관리자 비밀번호를 다시 입력해야 처리할 수 있습니다.
         </p>
       ) : null}
 

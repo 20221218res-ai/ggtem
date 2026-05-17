@@ -80,8 +80,18 @@ function getBuyerActionMessageKey(action: BuyerOrderActionBody["action"]) {
 }
 
 function getPaymentPinErrorKey(code: string) {
-  if (code === "PAYMENT_PIN_NOT_SET") return "tradeSafety.paymentPinMissing";
-  if (code === "PAYMENT_PIN_INVALID_FORMAT") return "tradeSafety.paymentPinInvalid";
-  if (code === "PAYMENT_PIN_MISMATCH") return "tradeSafety.paymentPinStatusError";
+  if (code === "PAYMENT_PIN_REQUIRED" || code === "PAYMENT_PIN_NOT_SET") {
+    return "tradeSafety.paymentPinMissing";
+  }
+  if (code === "PAYMENT_PIN_FORMAT_INVALID" || code === "PAYMENT_PIN_INVALID_FORMAT") {
+    return "tradeSafety.paymentPinInvalid";
+  }
+  if (
+    code === "PAYMENT_PIN_INVALID" ||
+    code === "PAYMENT_PIN_MISMATCH" ||
+    code === "PAYMENT_PIN_LOCKED"
+  ) {
+    return "tradeSafety.paymentPinStatusError";
+  }
   return "tradeSafety.paymentPinStatusError";
 }

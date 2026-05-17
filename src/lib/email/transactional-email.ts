@@ -60,6 +60,33 @@ export async function sendPasswordResetEmail(input: {
   });
 }
 
+export async function sendAdminMfaCodeEmail(input: {
+  to: string;
+  displayName: string;
+  code: string;
+  expiresInMinutes: number;
+}) {
+  return sendTransactionalEmail({
+    to: input.to,
+    subject: "[GGtem] 관리자 로그인 인증번호",
+    text: [
+      `${input.displayName}님, 관리자 로그인을 계속하려면 아래 인증번호를 입력해 주세요.`,
+      "",
+      input.code,
+      "",
+      `이 인증번호는 ${input.expiresInMinutes}분 동안만 유효합니다.`,
+      "본인이 요청하지 않았다면 즉시 비밀번호를 변경하고 최고관리자에게 알려 주세요.",
+    ].join("\n"),
+    html: renderEmail({
+      title: "관리자 로그인 인증번호",
+      greeting: `${input.displayName}님,`,
+      body: `관리자 로그인을 계속하려면 인증번호 ${input.code} 를 입력해 주세요. 이 인증번호는 ${input.expiresInMinutes}분 동안만 유효합니다.`,
+      ctaLabel: "GGtem 관리자 로그인",
+      ctaUrl: buildPublicUrl("/admin/sign-in"),
+    }),
+  });
+}
+
 export function buildPublicUrl(path: string) {
   const baseUrl = process.env.GGITEM_BASE_URL?.trim() || "http://localhost:3000";
   const normalizedBaseUrl = baseUrl.replace(/\/+$/, "");

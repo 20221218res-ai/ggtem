@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/guards";
+import { requireAdminPasswordRecheck } from "@/lib/auth/admin-step-up";
 import {
   createAdminInvite,
   createPreparedAdminAccount,
@@ -23,6 +24,7 @@ export async function POST(request: NextRequest) {
       targetUserId?: string;
       inviteId?: string;
       reason?: string;
+      adminPassword?: string;
     };
 
     if (body.intent === "create") {
@@ -32,6 +34,11 @@ export async function POST(request: NextRequest) {
           { status: 400 },
         );
       }
+
+      await requireAdminPasswordRecheck({
+        adminId: auth.user.userId,
+        adminPassword: body.adminPassword,
+      });
 
       const result = await createPreparedAdminAccount({
         actorId: auth.user.userId,
@@ -52,6 +59,11 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      await requireAdminPasswordRecheck({
+        adminId: auth.user.userId,
+        adminPassword: body.adminPassword,
+      });
+
       const result = await updateAdminAccountAccess({
         actorId: auth.user.userId,
         targetUserId: body.targetUserId,
@@ -71,6 +83,11 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      await requireAdminPasswordRecheck({
+        adminId: auth.user.userId,
+        adminPassword: body.adminPassword,
+      });
+
       const result = await createAdminInvite({
         actorId: auth.user.userId,
         targetUserId: body.targetUserId,
@@ -87,6 +104,11 @@ export async function POST(request: NextRequest) {
           { status: 400 },
         );
       }
+
+      await requireAdminPasswordRecheck({
+        adminId: auth.user.userId,
+        adminPassword: body.adminPassword,
+      });
 
       const result = await revokeAdminInvite({
         actorId: auth.user.userId,

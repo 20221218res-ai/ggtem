@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole, ROLE_GROUPS } from "@/lib/auth/guards";
+import { requireAdminPasswordRecheck } from "@/lib/auth/admin-step-up";
 import { getAdminUsersState, updateAdminUserAccess } from "@/lib/admin/users";
 
 export async function GET(request: NextRequest) {
@@ -44,6 +45,7 @@ export async function POST(request: NextRequest) {
       role?: string;
       status?: string;
       reason?: string;
+      adminPassword?: string;
     };
 
     if (!body.userId || !body.role || !body.status) {
@@ -56,6 +58,11 @@ export async function POST(request: NextRequest) {
         },
       );
     }
+
+    await requireAdminPasswordRecheck({
+      adminId: auth.user.userId,
+      adminPassword: body.adminPassword,
+    });
 
     const result = await updateAdminUserAccess({
       actorId: auth.user.userId,

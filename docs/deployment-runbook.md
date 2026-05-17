@@ -29,7 +29,7 @@ npx prisma migrate deploy
 npx prisma generate
 ```
 
-Check that the latest migration `20260509120000_add_premium_promotions` is applied.
+Check that the latest migration `20260517161000_harden_admin_mfa_challenges` is applied.
 
 ## 2. Vercel Project Setup
 
@@ -63,6 +63,15 @@ ADMIN_HOSTS="topofword.com,www.topofword.com"
 ADMIN_BASE_URL="https://topofword.com"
 NEXT_PUBLIC_ADMIN_BASE_URL="https://topofword.com"
 GGITEM_BASE_URL="https://ggtem.com"
+RESEND_API_KEY="Resend API key"
+GGITEM_EMAIL_FROM="GGtem <no-reply@ggtem.com>"
+GGITEM_EMAIL_REQUIRED="true"
+GGITEM_EXPOSE_AUTH_DEBUG_LINKS="false"
+GGITEM_ENABLE_DEMO_ACCOUNTS="false"
+GGITEM_ENABLE_DEMO_TOOLS="false"
+GGITEM_ACCOUNT_CREDENTIAL_SECRET="long random server-only secret"
+TELEGRAM_BOT_TOKEN="Telegram bot token"
+TELEGRAM_ADMIN_CHAT_ID="Telegram admin chat id"
 ```
 
 Important checks:
@@ -71,6 +80,10 @@ Important checks:
 - `GGITEM_SECURE_SESSION_COOKIE` must be `true` for HTTPS production.
 - `ADMIN_BASE_URL` must be `https://topofword.com`.
 - `GGITEM_BASE_URL` must be `https://ggtem.com`.
+- `GGITEM_EMAIL_REQUIRED` must be `true`.
+- `GGITEM_EXPOSE_AUTH_DEBUG_LINKS` must be `false`.
+- Demo account variables must stay `false`.
+- `GGITEM_ACCOUNT_CREDENTIAL_SECRET` must be set before account trading is enabled.
 
 ## 4. Vercel Domain Setup
 
@@ -153,13 +166,23 @@ Before announcing the service:
 - Production Vercel is not using local `DATABASE_URL`.
 - Supabase migrations are fully applied.
 - `GGITEM_SECURE_SESSION_COOKIE=true`.
+- `GGITEM_EMAIL_REQUIRED=true`.
+- `GGITEM_EXPOSE_AUTH_DEBUG_LINKS=false`.
+- `GGITEM_ENABLE_DEMO_ACCOUNTS=false`.
+- `GGITEM_ENABLE_DEMO_TOOLS=false`.
 - `ADMIN_HOSTS` includes `topofword.com`.
+- `GGITEM_ACCOUNT_CREDENTIAL_SECRET` is set and server-only.
 - `/admin/deposit-addresses` is accessible only to `SUPER`.
 - Deposit approval rejects missing TXID.
 - Deposit approval rejects duplicate TXID.
 - Withdrawal completion requires payout TXID.
 - Premium revenue appears in platform revenue ledger.
 - Game image upload works in `/admin/game-settings`.
+- Supabase Security Advisor has no unresolved launch-blocking warnings.
+- Vercel team/account 2FA is enabled.
+- Marketplace fee policy shown to users matches deployed code.
+- 5% marketplace fee is treated as planned until code, UI copy, admin reports, exports, and smoke tests are updated together.
+- PWA install/offline behavior is not considered complete until manifest, icons, service worker cache rules, and mobile install checks are verified.
 
 ## 9. Rollback Plan
 
