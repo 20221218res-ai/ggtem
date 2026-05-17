@@ -93,7 +93,7 @@ export async function getAdminMarketListingsState(filters?: AdminMarketListingsF
       imageCount: item._count.images,
       isPremium: item.premiumEndsAt ? item.premiumEndsAt > new Date() : false,
       createdAt: formatDateTime(item.createdAt),
-      href: `/listings/${item.id}`,
+      href: `/admin/market-listings?mode=SELL&query=${item.id}`,
       auditHref: `/admin/audit?targetType=LISTING&query=${item.id}`,
     })),
     buyRequests: buyRequests.map((item) => ({
@@ -111,7 +111,7 @@ export async function getAdminMarketListingsState(filters?: AdminMarketListingsF
       imageCount: item._count.images,
       isPremium: item.premiumEndsAt ? item.premiumEndsAt > new Date() : false,
       createdAt: formatDateTime(item.createdAt),
-      href: `/buy-requests/${item.id}`,
+      href: `/admin/market-listings?mode=BUY&query=${item.id}`,
       auditHref: `/admin/audit?targetType=BUY_REQUEST&query=${item.id}`,
       actionLocked: item.status === "ACTIVE" && Number(item.lockAmount) > 0,
     })),

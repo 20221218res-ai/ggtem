@@ -282,7 +282,7 @@ function mapListingPremiumItem(
     remainingLabel: formatRemaining(listing.premiumEndsAt, now),
     durationHours: listing.premiumDurationHours ?? 0,
     feeAmount: formatDecimal(String(listing.premiumFeeAmount ?? "0")),
-    href: `/listings/${listing.id}`,
+    href: `/admin/market-listings?mode=SELL&query=${listing.id}`,
   };
 }
 
@@ -341,7 +341,7 @@ function mapBuyRequestPremiumItem(
     remainingLabel: formatRemaining(request.premiumEndsAt, now),
     durationHours: request.premiumDurationHours ?? 0,
     feeAmount: formatDecimal(String(request.premiumFeeAmount ?? "0")),
-    href: `/buy-requests/${request.id}`,
+    href: `/admin/market-listings?mode=BUY&query=${request.id}`,
   };
 }
 
