@@ -19,6 +19,7 @@ export default function ConditionalAuthStatus({
     pathname.startsWith("/listings") ||
     pathname.startsWith("/sellers") ||
     pathname.startsWith("/support") ||
+    pathname.startsWith("/download") ||
     pathname.startsWith("/password-reset") ||
     pathname.startsWith("/verify-email")
   ) {
