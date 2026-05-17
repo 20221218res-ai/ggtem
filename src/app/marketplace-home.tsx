@@ -46,25 +46,25 @@ export function MarketplaceHome({
     <main className="min-h-screen bg-[var(--gg-page-bg)] text-[var(--gg-text)] transition-colors">
       <MarketplaceHeader />
 
-      <section className="mx-auto grid max-w-[1360px] gap-8 px-5 py-8 lg:px-8">
-        <section className="grid gap-6 xl:grid-cols-[1fr_360px]">
+      <section className="mx-auto grid max-w-[1360px] gap-5 px-4 py-4 sm:gap-6 sm:px-5 sm:py-6 lg:px-8 lg:py-8">
+        <section className="grid gap-4 xl:grid-cols-[1fr_360px] xl:gap-6">
           <HeroSearch games={filterOptions.gameOptions ?? []} />
           <LiveTradeBoard listings={liveListings} />
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3">
+        <section className="grid gap-3 sm:grid-cols-3 sm:gap-4">
           {categoryLinks.map((category) => (
             <Link
               key={category.href}
               href={category.href}
               prefetch={false}
-              className="group rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)] transition hover:-translate-y-0.5 hover:border-[var(--gg-accent)]"
+              className="group rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 shadow-sm shadow-[var(--gg-shadow)] transition hover:-translate-y-0.5 hover:border-[var(--gg-accent)] sm:rounded-2xl sm:p-5"
             >
               <p className="text-xs font-bold text-[var(--gg-accent)]">
                 <CountryText id="home.quickLink" />
               </p>
-              <div className="mt-3 flex items-center justify-between gap-4">
-                <h2 className="text-2xl font-black">
+              <div className="mt-2 flex items-center justify-between gap-3 sm:mt-3 sm:gap-4">
+                <h2 className="text-xl font-black sm:text-2xl">
                   <CountryText id={category.labelKey} />
                 </h2>
                 <span className="rounded-full bg-[var(--gg-card-soft-bg)] px-3 py-1 text-xs font-black text-[var(--gg-muted)] group-hover:bg-[var(--gg-accent)] group-hover:text-[var(--gg-inverse-text)]">
@@ -75,12 +75,12 @@ export function MarketplaceHome({
           ))}
         </section>
 
-        <section className="grid gap-6 xl:grid-cols-[300px_1fr]">
+        <section className="grid gap-4 xl:grid-cols-[300px_1fr] xl:gap-6">
           <GameIndex games={games} />
           <FeaturedListings listings={featuredListings} />
         </section>
 
-        <section className="grid gap-3 md:grid-cols-4">
+        <section className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
           <HomeAction href="/listings?mode=sell" titleKey="home.viewSellListings" labelKey="common.sellModeShort" />
           <HomeAction href="/listings?mode=buy" titleKey="home.viewBuyRequests" labelKey="common.buyModeShort" />
           <HomeAction href="/my/listings/new" titleKey="home.startSelling" labelKey="home.createListing" />
@@ -97,23 +97,23 @@ export async function MarketplaceHeader() {
 
 function HeroSearch({ games }: { games: GameCatalogOption[] }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] shadow-xl shadow-[var(--gg-shadow)]">
-      <div className="p-6 lg:p-8">
+    <section className="overflow-hidden rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] shadow-md shadow-[var(--gg-shadow)] sm:rounded-2xl sm:shadow-xl">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="flex flex-wrap gap-2">
           <span className="rounded-full bg-[var(--gg-accent)] px-3 py-1 text-xs font-black text-[var(--gg-inverse-text)]">
             <CountryText id="home.globalMarketLabel" />
           </span>
-          <span className="rounded-full border border-[var(--gg-border)] px-3 py-1 text-xs font-bold text-[var(--gg-muted)]">
+          <span className="hidden rounded-full border border-[var(--gg-border)] px-3 py-1 text-xs font-bold text-[var(--gg-muted)] sm:inline-flex">
             <CountryText id="home.safeTradeBadge" />
           </span>
         </div>
 
-        <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight lg:text-6xl">
+        <h1 className="mt-4 max-w-3xl text-2xl font-black leading-tight sm:mt-6 sm:text-4xl lg:text-6xl">
           <CountryText id="home.heroTitleA" />
           <br />
-          <BrandLogo size="lg" className="mt-3 align-middle" />
+          <BrandLogo size="lg" className="mt-2 align-middle sm:mt-3" />
         </h1>
-        <div className="mt-5 flex flex-wrap gap-2">
+        <div className="mt-4 flex gap-2 overflow-x-auto whitespace-nowrap sm:mt-5 sm:flex-wrap sm:overflow-visible sm:whitespace-normal [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <HeroChip labelKey="home.escrowChip" />
           <HeroChip labelKey="home.orderChatChip" />
           <HeroChip labelKey="home.usdtTopUpChip" />
@@ -122,12 +122,12 @@ function HeroSearch({ games }: { games: GameCatalogOption[] }) {
 
         <form
           action="/listings"
-          className="mt-8 grid gap-3 rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-3 md:grid-cols-[180px_1fr_150px_auto]"
+          className="mt-5 grid gap-2 rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] p-2 sm:mt-8 sm:gap-3 sm:rounded-2xl sm:p-3 md:grid-cols-[180px_1fr_150px_auto]"
         >
           <input type="hidden" name="mode" value="sell" />
           <select
             name="game"
-            className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-4 py-3 text-sm font-bold outline-none"
+            className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-2.5 text-sm font-bold outline-none sm:rounded-xl sm:px-4 sm:py-3"
             defaultValue=""
           >
             <option value="">
@@ -142,12 +142,12 @@ function HeroSearch({ games }: { games: GameCatalogOption[] }) {
           <LocalizedInput
             name="query"
             placeholderKey="home.searchPlaceholder"
-            className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-4 py-3 text-sm font-semibold outline-none placeholder:text-[var(--gg-subtle)]"
+            className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-2.5 text-sm font-semibold outline-none placeholder:text-[var(--gg-subtle)] sm:rounded-xl sm:px-4 sm:py-3"
           />
           <select
             name="category"
             defaultValue="GAME_MONEY"
-            className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-4 py-3 text-sm font-bold outline-none"
+            className="rounded-lg border border-[var(--gg-border)] bg-[var(--gg-control-bg)] px-3 py-2.5 text-sm font-bold outline-none sm:rounded-xl sm:px-4 sm:py-3"
           >
             <option value="GAME_MONEY">
               <CountryText id="common.gameMoney" />
@@ -161,13 +161,13 @@ function HeroSearch({ games }: { games: GameCatalogOption[] }) {
           </select>
           <button
             type="submit"
-            className="rounded-xl bg-[var(--gg-accent)] px-6 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
+            className="rounded-lg bg-[var(--gg-accent)] px-5 py-2.5 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] sm:rounded-xl sm:px-6 sm:py-3"
           >
             <CountryText id="home.search" />
           </button>
         </form>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-4 flex gap-2 overflow-x-auto whitespace-nowrap sm:mt-6 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:whitespace-normal [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <HomeButton href="/listings">
             <CountryText id="home.browseListings" />
           </HomeButton>
@@ -188,7 +188,7 @@ function HeroSearch({ games }: { games: GameCatalogOption[] }) {
 
 function HeroChip({ labelKey }: { labelKey: TranslationKey }) {
   return (
-    <span className="rounded-full border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] px-4 py-2 text-sm font-black text-[var(--gg-muted)]">
+    <span className="shrink-0 rounded-full border border-[var(--gg-border)] bg-[var(--gg-card-soft-bg)] px-3 py-1.5 text-xs font-black text-[var(--gg-muted)] sm:px-4 sm:py-2 sm:text-sm">
       <CountryText id={labelKey} />
     </span>
   );
@@ -199,7 +199,7 @@ function HomeButton({ href, children }: { href: string; children: React.ReactNod
     <Link
       href={href}
       prefetch={false}
-      className="rounded-xl bg-[var(--gg-accent)] px-5 py-3 text-sm font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)]"
+      className="shrink-0 rounded-lg bg-[var(--gg-accent)] px-4 py-2.5 text-xs font-black text-[var(--gg-inverse-text)] hover:bg-[var(--gg-accent-hover)] sm:rounded-xl sm:px-5 sm:py-3 sm:text-sm"
     >
       {children}
     </Link>
@@ -211,7 +211,7 @@ function OutlineButton({ href, children }: { href: string; children: React.React
     <Link
       href={href}
       prefetch={false}
-      className="rounded-xl border border-[var(--gg-border)] px-5 py-3 text-sm font-bold hover:bg-[var(--gg-control-bg)]"
+      className="shrink-0 rounded-lg border border-[var(--gg-border)] px-4 py-2.5 text-xs font-bold hover:bg-[var(--gg-control-bg)] sm:rounded-xl sm:px-5 sm:py-3 sm:text-sm"
     >
       {children}
     </Link>
@@ -231,12 +231,12 @@ function HomeAction({
     <Link
       href={href}
       prefetch={false}
-      className="rounded-2xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-5 shadow-sm shadow-[var(--gg-shadow)] transition hover:-translate-y-0.5 hover:border-[var(--gg-accent)]"
+      className="rounded-xl border border-[var(--gg-border)] bg-[var(--gg-card-bg)] p-4 shadow-sm shadow-[var(--gg-shadow)] transition hover:-translate-y-0.5 hover:border-[var(--gg-accent)] sm:rounded-2xl sm:p-5"
     >
-      <p className="text-sm font-black text-[var(--gg-muted)]">
+      <p className="text-xs font-black text-[var(--gg-muted)] sm:text-sm">
         <CountryText id={titleKey} />
       </p>
-      <p className="mt-2 text-2xl font-black text-[var(--gg-text)]">
+      <p className="mt-1 text-xl font-black text-[var(--gg-text)] sm:mt-2 sm:text-2xl">
         <CountryText id={labelKey} />
       </p>
     </Link>
