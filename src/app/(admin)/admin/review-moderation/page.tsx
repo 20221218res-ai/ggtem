@@ -19,45 +19,34 @@ export default async function ReviewModerationPage() {
   return (
     <main className="min-h-screen bg-slate-100 px-5 py-8 text-slate-950">
       <div className="mx-auto flex max-w-7xl flex-col gap-6">
-        <header className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black uppercase tracking-wide text-[var(--gg-accent)]">
-              REVIEW DESK
-            </p>
-            <h1 className="mt-1 text-2xl font-black">리뷰 모더레이션</h1>
+        <header className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-wide text-[var(--gg-accent)]">
+                REVIEW DESK
+              </p>
+              <h1 className="mt-1 text-2xl font-black">리뷰 모더레이션</h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">{nextAction.title}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <AdminLink href="/admin/risk">신고·리스크</AdminLink>
+              <AdminLink href="/admin/users">유저 관리</AdminLink>
+              <AdminLink href="/admin/audit?targetType=TRUST_REPORT">감사 로그</AdminLink>
+              <AdminLink href={nextAction.href}>바로 확인</AdminLink>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <AdminLink href="/admin/risk">신고·리스크</AdminLink>
-            <AdminLink href="/admin/users">유저 관리</AdminLink>
-            <AdminLink href="/admin/audit?targetType=TRUST_REPORT">감사 로그</AdminLink>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-4">
+            <MetricCard label="검토 대기" value={`${state.summary.queueCount}건`} tone="blue" />
+            <MetricCard label="신고 대기" value={`${state.summary.openReports}건`} tone="red" />
+            <MetricCard label="AI 자동 신고" value={`${state.summary.autoEscalatedReports}건`} tone="amber" />
+            <MetricCard label="평균 평점" value={state.summary.averageRating} tone="green" />
+            <MetricCard label="전체 리뷰" value={`${state.summary.totalReviews.toLocaleString()}건`} tone="slate" />
+            <MetricCard label="낮은 리뷰" value={`${state.summary.lowReviews}건`} tone="amber" />
+            <MetricCard label="숨김" value={`${state.summary.hiddenReviews}건`} tone="red" />
+            <MetricCard label="검토 중" value={`${state.summary.underReviewReviews}건`} tone="blue" />
           </div>
         </header>
-
-        <section className="grid gap-3 md:grid-cols-4">
-          <MetricCard label="검토 대기" value={`${state.summary.queueCount}건`} tone="blue" />
-          <MetricCard label="신고 대기" value={`${state.summary.openReports}건`} tone="red" />
-          <MetricCard label="AI 자동 신고" value={`${state.summary.autoEscalatedReports}건`} tone="amber" />
-          <MetricCard label="평균 평점" value={state.summary.averageRating} tone="green" />
-          <MetricCard label="전체 리뷰" value={`${state.summary.totalReviews.toLocaleString()}건`} tone="slate" />
-          <MetricCard label="낮은 리뷰" value={`${state.summary.lowReviews}건`} tone="amber" />
-          <MetricCard label="숨김" value={`${state.summary.hiddenReviews}건`} tone="red" />
-          <MetricCard label="검토 중" value={`${state.summary.underReviewReviews}건`} tone="blue" />
-        </section>
-
-        <section className={`rounded-lg border p-4 ${nextAction.className}`}>
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs font-black uppercase tracking-wide">{nextAction.label}</p>
-              <h2 className="mt-1 text-xl font-black">{nextAction.title}</h2>
-            </div>
-            <Link
-              href={nextAction.href}
-              className="rounded-md bg-white px-4 py-2 text-sm font-black text-slate-950 shadow-sm"
-            >
-              바로 확인
-            </Link>
-          </div>
-        </section>
 
         <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
           <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
@@ -85,43 +74,37 @@ export default async function ReviewModerationPage() {
           </section>
 
           <aside className="flex flex-col gap-5">
-            <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-              <p className="text-sm font-black uppercase tracking-wide text-[var(--gg-accent)]">
-                RATING
-              </p>
-              <h2 className="mt-1 text-xl font-black">리뷰 분포</h2>
-              <div className="mt-4 flex flex-col gap-3">
-                {state.ratingDistribution.map((item) => (
-                  <div key={item.rating} className="grid grid-cols-[44px_1fr_56px] items-center gap-3">
-                    <span className="text-sm font-black">{item.rating}점</span>
-                    <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-                      <div
-                        className="h-full rounded-full bg-[var(--gg-accent)]"
-                        style={{ width: `${item.width}%` }}
-                      />
-                    </div>
-                    <span className="text-right text-xs font-black text-slate-500">
-                      {item.percentLabel}
-                    </span>
+            <details className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+              <summary className="cursor-pointer text-lg font-black text-slate-950">분포 / 감지 유형</summary>
+              <div className="mt-4 space-y-5">
+                <section>
+                  <p className="text-sm font-black uppercase tracking-wide text-[var(--gg-accent)]">RATING</p>
+                  <div className="mt-4 flex flex-col gap-3">
+                    {state.ratingDistribution.map((item) => (
+                      <div key={item.rating} className="grid grid-cols-[44px_1fr_56px] items-center gap-3">
+                        <span className="text-sm font-black">{item.rating}점</span>
+                        <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                          <div className="h-full rounded-full bg-[var(--gg-accent)]" style={{ width: `${item.width}%` }} />
+                        </div>
+                        <span className="text-right text-xs font-black text-slate-500">{item.percentLabel}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </section>
+                </section>
 
-            <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-              <p className="text-sm font-black uppercase tracking-wide text-[var(--gg-accent)]">
-                DETECTION
-              </p>
-              <h2 className="mt-1 text-xl font-black">감지 유형</h2>
-              <div className="mt-4 flex flex-col gap-2">
-                {state.detectionTypes.map((item) => (
-                  <div key={item.label} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-3">
-                    <span className="text-sm font-black">{item.label}</span>
-                    <span className="text-sm font-black text-[var(--gg-accent)]">{item.count}건</span>
+                <section>
+                  <p className="text-sm font-black uppercase tracking-wide text-[var(--gg-accent)]">DETECTION</p>
+                  <div className="mt-4 flex flex-col gap-2">
+                    {state.detectionTypes.map((item) => (
+                      <div key={item.label} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-3">
+                        <span className="text-sm font-black">{item.label}</span>
+                        <span className="text-sm font-black text-[var(--gg-accent)]">{item.count}건</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </section>
               </div>
-            </section>
+            </details>
 
           </aside>
         </div>
@@ -132,7 +115,7 @@ export default async function ReviewModerationPage() {
 
 function QueueCard({ item }: { item: QueueItem }) {
   return (
-    <article className="p-5">
+    <article className="p-4">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -147,7 +130,7 @@ function QueueCard({ item }: { item: QueueItem }) {
           <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto]">
             <div>
               <p className="text-sm font-black text-slate-500">{item.usersLabel}</p>
-              <p className="mt-2 whitespace-pre-wrap rounded-lg bg-slate-50 p-4 text-base font-bold leading-7 text-slate-950">
+              <p className="mt-2 whitespace-pre-wrap rounded-lg bg-slate-50 p-3 text-base font-bold leading-7 text-slate-950">
                 {item.body}
               </p>
               {item.note ? (
@@ -193,7 +176,7 @@ function MetricCard({
   tone: "blue" | "green" | "amber" | "red" | "slate";
 }) {
   return (
-    <div className={`rounded-lg border bg-white p-5 shadow-sm ${metricToneClass(tone)}`}>
+    <div className={`rounded-lg border bg-white p-4 shadow-sm ${metricToneClass(tone)}`}>
       <p className="text-sm font-black text-slate-500">{label}</p>
       <p className="mt-2 text-2xl font-black">{value}</p>
     </div>
@@ -218,27 +201,21 @@ function Badge({ tone, children }: { tone: string; children: React.ReactNode }) 
 function getNextAction(state: ReviewModerationState) {
   if (state.summary.openReports > 0) {
     return {
-      label: "우선 처리",
       title: `신고 대기 ${state.summary.openReports}건`,
       href: "/admin/review-moderation",
-      className: "border-red-200 bg-red-50 text-red-800",
     };
   }
 
   if (state.summary.autoEscalatedReports > 0) {
     return {
-      label: "AI 감지",
-      title: `AI 자동 신고 ${state.summary.autoEscalatedReports}건이 있습니다.`,
+      title: `AI 자동 신고 ${state.summary.autoEscalatedReports}건`,
       href: "/admin/review-moderation",
-      className: "border-amber-200 bg-amber-50 text-amber-800",
     };
   }
 
   return {
-    label: "안정",
-    title: "긴급 처리 항목이 없습니다.",
+    title: "처리 항목 없음",
     href: "/admin/audit?targetType=REVIEW",
-    className: "border-emerald-200 bg-emerald-50 text-emerald-800",
   };
 }
 

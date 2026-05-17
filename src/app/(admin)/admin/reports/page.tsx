@@ -92,42 +92,37 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
   return (
     <main className="bg-slate-100 px-6 py-8 text-slate-950">
       <section className="mx-auto flex max-w-[1500px] flex-col gap-6">
-        <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black text-[var(--gg-accent)]">REPORT CENTER</p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight">운영 데이터 조회</h1>
-            <p className="sr-only">
-              거래, 입출금, 분쟁, 유저, 관리자 이력을 한 곳에서 조회하고 다운로드합니다.
-            </p>
+        <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-black text-[var(--gg-accent)]">REPORT CENTER</p>
+              <h1 className="mt-2 text-3xl font-black tracking-tight">운영 데이터 조회</h1>
+              <p className="mt-2 text-sm font-bold text-slate-500">{nextAction.title}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <TopLink href="/admin/game-settings" label="게임/서버 관리" />
+              <TopLink href="/admin/audit" label="감사 로그" />
+              <TopLink href={nextAction.href} label={nextAction.actionLabel} />
+              <ExportButton href={xlsxExportHref} disabled={!canDownloadCurrentView} label="XLSX" primary />
+              <ExportButton href={csvExportHref} disabled={!canDownloadCurrentView} label="CSV" />
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <TopLink href="/admin/game-settings" label="게임/서버 관리" />
-            <TopLink href="/admin/audit" label="감사 로그" />
-            <ExportButton href={xlsxExportHref} disabled={!canDownloadCurrentView} label="XLSX 다운로드" primary />
-            <ExportButton href={csvExportHref} disabled={!canDownloadCurrentView} label="CSV 다운로드" />
-          </div>
-        </header>
 
-        <section className="rounded-xl border border-sky-200 bg-sky-50 p-5">
-          <p className="text-sm font-black text-sky-800">NEXT ACTION</p>
-          <h2 className="mt-2 text-2xl font-black">{nextAction.title}</h2>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Link
-              href={nextAction.href}
-              className="inline-flex rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-slate-950 hover:brightness-105"
-            >
-              {nextAction.actionLabel}
-            </Link>
-            <SecurityRule label="직접 선택 최대" value="30일" />
-            <SecurityRule label="유저 데이터" value="SUPER 전용" />
-            <SecurityRule label="다운로드" value="감사 로그 기록" />
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-7">
+            <Metric label="거래 건수" value={`${state.summary.orderCount.toLocaleString("ko-KR")}건`} />
+            <Metric label="총 거래액" value={`${state.summary.grossAmount} USDT`} />
+            <Metric label="플랫폼 수익" value={`${state.summary.platformFeeAmount} USDT`} />
+            <Metric label="분쟁/신고" value={`${state.summary.disputeCount.toLocaleString("ko-KR")}건`} />
+            <Metric label="입출금 요청" value={`${state.summary.walletRequestCount.toLocaleString("ko-KR")}건`} />
+            <Metric label="신규 유저" value={`${state.summary.userCount.toLocaleString("ko-KR")}명`} />
+            <Metric label="관리자 업무" value={`${state.summary.adminActivityCount.toLocaleString("ko-KR")}건`} />
           </div>
           {!canDownloadCurrentView ? (
             <p className="sr-only">
               현재 범위에는 유저 데이터가 포함되어 SUPER 관리자만 다운로드할 수 있습니다.
             </p>
           ) : null}
-        </section>
+        </header>
 
         <form className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="grid gap-3 lg:grid-cols-4 xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.5fr]">
@@ -209,19 +204,9 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
           </div>
         </form>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-7">
-          <Metric label="거래 건수" value={`${state.summary.orderCount.toLocaleString("ko-KR")}건`} />
-          <Metric label="총 거래액" value={`${state.summary.grossAmount} USDT`} />
-          <Metric label="플랫폼 수익" value={`${state.summary.platformFeeAmount} USDT`} />
-          <Metric label="분쟁/신고" value={`${state.summary.disputeCount.toLocaleString("ko-KR")}건`} />
-          <Metric label="입출금 요청" value={`${state.summary.walletRequestCount.toLocaleString("ko-KR")}건`} />
-          <Metric label="신규 유저" value={`${state.summary.userCount.toLocaleString("ko-KR")}명`} />
-          <Metric label="관리자 업무" value={`${state.summary.adminActivityCount.toLocaleString("ko-KR")}건`} />
-        </section>
-
-        <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <h2 className="text-xl font-black">파일 출력 구성</h2>
+        <details className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <summary className="cursor-pointer text-xl font-black">파일 출력 구성</summary>
+          <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-wrap gap-2">
               {cleanSheetNames(state.exportPlan.sheets).map((sheet) => (
                 <span key={sheet} className="rounded bg-slate-100 px-3 py-2 text-xs font-black text-slate-600">
@@ -239,7 +224,7 @@ export default async function AdminReportsPage({ searchParams }: AdminReportsPag
             <ExportScopeCard label="유저" value={`${state.users.length}개`} />
             <ExportScopeCard label="관리자 이력" value={`${state.adminActivity.length}개`} />
           </div>
-        </section>
+        </details>
 
         <ReportSection title="일자별 요약" show>
           <DataTable
@@ -409,39 +394,6 @@ function ExportButton({ href, label, disabled, primary = false }: { href: string
       {label}
     </Link>
   );
-}
-
-function SecurityRule({ label, value }: { label: string; value: string }) {
-  return (
-    <span className="sr-only">
-      {label}: {value}
-    </span>
-  );
-}
-
-function ReportWorkflow({ canDownloadCurrentView }: { canDownloadCurrentView: boolean }) {
-  const steps = [
-    {
-      title: "범위 확인",
-      body: "기간, 상태, 게임/서버 필터를 먼저 조합해서 필요한 운영 데이터를 조회합니다.",
-      href: "/admin/reports",
-    },
-    {
-      title: "민감 데이터",
-      body: canDownloadCurrentView
-        ? "현재 권한으로 이 범위의 다운로드가 가능합니다."
-        : "유저 데이터가 포함된 다운로드는 SUPER 권한이 필요합니다.",
-      href: "/admin/audit?action=REPORT_EXPORT_XLSX",
-    },
-    {
-      title: "감사 추적",
-      body: "다운로드 전후에는 감사 로그에서 관리자, 사유, 파일 형식을 확인합니다.",
-      href: "/admin/audit?action=REPORT_EXPORT_XLSX",
-    },
-  ];
-
-  void steps;
-  return null;
 }
 
 function ExportScopeCard({ label, value }: { label: string; value: string }) {
