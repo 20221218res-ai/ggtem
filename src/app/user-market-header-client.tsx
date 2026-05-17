@@ -171,6 +171,13 @@ export default function UserMarketHeaderClient({
         >
           {t("common.customerCenter")}
         </Link>
+        <Link
+          href="/download"
+          prefetch={false}
+          className="shrink-0 rounded-full px-3 py-2 text-sm font-black text-[var(--gg-accent)] hover:bg-[var(--gg-control-bg)]"
+        >
+          {t("pwaInstall.installButton")}
+        </Link>
         <div className="flex shrink-0 items-center gap-2 sm:ml-auto">
           {currentUser ? (
             <>
